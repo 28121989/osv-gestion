@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OSV Gestion — MVP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2F4F1;--panel:#FFFFFF;--ink:#14231F;--muted:#55665F;--line:#D7DED9;--soft:#E8EEEA;--side:#0F3A33;--side-ink:#E3EEEA;--side-muted:#9DBDB3;--accent:#E9771F;--accent-ink:#1A0E03;--ok:#2E7D4F;--warn:#9A6412;--bad:#B3261E;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D1412;--panel:#15201C;--ink:#E2EBE7;--muted:#98AAA3;--line:#2A3834;--soft:#1C2925;--side:#09241F;--ok:#5DBB86;--warn:#E0A84A;--bad:#F08A80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0D1412;--panel:#15201C;--ink:#E2EBE7;--muted:#98AAA3;--line:#2A3834;--soft:#1C2925;--side:#09241F;--ok:#5DBB86;--warn:#E0A84A;--bad:#F08A80;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5}
+h1,h2,h3{font-stretch:82%;font-weight:700;line-height:1.15;margin:0}
+h1{font-size:1.9rem}h2{font-size:1.3rem}h3{font-size:1.05rem}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{border:0;border-radius:6px;padding:.55rem 1rem;background:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:.3rem .65rem;font-size:.85rem}
+.btn.danger{background:transparent;color:var(--bad);border:1px solid var(--bad)}
+input,select,textarea{width:100%;padding:.5rem .6rem;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:.25rem}
+.field{margin-bottom:.8rem}
+.grid{display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+/* login */
+.login{min-height:100%;display:grid;place-items:center;padding:1.5rem}
+.login-box{width:100%;max-width:420px}
+.brand{display:flex;align-items:center;gap:.6rem;margin-bottom:1.6rem}
+.brand-mark{width:14px;height:44px;background:var(--accent)}
+.brand small{display:block;color:var(--muted);font-size:.85rem}
+.login-box .card{padding:1.5rem}
+.err{color:var(--bad);font-size:.88rem;margin-top:.4rem}
+details{margin-top:1rem;font-size:.88rem;color:var(--muted)}
+details table{margin-top:.5rem}
+/* shell */
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100%}
+.side{background:var(--side);color:var(--side-ink);padding:1.4rem 1rem;display:flex;flex-direction:column;gap:1.2rem;position:sticky;top:0;height:100vh;height:100dvh}
+.who{border-left:6px solid var(--accent);padding-left:.75rem}
+.who strong{display:block;font-stretch:85%;font-size:1.1rem}
+.who span{color:var(--side-muted);font-size:.85rem}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{background:transparent;border:0;color:var(--side-ink);text-align:left;padding:.55rem .7rem;border-radius:6px}
+.nav button[aria-current="page"]{background:rgba(255,255,255,.1);box-shadow:inset 3px 0 0 var(--accent)}
+.side .foot{margin-top:auto;font-size:.8rem;color:var(--side-muted)}
+.side .foot button{color:var(--side-ink);border-color:rgba(255,255,255,.25)}
+main{padding:1.8rem clamp(1rem,3vw,2.5rem);min-width:0}
+.head{margin-bottom:1.4rem}
+.head p{color:var(--muted);margin:.35rem 0 0;max-width:70ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:1.1rem 1.2rem;margin-bottom:1rem}
+.kpis{display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:1rem}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:1rem}
+.kpi b{display:block;font-size:2rem;font-stretch:78%;line-height:1}
+.kpi span{color:var(--muted);font-size:.85rem}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th{text-align:left;color:var(--muted);font-weight:500;padding:.45rem .5rem;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:.55rem .5rem;border-bottom:1px solid var(--line);vertical-align:top}
+.tag{display:inline-block;font-size:.78rem;padding:.1rem .5rem;border-radius:999px;background:var(--soft);white-space:nowrap}
+.tag.ok{color:var(--ok)}.tag.warn{color:var(--warn)}.tag.bad{color:var(--bad)}
+.bar{height:10px;background:var(--soft);border-radius:5px;overflow:hidden;margin:.3rem 0}
+.bar i{display:block;height:100%;background:var(--ok)}
+.ind{display:grid;grid-template-columns:1fr auto;gap:.2rem 1rem;padding:.6rem 0;border-top:1px solid var(--line)}
+.ind:first-of-type{border-top:0}
+.ind .num{font-stretch:80%;font-weight:600;text-align:right}
+.muted{color:var(--muted)}
+.row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.note{font-size:.85rem;color:var(--muted);border-left:3px solid var(--warn);padding-left:.6rem;margin:.6rem 0}
+.empty{color:var(--muted);padding:.6rem 0}
+.demo{font-size:.75rem;color:var(--warn)}
+.bar{position:relative}.bar.lg{height:14px;border-radius:7px}
+.bar i.warn{background:var(--warn)}.bar i.bad{background:var(--bad)}
+.bar .mk{position:absolute;top:0;bottom:0;width:2px;background:var(--ink);opacity:.7}
+.strat-head{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.8rem}
+.score b{display:block;font-size:2.6rem;font-stretch:75%;line-height:1;text-align:right}
+.axe{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:.1rem 1rem;padding:.7rem 0;border-top:1px solid var(--line);width:100%;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;cursor:pointer}
+.axe:hover{background:var(--soft)}
+.axe .num{text-align:right;font-weight:600;font-stretch:80%}
+.legend{font-size:.8rem;color:var(--muted);margin-top:.6rem}
+.inl{display:flex;gap:.3rem;min-width:150px}.inl input{width:80px;padding:.3rem .4rem}
+@media (max-width:820px){
+ .app{grid-template-columns:1fr}
+ .side{position:static;height:auto;padding:1rem}
+ .nav{flex-direction:row;overflow-x:auto}
+ .nav button{white-space:nowrap}
+ .side .foot{margin-top:0}
+}
+@media (prefers-reduced-motion:no-preference){.bar i{transition:width .4s ease}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const KEY='osv-mvp-v1';
+const ROLES={
+ DE:{label:'Directeur exécutif',nav:['dash','plan','projets','validation','personnel','admin','demandes','audit']},
+ CA:{label:"Conseil d'administration",nav:['dash','plan','projets']},
+ RA:{label:'Responsable administratif',nav:['dash','plan','admin','demandes']},
+ RH:{label:'Responsable RH',nav:['dash','plan','personnel','demandes']},
+ DP:{label:'Directeur des programmes',nav:['dash','plan','projets','validation','demandes']},
+ CP:{label:'Chef de projet',nav:['dash','projets','validation','demandes']},
+ SE:{label:'Suivi-évaluation',nav:['dash','projets','validation','demandes']},
+ ASC:{label:'Agent de santé communautaire',nav:['collecte','demandes']}
+};
+const VIEWS={dash:'Tableau de bord',plan:'Plan stratégique',projets:'Projets et indicateurs',collecte:'Collecte terrain',validation:'Validation des données',personnel:'Personnel et accès',admin:'Administration',demandes:'Mes demandes',audit:"Journal d'audit"};
+const DOMAINES=['DSSR-VBG','Eau et assainissement','HSE','Sécurité routière','Sécurité au travail','Agriculture durable','Gestion des plaintes','Environnement et climat'];
+const STATUTS={soumise:['Soumise','warn'],verifiee:['Vérifiée S&E','warn'],validee:['Validée','ok'],rejetee:['Rejetée','bad']};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>new Date().toISOString().slice(0,10);
+const fmtD=d=>d?new Date(d).toLocaleDateString('fr-FR'):'—';
+
+function seed(){
+ const b=[{id:'b1',nom:'Siège',ville:'Yamoussoukro'},{id:'b2',nom:'Bureau technique',ville:'Kong'},{id:'b3',nom:'Bureau technique',ville:'Touba'}];
+ const st=[
+  ['DE','Compte démo DE','Direction exécutive','DE-1001','b1'],['CA','Compte démo CA',"Conseil d'administration",'CA-1002','b1'],
+  ['RA','Compte démo Administration','Administration','RA-1003','b1'],['RH','Compte démo RH','Ressources humaines','RH-1004','b1'],
+  ['DP','Compte démo Programmes','Programmes','DP-1005','b1'],['CP','Compte démo Chef de projet','Programmes','CP-1006','b2'],
+  ['SE','Compte démo S&E','Programmes','SE-1007','b2'],['ASC','Compte démo Agent terrain','Programmes','ASC-1008','b2']
+ ].map(([r,n,d,c,bu],i)=>({id:'u'+(i+1),nom:n,role:r,dept:d,statut:'Salarié',bureau:bu,code:c,actif:true,finAcces:''}));
+ const p=[{id:'p1',nom:'Projet démo DSSR-VBG',domaine:'DSSR-VBG',bureau:'b2',chefId:'u6',indicateurs:[
+   {id:'i1',libelle:'Personnes sensibilisées',cible:500,unite:'personnes',sensible:false},
+   {id:'i2',libelle:'Cas VBG référés vers une prise en charge',cible:40,unite:'cas',sensible:true}]},
+  {id:'p2',nom:'Projet démo Eau et assainissement',domaine:'Eau et assainissement',bureau:'b3',chefId:'u6',indicateurs:[
+   {id:'i3',libelle:"Points d'eau réhabilités",cible:10,unite:'points',sensible:false}]}];
+ const c=[{id:'c1',projetId:'p1',indicId:'i1',valeur:120,localite:'Kong (démo)',date:today(),note:'Causerie éducative (démo)',auteurId:'u8',statut:'validee'},
+  {id:'c2',projetId:'p1',indicId:'i1',valeur:45,localite:'Kong (démo)',date:today(),note:'',auteurId:'u8',statut:'soumise'},
+  {id:'c3',projetId:'p1',indicId:'i2',valeur:3,localite:'Kong (démo)',date:today(),note:'',auteurId:'u8',statut:'verifiee'}];
+ return {bureaux:b,staff:st,projets:p,collectes:c,demandes:[],audit:[{t:new Date().toISOString(),u:null,a:'Données de démonstration créées'}]};
+}
+function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const AXES=[
+ {k:'projets',nom:'Gestion des projets',resp:'DP'},
+ {k:'partenariats',nom:'Partenariats et mobilisation de ressources',resp:'DE'},
+ {k:'rh',nom:'Ressources humaines',resp:'RH'},
+ {k:'finances',nom:'Comptabilité et finances',resp:'RA'},
+ {k:'logistique',nom:'Logistique',resp:'RA'},
+ {k:'gouvernance',nom:'Gouvernance organisationnelle',resp:'DE'},
+ {k:'risques',nom:'Gestion des risques',resp:'DE'},
+ {k:'direction',nom:'Objectifs du directeur exécutif',resp:'DE'}];
+const AUTO={projets_realisation:'Réalisation moyenne des indicateurs projets',demandes_traitees:'Demandes administratives traitées',donnees_validees:'Données terrain validées'};
+function seedPlan(){
+ const o=(axe,libelle,inds)=>({id:uid(),axe,libelle,demo:true,indicateurs:inds.map(([l,u,b,c,a,auto])=>({id:uid(),libelle:l,unite:u,base:b,cible:c,actuel:a??null,auto:auto||null}))});
+ return {annee:new Date().getFullYear(),objectifs:[
+  o('projets','Atteindre les résultats contractuels des projets',[['Réalisation des indicateurs projets','%',0,100,null,'projets_realisation'],['Rapports aux bailleurs remis à temps','%',0,100,75]]),
+  o('partenariats','Diversifier les sources de financement',[['Nouvelles conventions signées','conventions',0,4,2],['Candidatures soumises','dossiers',0,12,7]]),
+  o('rh','Disposer d\'un personnel qualifié et stable',[['Postes clés pourvus','%',50,100,80],['Agents formés dans l\'année','agents',0,30,12]]),
+  o('finances','Garantir une gestion financière transparente',[['Dépenses avec pièces complètes','%',60,100,85],['Délai de clôture mensuelle','jours',20,10,14]]),
+  o('logistique','Rendre la logistique réactive',[['Demandes traitées','%',0,100,null,'demandes_traitees'],['Véhicules à entretien à jour','%',0,100,60]]),
+  o('gouvernance','Renforcer la gouvernance interne',[['Réunions du CA tenues','réunions',0,4,3],['Procédures internes adoptées','procédures',0,6,2]]),
+  o('risques','Maîtriser les risques majeurs',[['Risques majeurs avec plan d\'atténuation','%',0,100,40],['Incidents de sécurité sur le terrain','incidents',6,2,3]]),
+  o('direction','Piloter l\'exécution du plan',[['Revues trimestrielles réalisées','revues',0,4,3],['Données terrain validées','%',0,100,null,'donnees_validees']])]};
+}
+let S=load()||seed();
+if(!S.plan){S.plan=seedPlan();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function autoVal(k){
+ if(k==='projets_realisation'){const is=S.projets.flatMap(p=>p.indicateurs);return is.length?Math.round(is.reduce((s,i)=>s+pct(i),0)/is.length):null}
+ if(k==='demandes_traitees'){const d=S.demandes;return d.length?Math.round(d.filter(x=>x.statut!=='En attente').length/d.length*100):null}
+ if(k==='donnees_validees'){const c=S.collectes;return c.length?Math.round(c.filter(x=>x.statut==='validee').length/c.length*100):null}
+ return null;
+}
+const valInd=i=>i.auto?autoVal(i.auto):i.actuel;
+function perfInd(i){const v=valInd(i);if(v===null||v===undefined||v==='')return null;const b=Number(i.base),c=Number(i.cible),a=Number(v);
+ if(c===b)return a===c?100:0;return Math.max(0,Math.min(100,Math.round((a-b)/(c-b)*100)))}
+const moy=a=>{const v=a.filter(x=>x!==null);return v.length?Math.round(v.reduce((s,x)=>s+x,0)/v.length):null};
+const perfObj=o=>moy(o.indicateurs.map(perfInd));
+const objsAxe=k=>S.plan.objectifs.filter(o=>o.axe===k);
+const perfAxe=k=>moy(objsAxe(k).map(perfObj));
+const perfGlobal=()=>moy(AXES.map(a=>perfAxe(a.k)));
+function attendu(){const y=S.plan.annee,n=new Date();if(n.getFullYear()>y)return 100;if(n.getFullYear()<y)return 0;
+ const d0=new Date(y,0,1),d1=new Date(y+1,0,1);return Math.round((n-d0)/(d1-d0)*100)}
+function statut(p){if(p===null)return['Pas encore de données',''];const e=p-attendu();return e>=-10?['Dans les temps','ok']:e>=-25?['À surveiller','warn']:['En retard','bad']}
+const axesVisibles=()=>['DE','CA'].includes(me.role)?AXES:AXES.filter(a=>a.resp===me.role);
+const canEditAxe=a=>me.role==='DE'||a.resp===me.role;
+function stratBar(p){const[,cl]=statut(p);return `<div class="bar lg"><i class="${cl}" style="width:${p??0}%"></i><span class="mk" style="left:${attendu()}%" title="Attendu à date"></span></div>`}
+function stratSection(){
+ const axes=axesVisibles();if(!axes.length)return '';
+ const g=['DE','CA'].includes(me.role)?perfGlobal():moy(axes.map(a=>perfAxe(a.k)));const[s,cl]=statut(g);
+ return `<section class="card"><div class="strat-head"><div><h2>Plan stratégique ${S.plan.annee}</h2><p class="muted" style="margin:.3rem 0 0">Exécution à date, comparée au rythme attendu : ${attendu()} % de l'année écoulée.</p></div>
+ <div class="score"><b>${g??'—'}${g!==null?' %':''}</b><span class="tag ${cl}">${s}</span></div></div>
+ ${axes.map(a=>{const p=perfAxe(a.k),[s2,c2]=statut(p);return `<button class="axe" data-act="go" data-v="plan"><div><strong>${esc(a.nom)}</strong> <span class="muted">· ${esc(ROLES[a.resp].label)}</span>${stratBar(p)}</div><div class="num">${p??'—'}${p!==null?' %':''}<br><span class="tag ${c2}">${s2}</span></div></button>`}).join('')}
+ <p class="legend">Le trait vertical indique où chaque axe devrait se situer aujourd'hui. Cliquez sur un axe pour voir le détail des objectifs.</p></section>`;
+}
+let me=null,view='dash',loginErr='';
+const can=r=>me&&r.includes(me.role);
+const who=id=>(S.staff.find(s=>s.id===id)||{}).nom||'—';
+const bur=id=>{const b=S.bureaux.find(x=>x.id===id);return b?b.ville:'—'};
+function log(a){S.audit.unshift({t:new Date().toISOString(),u:me?me.id:null,a});S.audit=S.audit.slice(0,400);save()}
+function projetsVisibles(){
+ if(['DE','CA','DP','SE'].includes(me.role))return S.projets;
+ if(me.role==='CP')return S.projets.filter(p=>p.chefId===me.id);
+ if(me.role==='ASC')return S.projets.filter(p=>p.bureau===me.bureau);
+ return [];
+}
+const realise=i=>S.collectes.filter(c=>c.indicId===i.id&&c.statut==='validee').reduce((s,c)=>s+Number(c.valeur||0),0);
+const pct=i=>i.cible?Math.min(100,Math.round(realise(i)/i.cible*100)):0;
+function aTraiter(){
+ const ps=projetsVisibles().map(p=>p.id);
+ return S.collectes.filter(c=>ps.includes(c.projetId)&&(
+  (c.statut==='soumise'&&['SE','DP','DE'].includes(me.role))||
+  (c.statut==='verifiee'&&['CP','DP','DE'].includes(me.role))));
+}
+
+function render(){
+ const root=document.getElementById('root');
+ if(!me){root.innerHTML=loginHTML();document.getElementById('code')?.focus();return}
+ const nav=ROLES[me.role].nav;
+ if(!nav.includes(view))view=nav[0];
+ root.innerHTML=`<div class="app"><aside class="side">
+  <div class="who"><strong>${esc(me.nom)}</strong><span>${esc(ROLES[me.role].label)} · ${esc(bur(me.bureau))}</span></div>
+  <nav class="nav" aria-label="Navigation">${nav.map(v=>`<button data-act="go" data-v="${v}" ${v===view?'aria-current="page"':''}>${VIEWS[v]}</button>`).join('')}</nav>
+  <div class="foot"><p>Prototype MVP. Données de démonstration stockées dans ce navigateur uniquement.</p><button class="btn ghost sm" data-act="logout">Se déconnecter</button></div>
+ </aside><main id="main">${viewHTML()}</main></div>`;
+}
+function loginHTML(){
+ return `<div class="login"><div class="login-box">
+ <div class="brand"><div class="brand-mark"></div><div><h1>OSV Gestion</h1><small>ONG Sécurité Vie · espace de travail interne</small></div></div>
+ <form class="card" data-form="login">
+  <div class="field"><label for="code">Code d'accès</label><input id="code" name="code" autocomplete="off" required></div>
+  <button class="btn" type="submit">Se connecter</button>
+  ${loginErr?`<p class="err" role="alert">${esc(loginErr)}</p>`:''}
+  <details><summary>Codes de démonstration</summary><div class="tbl"><table>
+   ${S.staff.filter(s=>s.nom.startsWith('Compte démo')).map(s=>`<tr><td>${esc(ROLES[s.role].label)}</td><td><b>${esc(s.code)}</b></td></tr>`).join('')}
+  </table></div><p><button type="button" class="btn ghost sm" data-act="reset">Réinitialiser les données de démo</button></p></details>
+ </form></div></div>`;
+}
+function head(t,p){return `<div class="head"><h1>${t}</h1>${p?`<p>${p}</p>`:''}</div>`}
+function plan(){
+ const axes=axesVisibles(),de=me.role==='DE';
+ return head(`Plan stratégique ${S.plan.annee}`,de?'Fixez les objectifs et les cibles de chaque département. Chaque responsable met à jour ses valeurs ; certains indicateurs se calculent seuls à partir de l\'application.':me.role==='CA'?'Vue de gouvernance en lecture seule.':'Mettez à jour les valeurs actuelles des indicateurs de votre département.')+
+ (de?`<form class="card" data-form="objectif"><h3 style="margin-bottom:.8rem">Ajouter un objectif</h3><div class="grid">
+  <div><label>Axe</label><select name="axe">${AXES.map(a=>`<option value="${a.k}">${esc(a.nom)}</option>`).join('')}</select></div>
+  <div style="grid-column:span 2"><label>Objectif stratégique</label><input name="libelle" required></div></div>
+  <button class="btn" type="submit">Ajouter l'objectif</button></form>`:'')+
+ axes.map(a=>{const p=perfAxe(a.k),[s,cl]=statut(p),ed=canEditAxe(a);
+  return `<section class="card"><div class="strat-head"><div><h2>${esc(a.nom)}</h2><p class="muted" style="margin:.2rem 0 0">Responsable : ${esc(ROLES[a.resp].label)}</p></div><div class="score"><b>${p??'—'}${p!==null?' %':''}</b><span class="tag ${cl}">${s}</span></div></div>
+  ${objsAxe(a.k).length?objsAxe(a.k).map(o=>{const po=perfObj(o);return `<div style="margin-top:1rem"><h3>${esc(o.libelle)} ${o.demo?'<span class="tag warn">démo</span>':''}</h3>${stratBar(po)}
+   <div class="tbl"><table><thead><tr><th>Indicateur</th><th>Référence</th><th>Cible</th><th>Actuel</th><th>Performance</th></tr></thead><tbody>
+   ${o.indicateurs.map(i=>{const v=valInd(i),pi=perfInd(i);return `<tr><td>${esc(i.libelle)}${i.auto?' <span class="tag">calcul automatique</span>':''}</td><td>${esc(i.base)} ${esc(i.unite)}</td><td>${esc(i.cible)} ${esc(i.unite)}</td>
+    <td>${ed&&!i.auto?`<form class="inl" data-form="maj" data-o="${o.id}" data-i="${i.id}"><input name="v" type="number" step="any" value="${v??''}" aria-label="Valeur actuelle"><button class="btn sm" type="submit">Mettre à jour</button></form>`:`${v??'—'} ${v!==null&&v!==undefined?esc(i.unite):''}`}</td>
+    <td>${pi??'—'}${pi!==null?' %':''}</td></tr>`}).join('')}</tbody></table></div>
+   ${de?`<form data-form="pind" data-o="${o.id}" class="grid" style="margin-top:.6rem;align-items:end">
+    <div><label>Nouvel indicateur</label><input name="libelle" required></div><div><label>Unité</label><input name="unite" required></div>
+    <div><label>Référence (début d'année)</label><input name="base" type="number" step="any" required></div><div><label>Cible de fin d'année</label><input name="cible" type="number" step="any" required></div>
+    <div><button class="btn sm" type="submit">Ajouter l'indicateur</button></div></form>`:''}</div>`}).join(''):'<p class="empty">Aucun objectif pour cet axe. Le directeur exécutif peut en ajouter un.</p>'}
+  </section>`}).join('')+
+ (de?'<p class="note">Pour un objectif de réduction (délais, incidents, plaintes non traitées), saisissez une cible plus basse que la référence : la performance se calcule correctement dans les deux sens.</p>':'');
+}
+function viewHTML(){return ({dash,plan,projets,collecte,validation,personnel,admin,demandes,audit})[view]()}
+
+function dash(){
+ const ps=projetsVisibles(),inds=ps.flatMap(p=>p.indicateurs);
+ const k=[];
+ if(ps.length||['DE','CA','DP','CP','SE'].includes(me.role)){
+  k.push([ps.length,'projets suivis']);
+  k.push([inds.length?Math.round(inds.reduce((s,i)=>s+pct(i),0)/inds.length)+' %':'—','réalisation moyenne des indicateurs']);
+ }
+ if(['SE','CP','DP','DE'].includes(me.role))k.push([aTraiter().length,'données en attente de votre validation']);
+ if(['RH','DE'].includes(me.role)){const lim=new Date(Date.now()+30*864e5).toISOString().slice(0,10);
+  k.push([S.staff.filter(s=>s.actif).length,'comptes actifs']);
+  k.push([S.staff.filter(s=>s.actif&&s.finAcces&&s.finAcces<=lim).length,'accès expirant sous 30 jours'])}
+ if(['RA','DE'].includes(me.role))k.push([S.demandes.filter(d=>d.statut==='En attente').length,'demandes à traiter']);
+ return head('Tableau de bord',me.role==='CA'?'Vue de gouvernance en lecture seule.':'Données consolidées selon votre niveau d\'accès. Seules les données validées comptent dans les résultats.')+
+ stratSection()+`<div class="kpis">${k.map(([v,l])=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('')}</div>`+
+ (ps.length?ps.map(projCard).join(''):'');
+}
+function projCard(p,edit){
+ return `<section class="card"><div class="row" style="justify-content:space-between"><h2>${esc(p.nom)}</h2><span class="tag">${esc(p.domaine)}</span></div>
+ <p class="muted" style="margin:.3rem 0 .6rem">${esc(bur(p.bureau))} · chef de projet : ${esc(who(p.chefId))}</p>
+ ${p.indicateurs.length?p.indicateurs.map(i=>`<div class="ind"><div>${esc(i.libelle)} ${i.sensible?'<span class="tag warn">sensible · agrégé</span>':''}<div class="bar"><i style="width:${pct(i)}%"></i></div></div><div class="num">${realise(i)} / ${i.cible} ${esc(i.unite)}<br><span class="muted">${pct(i)} %</span></div></div>`).join(''):'<p class="empty">Aucun indicateur. Ajoutez-en un pour suivre les résultats.</p>'}
+ ${edit?`<form data-form="indic" data-p="${p.id}" class="grid" style="margin-top:.8rem;align-items:end">
+  <div><label>Nouvel indicateur</label><input name="libelle" required></div>
+  <div><label>Cible</label><input name="cible" type="number" min="1" required></div>
+  <div><label>Unité</label><input name="unite" required></div>
+  <div><label><input type="checkbox" name="sensible" style="width:auto"> Donnée sensible (VBG, plaintes)</label><button class="btn sm" type="submit">Ajouter l'indicateur</button></div>
+ </form>`:''}</section>`;
+}
+function projets(){
+ const ps=projetsVisibles(),creer=can(['DE','DP']),edit=can(['DE','DP','CP']);
+ const cps=S.staff.filter(s=>s.role==='CP'&&s.actif);
+ return head('Projets et indicateurs',edit?'Les cibles sont fixées ici ; le réalisé se calcule automatiquement à partir des données validées.':'')+
+ (creer?`<form class="card" data-form="projet"><h3 style="margin-bottom:.8rem">Créer un projet</h3><div class="grid">
+  <div><label>Nom du projet</label><input name="nom" required></div>
+  <div><label>Domaine</label><select name="domaine">${DOMAINES.map(d=>`<option>${d}</option>`).join('')}</select></div>
+  <div><label>Bureau</label><select name="bureau">${S.bureaux.map(b=>`<option value="${b.id}">${esc(b.ville)}</option>`).join('')}</select></div>
+  <div><label>Chef de projet</label><select name="chef">${cps.map(c=>`<option value="${c.id}">${esc(c.nom)}</option>`).join('')}</select></div>
+ </div><button class="btn" type="submit">Créer le projet</button></form>`:'')+
+ (ps.length?ps.map(p=>projCard(p,edit)).join(''):'<p class="empty">Aucun projet ne vous est encore rattaché.</p>');
+}
+function collecte(){
+ const ps=projetsVisibles(),mine=S.collectes.filter(c=>c.auteurId===me.id);
+ const opts=ps.flatMap(p=>p.indicateurs.map(i=>`<option value="${p.id}|${i.id}" data-s="${i.sensible?1:0}">${esc(p.nom)} — ${esc(i.libelle)}</option>`)).join('');
+ return head('Collecte terrain','Saisissez vos données directement : elles remontent au suivi-évaluation puis au chef de projet pour validation.')+
+ (opts?`<form class="card" data-form="collecte"><div class="grid">
+  <div style="grid-column:1/-1"><label>Indicateur</label><select name="ind" id="indSel">${opts}</select></div>
+  <div><label>Valeur</label><input name="valeur" type="number" min="0" required></div>
+  <div><label>Localité</label><input name="localite" required></div>
+  <div><label>Date de l'activité</label><input name="date" type="date" value="${today()}" max="${today()}" required></div>
+  <div style="grid-column:1/-1" id="noteWrap"><label>Observation</label><textarea name="note" rows="2"></textarea></div>
+ </div><p class="note" id="sensNote" hidden>Indicateur sensible : saisissez uniquement un nombre. Aucun nom ni détail permettant d'identifier une personne.</p>
+ <button class="btn" type="submit">Envoyer pour validation</button></form>`:'<p class="empty">Aucun projet actif dans votre bureau.</p>')+
+ `<section class="card"><h3>Mes envois</h3>${table(mine,false)}</section>`;
+}
+function table(list,actions){
+ if(!list.length)return '<p class="empty">Rien pour le moment.</p>';
+ return `<div class="tbl"><table><thead><tr><th>Date</th><th>Indicateur</th><th>Valeur</th><th>Localité</th><th>Agent</th><th>Statut</th>${actions?'<th></th>':''}</tr></thead><tbody>
+ ${list.map(c=>{const p=S.projets.find(x=>x.id===c.projetId)||{indicateurs:[]},i=p.indicateurs.find(x=>x.id===c.indicId)||{};const[s,cl]=STATUTS[c.statut];
+  return `<tr><td>${fmtD(c.date)}</td><td>${esc(i.libelle)}<br><span class="muted">${esc(p.nom)}</span></td><td>${esc(c.valeur)}</td><td>${esc(c.localite)}</td><td>${esc(who(c.auteurId))}</td><td><span class="tag ${cl}">${s}</span></td>${actions?`<td class="row">${actBtns(c)}</td>`:''}</tr>`}).join('')}
+ </tbody></table></div>`;
+}
+function actBtns(c){
+ if(c.statut==='soumise'&&can(['SE','DP','DE']))return `<button class="btn sm" data-act="val" data-id="${c.id}" data-to="verifiee">Vérifier</button><button class="btn danger sm" data-act="val" data-id="${c.id}" data-to="rejetee">Rejeter</button>`;
+ if(c.statut==='verifiee'&&can(['CP','DP','DE']))return `<button class="btn sm" data-act="val" data-id="${c.id}" data-to="validee">Valider</button><button class="btn danger sm" data-act="val" data-id="${c.id}" data-to="rejetee">Rejeter</button>`;
+ return '';
+}
+function validation(){
+ const ps=projetsVisibles().map(p=>p.id),todo=aTraiter(),hist=S.collectes.filter(c=>ps.includes(c.projetId)&&!todo.includes(c));
+ return head('Validation des données','Circuit : agent terrain → vérification S&E → validation chef de projet. Une donnée rejetée ne compte pas dans les résultats.')+
+ `<section class="card"><h3>À traiter (${todo.length})</h3>${table(todo,true)}</section><section class="card"><h3>Historique</h3>${table(hist,false)}</section>`;
+}
+function personnel(){
+ return head('Personnel et accès',"Chaque personne reçoit un code lié à son poste. Le code donne exactement les droits du poste, rien de plus.")+
+ `<form class="card" data-form="staff"><h3 style="margin-bottom:.8rem">Ajouter une personne</h3><div class="grid">
+  <div><label>Nom complet</label><input name="nom" required></div>
+  <div><label>Poste (niveau d'accès)</label><select name="role">${Object.entries(ROLES).filter(([r])=>r!=='DE'||me.role==='DE').map(([r,v])=>`<option value="${r}">${v.label}</option>`).join('')}</select></div>
+  <div><label>Statut</label><select name="statut"><option>Salarié</option><option>Prestataire</option><option>Bénévole</option></select></div>
+  <div><label>Bureau</label><select name="bureau">${S.bureaux.map(b=>`<option value="${b.id}">${esc(b.ville)}</option>`).join('')}</select></div>
+  <div><label>Fin d'accès (facultatif)</label><input name="fin" type="date" min="${today()}"></div>
+ </div><button class="btn" type="submit">Créer le compte</button></form>
+ <section class="card"><div class="tbl"><table><thead><tr><th>Nom</th><th>Poste</th><th>Statut</th><th>Bureau</th><th>Code</th><th>Fin d'accès</th><th>État</th><th></th></tr></thead><tbody>
+ ${S.staff.map(s=>`<tr><td>${esc(s.nom)}</td><td>${esc(ROLES[s.role].label)}</td><td>${esc(s.statut)}</td><td>${esc(bur(s.bureau))}</td><td><b>${esc(s.code)}</b></td><td>${fmtD(s.finAcces)}</td><td><span class="tag ${s.actif?'ok':'bad'}">${s.actif?'Actif':'Désactivé'}</span></td><td>${s.id!==me.id?`<button class="btn ghost sm" data-act="toggle" data-id="${s.id}">${s.actif?'Désactiver':'Réactiver'}</button>`:''}</td></tr>`).join('')}
+ </tbody></table></div></section>`;
+}
+function admin(){
+ return head('Administration','Bureaux de la structure et demandes logistiques ou administratives à approuver.')+
+ `<section class="card"><h3>Demandes à traiter</h3>${demTable(S.demandes,true)}</section>
+ <section class="card"><h3>Bureaux</h3><div class="tbl"><table><thead><tr><th>Ville</th><th>Type</th><th>Personnel actif</th></tr></thead><tbody>
+ ${S.bureaux.map(b=>`<tr><td>${esc(b.ville)}</td><td>${esc(b.nom)}</td><td>${S.staff.filter(s=>s.bureau===b.id&&s.actif).length}</td></tr>`).join('')}</tbody></table></div>
+ <form data-form="bureau" class="grid" style="margin-top:.8rem;align-items:end"><div><label>Ville</label><input name="ville" required></div><div><label>Type</label><select name="nom"><option>Bureau technique</option><option>Antenne</option></select></div><div><button class="btn sm" type="submit">Ajouter le bureau</button></div></form></section>`;
+}
+function demTable(list,act){
+ if(!list.length)return '<p class="empty">Aucune demande.</p>';
+ return `<div class="tbl"><table><thead><tr><th>Date</th><th>Type</th><th>Objet</th><th>Demandeur</th><th>Statut</th>${act?'<th></th>':''}</tr></thead><tbody>
+ ${list.map(d=>`<tr><td>${fmtD(d.date)}</td><td>${esc(d.type)}</td><td>${esc(d.objet)}</td><td>${esc(who(d.auteurId))}</td><td><span class="tag ${d.statut==='Approuvée'?'ok':d.statut==='Refusée'?'bad':'warn'}">${d.statut}</span></td>${act?`<td class="row">${d.statut==='En attente'?`<button class="btn sm" data-act="dem" data-id="${d.id}" data-to="Approuvée">Approuver</button><button class="btn danger sm" data-act="dem" data-id="${d.id}" data-to="Refusée">Refuser</button>`:''}</td>`:''}</tr>`).join('')}
+ </tbody></table></div>`;
+}
+function demandes(){
+ return head('Mes demandes','Matériel, carburant, missions, congés : la demande part au responsable administratif.')+
+ `<form class="card" data-form="demande"><div class="grid">
+  <div><label>Type</label><select name="type"><option>Matériel</option><option>Carburant</option><option>Mission</option><option>Congé</option><option>Autre</option></select></div>
+  <div style="grid-column:span 2"><label>Objet</label><input name="objet" required></div>
+ </div><button class="btn" type="submit">Envoyer la demande</button></form>
+ <section class="card">${demTable(S.demandes.filter(d=>d.auteurId===me.id),false)}</section>`;
+}
+function audit(){
+ return head("Journal d'audit",'Chaque action est enregistrée avec son auteur et l\'heure. Ce journal ne peut pas être modifié depuis l\'application.')+
+ `<section class="card"><div class="tbl"><table><thead><tr><th>Date et heure</th><th>Utilisateur</th><th>Action</th></tr></thead><tbody>
+ ${S.audit.map(a=>`<tr><td>${new Date(a.t).toLocaleString('fr-FR')}</td><td>${a.u?esc(who(a.u)):'Système'}</td><td>${esc(a.a)}</td></tr>`).join('')}</tbody></table></div></section>`;
+}
+
+document.addEventListener('submit',e=>{
+ const f=e.target,t=f.dataset.form;if(!t)return;e.preventDefault();
+ const d=Object.fromEntries(new FormData(f));
+ if(t==='login'){
+  const s=S.staff.find(x=>x.code.toUpperCase()===String(d.code).trim().toUpperCase());
+  if(!s||!s.actif){loginErr="Code inconnu ou désactivé. Vérifiez le code ou contactez les ressources humaines.";render();return}
+  if(s.finAcces&&s.finAcces<today()){loginErr=`Accès expiré le ${fmtD(s.finAcces)}. Contactez les ressources humaines.`;render();return}
+  me=s;loginErr='';view=ROLES[s.role].nav[0];log('Connexion');render();return;
+ }
+ if(t==='projet'){S.projets.push({id:uid(),nom:d.nom.trim(),domaine:d.domaine,bureau:d.bureau,chefId:d.chef,indicateurs:[]});log(`Projet créé : ${d.nom}`)}
+ if(t==='indic'){const p=S.projets.find(x=>x.id===f.dataset.p);p.indicateurs.push({id:uid(),libelle:d.libelle.trim(),cible:Number(d.cible),unite:d.unite.trim(),sensible:!!d.sensible});log(`Indicateur ajouté à ${p.nom} : ${d.libelle}`)}
+ if(t==='collecte'){const[pid,iid]=d.ind.split('|');const sens=S.projets.find(p=>p.id===pid).indicateurs.find(i=>i.id===iid).sensible;
+  S.collectes.unshift({id:uid(),projetId:pid,indicId:iid,valeur:Number(d.valeur),localite:d.localite.trim(),date:d.date,note:sens?'':(d.note||''),auteurId:me.id,statut:'soumise'});log('Donnée terrain envoyée')}
+ if(t==='staff'){const code=d.role+'-'+Math.floor(1000+Math.random()*9000);
+  S.staff.push({id:uid(),nom:d.nom.trim(),role:d.role,dept:'',statut:d.statut,bureau:d.bureau,code,actif:true,finAcces:d.fin||''});log(`Compte créé : ${d.nom} (${ROLES[d.role].label})`)}
+ if(t==='objectif'){S.plan.objectifs.push({id:uid(),axe:d.axe,libelle:d.libelle.trim(),indicateurs:[]});log(`Objectif stratégique ajouté : ${d.libelle}`)}
+ if(t==='pind'){const o=S.plan.objectifs.find(x=>x.id===f.dataset.o);o.indicateurs.push({id:uid(),libelle:d.libelle.trim(),unite:d.unite.trim(),base:Number(d.base),cible:Number(d.cible),actuel:null,auto:null});log(`Indicateur stratégique ajouté : ${d.libelle}`)}
+ if(t==='maj'){const o=S.plan.objectifs.find(x=>x.id===f.dataset.o),i=o.indicateurs.find(x=>x.id===f.dataset.i);i.actuel=d.v===''?null:Number(d.v);log(`Plan stratégique mis à jour : ${i.libelle} = ${d.v} ${i.unite}`)}
+ if(t==='bureau'){S.bureaux.push({id:uid(),nom:d.nom,ville:d.ville.trim()});log(`Bureau ajouté : ${d.ville}`)}
+ if(t==='demande'){S.demandes.unshift({id:uid(),type:d.type,objet:d.objet.trim(),auteurId:me.id,statut:'En attente',date:today()});log(`Demande envoyée : ${d.type}`)}
+ save();render();
+});
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+ if(a==='go'){view=b.dataset.v;render();window.scrollTo(0,0)}
+ if(a==='logout'){log('Déconnexion');me=null;render()}
+ if(a==='reset'){S=seed();S.plan=seedPlan();save();loginErr='';render()}
+ if(a==='val'){const c=S.collectes.find(x=>x.id===b.dataset.id);c.statut=b.dataset.to;log(`Donnée ${STATUTS[c.statut][0].toLowerCase()} (${c.valeur} à ${c.localite})`);render()}
+ if(a==='toggle'){const s=S.staff.find(x=>x.id===b.dataset.id);s.actif=!s.actif;log(`Compte ${s.actif?'réactivé':'désactivé'} : ${s.nom}`);render()}
+ if(a==='dem'){const d=S.demandes.find(x=>x.id===b.dataset.id);d.statut=b.dataset.to;log(`Demande ${d.statut.toLowerCase()} : ${d.objet}`);render()}
+});
+document.addEventListener('change',e=>{
+ if(e.target.id==='indSel')syncSens();
+});
+function syncSens(){const s=document.getElementById('indSel');if(!s)return;const sens=s.selectedOptions[0]?.dataset.s==='1';
+ document.getElementById('sensNote').hidden=!sens;document.getElementById('noteWrap').hidden=sens}
+const _r=render;render=function(){_r();syncSens()};
+render();
+</script>
+</body>
+</html>
