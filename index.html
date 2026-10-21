@@ -157,7 +157,16 @@ fieldset.field{border:1px solid var(--line);border-radius:8px;padding:.5rem .8re
 .notif{border-left:4px solid var(--accent)}
 @media (max-width:600px){.pol-item{padding:.85rem}.pol-ack .btn{width:100%}}
 .obs{border-top:1px solid var(--line);padding:.6rem 0}.obs p{margin:.25rem 0}.obs.corr{border-left:3px solid var(--bad);padding-left:.7rem}
-.card.soft{background:var(--soft);border:0}@media (max-width:600px){.grid>[style*="span 2"]{grid-column:auto!important}}.moi-lien{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem}
+.card.soft{background:var(--soft);border:0}@media (max-width:600px){.grid>[style*="span 2"]{grid-column:auto!important}}
+.srvApp{display:grid;grid-template-columns:230px 1fr;align-items:start}.srvNav{position:sticky;top:0;display:flex;flex-direction:column;gap:2px;padding:1.2rem .6rem;border-right:1px solid var(--line);min-height:calc(100vh - 70px)}
+.srvNav button{background:none;border:0;text-align:left;padding:.55rem .75rem;border-radius:6px;color:var(--ink);font:inherit}.srvNav button:hover{background:var(--soft)}.srvNav button[aria-current="page"]{background:var(--soft);box-shadow:inset 3px 0 0 var(--accent);font-weight:600}
+@media (max-width:820px){.srvApp{grid-template-columns:1fr}.srvNav{position:sticky;top:0;z-index:5;flex-direction:row;overflow-x:auto;min-height:0;padding:.4rem .6rem;border-right:0;border-bottom:1px solid var(--line);background:var(--bg)}.srvNav button{white-space:nowrap}}
+button.kpi.svK{text-align:left;font:inherit;color:var(--ink);cursor:pointer}button.kpi.svK:hover{border-color:var(--accent)}.kpi .bar{margin:.5rem 0 .3rem}
+.svAl{list-style:none;margin:0;padding:0;display:grid;gap:.35rem}.svAl li{border-left:4px solid var(--warn);padding:.3rem .6rem;background:var(--soft);border-radius:0 6px 6px 0}.svAl li.bad{border-left-color:var(--bad)}.svAl .lnk{text-align:left}
+.svObj{border-top:1px solid var(--line);padding-top:.6rem;margin-top:.6rem}.svTree,.svTree ul{list-style:none;margin:0;padding-left:1.1rem;border-left:2px solid var(--line)}.svTree{padding-left:.4rem;border-left:0}.svTree li{margin:.35rem 0}
+.svSteps{display:flex;flex-wrap:wrap;gap:.3rem;list-style:none;padding:0;counter-reset:e}.svSteps li{counter-increment:e;padding:.35rem .7rem;border-radius:999px;background:var(--soft);color:var(--muted);font-size:.88rem}.svSteps li::before{content:counter(e) ". "}.svSteps li.fait{color:var(--ok)}.svSteps li.cour{background:var(--accent);color:var(--accent-ink);font-weight:600}
+td .bar{min-width:80px}.svChk{margin:.3rem 0;padding-left:1.2rem}.svChk li.bad{color:var(--bad)}.svMeth li{margin:.45rem 0}
+@media print{.srvNav{display:none}.srvApp{display:block}}.moi-lien{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem}
 body.busy,body.busy *{cursor:progress!important}body.busy main{opacity:.7}
 </style>
 </head>
@@ -177,12 +186,13 @@ const ROLES={
  SUP:{label:'Supervision terrain',nav:['dash','projets','validation','demandes']},
  ASC:{label:'Collecte terrain',nav:['collecte','demandes']},
  LECT:{label:'Consultation projet',nav:['dash','projets','demandes']},
+ CPT:{label:'Comptable',nav:['dash','demandes']},
  EXT:{label:'Collaborateur externe / invité',nav:['politiques']}
 };
 const NIV_DESC={DE:'Tout voir, tout piloter',CA:'Lecture seule, gouvernance',RA:'Administration, logistique, demandes',RH:'Personnel, postes et accès',DP:'Tous les projets, validation',CP:'Gérer ses projets, valider les données',SE:'Vérifier les données de ses projets',SUP:'Superviser les agents, contrôler leurs saisies',ASC:'Saisir les données de terrain',LECT:'Consulter les projets de son équipe'};
 function seedPostes(){return [['DE','Directeur exécutif'],['CA',"Membre du conseil d'administration"],['RA','Responsable administratif'],['RH','Responsable RH'],['DP','Directeur des programmes'],['CP','Chef de projet'],['SE','Chargé de suivi-évaluation'],['ASC','Relais communautaire'],['SUP','Superviseur terrain'],['SE','Assistant suivi-évaluation'],['LECT','Assistant programme']].map(([n,t],i)=>({id:i<8?'po-'+n:'po-x'+i,intitule:t,niveau:n}))}
 Object.entries(ROLES).forEach(([k,r])=>{if(k!=='EXT'){r.nav.push('rapports');r.nav.splice(r.nav[0]==='dash'?2:1,0,'politiques');r.nav.unshift('moi')}});
-NIV_DESC.EXT='Politiques et documents ouverts aux partenaires, accès limité dans le temps';
+NIV_DESC.CPT='Archives de la comptabilité, demandes';NIV_DESC.EXT='Politiques et documents ouverts aux partenaires, accès limité dans le temps';
 const VIEWS={moi:'Mon espace',politiques:'Politiques et procédures',cpsec:'Projet',infos:'Actualités',activites:'Mes projets',formulaires:'Formulaires de collecte',saisie:'Remplir une fiche',rapports:'Rapports',dash:'Tableau de bord',plan:'Plan stratégique',projets:'Projets et indicateurs',collecte:'Collecte terrain',validation:'Validation des données',personnel:'Personnel et accès',admin:'Administration',demandes:'Mes demandes',audit:"Journal d'audit"};
 const DOMAINES=['DSSR-VBG','Eau et assainissement','Environnement, résilience climatique et HSE','Sécurité routière','Sécurité au travail','Agriculture durable','Gestion des plaintes'];
 const STATUTS={soumise:['Soumise','warn'],supervisee:['Contrôlée superviseur','warn'],verifiee:['Vérifiée S&E','warn'],validee:['Validée','ok'],rejetee:['Rejetée','bad']};
@@ -1453,7 +1463,7 @@ async function authRefresh(){const s=sess;if(!s)return;sess=null;
 async function authLogout(){try{if(sess)await api('/auth/v1/logout',{method:'POST'})}catch(e){}sessEcrire(null)}
 
 /* ---------- chargement des données autorisées ---------- */
-function srvVide(){return {org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]}}}
+function srvVide(){return {org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
 async function srvLoad(){
  const uid=sess.user.id,mine=await sel('membres',`select=*&user_id=eq.${uid}&actif=is.true`);
  const m=(mine||[]).find(x=>!x.fin_acces||x.fin_acces>=today());
@@ -1466,7 +1476,7 @@ async function srvLoad(){
  const N=srvVide();N.org={id:o,nom:(org[0]||{}).nom||''};
  N.staff=mb.map(x=>({id:x.user_id,nom:x.nom,email:x.email||'',role:x.role,posteId:x.poste_id,bureau:x.bureau_id,supId:x.sup_id||'',statut:x.statut,actif:x.actif,finAcces:x.fin_acces||'',code:''}));
  N.bureaux=bu.map(x=>({id:x.id,nom:x.nom,ville:x.ville}));N.postes=po.map(x=>({id:x.id,intitule:x.intitule,niveau:x.niveau}));
- N.projets=pr.map(p=>({id:p.id,nom:p.nom,bailleur:p.bailleur||'',montant:Number(p.montant)||0,debut:p.debut||'',fin:p.fin||'',zone:p.zone||'',domaine:p.domaine||'',bureau:p.bureau_id,chefId:p.chef_id,statut:p.statut,valideLe:p.valide_le,validePar:p.valide_par,prevus:[],indicateurs:[],
+ N.projets=pr.map(p=>({id:p.id,nom:p.nom,code:p.code||'',programmeId:p.programme_id||'',budgetApprouve:Number(p.budget_approuve)||0,bailleur:p.bailleur||'',montant:Number(p.montant)||0,debut:p.debut||'',fin:p.fin||'',zone:p.zone||'',domaine:p.domaine||'',bureau:p.bureau_id,chefId:p.chef_id,statut:p.statut,valideLe:p.valide_le,validePar:p.valide_par,prevus:[],indicateurs:[],
   membres:af.filter(a=>a.projet_id===p.id).map(a=>({affId:a.id,staffId:a.user_id,roleProjet:a.role_projet,debut:a.debut||'',fin:a.fin||''}))}));
  const ext=n=>(n||'').split('.').pop().toLowerCase();
  N.pol.docs=dd.map(d=>({id:d.id,org:d.org_id,titre:d.titre,categorie:d.categorie,description:d.description||'',responsable:d.responsable,niveau:d.niveau,obligatoire:d.obligatoire,dl:d.telechargeable,archive:d.archive,auteurId:d.auteur_id,creeLe:(d.cree_le||'').slice(0,10),
@@ -1475,11 +1485,16 @@ async function srvLoad(){
    fichier:v.fichier_chemin?{nom:v.fichier_nom,taille:Number(v.fichier_taille)||0,type:ext(v.fichier_nom)==='pdf'?'application/pdf':ext(v.fichier_nom),chemin:v.fichier_chemin}:null,auteurId:v.auteur_id,cree:v.cree_le,publieLe:(v.publie_le||'').slice(0,10)}))}));
  N.pol.accuses=ac.map(a=>{const d=N.pol.docs.find(x=>x.id===a.document_id),i=d?d.versions.findIndex(v=>v.id===a.version_id):-1;return {id:a.id,docId:a.document_id,vIdx:i,version:i>=0?d.versions[i].v:'',userId:a.user_id,date:a.confirme_le}});
  N.pol.notifs=nt.map(n=>({id:n.id,docId:n.lien==='politique'?n.ref:null,lien:n.lien==='politique'?null:n.lien,ref:n.ref,texte:n.texte,date:n.cree_le,dest:[uid],lus:n.lu?[uid]:[]}));
+ const opt=q=>q.catch(()=>null),T=await Promise.all([sel('plans_strategiques',f+'&order=debut.desc'),sel('axes_strategiques',f),sel('objectifs_strategiques',f),sel('programmes',f+'&order=code,nom'),sel('jalons',f),sel('cadre_logique',f),sel('indicateurs',f+'&order=code,cree_le'),sel('mesures',f+'&order=periode_fin'),sel('risques',f),sel('documents',f+'&order=cree_le.desc&limit=5000'),sel('audit',f+'&objet_id=not.is.null&order=le.desc&limit=2000')].map(opt));
+ p03=T[0]!==null;[N.plans,N.axes,N.objectifs,N.programmes,N.jalons,N.cadre,N.inds,N.mesures,N.risques,N.docs,N.histo]=T.map(x=>x||[]);
  S=N;me=S.staff.find(x=>x.id===uid);
  Object.keys(ROLES).forEach(k=>ROLES[k].nav=srvNav(k));
  srvAudit=me.role==='DE'?await sel('audit',`${f}&order=le.desc&limit=300`):[];
 }
-function srvNav(r){const n=['politiques'];if(r!=='EXT')n.push('projets');if(['DE','RH'].includes(r))n.push('personnel');if(r==='DE')n.push('audit');return n}
+function srvNav(r){if(r==='EXT')return ['politiques'];const n=[];
+ if(p03&&['DE','DP','CA'].includes(r))n.push('strategie','programmes');
+ n.push('projets');if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');
+ if(['DE','RH'].includes(r))n.push('personnel');if(r==='DE')n.push('audit');return n}
 async function notifierSrv(dest,texte,lien,ref){const ids=[...new Set(dest.filter(Boolean))].filter(id=>id!==me.id&&S.staff.some(u=>u.id===id));
  if(!ids.length)return 0;await ins('notifications',ids.map(id=>({org_id:S.org.id,user_id:id,texte,lien,ref,envoye_par:me.id})));return ids.length}
 async function action(fn,msg){if(srvBusy)return;srvBusy=true;document.body.classList.add('busy');
@@ -1497,18 +1512,19 @@ function srvLoginHTML(){if(nonSecurise())return `<div class="login"><div class="
   <p style="margin:.4rem 0 0"><button type="button" class="lnk" data-act="srvPublic">Consulter les documents publics de l'organisation</button></p></form>
  <p class="legend" style="margin-top:1rem">Pour découvrir l'application sans compte : <button type="button" class="lnk" data-act="srvDemo" data-v="demo">ouvrir la démonstration (données fictives)</button>.</p></div></div>`}
 function srvHome(){const n=ROLES[me.role].nav,pa=polEnAttente().length;
- const D={politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Projets, statuts et équipes affectées',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
+ const D={strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
  return head('Accueil',`${esc(posteLib(me))}${me.bureau?' · '+esc(bur(me.bureau)):''} · ${esc(S.org.nom)}`)+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+notifBox()+
- `<div class="tiles">${n.map(v=>`<button class="tile" data-act="go" data-v="${v}"><h2>${VIEWS[v]} ${v==='politiques'&&pa?`<span class="badge">${pa}</span>`:''}</h2><p>${D[v]}</p></button>`).join('')}</div>
+ (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():p03&&aValider().length?`<section class="card notif"><h3>À faire</h3><p>${aValider().length} mesure(s) d'indicateur attendent votre validation.</p>${alerteHTML(alertes())}</section>`:'')+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
+ `<div class="tiles">${n.map(v=>`<button class="tile" data-act="go" data-v="${v}"><h2>${VIEWS[v]} ${v==='politiques'&&pa?`<span class="badge">${pa}</span>`:''}</h2><p>${D[v]||''}</p></button>`).join('')}</div>
  ${srvRecup?'<p class="note" role="alert">Lien de réinitialisation accepté : choisissez maintenant votre nouveau mot de passe ci-dessous.</p>':''}<details class="card" style="margin-top:1.5rem" ${srvRecup?'open':''}><summary><b>Mon compte</b> <span class="muted">· ${esc(sess.user.email)}</span></summary>
   <form data-form="srvPwd" class="grid" style="margin-top:.8rem;align-items:end"><div><label for="np1">Nouveau mot de passe (12 caractères au moins)</label><input id="np1" name="p1" type="password" minlength="12" autocomplete="new-password" required></div>
   <div><label for="np2">Confirmer</label><input id="np2" name="p2" type="password" minlength="12" autocomplete="new-password" required></div><div><button class="btn sm" type="submit">Changer mon mot de passe</button></div></form></details>
- <p class="legend" style="margin-top:1.5rem">Données enregistrées sur le serveur sécurisé de l'organisation. Les autres modules (collecte, activités, feuilles de route, rapports) arrivent sur le serveur au fil des prochaines phases ; ils peuvent être essayés dans la démonstration.</p>`}
+ <p class="legend" style="margin-top:1.5rem">Données enregistrées sur le serveur sécurisé de l'organisation. Les autres modules (collecte terrain, activités, feuilles de route, rapports automatiques) arrivent sur le serveur au fil des prochaines phases ; ils peuvent être essayés dans la démonstration.</p>`}
 function srvPersonnel(){const rh=me.role==='RH',postesOk=S.postes.filter(p=>!(rh&&['DE','CA'].includes(p.niveau))),actifs=S.staff.filter(u=>u.actif);
  const niv=Object.entries(ROLES).filter(([r])=>!(rh&&['DE','CA'].includes(r)));
  return head('Personnel et accès','Chaque personne se connecte avec sa propre adresse e-mail et son mot de passe. Son poste détermine ce qu\'elle voit et peut faire.')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
  `<form class="card" data-form="srvMembre"><h3>Ajouter une personne</h3>
-  <ol class="muted" style="margin:.2rem 0 .8rem 1.1rem;padding:0"><li>Créez d'abord son compte dans Supabase : <b>Authentication › Users › Add user › Create new user</b> (adresse e-mail, mot de passe, case « Auto Confirm User » cochée).</li><li>Rattachez-le ensuite ici, avec la même adresse e-mail.</li><li>Pour changer le poste, le bureau ou la date de fin d'accès d'une personne déjà rattachée, rattachez de nouveau la même adresse avec les nouvelles informations.</li></ol>
+  <ol class="muted" style="margin:.2rem 0 .8rem 1.1rem;padding:0"><li>Créez d'abord son compte dans Supabase : <b>Authentication › Users › Add user › Create new user</b> (adresse e-mail, mot de passe, case « Auto Confirm User » cochée).</li><li>Rattachez-le ensuite ici, avec la même adresse e-mail.</li><li>Pour changer le nom, le poste, le bureau ou la date de fin d'accès d'une personne déjà rattachée, utilisez le bouton « Modifier » sur sa ligne.</li></ol>
   <div class="grid"><div><label>Adresse e-mail du compte</label><input name="email" type="email" required></div><div><label>Nom complet</label><input name="nom" required></div>
   <div><label>Poste</label><select name="poste" required>${postesOk.map(p=>`<option value="${p.id}">${esc(p.intitule)}</option>`).join('')}</select></div>
   <div><label>Bureau</label><select name="bureau"><option value="">—</option>${S.bureaux.map(b=>`<option value="${b.id}">${esc(b.ville)} (${esc(b.nom)})</option>`).join('')}</select></div>
@@ -1520,7 +1536,7 @@ function srvPersonnel(){const rh=me.role==='RH',postesOk=S.postes.filter(p=>!(rh
  ${S.staff.map(u=>{const bloque=rh&&['DE','CA'].includes(u.role);return `<tr><td>${esc(u.nom)}</td><td>${esc(u.email)}</td><td>${esc(posteLib(u))}</td><td>${esc(bur(u.bureau))}</td>
   <td>${u.role==='CA'||bloque?esc(who(u.supId)):`<select class="srvSup" data-id="${u.id}" aria-label="Responsable de ${esc(u.nom)}"><option value="">— aucun —</option>${actifs.filter(x=>x.id!==u.id&&x.role!=='EXT').map(x=>`<option value="${x.id}" ${u.supId===x.id?'selected':''}>${esc(x.nom)}</option>`).join('')}</select>`}</td>
   <td>${esc(u.statut)}</td><td>${fmtD(u.finAcces)}</td><td><span class="tag ${u.actif?'ok':'bad'}">${u.actif?'Actif':'Désactivé'}</span></td>
-  <td>${u.id!==me.id&&!bloque?`<button class="btn ghost sm" data-act="srvToggle" data-id="${u.id}">${u.actif?'Désactiver':'Réactiver'}</button>`:''}</td></tr>`}).join('')}</tbody></table></div></section>
+  <td><div class="row">${!bloque?`<button class="btn ghost sm" data-act="svMbEdit" data-id="${u.id}">Modifier</button>`:''}${u.id!==me.id&&!bloque?`<button class="btn ghost sm" data-act="srvToggle" data-id="${u.id}">${u.actif?'Désactiver':'Réactiver'}</button>`:''}</div></td></tr>${mbEdit===u.id?mbEditForm(u):''}`}).join('')}</tbody></table></div></section>
  <section class="card"><h3>Postes (${S.postes.length})</h3><div class="tbl"><table><thead><tr><th>Poste</th><th>Niveau d'accès</th><th>Personnes actives</th></tr></thead><tbody>${S.postes.map(p=>`<tr><td>${esc(p.intitule)}</td><td>${esc(ROLES[p.niveau].label)}</td><td class="num">${S.staff.filter(u=>u.posteId===p.id&&u.actif).length}</td></tr>`).join('')}</tbody></table></div>
   <form data-form="srvPoste" class="grid" style="margin-top:.8rem;align-items:end"><div><label>Nouveau poste</label><input name="intitule" required></div><div><label>Niveau d'accès</label><select name="niveau">${niv.map(([r,v])=>`<option value="${r}">${esc(v.label)}</option>`).join('')}</select></div><div><button class="btn sm" type="submit">Créer le poste</button></div></form></section>
  <section class="card"><h3>Bureaux (${S.bureaux.length})</h3>${polT(['Ville','Type','Personnel actif'],S.bureaux.map(b=>[b.ville,b.nom,S.staff.filter(u=>u.bureau===b.id&&u.actif).length]))}
@@ -1576,14 +1592,14 @@ document.addEventListener('submit',e=>{if(MODE!=='srv')return;const f=e.target,t
  if(t==='srvPoste'){action(()=>ins('postes',{org_id:S.org.id,intitule:String(d.intitule).trim(),niveau:d.niveau}),'Poste créé.');return}
  if(t==='srvBureau'){action(()=>ins('bureaux',{org_id:S.org.id,ville:String(d.ville).trim(),nom:String(d.nom).trim()}),'Bureau ajouté.');return}
  if(t==='srvProjet'){if(d.debut&&d.fin&&d.fin<d.debut){alert('La date de fin doit être après la date de début.');return}
-  action(async()=>{const id=uuid();await ins('projets',{id,org_id:S.org.id,nom:String(d.nom).trim(),bailleur:d.bailleur||null,montant:d.montant===''?null:Number(d.montant),debut:d.debut||null,fin:d.fin||null,zone:d.zone||null,domaine:d.domaine||null,bureau_id:d.bureau||null,chef_id:d.chef||null});
+  action(async()=>{const id=uuid();await ins('projets',{id,org_id:S.org.id,nom:String(d.nom).trim(),...(p03?{code:d.code||null,programme_id:d.programme||null,budget_approuve:d.montant===''?null:Number(d.montant)}:{}),bailleur:d.bailleur||null,montant:d.montant===''?null:Number(d.montant),debut:d.debut||null,fin:d.fin||null,zone:d.zone||null,domaine:d.domaine||null,bureau_id:d.bureau||null,chef_id:d.chef||null});
    if(d.chef){await ins('affectations',{org_id:S.org.id,projet_id:id,user_id:d.chef,role_projet:'Chef de projet',debut:d.debut||null,fin:d.fin||null,cree_par:me.id});await notifierSrv([d.chef],`Vous êtes désigné(e) chef du projet « ${String(d.nom).trim()} »`,'projet',id)}
-   log(`Projet enregistré : ${d.nom}`)},'Projet enregistré en brouillon.');return}
+   log(`Projet enregistré : ${d.nom}`);if(p03){logO('projet',id,`Projet enregistré en brouillon : ${d.nom}`);dosSel=id;dosTab='id';view='dossier'}},'Projet enregistré en brouillon.');return}
  if(t==='srvProjetMaj'){const p=S.projets.find(x=>x.id===f.dataset.p);if(d.debut&&d.fin&&d.fin<d.debut){alert('La date de fin doit être après la date de début.');return}
-  const patch={nom:String(d.nom).trim(),bailleur:d.bailleur||null,montant:d.montant===''?null:Number(d.montant),debut:d.debut||null,fin:d.fin||null,zone:d.zone||null,domaine:d.domaine||null};if('chef' in d)patch.chef_id=d.chef||null;
-  action(async()=>{await upd('projets',`id=eq.${p.id}`,patch);if('chef' in d&&d.chef&&d.chef!==p.chefId){if(!p.membres.some(m=>m.staffId===d.chef&&m.roleProjet==='Chef de projet'))await ins('affectations',{org_id:S.org.id,projet_id:p.id,user_id:d.chef,role_projet:'Chef de projet',debut:d.debut||null,fin:d.fin||null,cree_par:me.id});await notifierSrv([d.chef],`Vous êtes désigné(e) chef du projet « ${patch.nom} »`,'projet',p.id)}log(`Projet modifié : ${patch.nom}`)},'Informations du projet enregistrées.');return}
+  const patch={nom:String(d.nom).trim(),bailleur:d.bailleur||null,montant:d.montant===''?null:Number(d.montant),debut:d.debut||null,fin:d.fin||null,zone:d.zone||null,domaine:d.domaine||null};if('chef' in d)patch.chef_id=d.chef||null;if(p03){patch.budget_approuve=patch.montant;if('code' in d)patch.code=d.code||null;if('programme' in d)patch.programme_id=d.programme||null;delete actChk[p.id]}
+  action(async()=>{await upd('projets',`id=eq.${p.id}`,patch);if('chef' in d&&d.chef&&d.chef!==p.chefId){if(!p.membres.some(m=>m.staffId===d.chef&&m.roleProjet==='Chef de projet'))await ins('affectations',{org_id:S.org.id,projet_id:p.id,user_id:d.chef,role_projet:'Chef de projet',debut:d.debut||null,fin:d.fin||null,cree_par:me.id});await notifierSrv([d.chef],`Vous êtes désigné(e) chef du projet « ${patch.nom} »`,'projet',p.id)}log(`Projet modifié : ${patch.nom}`);if(p03)logO('projet',p.id,'Informations du projet modifiées')},'Informations du projet enregistrées.');return}
  if(t==='srvAff'){const p=S.projets.find(x=>x.id===f.dataset.p);if(d.debut&&d.fin&&d.fin<d.debut){alert('La date de fin doit être après la date de début.');return}
-  action(async()=>{await ins('affectations',{org_id:S.org.id,projet_id:p.id,user_id:d.user,role_projet:d.role,debut:d.debut||null,fin:d.fin||null,cree_par:me.id});await notifierSrv([d.user],`Vous êtes affecté(e) au projet « ${p.nom} » (${d.role})`,'projet',p.id);log(`${who(d.user)} affecté(e) à ${p.nom} (${d.role})`)},`${who(d.user)} est affecté(e) au projet.`);return}
+  action(async()=>{await ins('affectations',{org_id:S.org.id,projet_id:p.id,user_id:d.user,role_projet:d.role,debut:d.debut||null,fin:d.fin||null,cree_par:me.id});await notifierSrv([d.user],`Vous êtes affecté(e) au projet « ${p.nom} » (${d.role})`,'projet',p.id);log(`${who(d.user)} affecté(e) à ${p.nom} (${d.role})`);if(p03)logO('projet',p.id,`${who(d.user)} affecté(e) : ${d.role}`)},`${who(d.user)} est affecté(e) au projet.`);return}
  const doc=S.pol.docs.find(x=>x.id===f.dataset.id);
  if(t==='polMsg'){const dv=fd.get('dest'),aud=polAudience(doc),dest=dv==='tous'?aud:dv==='retard'?aud.filter(u=>!polAccuse(doc,u)):aud.filter(u=>u.role===dv.slice(5));
   action(async()=>{const n=await notifierSrv(dest.map(u=>u.id),`${doc.titre} : ${String(fd.get('texte')).trim()}`,'politique',doc.id);srvMsg=`Notification envoyée à ${n} personne(s).`});return}
@@ -1610,11 +1626,11 @@ document.addEventListener('click',e=>{if(MODE!=='srv')return;const b=e.target.cl
    else{if(!d.dl)return;fichierLien(v.fichier.nom,blob,blob.type);if(me)log(`Document téléchargé : ${d.titre} (v${v.v})`)}}).catch(err=>alert(err.message));return}
  if(!me)return;
  if(a==='logout'){stop();log('Déconnexion');authLogout().then(()=>{me=null;S=srvVide();view='home';polDoc=polEdit=null;render()});return}
- if(a==='notifOuvrir'){const n=S.pol.notifs.find(x=>x.id===b.dataset.id);if(n){upd('notifications',`id=eq.${n.id}`,{lu:true}).catch(()=>{});if(n.lien==='projet'){stop();n.lus.push(me.id);view='projets';render();return}}return}
+ if(a==='notifOuvrir'){const n=S.pol.notifs.find(x=>x.id===b.dataset.id);if(n){upd('notifications',`id=eq.${n.id}`,{lu:true}).catch(()=>{});if(n.lien==='projet'||n.lien==='programme'){stop();n.lus.push(me.id);if(n.lien==='projet'&&p03&&projet(n.ref)){dosSel=n.ref;dosTab='id';view='dossier'}else if(n.lien==='programme'&&programme(n.ref)){pgSel=n.ref;view='programmes'}else view='projets';render();return}}return}
  if(a==='notifLu'){stop();action(()=>upd('notifications',`user_id=eq.${me.id}&lu=is.false`,{lu:true}));return}
  if(a==='srvToggle'){stop();const u=S.staff.find(x=>x.id===b.dataset.id);action(async()=>{await upd('membres',`org_id=eq.${S.org.id}&user_id=eq.${u.id}`,{actif:!u.actif});log(`Compte ${u.actif?'désactivé':'réactivé'} : ${u.nom}`)},`Compte ${u.actif?'désactivé':'réactivé'} : ${u.nom}.`);return}
  if(a==='srvDelAff'){stop();const p=S.projets.find(x=>x.membres.some(m=>m.affId===b.dataset.id)),m=p&&p.membres.find(x=>x.affId===b.dataset.id);if(!m||!confirm(`Retirer ${who(m.staffId)} du projet ?`))return;
-  action(async()=>{await del('affectations',`id=eq.${m.affId}`);log(`${who(m.staffId)} retiré(e) de ${p.nom}`)});return}
+  action(async()=>{await del('affectations',`id=eq.${m.affId}`);log(`${who(m.staffId)} retiré(e) de ${p.nom}`);if(p03)logO('projet',p.id,`${who(m.staffId)} retiré(e) de l'équipe`)});return}
  const d=S.pol.docs.find(x=>x.id===b.dataset.id);
  if(a==='polAck'&&d&&polDoitConfirmer(d)){stop();const i=vPub(d);action(async()=>{await ins('pol_accuses',{org_id:S.org.id,document_id:d.id,version_id:d.versions[i].id,user_id:me.id});log(`Lecture confirmée : ${d.titre} (v${d.versions[i].v})`)});return}
  if(!polGest())return;
@@ -1632,7 +1648,420 @@ document.addEventListener('change',e=>{if(MODE!=='srv'||!me)return;const t=e.tar
   action(async()=>{await upd('membres',`org_id=eq.${S.org.id}&user_id=eq.${u.id}`,{sup_id:t.value||null});log(`Responsable de ${u.nom} : ${t.value?who(t.value):'aucun'}`)},`Responsable de ${u.nom} mis à jour.`)}
  if(t.classList&&t.classList.contains('srvStatutSel')){const p=S.projets.find(x=>x.id===t.dataset.id),to=t.value;
   if(!confirm(`Passer « ${p.nom} » au statut « ${PSTAT[to][0]} » ?`)){render();return}
-  action(async()=>{await upd('projets',`id=eq.${p.id}`,{statut:to});if(p.chefId)await notifierSrv([p.chefId],`Projet « ${p.nom} » : statut « ${PSTAT[to][0]} »`,'projet',p.id)},`Statut du projet : ${PSTAT[to][0]}.`)}
+  delete actChk[p.id];action(async()=>{await upd('projets',`id=eq.${p.id}`,{statut:to});if(p.chefId)await notifierSrv([p.chefId],`Projet « ${p.nom} » : statut « ${PSTAT[to][0]} »`,'projet',p.id)},`Statut du projet : ${PSTAT[to][0]}.`)}
+},true);
+
+
+/* ===== Base du Directeur des programmes (mode serveur) : stratégie, programmes, portefeuille, dossier du projet, performance, archives ===== */
+const DEPTS={GOUVERNANCE:'Gouvernance (conseil d\'administration)',DIRECTION:'Direction exécutive',PROGRAMMES:'Programmes et projets',ADMIN_FIN:'Administration et finances',COMPTA:'Comptabilité',RH:'Ressources humaines',LOGISTIQUE:'Logistique'};
+const DEP_ROLE={DE:Object.keys(DEPTS),CA:['GOUVERNANCE'],RA:['ADMIN_FIN','COMPTA','LOGISTIQUE'],CPT:['COMPTA'],RH:['RH'],DP:['PROGRAMMES'],CP:['PROGRAMMES'],SE:['PROGRAMMES'],SUP:['PROGRAMMES'],ASC:['PROGRAMMES'],LECT:['PROGRAMMES']};
+const DOC_TYPES=['Convention de financement','Proposition de projet','Budget approuvé','Plan de travail','Termes de référence','Rapport d\'activité','Rapport narratif au bailleur','Rapport financier','Rapport de mission','Fiche de terrain (scan)','Liste de présence (scan)','Procès-verbal','Compte rendu de réunion','Contrat','Facture ou justificatif','Pièce comptable','Bon de commande','Correspondance','Évaluation','Photo ou vidéo','Autre'];
+const DOC_ST={brouillon:['Brouillon',''],valide:['Validé','ok'],signe:['Signé et cacheté','ok'],obsolete:['Obsolète','warn']};
+const CL_NIV={og:'Objectif global',os:'Objectif spécifique',res:'Résultat attendu',act:'Activité'};
+const CHAINE={impact:'Impact',effet:'Effet',extrant:'Extrant',processus:'Processus'};
+const PG_ST={planifie:['Planifié',''],en_cours:['En cours','ok'],suspendu:['Suspendu','bad'],clos:['Clos','']};
+const JAL_ST={a_faire:'À faire',en_cours:'En cours',fait:'Fait',abandonne:'Abandonné'};
+const RQ_ST={ouvert:['Ouvert','bad'],en_traitement:['En traitement','warn'],clos:['Clos','ok']};
+const PERF_ST={ok:['Dans les temps','ok'],warn:['À surveiller','warn'],bad:['En retard','bad'],info:['Sans échéance',''],nd:['Données insuffisantes','']};
+let p03=true,pgSel=null,dosSel=null,dosTab='id',perfTab='org',actChk={},pfF={prog:'',statut:'',q:''},arF={dept:'',prog:'',proj:'',annee:'',type:'',q:''};
+const pilote=()=>['DE','DP'].includes(me.role);
+const tx=x=>x==null?'—':Math.round(x*100)+' %';
+const num=v=>v==null||v===''?'—':Number(v).toLocaleString('fr-FR');
+const nz=v=>v===''||v==null?null:Number(v);
+const svT=(cols,rows,vide)=>rows.length?`<div class="tbl"><table><thead><tr>${cols.map(c=>`<th${c.startsWith('#')?' class="num"':''}>${esc(c.replace(/^#/,''))}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((v,i)=>`<td${cols[i]&&cols[i].startsWith('#')?' class="num"':''}>${v}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:`<p class="empty">${vide||'Rien pour le moment.'}</p>`;
+const tag=([l,c])=>`<span class="tag ${c||''}">${esc(l)}</span>`;
+const opts=(arr,cur,vide)=>(vide!==undefined?`<option value="">${esc(vide)}</option>`:'')+arr.map(([v,l])=>`<option value="${esc(v)}" ${String(v)===String(cur??'')?'selected':''}>${esc(l)}</option>`).join('');
+const staffOpts=(cur,vide='— à désigner —')=>opts(S.staff.filter(u=>u.actif&&u.role!=='EXT').map(u=>[u.id,`${u.nom} (${posteLib(u)})`]),cur,vide);
+const projet=id=>S.projets.find(p=>p.id===id);
+const programme=id=>S.programmes.find(p=>p.id===id);
+const objectif=id=>S.objectifs.find(o=>o.id===id);
+const libObj=o=>o?`${o.code?o.code+' · ':''}${o.intitule}`:'—';
+const libProg=p=>p?`${p.code?p.code+' · ':''}${p.nom}`:'—';
+const libProj=p=>p?`${p.code?p.code+' · ':''}${p.nom}`:'—';
+const planCourant=()=>S.plans.find(p=>p.statut==='en_vigueur')||S.plans[0]||null;
+const gereProj=p=>p&&(pilote()||p.chefId===me.id);
+const saisitMes=i=>{if(i.projet_id){const p=projet(i.projet_id);return gereProj(p)||['SE','SUP'].includes(me.role)}return pilote()};
+const ecritInd=i=>i.projet_id?gereProj(projet(i.projet_id)):pilote();
+function logO(objet,id,texte){if(me&&S.org.id)ins('audit',{org_id:S.org.id,user_id:me.id,objet,objet_id:id||null,action:String(texte).slice(0,500)}).catch(()=>{})}
+
+/* ---------- calcul de la performance (méthode documentée dans l'écran Performance) ---------- */
+const mesV=i=>S.mesures.filter(m=>m.indicateur_id===i.id&&m.statut==='validee').sort((a,b)=>a.periode_fin<b.periode_fin?-1:a.periode_fin>b.periode_fin?1:0);
+function indCtx(i){if(i.projet_id){const p=projet(i.projet_id)||{};return {debut:p.debut,fin:p.fin}}
+ if(i.programme_id){const p=programme(i.programme_id)||{};return {debut:p.debut,fin:p.fin}}
+ const o=objectif(i.objectif_id),a=o&&S.axes.find(x=>x.id===o.axe_id),pl=a&&S.plans.find(x=>x.id===a.plan_id);return pl?{debut:pl.debut,fin:pl.fin}:{}}
+function rythme(d0,d1){if(!d0||!d1)return null;const t0=+new Date(d0),t1=+new Date(d1),t=Date.now();if(!(t1>t0))return null;return Math.min(1,Math.max(0,(t-t0)/(t1-t0)))}
+function indValeur(i,prof=0){const ms=mesV(i);
+ if(ms.length)return {v:i.mode_periode==='cumul'?ms.reduce((s,m)=>s+Number(m.valeur),0):Number(ms[ms.length-1].valeur),src:'mesures',n:ms.length,der:ms[ms.length-1].periode_fin};
+ const enf=prof<5?S.inds.filter(x=>x.parent_id===i.id):[];if(!enf.length)return {v:null,src:null};
+ if(i.mode_agregat==='somme'){const vs=enf.map(e=>indValeur(e,prof+1)).filter(x=>x.v!=null);return {v:vs.length?vs.reduce((s,x)=>s+x.v,0):null,src:'agregat',n:vs.length,nEnf:enf.length}}
+ const ps=enf.map(e=>indPerf(e,prof+1)).filter(x=>x.taux!=null);return {v:null,tauxMoy:ps.length?ps.reduce((s,x)=>s+x.taux,0)/ps.length:null,src:'agregat',n:ps.length,nEnf:enf.length}}
+function indPerf(i,prof=0){const r=indValeur(i,prof);let taux=null,raison='';const c=nz(i.cible),b=nz(i.baseline);
+ if(r.tauxMoy!=null)taux=r.tauxMoy;
+ else if(r.v==null)raison=r.src==='agregat'?'Aucune mesure validée dans les indicateurs contributeurs':'Aucune mesure validée';
+ else if(c==null)raison='Cible non définie';
+ else if(i.mode_periode==='cumul'){if(c===0)raison='Cible égale à zéro';else taux=r.v/c}
+ else if(b==null)raison='Valeur de référence manquante';else if(c===b)raison='Cible égale à la valeur de référence';else taux=(r.v-b)/(c-b);
+ const ctx=indCtx(i),att=rythme(i.baseline_date||ctx.debut,i.cible_date||ctx.fin);
+ const st=taux==null?'nd':att==null?'info':(taux-att)*100>=-10?'ok':(taux-att)*100>=-25?'warn':'bad';
+ return {...r,taux,att,st,raison}}
+function synth(inds){const ps=inds.map(i=>indPerf(i)),ok=ps.filter(p=>p.taux!=null);
+ const c=k=>ps.filter(p=>p.st===k).length;
+ return {n:inds.length,nData:ok.length,score:ok.length?ok.reduce((s,p)=>s+Math.min(1,Math.max(0,p.taux)),0)/ok.length:null,ok:c('ok'),warn:c('warn'),bad:c('bad'),info:c('info'),nd:c('nd')}}
+const indsProjet=p=>S.inds.filter(i=>i.projet_id===p.id);
+const indsProg=g=>S.inds.filter(i=>i.programme_id===g.id&&i.niveau==='programme');
+const projsProg=g=>S.projets.filter(p=>p.programmeId===g.id);
+function perfProg(g){const own=indsProg(g);if(own.length)return {...synth(own),base:'indicateurs du programme'};
+ const pi=projsProg(g).flatMap(indsProjet);return {...synth(pi),base:pi.length?'indicateurs des projets rattachés':'aucun indicateur'}}
+function perfObjS(o){const own=S.inds.filter(i=>i.objectif_id===o.id&&i.niveau==='strategique');if(own.length)return {...synth(own),base:'indicateurs stratégiques'};
+ const gs=S.programmes.filter(g=>g.objectif_id===o.id).map(perfProg).filter(x=>x.score!=null);
+ return {n:0,nData:gs.length,score:gs.length?gs.reduce((s,x)=>s+x.score,0)/gs.length:null,base:gs.length?'performance des programmes rattachés':'aucun indicateur ni programme renseigné'}}
+function perfPlan(pl){if(!pl)return null;const os=S.objectifs.filter(o=>S.axes.some(a=>a.id===o.axe_id&&a.plan_id===pl.id)).map(perfObjS).filter(x=>x.score!=null);
+ return {score:os.length?os.reduce((s,x)=>s+x.score,0)/os.length:null,nData:os.length,att:rythme(pl.debut,pl.fin)}}
+function barre(taux,att){const w=taux==null?0:Math.min(100,Math.max(0,taux*100)),cl=att==null||taux==null?'':(taux-att)*100>=-10?'':(taux-att)*100>=-25?'warn':'bad';
+ return `<div class="bar" role="img" aria-label="Réalisé ${tx(taux)}${att!=null?', attendu '+tx(att):''}"><i class="${cl}" style="width:${w}%"></i>${att!=null?`<span class="mk" style="left:${Math.round(att*100)}%"></span>`:''}</div>`}
+function scoreBloc(s,att,titre){return `<div class="kpi"><span>${esc(titre)}</span><b>${s&&s.score!=null?tx(s.score):'—'}</b>${s&&s.score!=null?barre(s.score,att):''}<span>${s?s.score==null?'Données insuffisantes':`sur ${s.nData} indicateur(s) renseigné(s)${s.base?' · '+esc(s.base):''}`:''}</span></div>`}
+function indTable(inds,opt={}){return svT(['Indicateur','Chaîne','Unité','#Référence','#Cible','#Réalisé','Taux','Statut',''],inds.map(i=>{const p=indPerf(i),par=i.parent_id&&S.inds.find(x=>x.id===i.parent_id);
+ return [`<b>${esc(i.code?i.code+' · ':'')}${esc(i.libelle)}</b>${par?`<br><span class="muted">contribue à : ${esc(par.libelle)}</span>`:''}${p.src==='agregat'?`<br><span class="muted">calculé à partir de ${p.n}/${p.nEnf} indicateur(s) contributeur(s)</span>`:''}`,
+  esc(CHAINE[i.chaine]||i.chaine),esc(i.unite),num(i.baseline),num(i.cible),p.v!=null?num(p.v):'—',`${tx(p.taux)}${barre(p.taux,p.att)}`,
+  `${tag(PERF_ST[p.st])}${p.raison?`<br><span class="muted">${esc(p.raison)}</span>`:''}`,
+  opt.suppr&&ecritInd(i)&&!S.mesures.some(m=>m.indicateur_id===i.id)?`<button class="btn danger sm" data-act="svDelInd" data-id="${i.id}">Supprimer</button>`:'']}),opt.vide||'Aucun indicateur défini.')}
+function indForm(form,extra,parents,champs){return `<details class="card"><summary>Ajouter un indicateur</summary><form data-form="${form}" ${extra||''} style="margin-top:.7rem"><div class="grid">
+ <div style="grid-column:span 2"><label>Libellé de l'indicateur</label><input name="libelle" required></div><div><label>Code</label><input name="code" placeholder="ex. IOS1.1"></div>
+ <div><label>Niveau de la chaîne des résultats</label><select name="chaine">${opts(Object.entries(CHAINE),'extrant')}</select></div>
+ <div><label>Unité</label><input name="unite" value="nombre" required></div>
+ <div><label>Mode de calcul dans le temps</label><select name="mode_periode"><option value="cumul">Cumul des mesures (ex. personnes touchées)</option><option value="dernier">Dernière mesure (ex. taux, pourcentage)</option></select></div>
+ <div><label>Valeur de référence</label><input name="baseline" type="number" step="any"></div><div><label>Date de référence</label><input name="baseline_date" type="date"></div>
+ <div><label>Cible</label><input name="cible" type="number" step="any"></div><div><label>Échéance de la cible</label><input name="cible_date" type="date"></div>
+ <div><label>Source de vérification</label><input name="source_verif"></div><div><label>Fréquence de collecte</label><select name="frequence">${opts(['Mensuelle','Trimestrielle','Semestrielle','Annuelle','Ponctuelle'].map(x=>[x,x]),'Trimestrielle')}</select></div>
+ <div><label>Désagrégation</label><input name="desagregation" placeholder="ex. sexe, âge, district"></div>
+ ${parents&&parents.length?`<div style="grid-column:span 2"><label>Contribue à l'indicateur de niveau supérieur</label><select name="parent_id">${opts(parents.map(x=>[x.id,`${x.niveau==='strategique'?'Stratégique':'Programme'} · ${x.code?x.code+' · ':''}${x.libelle}`]),'','— aucun —')}</select></div>`:''}
+ ${form!=='svIndJ'?`<div><label>Agrégation des contributions</label><select name="mode_agregat"><option value="somme">Somme des indicateurs contributeurs</option><option value="moyenne">Moyenne des taux d'atteinte</option></select></div>`:''}
+ ${champs||''}<div><label><input type="checkbox" name="sensible"> Donnée sensible (chiffres agrégés seulement)</label></div></div>
+ <button class="btn" type="submit">Enregistrer l'indicateur</button></form></details>`}
+const lireInd=d=>({libelle:String(d.libelle).trim(),code:d.code||null,chaine:d.chaine,unite:String(d.unite||'nombre').trim(),mode_periode:d.mode_periode,mode_agregat:d.mode_agregat||'somme',baseline:nz(d.baseline),baseline_date:d.baseline_date||null,cible:nz(d.cible),cible_date:d.cible_date||null,source_verif:d.source_verif||null,frequence:d.frequence||null,desagregation:d.desagregation||null,sensible:!!d.sensible,parent_id:d.parent_id||null});
+function mesuresBloc(inds){const ms=S.mesures.filter(m=>inds.some(i=>i.id===m.indicateur_id)).sort((a,b)=>a.saisi_le<b.saisi_le?1:-1);const peutS=inds.filter(saisitMes);
+ return `<section class="card"><h3>Mesures (${ms.length})</h3><p class="muted">Règle des quatre yeux : une mesure saisie par une personne est validée par une autre (DE, DP ou chef du projet). Seules les mesures validées entrent dans les calculs de performance ; une mesure validée ne se modifie plus.</p>
+ ${svT(['Indicateur','Période (fin)','#Valeur','#Femmes','#Hommes','Source','Saisie par','Statut',''],ms.map(m=>{const i=S.inds.find(x=>x.id===m.indicateur_id),ok=m.statut==='soumise'&&ecritInd(i);
+  return [esc(i.libelle),fmtD(m.periode_fin),num(m.valeur),num(m.valeur_f),num(m.valeur_h),esc(m.source||''),`${esc(who(m.saisi_par))}<br><span class="muted">${new Date(m.saisi_le).toLocaleDateString('fr-FR')}</span>`,
+   tag(m.statut==='validee'?['Validée','ok']:m.statut==='rejetee'?['Rejetée','bad']:['À valider','warn'])+(m.valide_par?`<br><span class="muted">${esc(who(m.valide_par))}</span>`:''),
+   ok?(m.saisi_par===me.id?'<span class="muted">À valider par une autre personne</span>':`<div class="row"><button class="btn sm" data-act="svMesVal" data-id="${m.id}">Valider</button><button class="btn ghost sm" data-act="svMesRej" data-id="${m.id}">Rejeter</button></div>`):'']}),'Aucune mesure saisie.')}
+ ${peutS.length?`<form data-form="svMesure" class="grid" style="margin-top:.8rem;align-items:end"><div style="grid-column:span 2"><label>Indicateur</label><select name="ind" required>${opts(peutS.map(i=>[i.id,`${i.code?i.code+' · ':''}${i.libelle} (${i.unite})`]))}</select></div>
+  <div><label>Fin de la période mesurée</label><input name="periode_fin" type="date" required max="${today()}"></div><div><label>Valeur</label><input name="valeur" type="number" step="any" required></div>
+  <div><label>dont femmes</label><input name="valeur_f" type="number" step="any" min="0"></div><div><label>dont hommes</label><input name="valeur_h" type="number" step="any" min="0"></div>
+  <div><label>Source</label><input name="source" placeholder="ex. fiches de présence"></div><div><label>Commentaire</label><input name="commentaire"></div><div><button class="btn sm" type="submit">Soumettre la mesure</button></div></form>`:''}</section>`}
+function risquesBloc(rs,scope){const peut=scope.projet?gereProj(projet(scope.projet)):pilote();
+ return `<section class="card"><h3>Risques (${rs.length})</h3><p class="muted">Criticité = probabilité × impact (1 à 25). 15 et plus : élevée.</p>
+ ${svT(['Risque','Catégorie','#P','#I','#Criticité','Mesures d\'atténuation','Responsable','Échéance','Statut'],rs.sort((a,b)=>b.probabilite*b.impact-a.probabilite*a.impact).map(r=>{const c=r.probabilite*r.impact;
+  return [esc(r.libelle),esc(r.categorie||''),r.probabilite,r.impact,`<span class="tag ${c>=15?'bad':c>=8?'warn':'ok'}">${c}</span>`,esc(r.mesures||''),esc(who(r.responsable_id)),fmtD(r.echeance),
+   peut||r.responsable_id===me.id?`<select class="svRqSt" data-id="${r.id}" aria-label="Statut du risque">${opts(Object.entries(RQ_ST).map(([k,[l]])=>[k,l]),r.statut)}</select>`:tag(RQ_ST[r.statut])]}),'Aucun risque enregistré.')}
+ ${peut?`<details style="margin-top:.6rem"><summary>Ajouter un risque</summary><form data-form="svRisque" ${scope.projet?`data-p="${scope.projet}"`:`data-g="${scope.prog}"`} class="grid" style="margin-top:.6rem;align-items:end">
+  <div style="grid-column:span 2"><label>Risque</label><input name="libelle" required></div><div><label>Catégorie</label><select name="categorie">${opts(['Sécuritaire','Financier','Opérationnel','Programmatique','Fiduciaire et fraude','Protection (PSEA)','Réputation','Climatique et environnemental','Juridique','Autre'].map(x=>[x,x]))}</select></div>
+  <div><label>Probabilité (1-5)</label><input name="probabilite" type="number" min="1" max="5" value="3" required></div><div><label>Impact (1-5)</label><input name="impact" type="number" min="1" max="5" value="3" required></div>
+  <div style="grid-column:span 2"><label>Mesures d'atténuation</label><input name="mesures"></div><div><label>Responsable</label><select name="resp">${staffOpts('')}</select></div><div><label>Échéance</label><input name="echeance" type="date"></div>
+  <div><button class="btn sm" type="submit">Enregistrer le risque</button></div></form></details>`:''}</section>`}
+
+/* ---------- accueil et pilotage ---------- */
+function aValider(){return S.mesures.filter(m=>m.statut==='soumise'&&m.saisi_par!==me.id&&ecritInd(S.inds.find(i=>i.id===m.indicateur_id)||{}))}
+function alertes(){const A=[],t=today(),d60=new Date(Date.now()+60*864e5).toISOString().slice(0,10);
+ const mv=aValider();if(mv.length){const i0=S.inds.find(i=>i.id===mv[0].indicateur_id)||{};A.push(['warn',`${mv.length} mesure(s) d'indicateur à valider`,i0.projet_id?'svDos':'svPg',i0.projet_id||i0.programme_id,'ind'])}
+ S.projets.filter(p=>['verification','validation'].includes(p.statut)&&pilote()).forEach(p=>A.push(['warn',`Projet « ${p.nom} » en ${PSTAT[p.statut][0].toLowerCase()} : décision attendue`,'svDos',p.id,'act']));
+ S.projets.filter(p=>p.fin&&p.fin>=t&&p.fin<=d60&&['active','execution'].includes(p.statut)).forEach(p=>A.push(['warn',`Projet « ${p.nom} » se termine le ${fmtD(p.fin)} : préparer la clôture et le rapport final`,'svDos',p.id,'id']));
+ S.projets.filter(p=>p.fin&&p.fin<t&&['active','execution'].includes(p.statut)).forEach(p=>A.push(['bad',`Projet « ${p.nom} » : date de fin dépassée (${fmtD(p.fin)}) mais toujours en exécution`,'svDos',p.id,'id']));
+ S.jalons.filter(j=>j.echeance&&j.echeance<t&&!['fait','abandonne'].includes(j.statut)).forEach(j=>A.push(['bad',`Jalon en retard : ${j.libelle} (${fmtD(j.echeance)}) · ${libProg(programme(j.programme_id))}`,'svPg',j.programme_id]));
+ S.risques.filter(r=>r.statut!=='clos'&&r.probabilite*r.impact>=15).forEach(r=>A.push(['bad',`Risque élevé (${r.probabilite*r.impact}) : ${r.libelle}`,r.projet_id?'svDos':'svPg',r.projet_id||r.programme_id,'rq']));
+ S.inds.filter(i=>indPerf(i).st==='bad').slice(0,8).forEach(i=>A.push(['bad',`Indicateur en retard : ${i.libelle}`,i.projet_id?'svDos':i.programme_id?'svPg':'go',i.projet_id||i.programme_id||'strategie','ind']));
+ return A}
+function alerteHTML(A){return A.length?`<ul class="svAl">${A.slice(0,15).map(([c,t,act,id,tab])=>`<li class="${c}"><button class="lnk" data-act="${act}" ${act==='go'?`data-v="${id}"`:`data-id="${id||''}"`} ${tab?`data-tab="${tab}"`:''}>${esc(t)}</button></li>`).join('')}</ul>${A.length>15?`<p class="muted">… et ${A.length-15} autre(s).</p>`:''}`:'<p class="empty">Aucune alerte. Tout est à jour.</p>'}
+function pilotageHTML(){const pl=planCourant(),pp=perfPlan(pl),ps=S.projets,actifs=ps.filter(p=>['active','execution'].includes(p.statut));
+ const s=synth(S.inds),budget=ps.filter(p=>!['rejete','archive'].includes(p.statut)).reduce((x,p)=>x+(p.budgetApprouve||p.montant||0),0),A=alertes();
+ const k=(v,l,act,val)=>`<button class="kpi svK" data-act="${act}" ${val?`data-v="${val}"`:''}><b>${v}</b><span>${l}</span></button>`;
+ return `<div class="kpis">${k(S.programmes.filter(g=>g.type==='programme').length+' · '+S.programmes.filter(g=>g.type==='operation').length,'Programmes · opérations stratégiques','go','programmes')}
+  ${k(actifs.length+' / '+ps.length,'Projets actifs / total','go','projets')}${k(budget?Math.round(budget/1e6).toLocaleString('fr-FR')+' M':'—','Budget approuvé du portefeuille (FCFA)','go','projets')}
+  ${k(pp&&pp.score!=null?tx(pp.score):'—','Réalisation du plan stratégique'+(pp&&pp.att!=null?` (rythme attendu ${tx(pp.att)})`:''),'go','performance')}
+  ${k(`${s.ok} · ${s.warn} · ${s.bad}`,'Indicateurs dans les temps · à surveiller · en retard','go','performance')}${k(s.nd,'Indicateurs sans données suffisantes','go','performance')}
+  ${k(aValider().length,'Mesures à valider','go','projets')}${k(S.risques.filter(r=>r.statut!=='clos'&&r.probabilite*r.impact>=15).length,'Risques élevés ouverts','go','programmes')}
+  ${k(S.docs.length,'Documents archivés visibles','go','archives')}</div>
+ <section class="card"><h3>Alertes et décisions à prendre (${A.length})</h3>${alerteHTML(A)}</section>`}
+
+/* ---------- plan stratégique ---------- */
+function svStrategie(){const de=me.role==='DE',pl=planCourant();
+ const formPlan=`<form data-form="svPlan" class="grid" style="align-items:end"><div style="grid-column:span 2"><label>Intitulé du plan</label><input name="intitule" required placeholder="ex. Plan stratégique 2026-2030"></div><div><label>Début</label><input name="debut" type="date" required></div><div><label>Fin</label><input name="fin" type="date" required></div><div><button class="btn sm" type="submit">Créer le plan</button></div></form>`;
+ if(!pl)return head('Plan stratégique','Le cadre de référence : axes, objectifs stratégiques, indicateurs et programmes qui y contribuent.')+`<section class="card">${de?`<h3>Enregistrer le plan stratégique</h3><p class="muted">Saisissez le plan adopté par le conseil d'administration. Aucune donnée n'est proposée par défaut.</p>${formPlan}`:'<p class="empty">Le plan stratégique n\'est pas encore saisi. Le Directeur exécutif l\'enregistre.</p>'}</section>`;
+ const pp=perfPlan(pl),axes=S.axes.filter(a=>a.plan_id===pl.id).sort((a,b)=>a.ordre-b.ordre||String(a.code).localeCompare(b.code)),objs=S.objectifs.filter(o=>axes.some(a=>a.id===o.axe_id));
+ return head('Plan stratégique',`${esc(pl.intitule)} · du ${fmtD(pl.debut)} au ${fmtD(pl.fin)}`)+
+ `<div class="kpis">${scoreBloc(pp&&{score:pp.score,nData:pp.nData,base:'moyenne des objectifs renseignés'},pp&&pp.att,'Réalisation du plan')}<div class="kpi"><span>Temps écoulé du plan</span><b>${tx(pp&&pp.att)}</b></div><div class="kpi"><span>Axes · objectifs</span><b>${axes.length} · ${objs.length}</b></div><div class="kpi"><span>Programmes et opérations rattachés</span><b>${S.programmes.filter(g=>objs.some(o=>o.id===g.objectif_id)).length}</b></div></div>`+
+ (de?`<details class="card"><summary>Modifier le plan, ajouter un axe ou un objectif</summary>
+  <form data-form="svPlanMaj" data-id="${pl.id}" class="grid" style="margin-top:.7rem;align-items:end"><div style="grid-column:span 2"><label>Intitulé</label><input name="intitule" required value="${esc(pl.intitule)}"></div><div><label>Début</label><input name="debut" type="date" required value="${pl.debut}"></div><div><label>Fin</label><input name="fin" type="date" required value="${pl.fin}"></div><div><label>Statut</label><select name="statut">${opts([['preparation','En préparation'],['en_vigueur','En vigueur'],['clos','Clos']],pl.statut)}</select></div><div><button class="btn sm" type="submit">Enregistrer</button></div></form>
+  <h4>Nouvel axe stratégique</h4><form data-form="svAxe" class="grid" style="align-items:end"><div><label>Code</label><input name="code" placeholder="ex. AXE 1"></div><div style="grid-column:span 2"><label>Intitulé de l'axe</label><input name="intitule" required></div><div><button class="btn sm" type="submit">Ajouter l'axe</button></div></form>
+  ${axes.length?`<h4>Nouvel objectif stratégique</h4><form data-form="svObj" class="grid" style="align-items:end"><div><label>Axe</label><select name="axe">${opts(axes.map(a=>[a.id,`${a.code||''} ${a.intitule}`]))}</select></div><div><label>Code</label><input name="code" placeholder="ex. OS 1.1"></div><div style="grid-column:span 2"><label>Intitulé de l'objectif</label><input name="intitule" required></div><div><button class="btn sm" type="submit">Ajouter l'objectif</button></div></form>`:''}</details>`:'')+
+ (axes.length?axes.map(a=>{const os=S.objectifs.filter(o=>o.axe_id===a.id).sort((x,y)=>x.ordre-y.ordre||String(x.code).localeCompare(y.code));
+  return `<section class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">${esc(a.code?a.code+' · ':'')}${esc(a.intitule)}</h3>${de&&!os.length?`<button class="btn danger sm" data-act="svDelAxe" data-id="${a.id}">Supprimer l'axe</button>`:''}</div>
+  ${os.length?os.map(o=>{const po=perfObjS(o),inds=S.inds.filter(i=>i.objectif_id===o.id&&i.niveau==='strategique'),gs=S.programmes.filter(g=>g.objectif_id===o.id);
+   return `<div class="svObj"><div class="row" style="justify-content:space-between"><h4 style="margin:.2rem 0">${esc(o.code?o.code+' · ':'')}${esc(o.intitule)}</h4><span>${po.score!=null?`<b>${tx(po.score)}</b> <span class="muted">(${esc(po.base)})</span>`:'<span class="tag">Données insuffisantes</span>'}${de&&!inds.length&&!gs.length?` <button class="btn danger sm" data-act="svDelObj" data-id="${o.id}">Supprimer</button>`:''}</span></div>
+   ${inds.length?indTable(inds,{suppr:true}):'<p class="muted">Aucun indicateur stratégique pour cet objectif.</p>'}
+   <p class="muted" style="margin:.3rem 0">Programmes et opérations qui y contribuent : ${gs.length?gs.map(g=>`<button class="lnk" data-act="svPg" data-id="${g.id}">${esc(libProg(g))}</button>`).join(', '):'aucun pour le moment'}</p>
+   ${pilote()?indForm('svIndS',`data-o="${o.id}"`):''}</div>`}).join(''):'<p class="empty">Aucun objectif dans cet axe.</p>'}</section>`}).join(''):`<section class="card"><p class="empty">${de?'Ajoutez les axes du plan ci-dessus.':'Les axes du plan ne sont pas encore saisis.'}</p></section>`)}
+
+/* ---------- programmes et opérations stratégiques ---------- */
+function mobilise(g){return projsProg(g).filter(p=>!['rejete'].includes(p.statut)).reduce((s,p)=>s+(p.budgetApprouve||p.montant||0),0)}
+function svProgrammes(){if(pgSel&&programme(pgSel))return svProgramme(programme(pgSel));pgSel=null;
+ const objs=S.objectifs;
+ const form=pilote()?`<details class="card" ${S.programmes.length?'':'open'}><summary><b>Créer un programme ou une opération stratégique</b></summary><form data-form="svProg" style="margin-top:.7rem"><div class="grid">
+  <div><label>Type</label><select name="type"><option value="programme">Programme</option><option value="operation">Opération stratégique (croissance, structuration)</option></select></div><div><label>Code</label><input name="code" placeholder="ex. PROG-SR"></div>
+  <div style="grid-column:span 2"><label>Intitulé</label><input name="nom" required></div><div><label>Domaine</label><select name="domaine"><option value="">—</option>${DOMAINES.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div>
+  <div style="grid-column:span 2"><label>Objectif stratégique servi</label><select name="objectif">${opts(objs.map(o=>[o.id,libObj(o)]),'',objs.length?'— à préciser —':'— le plan n\'est pas encore saisi —')}</select></div>
+  <div><label>Responsable</label><select name="resp">${staffOpts('')}</select></div><div><label>Début</label><input name="debut" type="date"></div><div><label>Fin</label><input name="fin" type="date"></div>
+  <div><label>Budget prévu (FCFA)</label><input name="budget" type="number" min="0"></div><div style="grid-column:1/-1"><label>Description</label><textarea name="description" rows="2"></textarea></div></div>
+  <button class="btn" type="submit">Créer</button></form></details>`:'';
+ const ligne=g=>{const pf=perfProg(g),m=mobilise(g),ps=projsProg(g);return [`<button class="lnk" data-act="svPg" data-id="${g.id}"><b>${esc(libProg(g))}</b></button><br><span class="muted">${esc(libObj(objectif(g.objectif_id)))}</span>`,
+  esc(who(g.responsable_id)),`${fmtD(g.debut)} → ${fmtD(g.fin)}`,ps.length,num(g.budget_prevu),num(m),g.budget_prevu?num(Math.max(0,g.budget_prevu-m)):'—',`${tx(pf.score)}${pf.score!=null?barre(pf.score,null):''}`,tag(PG_ST[g.statut])]};
+ const cols=['Intitulé et objectif servi','Responsable','Période','#Projets','#Budget prévu','#Mobilisé','#À mobiliser','Performance','Statut'];
+ return head('Programmes et opérations stratégiques','Chaque programme regroupe des projets financés ; les opérations stratégiques portent la croissance et la structuration de l\'organisation. Montants en FCFA.')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+form+
+ `<section class="card"><h3>Programmes (${S.programmes.filter(g=>g.type==='programme').length})</h3>${svT(cols,S.programmes.filter(g=>g.type==='programme').map(ligne),'Aucun programme enregistré.')}</section>
+ <section class="card"><h3>Opérations stratégiques (${S.programmes.filter(g=>g.type==='operation').length})</h3>${svT(cols,S.programmes.filter(g=>g.type==='operation').map(ligne),'Aucune opération stratégique enregistrée.')}</section>
+ ${S.projets.some(p=>!p.programmeId)?`<section class="card"><h3>Projets non rattachés à un programme (${S.projets.filter(p=>!p.programmeId).length})</h3><p class="muted">Un projet doit être rattaché à un programme pour être activé.</p>${svT(['Projet','Bailleur','Statut'],S.projets.filter(p=>!p.programmeId).map(p=>[`<button class="lnk" data-act="svDos" data-id="${p.id}">${esc(libProj(p))}</button>`,esc(p.bailleur||'—'),tag(PSTAT[p.statut]||[p.statut])]))}</section>`:''}`}
+function svProgramme(g){const pf=perfProg(g),m=mobilise(g),ps=projsProg(g),js=S.jalons.filter(j=>j.programme_id===g.id).sort((a,b)=>(a.echeance||'9')<(b.echeance||'9')?-1:1),pi=indsProg(g),pil=pilote();
+ const parents=S.inds.filter(i=>i.niveau==='strategique'&&(!g.objectif_id||i.objectif_id===g.objectif_id));
+ return `<p><button class="lnk" data-act="svPg" data-id="">← Tous les programmes</button></p>`+head(esc(libProg(g)),`${g.type==='operation'?'Opération stratégique':'Programme'} · ${esc(libObj(objectif(g.objectif_id)))}`)+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
+ `<div class="kpis">${scoreBloc(pf,rythme(g.debut,g.fin),'Performance du '+(g.type==='operation'?'l\'opération':'programme'))}<div class="kpi"><span>Budget prévu</span><b>${num(g.budget_prevu)}</b><span>FCFA</span></div><div class="kpi"><span>Mobilisé (projets rattachés)</span><b>${num(m)}</b><span>${g.budget_prevu?tx(m/g.budget_prevu)+' du prévu':'FCFA'}</span></div><div class="kpi"><span>Financement à mobiliser</span><b>${g.budget_prevu?num(Math.max(0,g.budget_prevu-m)):'—'}</b><span>FCFA</span></div></div>
+ <section class="card"><div class="facts"><div><span>Responsable</span><b>${esc(who(g.responsable_id))}</b></div><div><span>Période</span><b>${fmtD(g.debut)} → ${fmtD(g.fin)}</b></div><div><span>Domaine</span><b>${esc(g.domaine||'—')}</b></div><div><span>Statut</span><b>${PG_ST[g.statut][0]}</b></div></div>${g.description?`<p>${esc(g.description)}</p>`:''}
+ ${pil?`<details><summary>Modifier</summary><form data-form="svProgMaj" data-id="${g.id}" class="grid" style="margin-top:.6rem;align-items:end">
+  <div><label>Code</label><input name="code" value="${esc(g.code||'')}"></div><div style="grid-column:span 2"><label>Intitulé</label><input name="nom" required value="${esc(g.nom)}"></div>
+  <div style="grid-column:span 2"><label>Objectif stratégique servi</label><select name="objectif">${opts(S.objectifs.map(o=>[o.id,libObj(o)]),g.objectif_id||'','— à préciser —')}</select></div>
+  <div><label>Responsable</label><select name="resp">${staffOpts(g.responsable_id||'')}</select></div><div><label>Début</label><input name="debut" type="date" value="${g.debut||''}"></div><div><label>Fin</label><input name="fin" type="date" value="${g.fin||''}"></div>
+  <div><label>Budget prévu (FCFA)</label><input name="budget" type="number" min="0" value="${g.budget_prevu??''}"></div><div><label>Statut</label><select name="statut">${opts(Object.entries(PG_ST).map(([k,[l]])=>[k,l]),g.statut)}</select></div>
+  <div style="grid-column:1/-1"><label>Description</label><textarea name="description" rows="2">${esc(g.description||'')}</textarea></div><div><button class="btn sm" type="submit">Enregistrer</button></div></form></details>`:''}</section>
+ <section class="card"><h3>Indicateurs du programme (${pi.length})</h3><p class="muted">Un indicateur de programme peut être calculé à partir des indicateurs des projets qui y contribuent (somme ou moyenne), ou mesuré directement.</p>${indTable(pi,{suppr:true,vide:'Aucun indicateur de programme : la performance est alors calculée sur les indicateurs des projets rattachés.'})}</section>
+ ${pil?indForm('svIndP',`data-g="${g.id}"`,parents):''}
+ ${pi.length?mesuresBloc(pi):''}
+ <section class="card"><h3>Projets rattachés (${ps.length})</h3>${svT(['Projet','Bailleur','#Budget','Période','Chef de projet','Performance','Statut'],ps.map(p=>{const s=synth(indsProjet(p));return [`<button class="lnk" data-act="svDos" data-id="${p.id}">${esc(libProj(p))}</button>`,esc(p.bailleur||'—'),num(p.budgetApprouve||p.montant),`${fmtD(p.debut)} → ${fmtD(p.fin)}`,esc(who(p.chefId)),`${tx(s.score)}${s.score!=null?barre(s.score,rythme(p.debut,p.fin)):''}`,tag(PSTAT[p.statut]||[p.statut])]}),'Aucun projet rattaché.')}
+ ${pil&&S.projets.some(p=>p.programmeId!==g.id)?`<div class="row" style="margin-top:.6rem"><label for="pgLier">Rattacher un projet :</label><select id="pgLier" class="svLier" data-g="${g.id}"><option value="">— choisir —</option>${S.projets.filter(p=>p.programmeId!==g.id).map(p=>`<option value="${p.id}">${esc(libProj(p))}${p.programmeId?' (déjà dans '+esc(libProg(programme(p.programmeId)))+')':''}</option>`).join('')}</select></div>`:''}</section>
+ <section class="card"><h3>Jalons (${js.length})</h3>${svT(['Jalon','Échéance','Responsable','Statut'],js.map(j=>[esc(j.libelle),`${fmtD(j.echeance)}${j.echeance&&j.echeance<today()&&!['fait','abandonne'].includes(j.statut)?' <span class="tag bad">En retard</span>':''}`,esc(who(j.responsable_id)),pil||j.responsable_id===me.id?`<select class="svJalSt" data-id="${j.id}" aria-label="Statut du jalon">${opts(Object.entries(JAL_ST),j.statut)}</select>`:esc(JAL_ST[j.statut])]),'Aucun jalon.')}
+ ${pil?`<form data-form="svJalon" data-g="${g.id}" class="grid" style="margin-top:.6rem;align-items:end"><div style="grid-column:span 2"><label>Nouveau jalon</label><input name="libelle" required></div><div><label>Échéance</label><input name="echeance" type="date"></div><div><label>Responsable</label><select name="resp">${staffOpts('')}</select></div><div><button class="btn sm" type="submit">Ajouter</button></div></form>`:''}</section>
+ ${risquesBloc(S.risques.filter(r=>r.programme_id===g.id&&!r.projet_id),{prog:g.id})}
+ <section class="card"><h3>Archives du programme</h3>${docsTable(S.docs.filter(d=>d.programme_id===g.id||ps.some(p=>p.id===d.projet_id)))}<p><button class="btn ghost sm" data-act="svArProg" data-id="${g.id}">Ouvrir dans les archives</button></p></section>`}
+
+/* ---------- portefeuille des projets ---------- */
+function svPortefeuille(){const creer=pilote();let ps=S.projets.slice();
+ if(pfF.prog)ps=ps.filter(p=>pfF.prog==='aucun'?!p.programmeId:p.programmeId===pfF.prog);if(pfF.statut)ps=ps.filter(p=>p.statut===pfF.statut);
+ if(pfF.q){const q=pfF.q.toLowerCase();ps=ps.filter(p=>[p.nom,p.code,p.bailleur,p.zone].join(' ').toLowerCase().includes(q))}
+ const tot=ps.reduce((s,p)=>s+(p.budgetApprouve||p.montant||0),0),parSt={};S.projets.forEach(p=>parSt[p.statut]=(parSt[p.statut]||0)+1);
+ return head('Portefeuille des projets',creer?'Tous les projets de l\'organisation. Un projet est créé en brouillon puis suit le circuit : configuration, vérification, validation, activation, exécution, clôture, archivage.':'Les projets auxquels vous êtes affecté(e).')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
+ (creer?`<details class="card" ${S.projets.length?'':'open'}><summary><b>Enregistrer un projet</b></summary><form data-form="srvProjet" style="margin-top:.8rem"><div class="grid">
+  <div style="grid-column:span 2"><label>Intitulé du projet</label><input name="nom" required></div><div><label>Code</label><input name="code"></div>
+  <div style="grid-column:span 2"><label>Programme</label><select name="programme">${opts(S.programmes.map(g=>[g.id,libProg(g)]),'','— à rattacher plus tard —')}</select></div><div><label>Bailleur</label><input name="bailleur"></div>
+  <div><label>Budget approuvé (FCFA)</label><input name="montant" type="number" min="0"></div><div><label>Début</label><input name="debut" type="date"></div><div><label>Fin</label><input name="fin" type="date"></div><div><label>Zone d'intervention</label><input name="zone"></div>
+  <div><label>Domaine</label><select name="domaine"><option value="">—</option>${DOMAINES.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div>
+  <div><label>Bureau</label><select name="bureau"><option value="">—</option>${S.bureaux.map(b=>`<option value="${b.id}">${esc(b.ville)}</option>`).join('')}</select></div>
+  <div><label>Chef de projet</label><select name="chef">${staffOpts('')}</select></div></div>
+  <button class="btn" type="submit">Enregistrer en brouillon</button></form></details>`:'')+
+ `<section class="card"><div class="row" style="gap:.4rem 1rem">${Object.entries(parSt).map(([k,n])=>`<span>${tag(PSTAT[k]||[k])} ${n}</span>`).join('')||'<span class="muted">Aucun projet.</span>'}</div>
+ <div class="grid" style="margin:.8rem 0;align-items:end"><div><label for="pfP">Programme</label><select id="pfP" data-flt="pf.prog">${opts([['aucun','Non rattachés'],...S.programmes.map(g=>[g.id,libProg(g)])],pfF.prog,'Tous')}</select></div>
+  <div><label for="pfS">Statut</label><select id="pfS" data-flt="pf.statut">${opts(Object.entries(PSTAT).map(([k,[l]])=>[k,l]),pfF.statut,'Tous')}</select></div>
+  <div><label for="pfQ">Recherche</label><input id="pfQ" data-flt="pf.q" value="${esc(pfF.q)}" placeholder="intitulé, bailleur, zone"></div></div>
+ ${svT(['Projet','Programme','Bailleur','#Budget (FCFA)','Période','Chef de projet','Avancement des indicateurs','Statut',''],ps.map(p=>{const s=synth(indsProjet(p));
+  return [`<b>${esc(libProj(p))}</b>${p.zone?`<br><span class="muted">${esc(p.zone)}</span>`:''}`,esc(libProg(programme(p.programmeId))),esc(p.bailleur||'—'),num(p.budgetApprouve||p.montant),`${fmtD(p.debut)} → ${fmtD(p.fin)}`,esc(who(p.chefId)),
+   s.n?`${tx(s.score)}${s.score!=null?barre(s.score,rythme(p.debut,p.fin)):''}<span class="muted">${s.nData}/${s.n} indicateur(s) renseigné(s)</span>`:'<span class="muted">Aucun indicateur</span>',tag(PSTAT[p.statut]||[p.statut]),`<button class="btn sm" data-act="svDos" data-id="${p.id}">Ouvrir le dossier</button>`]}),'Aucun projet ne correspond.')}
+ <p class="legend">${ps.length} projet(s) · budget cumulé ${num(tot)} FCFA. Le trait vertical sur les barres indique le rythme attendu à la date du jour.</p></section>`}
+
+/* ---------- dossier unique du projet ---------- */
+const DOS_TABS=[['id','Identification'],['cl','Cadre logique'],['ind','Indicateurs et mesures'],['eq','Équipe'],['rq','Risques'],['doc','Documents'],['hist','Historique'],['act','Activation']];
+function svDossier(){const p=projet(dosSel);if(!p){view='projets';return svPortefeuille()}
+ const s=synth(indsProjet(p)),g=programme(p.programmeId);
+ return `<p><button class="lnk" data-act="go" data-v="projets">← Portefeuille</button>${g?` · <button class="lnk" data-act="svPg" data-id="${g.id}">${esc(libProg(g))}</button>`:''}</p>`+
+ head(esc(libProj(p)),`${esc(p.bailleur||'Bailleur non renseigné')} · ${fmtD(p.debut)} → ${fmtD(p.fin)} · ${(PSTAT[p.statut]||[p.statut])[0]} · avancement des indicateurs ${tx(s.score)}`)+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
+ `<nav class="subnav" aria-label="Volets du dossier">${DOS_TABS.map(([k,l])=>`<button data-act="svDosTab" data-v="${k}" ${dosTab===k?'aria-current="page"':''}>${l}</button>`).join('')}</nav>`+
+ ({id:dosId,cl:dosCadre,ind:dosInd,eq:dosEquipe,rq:p=>risquesBloc(S.risques.filter(r=>r.projet_id===p.id),{projet:p.id}),doc:dosDocs,hist:dosHist,act:dosAct}[dosTab]||dosId)(p)}
+function dosId(p){const creer=pilote(),ge=gereProj(p),g=programme(p.programmeId);
+ return `<section class="card"><div class="facts"><div><span>Programme</span><b>${esc(libProg(g))}</b></div><div><span>Code</span><b>${esc(p.code||'—')}</b></div><div><span>Budget approuvé</span><b>${num(p.budgetApprouve||p.montant)} FCFA</b></div><div><span>Période</span><b>${fmtD(p.debut)} → ${fmtD(p.fin)}</b></div><div><span>Zone</span><b>${esc(p.zone||'—')}</b></div><div><span>Domaine</span><b>${esc(p.domaine||'—')}</b></div><div><span>Bureau</span><b>${esc(bur(p.bureau))}</b></div><div><span>Chef de projet</span><b>${esc(p.chefId?who(p.chefId):'à désigner')}</b></div>${p.valideLe?`<div><span>Validé</span><b>${fmtD(p.valideLe)} · ${esc(who(p.validePar))}</b></div>`:''}<div><span>Temps écoulé</span><b>${tx(rythme(p.debut,p.fin))}</b></div></div>
+ ${creer?`<div class="row"><label for="stP">Statut du projet :</label><select id="stP" class="srvStatutSel" data-id="${p.id}">${Object.entries(PSTAT).map(([k,[l]])=>`<option value="${k}" ${k===p.statut?'selected':''}>${l}</option>`).join('')}</select></div>`:''}
+ ${ge?`<details style="margin-top:.6rem"><summary>Modifier les informations du projet</summary><form data-form="srvProjetMaj" data-p="${p.id}" class="grid" style="margin-top:.6rem;align-items:end"><div style="grid-column:span 2"><label>Intitulé</label><input name="nom" required value="${esc(p.nom)}"></div><div><label>Code</label><input name="code" value="${esc(p.code||'')}"></div>
+  ${creer?`<div style="grid-column:span 2"><label>Programme</label><select name="programme">${opts(S.programmes.map(x=>[x.id,libProg(x)]),p.programmeId||'','— non rattaché —')}</select></div>`:''}<div><label>Bailleur</label><input name="bailleur" value="${esc(p.bailleur)}"></div><div><label>Budget approuvé (FCFA)</label><input name="montant" type="number" min="0" value="${(p.budgetApprouve||p.montant)||''}"></div><div><label>Début</label><input name="debut" type="date" value="${p.debut}"></div><div><label>Fin</label><input name="fin" type="date" value="${p.fin}"></div><div><label>Zone</label><input name="zone" value="${esc(p.zone)}"></div><div><label>Domaine</label><select name="domaine"><option value="">—</option>${DOMAINES.map(x=>`<option ${x===p.domaine?'selected':''}>${esc(x)}</option>`).join('')}</select></div>${creer?`<div><label>Chef de projet</label><select name="chef">${staffOpts(p.chefId||'')}</select></div>`:''}<div><button class="btn sm" type="submit">Enregistrer</button></div></form></details>`:''}</section>
+ <div class="tiles six">${DOS_TABS.slice(1).map(([k,l])=>{const n={cl:S.cadre.filter(c=>c.projet_id===p.id).length,ind:indsProjet(p).length,eq:p.membres.length,rq:S.risques.filter(r=>r.projet_id===p.id&&r.statut!=='clos').length,doc:S.docs.filter(d=>d.projet_id===p.id).length}[k];return `<button class="tile" data-act="svDosTab" data-v="${k}"><h2>${l}</h2><p>${n!=null?n+' élément(s)':''}</p></button>`}).join('')}</div>`}
+function dosCadre(p){const cl=S.cadre.filter(c=>c.projet_id===p.id),ge=gereProj(p),ordre=['og','os','res','act'];
+ const branche=(par,prof)=>cl.filter(c=>(c.parent_id||null)===par).sort((a,b)=>ordre.indexOf(a.niveau)-ordre.indexOf(b.niveau)||a.ordre-b.ordre||String(a.code).localeCompare(b.code)).map(c=>{const inds=S.inds.filter(i=>i.cadre_id===c.id);
+  return `<li><div class="row" style="justify-content:space-between"><span><span class="tag">${CL_NIV[c.niveau]}</span> <b>${esc(c.code?c.code+' · ':'')}${esc(c.libelle)}</b>${inds.length?` <span class="muted">· ${inds.length} indicateur(s)</span>`:''}</span>${ge&&!cl.some(x=>x.parent_id===c.id)&&!inds.length?`<button class="btn danger sm" data-act="svDelCl" data-id="${c.id}">Supprimer</button>`:''}</div>${c.hypotheses?`<p class="muted" style="margin:.2rem 0">Hypothèses : ${esc(c.hypotheses)}</p>`:''}${prof<4?`<ul>${branche(c.id,prof+1)}</ul>`:''}</li>`}).join('');
+ return `<section class="card"><h3>Cadre logique</h3><p class="muted">Objectif global → objectifs spécifiques → résultats attendus → activités. Les indicateurs se rattachent à chaque niveau (onglet Indicateurs).</p>${cl.length?`<ul class="svTree">${branche(null,0)}</ul>`:'<p class="empty">Le cadre logique n\'est pas encore saisi.</p>'}
+ ${ge?`<form data-form="svCadre" data-p="${p.id}" class="grid" style="margin-top:.8rem;align-items:end"><div><label>Niveau</label><select name="niveau">${opts(Object.entries(CL_NIV),cl.length?'os':'og')}</select></div>
+  <div><label>Rattaché à</label><select name="parent">${opts(cl.filter(c=>c.niveau!=='act').map(c=>[c.id,`${CL_NIV[c.niveau]} · ${c.code?c.code+' · ':''}${c.libelle}`]),'','— niveau supérieur —')}</select></div><div><label>Code</label><input name="code" placeholder="ex. R1.2"></div>
+  <div style="grid-column:span 2"><label>Libellé</label><input name="libelle" required></div><div style="grid-column:span 2"><label>Hypothèses et conditions (facultatif)</label><input name="hypotheses"></div><div><button class="btn sm" type="submit">Ajouter</button></div></form>`:''}</section>`}
+function dosInd(p){const inds=indsProjet(p),g=programme(p.programmeId),parents=S.inds.filter(i=>(i.niveau==='programme'&&i.programme_id===p.programmeId)||(i.niveau==='strategique'&&g&&i.objectif_id===g.objectif_id));
+ return `<section class="card"><h3>Indicateurs du projet (${inds.length})</h3>${indTable(inds,{suppr:true})}</section>${gereProj(p)?indForm('svIndJ',`data-p="${p.id}"`,parents,`<div style="grid-column:span 2"><label>Niveau du cadre logique mesuré</label><select name="cadre_id">${opts(S.cadre.filter(c=>c.projet_id===p.id).map(c=>[c.id,`${CL_NIV[c.niveau]} · ${c.code?c.code+' · ':''}${c.libelle}`]),'','—')}</select></div>`):''}${mesuresBloc(inds)}`}
+function dosEquipe(p){const ge=srvGereEq(p),actifs=S.staff.filter(u=>u.actif&&u.role!=='EXT');
+ return `<section class="card"><h3>Équipe affectée (${p.membres.length})</h3>${p.membres.length?`<div class="tbl"><table><thead><tr><th>Personne</th><th>Rôle dans le projet</th><th>Du</th><th>Au</th>${ge?'<th></th>':''}</tr></thead><tbody>${p.membres.map(m=>`<tr><td>${esc(who(m.staffId))}</td><td>${esc(m.roleProjet)}</td><td>${fmtD(m.debut)}</td><td>${fmtD(m.fin)}</td>${ge?`<td><button class="btn danger sm" data-act="srvDelAff" data-id="${m.affId}">Retirer</button></td>`:''}</tr>`).join('')}</tbody></table></div>`:'<p class="empty">Personne n\'est encore affecté.</p>'}
+ ${ge?`<form data-form="srvAff" data-p="${p.id}" class="grid" style="margin-top:.6rem;align-items:end"><div><label>Personne</label><select name="user" required>${actifs.map(u=>`<option value="${u.id}">${esc(u.nom)} (${esc(posteLib(u))})</option>`).join('')}</select></div><div><label>Rôle dans le projet</label><select name="role">${ROLES_PROJET.map(r=>`<option>${r}</option>`).join('')}</select></div><div><label>Du</label><input type="date" name="debut"></div><div><label>Au</label><input type="date" name="fin"></div><div><button class="btn sm" type="submit">Affecter</button></div></form>`:''}</section>`}
+function dosDocs(p){const ds=S.docs.filter(d=>d.projet_id===p.id);
+ return `<section class="card"><h3>Documents du projet (${ds.length})</h3><p class="muted">Vous voyez les documents que vos droits permettent de consulter. Les pièces comptables restent dans les archives de la comptabilité.</p>${docsTable(ds)}
+ <div class="row" style="margin-top:.6rem"><button class="btn sm" data-act="svArDepot" data-id="${p.id}">Archiver un document pour ce projet</button><button class="btn ghost sm" data-act="svAudit" data-id="${p.id}">Télécharger le dossier d'audit (.zip)</button></div></section>`}
+function dosHist(p){const h=S.histo.filter(a=>a.objet==='projet'&&a.objet_id===p.id);
+ return `<section class="card"><h3>Historique du projet</h3>${svT(['Date et heure','Personne','Action'],h.map(a=>[new Date(a.le).toLocaleString('fr-FR'),esc(a.user_id?who(a.user_id):'Administrateur'),esc(a.action)]),gereProj(p)?'Aucune action enregistrée pour ce projet.':'L\'historique est consulté par le DE, le DP et le chef du projet.')}</section>`}
+function dosAct(p){const m=actChk[p.id],etapes=['brouillon','configuration','verification','validation','active','execution','cloture','archive'],i=etapes.indexOf(p.statut);
+ if(!m)rpc('verif_activation',{p:p.id}).then(r=>{actChk[p.id]=r||[];if(view==='dossier'&&dosTab==='act')render()}).catch(e=>{actChk[p.id]=['Vérification impossible : '+e.message];render()});
+ return `<section class="card"><h3>Circuit du projet</h3><ol class="svSteps">${etapes.map((k,j)=>`<li class="${j<i?'fait':j===i?'cour':''}">${PSTAT[k][0]}</li>`).join('')}</ol>
+ ${['suspendu','rejete','a_corriger'].includes(p.statut)?`<p class="note">Statut particulier : ${PSTAT[p.statut][0]}.</p>`:''}</section>
+ <section class="card"><h3>Conditions d'activation</h3><p class="muted">Vérifiées par le serveur : le projet ne peut pas être activé tant qu'une condition manque.</p>
+ ${!m?'<p class="muted">Vérification en cours…</p>':m.length?`<ul class="svChk">${m.map(x=>`<li class="bad">${esc(x)}</li>`).join('')}</ul>`:'<p><span class="tag ok">Toutes les conditions sont remplies</span></p>'}
+ <div class="row" style="margin-top:.6rem">${pilote()&&m&&!m.length&&['brouillon','configuration','verification','validation','a_corriger'].includes(p.statut)?`<button class="btn" data-act="svActiver" data-id="${p.id}">Activer le projet</button>`:''}
+ ${p.chefId===me.id&&!pilote()&&['brouillon','configuration','a_corriger'].includes(p.statut)?`<button class="btn" data-act="svDemVal" data-id="${p.id}">Demander la vérification au DP</button>`:''}<button class="btn ghost sm" data-act="svRechk" data-id="${p.id}">Vérifier de nouveau</button></div></section>`}
+
+/* ---------- performance à trois niveaux ---------- */
+function svPerformance(){const tabs=[['org','Organisation et plan stratégique'],['prog','Programmes et opérations'],['proj','Projets'],['meth','Méthode de calcul']];
+ let c='';
+ if(perfTab==='org'){const pl=planCourant(),pp=perfPlan(pl);
+  c=!pl?'<section class="card"><p class="empty">Le plan stratégique n\'est pas encore saisi : la performance de l\'organisation ne peut pas être calculée.</p></section>':
+  `<div class="kpis">${scoreBloc(pp&&{score:pp.score,nData:pp.nData,base:'objectifs renseignés'},pp.att,'Réalisation du plan stratégique')}<div class="kpi"><span>Rythme attendu (temps écoulé)</span><b>${tx(pp.att)}</b></div><div class="kpi"><span>Écart</span><b>${pp.score!=null&&pp.att!=null?((pp.score-pp.att)*100>=0?'+':'')+Math.round((pp.score-pp.att)*100)+' pts':'—'}</b></div></div>
+  <section class="card"><h3>Par objectif stratégique</h3>${svT(['Axe','Objectif','Base de calcul','Performance'],S.axes.filter(a=>a.plan_id===pl.id).flatMap(a=>S.objectifs.filter(o=>o.axe_id===a.id).map(o=>{const po=perfObjS(o);return [esc(a.code||a.intitule),esc(libObj(o)),esc(po.base),po.score!=null?`${tx(po.score)}${barre(po.score,pp.att)}`:'<span class="tag">Données insuffisantes</span>']})),'Aucun objectif saisi.')}</section>`}
+ if(perfTab==='prog')c=`<section class="card">${svT(['Programme ou opération','Type','Base de calcul','#Indicateurs renseignés','Performance','Statut'],S.programmes.map(g=>{const pf=perfProg(g);return [`<button class="lnk" data-act="svPg" data-id="${g.id}">${esc(libProg(g))}</button>`,g.type==='operation'?'Opération':'Programme',esc(pf.base),`${pf.nData}/${pf.n}`,pf.score!=null?`${tx(pf.score)}${barre(pf.score,rythme(g.debut,g.fin))}`:'<span class="tag">Données insuffisantes</span>',tag(PG_ST[g.statut])]}),'Aucun programme.')}</section>
+  <section class="card"><h3>Vue commune : tous les programmes</h3>${(()=>{const all=S.programmes.map(perfProg).filter(x=>x.score!=null);return all.length?`<p>Performance moyenne des ${all.length} programme(s) renseigné(s) : <b>${tx(all.reduce((s,x)=>s+x.score,0)/all.length)}</b>.</p>`:'<p class="empty">Données insuffisantes.</p>'})()}</section>`;
+ if(perfTab==='proj')c=`<section class="card">${svT(['Projet','Programme','#Indicateurs renseignés','#Dans les temps','#À surveiller','#En retard','Avancement','Temps écoulé'],S.projets.map(p=>{const s=synth(indsProjet(p)),a=rythme(p.debut,p.fin);return [`<button class="lnk" data-act="svDos" data-id="${p.id}" data-tab="ind">${esc(libProj(p))}</button>`,esc(libProg(programme(p.programmeId))),`${s.nData}/${s.n}`,s.ok,s.warn,s.bad,s.score!=null?`${tx(s.score)}${barre(s.score,a)}`:'<span class="tag">Données insuffisantes</span>',tx(a)]}),'Aucun projet.')}</section>`;
+ if(perfTab==='meth')c=`<section class="card svMeth"><h3>Comment la performance est calculée</h3><ol>
+  <li><b>Seules les mesures validées comptent.</b> Une mesure saisie est validée par une autre personne (DE, DP ou chef du projet). Les mesures en attente ou rejetées sont ignorées.</li>
+  <li><b>Valeur réalisée d'un indicateur.</b> Mode « cumul » : somme des mesures validées (ex. nombre de personnes sensibilisées). Mode « dernière mesure » : la mesure validée la plus récente (ex. un taux).</li>
+  <li><b>Taux d'atteinte.</b> Cumul : réalisé ÷ cible. Dernière mesure : (réalisé − référence) ÷ (cible − référence), ce qui fonctionne aussi pour les indicateurs à faire baisser.</li>
+  <li><b>Rythme attendu.</b> Part du temps écoulé entre la date de référence (ou le début du projet, du programme ou du plan) et l'échéance de la cible (ou la fin). Statut : « dans les temps » si le taux est au plus 10 points sous le rythme attendu, « à surveiller » jusqu'à 25 points, « en retard » au-delà.</li>
+  <li><b>Indicateurs de niveau supérieur.</b> Un indicateur de programme ou stratégique sans mesure propre est calculé à partir des indicateurs qui y contribuent : somme de leurs valeurs, ou moyenne de leurs taux d'atteinte, selon le choix fait à sa création.</li>
+  <li><b>Performance d'un projet, d'un programme, d'un objectif.</b> Moyenne des taux d'atteinte de ses indicateurs renseignés, chaque taux étant plafonné à 100 %. Un programme sans indicateur propre est évalué sur les indicateurs de ses projets ; un objectif sans indicateur stratégique, sur ses programmes.</li>
+  <li><b>Performance de l'organisation.</b> Moyenne des objectifs stratégiques renseignés, comparée au temps écoulé du plan.</li>
+  <li><b>Données insuffisantes.</b> Affiché quand il n'y a ni mesure validée, ni cible, ni valeur de référence utilisable. Aucune valeur n'est estimée ou inventée.</li></ol>
+  <p class="muted">Ces chiffres sont des aides au pilotage. Ils ne suffisent jamais, seuls, à fonder une décision sur une personne.</p></section>`;
+ return head('Performance','Projets, programmes et organisation, calculés à partir des seules mesures validées.')+`<nav class="subnav minor">${tabs.map(([k,l])=>`<button data-act="svPerfTab" data-v="${k}" ${perfTab===k?'aria-current="page"':''}>${l}</button>`).join('')}</nav>`+c}
+
+/* ---------- archives ---------- */
+const depsDepot=()=>DEP_ROLE[me.role]||[];
+function docsTable(ds){return svT(['Document','Type','Département','Rattachement','#Année','Statut','Fichier',''],ds.map(d=>{const scan=S.docs.find(x=>x.version_de===d.id);
+ return [`<b>${esc(d.titre)}</b>${d.proprietaire_id?`<br><span class="muted">Archive personnelle de ${esc(who(d.proprietaire_id))}</span>`:''}${d.version_de?`<br><span class="muted">Version signée de : ${esc((S.docs.find(x=>x.id===d.version_de)||{}).titre||'document non visible')}</span>`:''}`,
+  esc(d.type_doc),esc(DEPTS[d.departement]||d.departement),esc(d.projet_id?libProj(projet(d.projet_id)):d.programme_id?libProg(programme(d.programme_id)):'—'),d.annee,tag(DOC_ST[d.statut]||[d.statut])+(scan?'<br><span class="muted">scan signé archivé</span>':''),
+  d.fichier_chemin?`<button class="lnk" data-act="svArDl" data-id="${d.id}">${esc(d.fichier_nom)}</button><br><span class="muted">${taille(Number(d.fichier_taille)||0)} · ${esc(who(d.cree_par))}, ${new Date(d.cree_le).toLocaleDateString('fr-FR')}</span>`:'<span class="tag warn">Fichier manquant</span>',
+  !scan&&d.statut!=='signe'&&d.fichier_chemin&&depsDepot().length?`<button class="btn ghost sm" data-act="svArScan" data-id="${d.id}">Ajouter le scan signé</button>`:'']}),'Aucun document.')}
+let arDepot=null,arScan=null;
+function svArchives(){let ds=S.docs.slice();const f=arF;
+ if(f.dept)ds=ds.filter(d=>f.dept==='perso'?d.proprietaire_id:d.departement===f.dept);if(f.prog)ds=ds.filter(d=>d.programme_id===f.prog||(projet(d.projet_id)||{}).programmeId===f.prog);if(f.proj)ds=ds.filter(d=>d.projet_id===f.proj);
+ if(f.annee)ds=ds.filter(d=>String(d.annee)===f.annee);if(f.type)ds=ds.filter(d=>d.type_doc===f.type);if(f.q){const q=f.q.toLowerCase();ds=ds.filter(d=>[d.titre,d.type_doc,d.fichier_nom].join(' ').toLowerCase().includes(q))}
+ const annees=[...new Set(S.docs.map(d=>d.annee))].sort().reverse(),deps=[...new Set(S.docs.map(d=>d.departement))],dep=depsDepot(),scanDe=arScan&&S.docs.find(d=>d.id===arScan);
+ const parDep={};S.docs.forEach(d=>parDep[d.departement]=(parDep[d.departement]||0)+1);
+ const formDepot=dep.length?`<details class="card" id="arDepot" ${arDepot||scanDe?'open':''}><summary><b>${scanDe?`Ajouter le scan signé de « ${esc(scanDe.titre)} »`:'Archiver un document'}</b></summary>
+  <form data-form="svArDoc" ${scanDe?`data-scan="${scanDe.id}"`:''} style="margin-top:.7rem"><div class="grid">
+  <div><label>Département</label><select name="departement" required>${opts(dep.map(k=>[k,DEPTS[k]]),scanDe?scanDe.departement:(dep.includes('PROGRAMMES')?'PROGRAMMES':dep[0]))}</select></div>
+  <div><label>Type de document</label><select name="type_doc">${opts(DOC_TYPES.map(x=>[x,x]),scanDe?scanDe.type_doc:'')}</select></div>
+  <div style="grid-column:span 2"><label>Titre</label><input name="titre" required value="${scanDe?esc(scanDe.titre+' (signé)'):''}"></div>
+  <div><label>Programme</label><select name="programme">${opts(S.programmes.map(g=>[g.id,libProg(g)]),scanDe?scanDe.programme_id||'':'','—')}</select></div>
+  <div><label>Projet</label><select name="projet">${opts(S.projets.map(p=>[p.id,libProj(p)]),scanDe?scanDe.projet_id||'':arDepot||'','—')}</select></div>
+  <div><label>Date du document</label><input name="date_doc" type="date" max="${today()}"></div><div><label>Année</label><input name="annee" type="number" min="1990" max="2100" value="${scanDe?scanDe.annee:new Date().getFullYear()}" required></div>
+  <div><label>Statut</label><select name="statut">${opts(Object.entries(DOC_ST).map(([k,[l]])=>[k,l]),scanDe?'signe':'valide')}</select></div><div><label>Conserver jusqu'au (facultatif)</label><input name="conserver" type="date"></div>
+  <div style="grid-column:span 2"><label>Fichier (PDF, image, bureautique ; 20 Mo au plus)</label><input name="fichier" type="file" required accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.odt,.xls,.xlsx,.ods,.ppt,.pptx,.txt"></div>
+  <div style="grid-column:1/-1"><label><input type="checkbox" name="perso"> Ranger dans mon archive personnelle (visible par moi et ma hiérarchie)</label></div></div>
+  <div class="row"><button class="btn" type="submit">Archiver</button>${scanDe?'<button class="btn ghost" type="button" data-act="svArScan" data-id="">Annuler</button>':''}</div>
+  <p class="legend">Un document archivé ne peut pas être supprimé ni son fichier remplacé : en cas d'erreur, archivez une nouvelle version et passez l'ancienne au statut « Obsolète ».</p></form></details>`:'';
+ return head('Archives',`Chaque département a ses archives. Vous voyez celles que votre poste autorise${['DE','CA'].includes(me.role)?' : toutes les archives de l\'organisation':''}. Les fiches de terrain et les rapports signés et cachetés se scannent et se déposent ici.`)+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
+ `<div class="kpis"><div class="kpi"><span>Documents visibles</span><b>${S.docs.length}</b></div>${Object.entries(parDep).map(([k,n])=>`<div class="kpi"><span>${esc(DEPTS[k])}</span><b>${n}</b></div>`).join('')}<div class="kpi"><span>Sans fichier</span><b>${S.docs.filter(d=>!d.fichier_chemin).length}</b></div></div>`+formDepot+
+ `<section class="card"><div class="grid" style="align-items:end"><div><label for="arD">Département</label><select id="arD" data-flt="ar.dept">${opts([...deps.map(k=>[k,DEPTS[k]]),['perso','Archives personnelles']],f.dept,'Tous')}</select></div>
+  <div><label for="arG">Programme</label><select id="arG" data-flt="ar.prog">${opts(S.programmes.map(g=>[g.id,libProg(g)]),f.prog,'Tous')}</select></div><div><label for="arP">Projet</label><select id="arP" data-flt="ar.proj">${opts(S.projets.map(p=>[p.id,libProj(p)]),f.proj,'Tous')}</select></div>
+  <div><label for="arA">Année</label><select id="arA" data-flt="ar.annee">${opts(annees.map(a=>[String(a),String(a)]),f.annee,'Toutes')}</select></div><div><label for="arT">Type</label><select id="arT" data-flt="ar.type">${opts(DOC_TYPES.map(x=>[x,x]),f.type,'Tous')}</select></div>
+  <div><label for="arQ">Recherche</label><input id="arQ" data-flt="ar.q" value="${esc(f.q)}" placeholder="titre, nom du fichier"></div></div>
+  <p class="muted">${ds.length} document(s)${f.proj?` · <button class="lnk" data-act="svAudit" data-id="${f.proj}">télécharger le dossier d'audit de ce projet (.zip)</button>`:''}</p>${docsTable(ds)}</section>`}
+
+/* ---------- fichiers d'archives et dossier d'audit (ZIP sans bibliothèque externe) ---------- */
+const stoUpA=(path,file)=>api(`/storage/v1/object/archives/${cheminSur(path)}`,{method:'POST',body:file,headers:{'Content-Type':file.type||'application/octet-stream','x-upsert':'false'}});
+const stoGetA=async path=>(await api(`/storage/v1/object/authenticated/archives/${cheminSur(path)}`,{raw:true})).blob();
+const AR_EXT=['pdf','jpg','jpeg','png','doc','docx','odt','xls','xlsx','ods','ppt','pptx','txt'];
+let CRC;function crc32(u){if(!CRC){CRC=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;CRC[n]=c>>>0}}let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRC[(c^u[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+function zipper(files){const te=new TextEncoder(),parts=[],cent=[];let off=0;const d=new Date(),dt=((d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1)),dd=(((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate());
+ for(const f of files){const nm=te.encode(f.name),data=f.data,crc=crc32(data),h=new DataView(new ArrayBuffer(30));
+  h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(8,0,true);h.setUint16(10,dt,true);h.setUint16(12,dd,true);h.setUint32(14,crc,true);h.setUint32(18,data.length,true);h.setUint32(22,data.length,true);h.setUint16(26,nm.length,true);h.setUint16(28,0,true);
+  parts.push(new Uint8Array(h.buffer),nm,data);const c=new DataView(new ArrayBuffer(46));
+  c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint16(10,0,true);c.setUint16(12,dt,true);c.setUint16(14,dd,true);c.setUint32(16,crc,true);c.setUint32(20,data.length,true);c.setUint32(24,data.length,true);c.setUint16(28,nm.length,true);c.setUint32(42,off,true);
+  cent.push(new Uint8Array(c.buffer),nm);off+=30+nm.length+data.length}
+ const csz=cent.reduce((s,x)=>s+x.length,0),e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,csz,true);e.setUint32(16,off,true);
+ return new Blob([...parts,...cent,new Uint8Array(e.buffer)],{type:'application/zip'})}
+async function dossierAudit(p){const ds=S.docs.filter(d=>d.projet_id===p.id),files=[],lignes=[],te=new TextEncoder();let i=0;
+ for(const d of ds){i++;let nom='';if(d.fichier_chemin){try{const b=await stoGetA(d.fichier_chemin);nom=`fichiers/${String(i).padStart(3,'0')}_${nomSur(d.fichier_nom)}`;files.push({name:nom,data:new Uint8Array(await b.arrayBuffer())})}catch(e){nom=''}}
+  lignes.push([i,d.titre,d.type_doc,DEPTS[d.departement],d.annee,fmtD(d.date_doc),(DOC_ST[d.statut]||[d.statut])[0],nom,who(d.cree_par),new Date(d.cree_le).toLocaleDateString('fr-FR')])}
+ const s=synth(indsProjet(p)),g=programme(p.programmeId);
+ const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Dossier d'audit · ${esc(p.nom)}</title><style>body{font-family:Arial,sans-serif;margin:2rem;color:#111}table{border-collapse:collapse;width:100%;font-size:10pt}th,td{border:1px solid #777;padding:4px 6px;text-align:left;vertical-align:top}th{background:#eee}h1{font-size:16pt}img{height:60px}</style></head><body>
+ <img src="${LOGO}" alt="Logo ONG Sécurité Vie"><h1>Dossier d'audit du projet ${esc(libProj(p))}</h1>
+ <p>${esc(S.org.nom)} · Programme : ${esc(libProg(g))} · Bailleur : ${esc(p.bailleur||'—')} · Période : ${fmtD(p.debut)} au ${fmtD(p.fin)} · Budget approuvé : ${num(p.budgetApprouve||p.montant)} FCFA · Chef de projet : ${esc(who(p.chefId))}</p>
+ <p>Généré le ${new Date().toLocaleString('fr-FR')} par ${esc(me.nom)} (${esc(posteLib(me))}). Contient les documents que ce compte est autorisé à consulter : ${ds.length} document(s), ${files.length} fichier(s). Avancement des indicateurs : ${tx(s.score)} (${s.nData}/${s.n} renseignés).</p>
+ <table><thead><tr><th>N°</th><th>Titre</th><th>Type</th><th>Département</th><th>Année</th><th>Date</th><th>Statut</th><th>Fichier</th><th>Déposé par</th><th>Le</th></tr></thead><tbody>${lignes.map(l=>`<tr>${l.map((v,j)=>`<td>${j===7&&v?`<a href="${esc(v)}">${esc(v.slice(9))}</a>`:esc(v===''?'(fichier non disponible)':v)}</td>`).join('')}</tr>`).join('')}</tbody></table>
+ <h2 style="font-size:13pt">Indicateurs</h2><table><thead><tr><th>Indicateur</th><th>Référence</th><th>Cible</th><th>Réalisé (mesures validées)</th><th>Taux</th></tr></thead><tbody>${indsProjet(p).map(i=>{const x=indPerf(i);return `<tr><td>${esc(i.libelle)}</td><td>${num(i.baseline)}</td><td>${num(i.cible)}</td><td>${x.v!=null?num(x.v):'—'}</td><td>${tx(x.taux)}</td></tr>`}).join('')}</tbody></table></body></html>`;
+ files.unshift({name:'00_index.html',data:te.encode(html)});
+ fichierLien(`Dossier_audit_${nomSur(p.code||p.nom).slice(0,40)}_${today()}.zip`,zipper(files),'application/zip');logO('projet',p.id,`Dossier d'audit téléchargé (${ds.length} documents)`)}
+
+/* ---------- personnel : modifier une personne ---------- */
+let mbEdit=null;
+function mbEditForm(u){const rh=me.role==='RH',postesOk=S.postes.filter(p=>!(rh&&['DE','CA'].includes(p.niveau))),actifs=S.staff.filter(x=>x.actif&&x.role!=='EXT'&&x.id!==u.id);
+ return `<tr><td colspan="9"><form data-form="srvMembreMaj" data-id="${u.id}" class="grid" style="align-items:end"><div><label>Nom complet</label><input name="nom" required value="${esc(u.nom)}"></div>
+ <div><label>Poste</label><select name="poste" ${u.id===me.id?'disabled':''}>${postesOk.map(p=>`<option value="${p.id}" ${p.id===u.posteId?'selected':''}>${esc(p.intitule)}</option>`).join('')}</select>${u.id===me.id?'<span class="muted">Vous ne pouvez pas changer votre propre poste.</span>':''}</div>
+ <div><label>Bureau</label><select name="bureau"><option value="">—</option>${S.bureaux.map(b=>`<option value="${b.id}" ${b.id===u.bureau?'selected':''}>${esc(b.ville)} (${esc(b.nom)})</option>`).join('')}</select></div>
+ <div><label>Responsable hiérarchique</label><select name="sup"><option value="">— aucun —</option>${actifs.map(x=>`<option value="${x.id}" ${x.id===u.supId?'selected':''}>${esc(x.nom)}</option>`).join('')}</select></div>
+ <div><label>Statut</label><select name="statut">${['Salarié','Prestataire','Consultant','Bénévole','Invité','Partenaire'].map(x=>`<option ${x===u.statut?'selected':''}>${x}</option>`).join('')}</select></div>
+ <div><label>Fin d'accès</label><input name="fin" type="date" value="${u.finAcces||''}"></div><div class="row"><button class="btn sm" type="submit">Enregistrer</button><button class="btn ghost sm" type="button" data-act="svMbEdit" data-id="">Annuler</button></div></form></td></tr>`}
+
+/* ---------- formulaires ---------- */
+async function arDeposer(d,file,extra){if(!file||!file.size)throw new Error('Choisissez le fichier à archiver.');const x=file.name.split('.').pop().toLowerCase();
+ if(!AR_EXT.includes(x))throw new Error(`Format .${x} non autorisé. Formats acceptés : ${AR_EXT.join(', ')}.`);if(file.size>SRV_MAX)throw new Error(`Fichier trop lourd (${taille(file.size)}). Limite : ${taille(SRV_MAX)}.`);
+ const id=uuid(),projetId=d.projet||null,pj=projet(projetId);
+ await ins('documents',{id,org_id:S.org.id,departement:d.departement,programme_id:d.programme||(pj&&pj.programmeId)||null,projet_id:projetId,proprietaire_id:d.perso?me.id:null,type_doc:d.type_doc,titre:String(d.titre).trim(),annee:Number(d.annee)||new Date().getFullYear(),date_doc:d.date_doc||null,statut:d.statut||'valide',conserver_jusqu:d.conserver||null,...extra});
+ const chemin=`${S.org.id}/${id}/${nomSur(file.name)}`;
+ try{await stoUpA(chemin,file)}catch(e){throw new Error('La fiche du document est créée, mais le fichier n\'a pas pu être déposé : '+e.message+'. Archivez-le de nouveau.')}
+ await upd('documents',`id=eq.${id}`,{fichier_chemin:chemin,fichier_nom:file.name,fichier_taille:file.size});
+ if(projetId)logO('projet',projetId,`Document archivé : ${d.titre} (${d.type_doc})`);else logO('archive',id,`Document archivé : ${d.titre} (${DEPTS[d.departement]})`);return id}
+const SV_FORMS=['svPlan','svPlanMaj','svAxe','svObj','svIndS','svIndP','svIndJ','svProg','svProgMaj','svJalon','svRisque','svCadre','svMesure','svArDoc','srvMembreMaj'];
+document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target,t=f.dataset&&f.dataset.form;if(!SV_FORMS.includes(t))return;
+ e.preventDefault();e.stopImmediatePropagation();const fd=new FormData(f),d=Object.fromEntries(fd);srvMsg='';const o=S.org.id;
+ const dates=(a,b)=>{if(a&&b&&b<a){alert('La date de fin doit être après la date de début.');return false}return true};
+ if(t==='svPlan'){if(!dates(d.debut,d.fin))return;action(async()=>{await ins('plans_strategiques',{org_id:o,intitule:String(d.intitule).trim(),debut:d.debut,fin:d.fin});logO('strategie',null,`Plan stratégique enregistré : ${d.intitule}`)},'Plan stratégique enregistré.');return}
+ if(t==='svPlanMaj'){if(!dates(d.debut,d.fin))return;action(async()=>{await upd('plans_strategiques',`id=eq.${f.dataset.id}`,{intitule:String(d.intitule).trim(),debut:d.debut,fin:d.fin,statut:d.statut});logO('strategie',null,`Plan stratégique modifié : ${d.intitule}`)},'Plan enregistré.');return}
+ if(t==='svAxe'){const pl=planCourant();action(async()=>{await ins('axes_strategiques',{org_id:o,plan_id:pl.id,code:d.code||null,intitule:String(d.intitule).trim(),ordre:S.axes.filter(a=>a.plan_id===pl.id).length+1});logO('strategie',null,`Axe ajouté : ${d.intitule}`)},'Axe ajouté.');return}
+ if(t==='svObj'){action(async()=>{await ins('objectifs_strategiques',{org_id:o,axe_id:d.axe,code:d.code||null,intitule:String(d.intitule).trim(),ordre:S.objectifs.filter(x=>x.axe_id===d.axe).length+1});logO('strategie',null,`Objectif stratégique ajouté : ${d.intitule}`)},'Objectif ajouté.');return}
+ if(t==='svIndS'||t==='svIndP'||t==='svIndJ'){const r=lireInd(d);if(!r.libelle)return;
+  const row={org_id:o,...r,niveau:t==='svIndS'?'strategique':t==='svIndP'?'programme':'projet',objectif_id:f.dataset.o||null,programme_id:f.dataset.g||null,projet_id:f.dataset.p||null,cadre_id:d.cadre_id||null};
+  action(async()=>{await ins('indicateurs',row);if(row.projet_id)logO('projet',row.projet_id,`Indicateur ajouté : ${r.libelle}`);else logO(row.programme_id?'programme':'strategie',row.programme_id,`Indicateur ajouté : ${r.libelle}`);if(row.projet_id)delete actChk[row.projet_id]},'Indicateur enregistré.');return}
+ if(t==='svProg'||t==='svProgMaj'){if(!dates(d.debut,d.fin))return;const row={code:d.code||null,nom:String(d.nom).trim(),objectif_id:d.objectif||null,responsable_id:d.resp||null,debut:d.debut||null,fin:d.fin||null,budget_prevu:nz(d.budget),description:d.description||null};
+  if(t==='svProg'){row.type=d.type;row.domaine=d.domaine||null;const id=uuid();action(async()=>{await ins('programmes',{id,org_id:o,...row,cree_par:me.id});pgSel=id;logO('programme',id,`${d.type==='operation'?'Opération stratégique':'Programme'} créé : ${row.nom}`);if(row.responsable_id)await notifierSrv([row.responsable_id],`Vous êtes responsable de « ${row.nom} »`,'programme',id)},'Enregistré.');return}
+  row.statut=d.statut;action(async()=>{await upd('programmes',`id=eq.${f.dataset.id}`,row);logO('programme',f.dataset.id,`Programme modifié : ${row.nom}`)},'Modifications enregistrées.');return}
+ if(t==='svJalon'){action(async()=>{await ins('jalons',{org_id:o,programme_id:f.dataset.g,libelle:String(d.libelle).trim(),echeance:d.echeance||null,responsable_id:d.resp||null});logO('programme',f.dataset.g,`Jalon ajouté : ${d.libelle}`);if(d.resp)await notifierSrv([d.resp],`Jalon à suivre : ${d.libelle}${d.echeance?' (échéance '+fmtD(d.echeance)+')':''}`,'programme',f.dataset.g)},'Jalon ajouté.');return}
+ if(t==='svRisque'){const pr=Number(d.probabilite),im=Number(d.impact);if(!(pr>=1&&pr<=5&&im>=1&&im<=5)){alert('Probabilité et impact : de 1 à 5.');return}
+  action(async()=>{await ins('risques',{org_id:o,projet_id:f.dataset.p||null,programme_id:f.dataset.g||(f.dataset.p?(projet(f.dataset.p)||{}).programmeId||null:null),libelle:String(d.libelle).trim(),categorie:d.categorie,probabilite:pr,impact:im,mesures:d.mesures||null,responsable_id:d.resp||null,echeance:d.echeance||null,cree_par:me.id});
+   if(f.dataset.p)logO('projet',f.dataset.p,`Risque enregistré : ${d.libelle} (${pr*im})`);else logO('programme',f.dataset.g,`Risque enregistré : ${d.libelle} (${pr*im})`);if(d.resp)await notifierSrv([d.resp],`Risque à suivre : ${d.libelle}`,f.dataset.p?'projet':'programme',f.dataset.p||f.dataset.g)},'Risque enregistré.');return}
+ if(t==='svCadre'){const par=d.parent?S.cadre.find(c=>c.id===d.parent):null,ordre=['og','os','res','act'];if(par&&ordre.indexOf(par.niveau)>=ordre.indexOf(d.niveau)){alert(`Un ${CL_NIV[d.niveau].toLowerCase()} ne peut pas être rattaché à un ${CL_NIV[par.niveau].toLowerCase()}.`);return}
+  action(async()=>{await ins('cadre_logique',{org_id:o,projet_id:f.dataset.p,parent_id:d.parent||null,niveau:d.niveau,code:d.code||null,libelle:String(d.libelle).trim(),hypotheses:d.hypotheses||null,ordre:S.cadre.filter(c=>c.projet_id===f.dataset.p).length+1});logO('projet',f.dataset.p,`Cadre logique : ${CL_NIV[d.niveau]} ajouté, ${d.libelle}`);delete actChk[f.dataset.p]},'Élément ajouté au cadre logique.');return}
+ if(t==='svMesure'){const i=S.inds.find(x=>x.id===d.ind),vf=nz(d.valeur_f),vh=nz(d.valeur_h),v=Number(d.valeur);if(vf!=null&&vh!=null&&vf+vh>v){alert('Femmes + hommes dépasse la valeur totale.');return}
+  action(async()=>{await ins('mesures',{org_id:o,indicateur_id:i.id,periode_fin:d.periode_fin,valeur:v,valeur_f:vf,valeur_h:vh,source:d.source||null,commentaire:d.commentaire||null});
+   const p=i.projet_id&&projet(i.projet_id);if(p){logO('projet',p.id,`Mesure soumise : ${i.libelle} = ${v}`);await notifierSrv([p.chefId,...S.staff.filter(u=>u.role==='DP'&&u.actif).map(u=>u.id)],`Mesure à valider : ${i.libelle} (${p.nom})`,'projet',p.id)}},'Mesure soumise : elle sera prise en compte après validation par une autre personne.');return}
+ if(t==='svArDoc'){const file=fd.get('fichier'),scan=f.dataset.scan;action(async()=>{await arDeposer(d,file,scan?{version_de:scan}:{});arDepot=null;arScan=null},'Document archivé.');return}
+ if(t==='srvMembreMaj'){const u=S.staff.find(x=>x.id===f.dataset.id),po=S.postes.find(p=>p.id===(d.poste||u.posteId))||{niveau:u.role,id:u.posteId};
+  action(async()=>{await rpc('rattacher_membre',{p_org:o,p_email:u.email,p_nom:String(d.nom).trim(),p_role:po.niveau,p_poste:po.id||null,p_bureau:d.bureau||null,p_sup:d.sup||null,p_statut:d.statut,p_fin:d.fin||null});mbEdit=null},`Informations de ${d.nom} enregistrées.`);return}
+},true);
+
+/* ---------- actions ---------- */
+document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;if(!a.startsWith('sv'))return;
+ e.preventDefault();e.stopImmediatePropagation();srvMsg='';const id=b.dataset.id;
+ if(a==='svPg'){pgSel=id||null;view='programmes';render();scrollTo(0,0);return}
+ if(a==='svDos'){if(!id){view='projets';render();return}dosSel=id;dosTab=b.dataset.tab||'id';view='dossier';render();scrollTo(0,0);return}
+ if(a==='svDosTab'){dosTab=b.dataset.v;render();return}
+ if(a==='svPerfTab'){perfTab=b.dataset.v;render();return}
+ if(a==='svMbEdit'){mbEdit=id||null;render();return}
+ if(a==='svArProg'){arF={dept:'',prog:id,proj:'',annee:'',type:'',q:''};view='archives';render();return}
+ if(a==='svArDepot'){arDepot=id;arScan=null;view='archives';render();document.getElementById('arDepot')?.scrollIntoView();return}
+ if(a==='svArScan'){arScan=id||null;arDepot=null;render();if(id)document.getElementById('arDepot')?.scrollIntoView();return}
+ if(a==='svRechk'){delete actChk[id];render();return}
+ if(a==='svArDl'){const d=S.docs.find(x=>x.id===id);document.body.classList.add('busy');stoGetA(d.fichier_chemin).then(bl=>{fichierLien(d.fichier_nom,bl,bl.type);logO(d.projet_id?'projet':'archive',d.projet_id||d.id,`Document consulté : ${d.titre}`)}).catch(err=>alert(err.message)).finally(()=>document.body.classList.remove('busy'));return}
+ if(a==='svAudit'){const p=projet(id);document.body.classList.add('busy');dossierAudit(p).catch(err=>alert(err.message)).finally(()=>document.body.classList.remove('busy'));return}
+ if(a==='svMesVal'||a==='svMesRej'){const m=S.mesures.find(x=>x.id===id),i=S.inds.find(x=>x.id===m.indicateur_id),ok=a==='svMesVal';if(!ok&&!confirm('Rejeter cette mesure ? Elle ne sera pas prise en compte.'))return;
+  action(async()=>{await upd('mesures',`id=eq.${m.id}`,{statut:ok?'validee':'rejetee'});if(i.projet_id)logO('projet',i.projet_id,`Mesure ${ok?'validée':'rejetée'} : ${i.libelle} = ${m.valeur}`);await notifierSrv([m.saisi_par],`Votre mesure « ${i.libelle} » (${m.valeur}) a été ${ok?'validée':'rejetée'}`,'projet',i.projet_id)},ok?'Mesure validée.':'Mesure rejetée.');return}
+ if(a==='svDelInd'){const i=S.inds.find(x=>x.id===id);if(!confirm(`Supprimer l'indicateur « ${i.libelle} » ?`))return;action(async()=>{await del('indicateurs',`id=eq.${id}`);if(i.projet_id){logO('projet',i.projet_id,`Indicateur supprimé : ${i.libelle}`);delete actChk[i.projet_id]}},'Indicateur supprimé.');return}
+ if(a==='svDelCl'){const c=S.cadre.find(x=>x.id===id);if(!confirm(`Supprimer « ${c.libelle} » du cadre logique ?`))return;action(async()=>{await del('cadre_logique',`id=eq.${id}`);logO('projet',c.projet_id,`Cadre logique : supprimé, ${c.libelle}`);delete actChk[c.projet_id]},'Élément supprimé.');return}
+ if(a==='svDelAxe'||a==='svDelObj'){const t=a==='svDelAxe'?'axes_strategiques':'objectifs_strategiques',x=(a==='svDelAxe'?S.axes:S.objectifs).find(y=>y.id===id);if(!confirm(`Supprimer « ${x.intitule} » ?`))return;action(async()=>{await del(t,`id=eq.${id}`);logO('strategie',null,`Supprimé du plan : ${x.intitule}`)},'Supprimé.');return}
+ if(a==='svActiver'){const p=projet(id);if(!confirm(`Activer le projet « ${p.nom} » ? Les personnes affectées pourront commencer l'exécution.`))return;
+  action(async()=>{await upd('projets',`id=eq.${p.id}`,{statut:'active'});delete actChk[p.id];await notifierSrv([p.chefId,...p.membres.map(m=>m.staffId)],`Le projet « ${p.nom} » est activé`,'projet',p.id)},'Projet activé.');return}
+ if(a==='svDemVal'){const p=projet(id);action(async()=>{const n=await notifierSrv(S.staff.filter(u=>['DP','DE'].includes(u.role)&&u.actif).map(u=>u.id),`Vérification demandée par ${me.nom} : projet « ${p.nom} »`,'projet',p.id);logO('projet',p.id,'Vérification demandée au DP');srvMsg=`Demande envoyée à ${n} personne(s).`});return}
+},true);
+document.addEventListener('change',e=>{if(MODE!=='srv'||!me)return;const t=e.target;
+ if(t.dataset&&t.dataset.flt){e.stopImmediatePropagation();const [o,k]=t.dataset.flt.split('.');(o==='pf'?pfF:arF)[k]=t.value;render();const n=document.querySelector(`[data-flt="${t.dataset.flt}"]`);if(n&&t.tagName==='INPUT')n.focus();return}
+ if(t.classList.contains('svJalSt')){e.stopImmediatePropagation();const j=S.jalons.find(x=>x.id===t.dataset.id);action(async()=>{await upd('jalons',`id=eq.${j.id}`,{statut:t.value,fait_le:t.value==='fait'?today():null});logO('programme',j.programme_id,`Jalon « ${j.libelle} » : ${JAL_ST[t.value]}`)},'Jalon mis à jour.');return}
+ if(t.classList.contains('svRqSt')){e.stopImmediatePropagation();const r=S.risques.find(x=>x.id===t.dataset.id);action(async()=>{await upd('risques',`id=eq.${r.id}`,{statut:t.value,maj_le:new Date().toISOString()});if(r.projet_id)logO('projet',r.projet_id,`Risque « ${r.libelle} » : ${RQ_ST[t.value][0]}`)},'Risque mis à jour.');return}
+ if(t.classList.contains('svLier')){e.stopImmediatePropagation();const p=projet(t.value),g=programme(t.dataset.g);if(!p)return;if(!confirm(`Rattacher « ${p.nom} » à « ${g.nom} » ?`)){render();return}
+  action(async()=>{await upd('projets',`id=eq.${p.id}`,{programme_id:g.id});logO('projet',p.id,`Rattaché au programme ${g.nom}`);delete actChk[p.id]},'Projet rattaché.');return}
 },true);
 
 /* ---------- démarrage ---------- */
@@ -1640,8 +2069,9 @@ async function srvInit(){
  if(MODE!=='srv'){render();return}
  save=function(){};                                              // rien de réel n'est gardé dans le navigateur
  const _log=log;log=function(a){if(me&&S.org&&S.org.id)ins('audit',{org_id:S.org.id,user_id:me.id,action:String(a).slice(0,500)}).catch(()=>{})};
- loginHTML=srvLoginHTML;home=srvHome;VIEWS.projets='Projets et équipes';
- viewHTML=function(){const h=({politiques,projets:srvProjets,personnel:srvPersonnel,audit:srvAuditHTML})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
+ loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
+ render=srvRender;
+ viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
  S=srvVide();me=null;sess=sessLire();
  const h=new URLSearchParams(location.hash.slice(1));                // retour d'un lien « mot de passe oublié »
  if(h.get('access_token')){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
@@ -1652,6 +2082,16 @@ async function srvInit(){
  if(sess){try{await srvLoad();view='home'}catch(e){loginErr=e.message;me=null}}
  render()}
 
+function srvRender(){const root=document.getElementById('root');
+ if(!me){root.innerHTML=pubView?publicHTML():loginHTML();if(!pubView)document.getElementById('email')?.focus();return}
+ const nav=ROLES[me.role].nav;if(view!=='home'&&!nav.includes(view)&&!(view==='dossier'&&p03&&nav.includes('projets')))view='home';
+ const cur=view==='dossier'?'projets':view;
+ root.innerHTML=`<header class="top"><div class="top-in">
+  <button class="logo-btn" data-act="go" data-v="home" aria-label="Accueil"><img src="${LOGO}" alt="Logo ONG Sécurité Vie"><span><strong>ONG Sécurité Vie</strong><small>OSV Gestion</small></span></button>
+  <span class="who2">${esc(me.nom)} · ${esc(posteLib(me))}</span>
+  <button class="btn ghost sm" data-act="logout">Se déconnecter</button></div></header>
+ <div class="srvApp"><nav class="srvNav" aria-label="Menu principal"><button data-act="go" data-v="home" ${cur==='home'?'aria-current="page"':''}>Accueil</button>${nav.map(v=>`<button data-act="go" data-v="${v}" ${cur===v?'aria-current="page"':''}>${VIEWS[v]}${v==='politiques'&&polEnAttente().length?` <span class="badge">${polEnAttente().length}</span>`:''}</button>`).join('')}</nav>
+ <main id="main">${view==='home'?home():viewHTML()}</main></div>`}
 function viewHTML(){return ({moi,politiques,cpsec,infos,activites,formulaires,saisie,rapports,dash,plan,projets,collecte,validation,personnel,admin,demandes,audit})[view]()}
 
 function dash(){
