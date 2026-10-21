@@ -1533,10 +1533,10 @@ function srvPersonnel(){const rh=me.role==='RH',postesOk=S.postes.filter(p=>!(rh
   <div><label>Fin d'accès (facultatif)</label><input name="fin" type="date" min="${today()}"></div></div>
   <button class="btn" type="submit">Rattacher le compte</button></form>
  <section class="card"><h3>Personnel (${S.staff.length})</h3><div class="tbl"><table><thead><tr><th>Nom</th><th>Adresse</th><th>Poste</th><th>Bureau</th><th>Responsable hiérarchique</th><th>Statut</th><th>Fin d'accès</th><th>État</th><th></th></tr></thead><tbody>
- ${S.staff.map(u=>{const bloque=rh&&['DE','CA'].includes(u.role);return `<tr><td>${esc(u.nom)}</td><td>${esc(u.email)}</td><td>${esc(posteLib(u))}</td><td>${esc(bur(u.bureau))}</td>
+ ${S.staff.map(u=>{const bloque=rh&&['DE','CA'].includes(u.role);return `<tr><td>${esc(u.nom)}${!bloque?`<br><button class="lnk" data-act="svMbEdit" data-id="${u.id}">Modifier</button>`:''}</td><td>${esc(u.email)}</td><td>${esc(posteLib(u))}</td><td>${esc(bur(u.bureau))}</td>
   <td>${u.role==='CA'||bloque?esc(who(u.supId)):`<select class="srvSup" data-id="${u.id}" aria-label="Responsable de ${esc(u.nom)}"><option value="">— aucun —</option>${actifs.filter(x=>x.id!==u.id&&x.role!=='EXT').map(x=>`<option value="${x.id}" ${u.supId===x.id?'selected':''}>${esc(x.nom)}</option>`).join('')}</select>`}</td>
   <td>${esc(u.statut)}</td><td>${fmtD(u.finAcces)}</td><td><span class="tag ${u.actif?'ok':'bad'}">${u.actif?'Actif':'Désactivé'}</span></td>
-  <td><div class="row">${!bloque?`<button class="btn ghost sm" data-act="svMbEdit" data-id="${u.id}">Modifier</button>`:''}${u.id!==me.id&&!bloque?`<button class="btn ghost sm" data-act="srvToggle" data-id="${u.id}">${u.actif?'Désactiver':'Réactiver'}</button>`:''}</div></td></tr>${mbEdit===u.id?mbEditForm(u):''}`}).join('')}</tbody></table></div></section>
+  <td><div class="row">${u.id!==me.id&&!bloque?`<button class="btn ghost sm" data-act="srvToggle" data-id="${u.id}">${u.actif?'Désactiver':'Réactiver'}</button>`:''}</div></td></tr>${mbEdit===u.id?mbEditForm(u):''}`}).join('')}</tbody></table></div></section>
  <section class="card"><h3>Postes (${S.postes.length})</h3><div class="tbl"><table><thead><tr><th>Poste</th><th>Niveau d'accès</th><th>Personnes actives</th></tr></thead><tbody>${S.postes.map(p=>`<tr><td>${esc(p.intitule)}</td><td>${esc(ROLES[p.niveau].label)}</td><td class="num">${S.staff.filter(u=>u.posteId===p.id&&u.actif).length}</td></tr>`).join('')}</tbody></table></div>
   <form data-form="srvPoste" class="grid" style="margin-top:.8rem;align-items:end"><div><label>Nouveau poste</label><input name="intitule" required></div><div><label>Niveau d'accès</label><select name="niveau">${niv.map(([r,v])=>`<option value="${r}">${esc(v.label)}</option>`).join('')}</select></div><div><button class="btn sm" type="submit">Créer le poste</button></div></form></section>
  <section class="card"><h3>Bureaux (${S.bureaux.length})</h3>${polT(['Ville','Type','Personnel actif'],S.bureaux.map(b=>[b.ville,b.nom,S.staff.filter(u=>u.bureau===b.id&&u.actif).length]))}
@@ -1994,7 +1994,7 @@ function mbEditForm(u){const rh=me.role==='RH',postesOk=S.postes.filter(p=>!(rh&
  <div><label>Bureau</label><select name="bureau"><option value="">—</option>${S.bureaux.map(b=>`<option value="${b.id}" ${b.id===u.bureau?'selected':''}>${esc(b.ville)} (${esc(b.nom)})</option>`).join('')}</select></div>
  <div><label>Responsable hiérarchique</label><select name="sup"><option value="">— aucun —</option>${actifs.map(x=>`<option value="${x.id}" ${x.id===u.supId?'selected':''}>${esc(x.nom)}</option>`).join('')}</select></div>
  <div><label>Statut</label><select name="statut">${['Salarié','Prestataire','Consultant','Bénévole','Invité','Partenaire'].map(x=>`<option ${x===u.statut?'selected':''}>${x}</option>`).join('')}</select></div>
- <div><label>Fin d'accès</label><input name="fin" type="date" value="${u.finAcces||''}"></div><div class="row"><button class="btn sm" type="submit">Enregistrer</button><button class="btn ghost sm" type="button" data-act="svMbEdit" data-id="">Annuler</button></div></form></td></tr>`}
+ <div><label>Fin d'accès</label><input name="fin" type="date" value="${u.finAcces||''}"><label style="font-weight:400"><input type="checkbox" name="sansFin" ${u.finAcces?'':'checked'}> Aucune date de fin (salarié)</label></div><div class="row"><button class="btn sm" type="submit">Enregistrer</button><button class="btn ghost sm" type="button" data-act="svMbEdit" data-id="">Annuler</button></div></form></td></tr>`}
 
 /* ---------- formulaires ---------- */
 async function arDeposer(d,file,extra){if(!file||!file.size)throw new Error('Choisissez le fichier à archiver.');const x=file.name.split('.').pop().toLowerCase();
@@ -2030,7 +2030,7 @@ document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.tar
    const p=i.projet_id&&projet(i.projet_id);if(p){logO('projet',p.id,`Mesure soumise : ${i.libelle} = ${v}`);await notifierSrv([p.chefId,...S.staff.filter(u=>u.role==='DP'&&u.actif).map(u=>u.id)],`Mesure à valider : ${i.libelle} (${p.nom})`,'projet',p.id)}},'Mesure soumise : elle sera prise en compte après validation par une autre personne.');return}
  if(t==='svArDoc'){const file=fd.get('fichier'),scan=f.dataset.scan;action(async()=>{await arDeposer(d,file,scan?{version_de:scan}:{});arDepot=null;arScan=null},'Document archivé.');return}
  if(t==='srvMembreMaj'){const u=S.staff.find(x=>x.id===f.dataset.id),po=S.postes.find(p=>p.id===(d.poste||u.posteId))||{niveau:u.role,id:u.posteId};
-  action(async()=>{await rpc('rattacher_membre',{p_org:o,p_email:u.email,p_nom:String(d.nom).trim(),p_role:po.niveau,p_poste:po.id||null,p_bureau:d.bureau||null,p_sup:d.sup||null,p_statut:d.statut,p_fin:d.fin||null});mbEdit=null},`Informations de ${d.nom} enregistrées.`);return}
+  action(async()=>{await rpc('rattacher_membre',{p_org:o,p_email:u.email,p_nom:String(d.nom).trim(),p_role:po.niveau,p_poste:po.id||null,p_bureau:d.bureau||null,p_sup:d.sup||null,p_statut:d.statut,p_fin:d.sansFin?null:(d.fin||null)});mbEdit=null},`Informations de ${d.nom} enregistrées.`);return}
 },true);
 
 /* ---------- actions ---------- */
