@@ -187,12 +187,13 @@ const ROLES={
  ASC:{label:'Collecte terrain',nav:['collecte','demandes']},
  LECT:{label:'Consultation projet',nav:['dash','projets','demandes']},
  CPT:{label:'Comptable',nav:['dash','demandes']},
+ LOG:{label:'Responsable logistique',nav:['dash','demandes']},
  EXT:{label:'Collaborateur externe / invité',nav:['politiques']}
 };
 const NIV_DESC={DE:'Tout voir, tout piloter',CA:'Lecture seule, gouvernance',RA:'Administration, logistique, demandes',RH:'Personnel, postes et accès',DP:'Tous les projets, validation',CP:'Gérer ses projets, valider les données',SE:'Vérifier les données de ses projets',SUP:'Superviser les agents, contrôler leurs saisies',ASC:'Saisir les données de terrain',LECT:'Consulter les projets de son équipe'};
 function seedPostes(){return [['DE','Directeur exécutif'],['CA',"Membre du conseil d'administration"],['RA','Responsable administratif'],['RH','Responsable RH'],['DP','Directeur des programmes'],['CP','Chef de projet'],['SE','Chargé de suivi-évaluation'],['ASC','Relais communautaire'],['SUP','Superviseur terrain'],['SE','Assistant suivi-évaluation'],['LECT','Assistant programme']].map(([n,t],i)=>({id:i<8?'po-'+n:'po-x'+i,intitule:t,niveau:n}))}
 Object.entries(ROLES).forEach(([k,r])=>{if(k!=='EXT'){r.nav.push('rapports');r.nav.splice(r.nav[0]==='dash'?2:1,0,'politiques');r.nav.unshift('moi')}});
-NIV_DESC.CPT='Archives de la comptabilité, demandes';NIV_DESC.EXT='Politiques et documents ouverts aux partenaires, accès limité dans le temps';
+NIV_DESC.CPT='Archives de la comptabilité, personnel des projets (paie)';NIV_DESC.LOG='Archives de la logistique, personnel des projets';NIV_DESC.EXT='Politiques et documents ouverts aux partenaires, accès limité dans le temps';
 const VIEWS={moi:'Mon espace',politiques:'Politiques et procédures',cpsec:'Projet',infos:'Actualités',activites:'Mes projets',formulaires:'Formulaires de collecte',saisie:'Remplir une fiche',rapports:'Rapports',dash:'Tableau de bord',plan:'Plan stratégique',projets:'Projets et indicateurs',collecte:'Collecte terrain',validation:'Validation des données',personnel:'Personnel et accès',admin:'Administration',demandes:'Mes demandes',audit:"Journal d'audit"};
 const DOMAINES=['DSSR-VBG','Eau et assainissement','Environnement, résilience climatique et HSE','Sécurité routière','Sécurité au travail','Agriculture durable','Gestion des plaintes'];
 const domListe=v=>String(v||'').split(/\s*;\s*/).filter(Boolean);
@@ -1494,9 +1495,11 @@ async function srvLoad(){
  Object.keys(ROLES).forEach(k=>ROLES[k].nav=srvNav(k));
  srvAudit=me.role==='DE'?await sel('audit',`${f}&order=le.desc&limit=300`):[];
 }
-function srvNav(r){if(r==='EXT')return ['politiques'];const n=[];
+const APPUI=['RH','RA','CPT','LOG'];
+function srvNav(r){if(r==='EXT')return ['politiques'];const appui=APPUI.includes(r),n=[];
  if(p03&&['DE','DP','CA'].includes(r))n.push('strategie','programmes');
- n.push('projets');if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');
+ if(!appui)n.push('projets');if(p03&&['DE','DP','CA',...APPUI].includes(r))n.push('equipes');
+ if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');
  if(['DE','RH'].includes(r))n.push('personnel');if(r==='DE')n.push('audit');return n}
 async function notifierSrv(dest,texte,lien,ref){const ids=[...new Set(dest.filter(Boolean))].filter(id=>id!==me.id&&S.staff.some(u=>u.id===id));
  if(!ids.length)return 0;await ins('notifications',ids.map(id=>({org_id:S.org.id,user_id:id,texte,lien,ref,envoye_par:me.id})));return ids.length}
@@ -1515,7 +1518,7 @@ function srvLoginHTML(){if(nonSecurise())return `<div class="login"><div class="
   <p style="margin:.4rem 0 0"><button type="button" class="lnk" data-act="srvPublic">Consulter les documents publics de l'organisation</button></p></form>
  <p class="legend" style="margin-top:1rem">Pour découvrir l'application sans compte : <button type="button" class="lnk" data-act="srvDemo" data-v="demo">ouvrir la démonstration (données fictives)</button>.</p></div></div>`}
 function srvHome(){const n=ROLES[me.role].nav,pa=polEnAttente().length;
- const D={strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
+ const D={equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
  return head('Accueil',`${esc(posteLib(me))}${me.bureau?' · '+esc(bur(me.bureau)):''} · ${esc(S.org.nom)}`)+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+notifBox()+
  (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():p03&&aValider().length?`<section class="card notif"><h3>À faire</h3><p>${aValider().length} mesure(s) d'indicateur attendent votre validation.</p>${alerteHTML(alertes())}</section>`:'')+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
  `<div class="tiles">${n.map(v=>`<button class="tile" data-act="go" data-v="${v}"><h2>${VIEWS[v]} ${v==='politiques'&&pa?`<span class="badge">${pa}</span>`:''}</h2><p>${D[v]||''}</p></button>`).join('')}</div>
@@ -1602,7 +1605,7 @@ document.addEventListener('submit',e=>{if(MODE!=='srv')return;const f=e.target,t
   const patch={nom:String(d.nom).trim(),bailleur:d.bailleur||null,montant:d.montant===''?null:Number(d.montant),debut:d.debut||null,fin:d.fin||null,zone:d.zone||null,domaine:d.domaine||null};if('chef' in d)patch.chef_id=d.chef||null;if(p03){patch.budget_approuve=patch.montant;if('code' in d)patch.code=d.code||null;if('programme' in d)patch.programme_id=d.programme||null;delete actChk[p.id]}
   action(async()=>{await upd('projets',`id=eq.${p.id}`,patch);if('chef' in d&&d.chef&&d.chef!==p.chefId){if(!p.membres.some(m=>m.staffId===d.chef&&m.roleProjet==='Chef de projet'))await ins('affectations',{org_id:S.org.id,projet_id:p.id,user_id:d.chef,role_projet:'Chef de projet',debut:d.debut||null,fin:d.fin||null,cree_par:me.id});await notifierSrv([d.chef],`Vous êtes désigné(e) chef du projet « ${patch.nom} »`,'projet',p.id)}log(`Projet modifié : ${patch.nom}`);if(p03)logO('projet',p.id,'Informations du projet modifiées')},'Informations du projet enregistrées.');return}
  if(t==='srvAff'){const p=S.projets.find(x=>x.id===f.dataset.p);if(d.debut&&d.fin&&d.fin<d.debut){alert('La date de fin doit être après la date de début.');return}
-  action(async()=>{await ins('affectations',{org_id:S.org.id,projet_id:p.id,user_id:d.user,role_projet:d.role,debut:d.debut||null,fin:d.fin||null,cree_par:me.id});await notifierSrv([d.user],`Vous êtes affecté(e) au projet « ${p.nom} » (${d.role})`,'projet',p.id);log(`${who(d.user)} affecté(e) à ${p.nom} (${d.role})`);if(p03)logO('projet',p.id,`${who(d.user)} affecté(e) : ${d.role}`)},`${who(d.user)} est affecté(e) au projet.`);return}
+  action(async()=>{await ins('affectations',{org_id:S.org.id,projet_id:p.id,user_id:d.user,role_projet:d.role,debut:d.debut||null,fin:d.fin||null,cree_par:me.id});await notifierSrv([d.user],`Vous êtes affecté(e) au projet « ${p.nom} » (${d.role})`,'projet',p.id);await notifierAppui(`Personnel du projet « ${p.nom} » : ${who(d.user)} affecté(e) comme ${d.role}${d.debut?' à partir du '+fmtD(d.debut):''}`,p.id);log(`${who(d.user)} affecté(e) à ${p.nom} (${d.role})`);if(p03)logO('projet',p.id,`${who(d.user)} affecté(e) : ${d.role}`)},`${who(d.user)} est affecté(e) au projet.`);return}
  const doc=S.pol.docs.find(x=>x.id===f.dataset.id);
  if(t==='polMsg'){const dv=fd.get('dest'),aud=polAudience(doc),dest=dv==='tous'?aud:dv==='retard'?aud.filter(u=>!polAccuse(doc,u)):aud.filter(u=>u.role===dv.slice(5));
   action(async()=>{const n=await notifierSrv(dest.map(u=>u.id),`${doc.titre} : ${String(fd.get('texte')).trim()}`,'politique',doc.id);srvMsg=`Notification envoyée à ${n} personne(s).`});return}
@@ -1629,11 +1632,12 @@ document.addEventListener('click',e=>{if(MODE!=='srv')return;const b=e.target.cl
    else{if(!d.dl)return;fichierLien(v.fichier.nom,blob,blob.type);if(me)log(`Document téléchargé : ${d.titre} (v${v.v})`)}}).catch(err=>alert(err.message));return}
  if(!me)return;
  if(a==='logout'){stop();log('Déconnexion');authLogout().then(()=>{me=null;S=srvVide();view='home';polDoc=polEdit=null;render()});return}
- if(a==='notifOuvrir'){const n=S.pol.notifs.find(x=>x.id===b.dataset.id);if(n){upd('notifications',`id=eq.${n.id}`,{lu:true}).catch(()=>{});if(n.lien==='projet'||n.lien==='programme'){stop();n.lus.push(me.id);if(n.lien==='projet'&&p03&&projet(n.ref)){dosSel=n.ref;dosTab='id';view='dossier'}else if(n.lien==='programme'&&programme(n.ref)){pgSel=n.ref;view='programmes'}else view='projets';render();return}}return}
+ if(a==='notifOuvrir'){const n=S.pol.notifs.find(x=>x.id===b.dataset.id);if(n){upd('notifications',`id=eq.${n.id}`,{lu:true}).catch(()=>{});if(n.lien==='equipes'){stop();n.lus.push(me.id);eqF.proj=n.ref||'';eqF.etat='';view='equipes';render();return}
+  if(n.lien==='projet'||n.lien==='programme'){stop();n.lus.push(me.id);if(n.lien==='projet'&&p03&&projet(n.ref)){dosSel=n.ref;dosTab='id';view='dossier'}else if(n.lien==='programme'&&programme(n.ref)){pgSel=n.ref;view='programmes'}else view='projets';render();return}}return}
  if(a==='notifLu'){stop();action(()=>upd('notifications',`user_id=eq.${me.id}&lu=is.false`,{lu:true}));return}
  if(a==='srvToggle'){stop();const u=S.staff.find(x=>x.id===b.dataset.id);action(async()=>{await upd('membres',`org_id=eq.${S.org.id}&user_id=eq.${u.id}`,{actif:!u.actif});log(`Compte ${u.actif?'désactivé':'réactivé'} : ${u.nom}`)},`Compte ${u.actif?'désactivé':'réactivé'} : ${u.nom}.`);return}
  if(a==='srvDelAff'){stop();const p=S.projets.find(x=>x.membres.some(m=>m.affId===b.dataset.id)),m=p&&p.membres.find(x=>x.affId===b.dataset.id);if(!m||!confirm(`Retirer ${who(m.staffId)} du projet ?`))return;
-  action(async()=>{await del('affectations',`id=eq.${m.affId}`);log(`${who(m.staffId)} retiré(e) de ${p.nom}`);if(p03)logO('projet',p.id,`${who(m.staffId)} retiré(e) de l'équipe`)});return}
+  action(async()=>{await del('affectations',`id=eq.${m.affId}`);log(`${who(m.staffId)} retiré(e) de ${p.nom}`);await notifierAppui(`Personnel du projet « ${p.nom} » : ${who(m.staffId)} retiré(e) de l'équipe (${m.roleProjet})`,p.id);if(p03)logO('projet',p.id,`${who(m.staffId)} retiré(e) de l'équipe`)});return}
  const d=S.pol.docs.find(x=>x.id===b.dataset.id);
  if(a==='polAck'&&d&&polDoitConfirmer(d)){stop();const i=vPub(d);action(async()=>{await ins('pol_accuses',{org_id:S.org.id,document_id:d.id,version_id:d.versions[i].id,user_id:me.id});log(`Lecture confirmée : ${d.titre} (v${d.versions[i].v})`)});return}
  if(!polGest())return;
@@ -1657,7 +1661,7 @@ document.addEventListener('change',e=>{if(MODE!=='srv'||!me)return;const t=e.tar
 
 /* ===== Base du Directeur des programmes (mode serveur) : stratégie, programmes, portefeuille, dossier du projet, performance, archives ===== */
 const DEPTS={GOUVERNANCE:'Gouvernance (conseil d\'administration)',DIRECTION:'Direction exécutive',PROGRAMMES:'Programmes et projets',ADMIN_FIN:'Administration et finances',COMPTA:'Comptabilité',RH:'Ressources humaines',LOGISTIQUE:'Logistique'};
-const DEP_ROLE={DE:Object.keys(DEPTS),CA:['GOUVERNANCE'],RA:['ADMIN_FIN','COMPTA','LOGISTIQUE'],CPT:['COMPTA'],RH:['RH'],DP:['PROGRAMMES'],CP:['PROGRAMMES'],SE:['PROGRAMMES'],SUP:['PROGRAMMES'],ASC:['PROGRAMMES'],LECT:['PROGRAMMES']};
+const DEP_ROLE={DE:Object.keys(DEPTS),CA:['GOUVERNANCE'],RA:['ADMIN_FIN','COMPTA','LOGISTIQUE'],CPT:['COMPTA'],LOG:['LOGISTIQUE'],RH:['RH'],DP:['PROGRAMMES'],CP:['PROGRAMMES'],SE:['PROGRAMMES'],SUP:['PROGRAMMES'],ASC:['PROGRAMMES'],LECT:['PROGRAMMES']};
 const DOC_TYPES=['Convention de financement','Proposition de projet','Budget approuvé','Plan de travail','Termes de référence','Rapport d\'activité','Rapport narratif au bailleur','Rapport financier','Rapport de mission','Fiche de terrain (scan)','Liste de présence (scan)','Procès-verbal','Compte rendu de réunion','Contrat','Facture ou justificatif','Pièce comptable','Bon de commande','Correspondance','Évaluation','Photo ou vidéo','Autre'];
 const DOC_ST={brouillon:['Brouillon',''],valide:['Validé','ok'],signe:['Signé et cacheté','ok'],obsolete:['Obsolète','warn']};
 const CL_NIV={og:'Objectif global',os:'Objectif spécifique',res:'Résultat attendu',act:'Activité'};
@@ -2071,21 +2075,47 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.targ
  if(a==='svDemVal'){const p=projet(id);action(async()=>{const n=await notifierSrv(S.staff.filter(u=>['DP','DE'].includes(u.role)&&u.actif).map(u=>u.id),`Vérification demandée par ${me.nom} : projet « ${p.nom} »`,'projet',p.id);logO('projet',p.id,'Vérification demandée au DP');srvMsg=`Demande envoyée à ${n} personne(s).`});return}
 },true);
 document.addEventListener('change',e=>{if(MODE!=='srv'||!me)return;const t=e.target;
- if(t.dataset&&t.dataset.flt){e.stopImmediatePropagation();const [o,k]=t.dataset.flt.split('.');(o==='pf'?pfF:arF)[k]=t.value;render();const n=document.querySelector(`[data-flt="${t.dataset.flt}"]`);if(n&&t.tagName==='INPUT')n.focus();return}
+ if(t.dataset&&t.dataset.flt){e.stopImmediatePropagation();const [o,k]=t.dataset.flt.split('.');(o==='pf'?pfF:o==='eq'?eqF:arF)[k]=t.value;render();const n=document.querySelector(`[data-flt="${t.dataset.flt}"]`);if(n&&t.tagName==='INPUT')n.focus();return}
  if(t.classList.contains('svJalSt')){e.stopImmediatePropagation();const j=S.jalons.find(x=>x.id===t.dataset.id);action(async()=>{await upd('jalons',`id=eq.${j.id}`,{statut:t.value,fait_le:t.value==='fait'?today():null});logO('programme',j.programme_id,`Jalon « ${j.libelle} » : ${JAL_ST[t.value]}`)},'Jalon mis à jour.');return}
  if(t.classList.contains('svRqSt')){e.stopImmediatePropagation();const r=S.risques.find(x=>x.id===t.dataset.id);action(async()=>{await upd('risques',`id=eq.${r.id}`,{statut:t.value,maj_le:new Date().toISOString()});if(r.projet_id)logO('projet',r.projet_id,`Risque « ${r.libelle} » : ${RQ_ST[t.value][0]}`)},'Risque mis à jour.');return}
  if(t.classList.contains('svLier')){e.stopImmediatePropagation();const p=projet(t.value),g=programme(t.dataset.g);if(!p)return;if(!confirm(`Rattacher « ${p.nom} » à « ${g.nom} » ?`)){render();return}
   action(async()=>{await upd('projets',`id=eq.${p.id}`,{programme_id:g.id});logO('projet',p.id,`Rattaché au programme ${g.nom}`);delete actChk[p.id]},'Projet rattaché.');return}
 },true);
 
+
+/* ---------- personnel des projets, partagé avec RH, RAF, comptabilité et logistique ---------- */
+let eqF={proj:'',statut:'',etat:'cours'};
+const ETAT_AFF={cours:['En cours','ok'],avenir:['À venir','warn'],termine:['Terminée','']};
+const etatAff=m=>{const t=today();return m.fin&&m.fin<t?'termine':m.debut&&m.debut>t?'avenir':'cours'};
+async function notifierAppui(texte,pid){return notifierSrv(S.staff.filter(u=>APPUI.includes(u.role)&&accesOK(u)).map(u=>u.id),texte,'equipes',pid)}
+function lignesEq(){let ps=S.projets.slice();if(eqF.proj)ps=ps.filter(p=>p.id===eqF.proj);
+ return ps.flatMap(p=>p.membres.map(m=>({p,m,u:S.staff.find(x=>x.id===m.staffId)||{},e:etatAff(m)}))).filter(x=>!eqF.etat||x.e===eqF.etat).filter(x=>!eqF.statut||x.u.statut===eqF.statut)}
+function svEquipes(){const L=lignesEq(),pers=new Set(L.map(x=>x.m.staffId)),projs=[...new Set(L.map(x=>x.p.id))].map(projet),parSt={};L.forEach(x=>{const k=x.u.statut||'Non précisé';parSt[k]=(parSt[k]||0)+1});
+ const usage={RH:'rédiger les contrats, établir les feuilles de route et suivre les feuilles de temps',RA:'préparer la paie des intervenants et les déclarations CNPS',CPT:'préparer la paie des intervenants et les déclarations CNPS',LOG:'organiser l\'équipement, les déplacements et la logistique des équipes'}[me.role];
+ const statuts=[...new Set(S.staff.map(u=>u.statut).filter(Boolean))];
+ return head('Personnel des projets',`Équipe de chaque projet, enregistrée par le Directeur des programmes.${usage?' Cette liste vous sert à '+usage+'.':''} Vous êtes prévenu(e) à chaque arrivée ou départ.`)+
+ (APPUI.includes(me.role)&&!S.projets.length?'<p class="note">Aucun projet visible. Si des projets existent, le script 04 doit être exécuté dans Supabase.</p>':'')+
+ `<div class="kpis"><div class="kpi"><span>Projets</span><b>${projs.length}</b></div><div class="kpi"><span>Personnes</span><b>${pers.size}</b></div><div class="kpi"><span>Affectations</span><b>${L.length}</b></div>${Object.entries(parSt).map(([k,n])=>`<div class="kpi"><span>${esc(k)}</span><b>${n}</b></div>`).join('')}</div>
+ <section class="card"><div class="grid" style="align-items:end"><div><label for="eqP">Projet</label><select id="eqP" data-flt="eq.proj">${opts(S.projets.map(p=>[p.id,libProj(p)]),eqF.proj,'Tous les projets')}</select></div>
+ <div><label for="eqE">Période</label><select id="eqE" data-flt="eq.etat">${opts(Object.entries(ETAT_AFF).map(([k,[l]])=>[k,l]),eqF.etat,'Toutes')}</select></div>
+ <div><label for="eqS">Statut d'emploi</label><select id="eqS" data-flt="eq.statut">${opts(statuts.map(x=>[x,x]),eqF.statut,'Tous')}</select></div>
+ <div><button class="btn sm" data-act="eqCsv">Télécharger la liste (Excel)</button></div></div></section>`+
+ (projs.length?projs.map(p=>{const l=L.filter(x=>x.p.id===p.id);return `<section class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">${esc(libProj(p))}</h3>${gereProj(p)?`<button class="btn ghost sm" data-act="svDos" data-id="${p.id}" data-tab="eq">Modifier l'équipe</button>`:''}</div>
+  <p class="muted" style="margin:.2rem 0 .6rem">${esc(p.bailleur||'Bailleur non renseigné')} · ${fmtD(p.debut)} → ${fmtD(p.fin)} · ${esc(p.zone||'')} · chef de projet : ${esc(who(p.chefId))}</p>
+  ${svT(['Nom','Poste à OSV','Rôle dans le projet','Statut d\'emploi','Bureau','E-mail','Du','Au','Période'],l.map(x=>[`<b>${esc(x.u.nom||'—')}</b>`,esc(x.u.posteId?posteLib(x.u):'—'),esc(x.m.roleProjet),esc(x.u.statut||'—'),esc(bur(x.u.bureau)),esc(x.u.email||''),fmtD(x.m.debut),fmtD(x.m.fin),tag(ETAT_AFF[x.e])]))}</section>`}).join(''):'<section class="card"><p class="empty">Aucune affectation pour ces critères.</p></section>')}
+function eqCsv(){const L=lignesEq(),c=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+ const rows=[['Projet','Code','Bailleur','Début projet','Fin projet','Nom','Poste à OSV','Rôle dans le projet',"Statut d'emploi",'Bureau','E-mail','Du','Au','Période'],...L.map(x=>[x.p.nom,x.p.code,x.p.bailleur,x.p.debut,x.p.fin,x.u.nom,x.u.posteId?posteLib(x.u):'',x.m.roleProjet,x.u.statut,bur(x.u.bureau),x.u.email,x.m.debut,x.m.fin,ETAT_AFF[x.e][0]])];
+ fichierLien(`Personnel_projets_${today()}.csv`,'﻿'+rows.map(r=>r.map(c).join(';')).join('\r\n'),'text/csv;charset=utf-8');logO('archive',null,`Liste du personnel des projets téléchargée (${L.length} lignes)`)}
+document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.target.closest('[data-act="eqCsv"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();eqCsv()},true);
+
 /* ---------- démarrage ---------- */
 async function srvInit(){
  if(MODE!=='srv'){render();return}
  save=function(){};                                              // rien de réel n'est gardé dans le navigateur
  const _log=log;log=function(a){if(me&&S.org&&S.org.id)ins('audit',{org_id:S.org.id,user_id:me.id,action:String(a).slice(0,500)}).catch(()=>{})};
- loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
+ loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
  render=srvRender;
- viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
+ viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
  S=srvVide();me=null;sess=sessLire();
  const h=new URLSearchParams(location.hash.slice(1));                // retour d'un lien « mot de passe oublié »
  if(h.get('access_token')){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
