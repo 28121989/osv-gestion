@@ -1467,7 +1467,7 @@ async function authRefresh(){const s=sess;if(!s)return;sess=null;
 async function authLogout(){try{if(sess)await api('/auth/v1/logout',{method:'POST'})}catch(e){}sessEcrire(null)}
 
 /* ---------- chargement des données autorisées ---------- */
-function srvVide(){return {org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
+function srvVide(){return {org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
 async function srvLoad(){
  const uid=sess.user.id,mine=await sel('membres',`select=*&user_id=eq.${uid}&actif=is.true`);
  const m=(mine||[]).find(x=>!x.fin_acces||x.fin_acces>=today());
@@ -1493,6 +1493,7 @@ async function srvLoad(){
  p03=T[0]!==null;[N.plans,N.axes,N.objectifs,N.programmes,N.jalons,N.cadre,N.inds,N.mesures,N.risques,N.docs,N.histo]=T.map(x=>x||[]);
  const T5=await Promise.all([sel('budget_lignes',f),sel('depenses',f),sel('financements',f),sel('seuils_approbation',f)].map(opt));p05=T5[0]!==null;[N.blignes,N.depenses,N.financements,N.seuils]=T5.map(x=>x||[]);
  const T6=await Promise.all(['comptes_tresorerie','mouvements','rapprochements','avances','fournisseurs','seuils_achat','achats','devis','baremes_mission','missions','biens','inventaires','plan_comptable','correspondances'].map(t=>sel(t,f)).concat([sel('inventaire_lignes')]).map(opt));p06=T6[3]!==null;
+ const T7=await opt(sel('mission_membres',f+'&order=ordre'));p07=T7!==null;N.mmembres=T7||[];
  [N.comptes,N.mouvements,N.rapprochements,N.avances,N.fournisseurs,N.seuilsAchat,N.achats,N.devis,N.baremes,N.missions,N.biens,N.inventaires,N.pcomptes,N.correspondances,N.invLignes]=T6.map(x=>x||[]);
  S=N;me=S.staff.find(x=>x.id===uid);
  Object.keys(ROLES).forEach(k=>ROLES[k].nav=srvNav(k));
@@ -2268,7 +2269,7 @@ const CT_TYPE={caisse:'Caisse',banque:'Banque',mobile_money:'Mobile Money'};
 const MV_CAT={financement:'Financement reçu',depense:'Dépense de projet',avance:'Avance versée',retour_avance:'Retour d\'avance',virement_interne:'Virement interne',frais_bancaires:'Frais bancaires',salaires:'Salaires',cotisations:'Cotisations sociales (CNPS)',impots:'Impôts et taxes',autre:'Autre'};
 const AV_ST={demandee:['Demandée','warn'],approuvee:['Approuvée','warn'],versee:['Versée, à justifier','warn'],justifiee:['Justifiée, à solder','warn'],soldee:['Soldée','ok'],rejetee:['Rejetée','bad']};
 const AC_ST={demande:['Demande','warn'],approuvee:['Approuvée : devis à réunir','warn'],attribuee:['Attribuée','warn'],commandee:['Commandée','warn'],receptionnee:['Réceptionnée','ok'],rejetee:['Rejetée','bad'],annulee:['Annulée','']};
-const MI_ST={demandee:['Demandée','warn'],approuvee:['Approuvée','ok'],rapport:['Rapport déposé, à liquider','warn'],liquidee:['Liquidée','ok'],rejetee:['Rejetée','bad'],annulee:['Annulée','']};
+const MI_ST={demandee:['À signer','warn'],approuvee:['Signé','ok'],rapport:['Rapport déposé, à liquider','warn'],liquidee:['Liquidée','ok'],rejetee:['Rejetée','bad'],annulee:['Annulée','']};
 const BI_CAT={informatique:'Informatique',telephonie:'Téléphonie',mobilier:'Mobilier',vehicule:'Véhicule',moto:'Moto',equipement_terrain:'Équipement de terrain',energie:'Énergie (groupe, panneaux)',autre:'Autre'};
 const BI_ET={bon:'Bon',moyen:'Moyen',hors_service:'Hors service',perdu:'Perdu',vole:'Volé',cede:'Cédé',reforme:'Réformé'};
 const FO_NAT={entreprise:'Entreprise',individu:'Personne physique',ong:'ONG ou association',administration:'Administration'};
@@ -2289,13 +2290,13 @@ const avVerse=a=>a.statut==='approuvee'&&gAdm()&&a.beneficiaire_id!==me.id;
 const avSolde=a=>a.statut==='justifiee'&&gAdm()&&a.beneficiaire_id!==me.id;
 const acAppr=a=>a.statut==='demande'&&['DE','RA','DP'].includes(me.role)&&a.demandeur_id!==me.id;
 const acGere=()=>['DE','RA','CPT','LOG'].includes(me.role);
-const miAppr=m=>m.statut==='demandee'&&m.agent_id!==me.id&&(['DE','DP','RA'].includes(me.role)||auDessusC(m.agent_id));
+const miAppr=m=>omPeutSigner(m);
 const miLiq=m=>m.statut==='rapport'&&gAdm()&&m.agent_id!==me.id;
 const avRetard=a=>a.statut==='versee'&&a.date_limite&&a.date_limite<today();
 function admAlertes(){const A=[];if(!p06)return A;
  const avA=S.avances.filter(avAppr),miA=S.missions.filter(miAppr),acA=S.achats.filter(acAppr);
  if(avA.length)A.push(['warn',`${avA.length} avance(s) à approuver`,'admGo','avances']);
- if(miA.length)A.push(['warn',`${miA.length} mission(s) à approuver`,ROLES[me.role].nav.includes('adm')?'admGo':'go',ROLES[me.role].nav.includes('adm')?'missions':'mesdem']);
+ if(miA.length)A.push(['warn',`${miA.length} ordre(s) de mission à signer`,ROLES[me.role].nav.includes('adm')?'admGo':'go',ROLES[me.role].nav.includes('adm')?'missions':'mesdem']);
  if(acA.length)A.push(['warn',`${acA.length} demande(s) d'achat à approuver`,'admGo','achats']);
  if(gAdm()){const v=S.avances.filter(avVerse).length,s=S.avances.filter(avSolde).length,l=S.missions.filter(miLiq).length,r=S.avances.filter(avRetard).length;
   if(v)A.push(['warn',`${v} avance(s) approuvée(s) à verser`,'admGo','avances']);if(s)A.push(['warn',`${s} justification(s) d'avance à contrôler`,'admGo','avances']);
@@ -2388,13 +2389,9 @@ function admFourn(){const ge=['DE','RA','CPT','LOG'].includes(me.role);
  ${ge?`<details style="margin-top:.6rem"><summary>Ajouter un fournisseur</summary><form data-form="admFourn" class="grid" style="margin-top:.6rem;align-items:end"><div style="grid-column:span 2"><label>Nom ou raison sociale</label><input name="nom" required></div><div><label>Nature</label><select name="nature">${opts(Object.entries(FO_NAT),'entreprise')}</select></div><div><label>RCCM</label><input name="rccm"></div><div><label>N° de compte contribuable</label><input name="ncc"></div><div><label>Contact</label><input name="contact"></div><div><label>Téléphone</label><input name="telephone"></div><div><label>E-mail</label><input name="email" type="email"></div><div><label>Domaine</label><input name="domaine" placeholder="ex. imprimerie, sonorisation"></div><div style="grid-column:span 2"><label>Adresse</label><input name="adresse"></div><div><button class="btn sm" type="submit">Ajouter</button></div></form></details>`:''}</section>`}
 
 /* ---------- missions ---------- */
-function miLigne(m){const tot=Math.round(Number(m.per_diem_jour)*Number(m.nb_jours))+Number(m.frais_transport)+Number(m.autres_frais);
- return [esc(who(m.agent_id)),`${esc(m.objet)}<br><span class="muted">${esc(m.destination)}${m.projet_id?' · '+esc(libProj(projet(m.projet_id))):''}</span>`,`${fmtD(m.date_depart)} → ${fmtD(m.date_retour)}`,`${num(m.nb_jours)} j × ${num(m.per_diem_jour)}<br><span class="muted">transport ${num(m.frais_transport)}${Number(m.autres_frais)?' · autres '+num(m.autres_frais):''}</span>`,num(m.montant_liquide??tot),
-  tag(MI_ST[m.statut])+(m.rapport_doc_id?`<br>${docLien(m.rapport_doc_id)}`:'')+(m.motif?`<br><span class="muted">${esc(m.motif)}</span>`:''),
-  `<div class="row">${miAppr(m)?`<button class="btn sm" data-act="miSt" data-v="approuvee" data-id="${m.id}">Approuver</button><button class="btn ghost sm" data-act="miRej" data-id="${m.id}">Rejeter</button>`:''}${miLiq(m)?`<button class="btn sm" data-act="miSt" data-v="liquidee" data-id="${m.id}">Liquider</button>`:''}<button class="btn ghost sm" data-act="miOM" data-id="${m.id}">Ordre de mission</button></div>`]}
-const MI_COLS=['Agent','Objet et destination','Dates','Per diem et frais','#Total (FCFA)','Statut',''];
+const MI_COLS=['N° · Missionnaires','Objet et destination','Dates','Per diem et frais','#Total (FCFA)','Statut',''];
 function admMissions(){const L=S.missions.slice().sort((a,b)=>a.date_depart<b.date_depart?1:-1);
- return `<section class="card"><h3>Missions (${L.length})</h3><p class="muted">Circuit : ordre de mission demandé → approuvé par le responsable hiérarchique, le DP, le RAF ou le DE → rapport de mission déposé au retour → liquidation des per diem et frais par la comptabilité, sur la base du barème.</p>${svT(MI_COLS,L.map(miLigne),'Aucune mission.')}</section>`}
+ return `<section class="card"><h3>Missions (${L.length})</h3><p class="muted">Circuit : ordre de mission établi par le responsable hiérarchique → signé par le DE (à défaut le DP ; par le PCA quand le DE part en mission), qui lui attribue un numéro et un QR code d'authenticité → rapport de mission déposé au retour → liquidation des per diem et frais par la comptabilité, sur la base du barème.</p>${svT(MI_COLS,L.map(miLigne),'Aucune mission.')}${['DE','DP','RA','CPT'].includes(me.role)&&p07?omForm():''}</section>`}
 
 /* ---------- biens et inventaire ---------- */
 function admBiens(){const ge=['DE','RA','CPT','LOG'].includes(me.role),L=S.biens.slice().sort((a,b)=>String(a.code).localeCompare(String(b.code),'fr',{numeric:true}));
@@ -2437,7 +2434,7 @@ function admParam(){const de=me.role==='DE',sa=S.seuilsAchat.slice().sort((a,b)=
  <section class="card"><h3>Délégations d'approbation des dépenses</h3><p class="muted">Elles se règlent dans <button class="lnk" data-act="go" data-v="finances">Finances des projets</button>.</p></section>`}
 
 /* ---------- mes demandes (tout le personnel) ---------- */
-function svMesDem(){const mA=S.avances.filter(a=>a.beneficiaire_id===me.id||a.demande_par===me.id),mM=S.missions.filter(m=>m.agent_id===me.id||m.demande_par===me.id),mC=S.achats.filter(a=>a.demandeur_id===me.id);
+function svMesDem(){const mA=S.avances.filter(a=>a.beneficiaire_id===me.id||a.demande_par===me.id),mM=S.missions.filter(m=>m.agent_id===me.id||m.demande_par===me.id||omMembres(m).some(x=>x.user_id===me.id)),mC=S.achats.filter(a=>a.demandeur_id===me.id);
  const apA=S.avances.filter(avAppr),apM=S.missions.filter(miAppr),apC=S.achats.filter(acAppr),projs=S.projets;
  return head('Mes demandes','Avances, missions et achats : vos demandes, leur avancement, et ce que vous avez à approuver.')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
  (apA.length+apM.length+apC.length?`<section class="card notif"><h3>À approuver (${apA.length+apM.length+apC.length})</h3>${apA.length?svT(AV_COLS,apA.map(a=>avLigne(a))):''}${apM.length?svT(MI_COLS,apM.map(miLigne)):''}${apC.length?svT(['Date','Objet','Demandeur','#Montant','Statut',''],apC.map(acLigne)):''}</section>`:'')+
@@ -2446,8 +2443,7 @@ function svMesDem(){const mA=S.avances.filter(a=>a.beneficiaire_id===me.id||a.de
  <details style="margin-top:.6rem"><summary>Demander une avance</summary><form data-form="mdAvance" class="grid" style="margin-top:.6rem;align-items:end"><div style="grid-column:span 2"><label>Objet</label><input name="objet" required placeholder="ex. Causeries éducatives, village B"></div><div><label>Montant (FCFA)</label><input name="montant" type="number" min="1" required></div><div><label>Projet</label><select name="projet">${opts(projs.map(p=>[p.id,libProj(p)]),'','— aucun —')}</select></div><div><label>Justification au plus tard le</label><input name="date_limite" type="date" required min="${today()}"></div><div><button class="btn sm" type="submit">Envoyer la demande</button></div></form></details></section>
  <section class="card"><h3>Mes missions (${mM.length})</h3>${svT(MI_COLS.slice(1),mM.map(m=>miLigne(m).slice(1)),'Aucune mission.')}
  ${mM.filter(m=>m.statut==='approuvee'&&m.agent_id===me.id).map(m=>`<form data-form="mdRapport" data-id="${m.id}" class="row" style="margin-top:.5rem"><span>Rapport de la mission « ${esc(m.objet)} » :</span><input name="fichier" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required aria-label="Rapport de mission"><button class="btn sm" type="submit">Déposer</button></form>`).join('')}
- <details style="margin-top:.6rem"><summary>Demander un ordre de mission</summary><form data-form="mdMission" class="grid" style="margin-top:.6rem;align-items:end"><div style="grid-column:span 2"><label>Objet</label><input name="objet" required></div><div><label>Destination</label><input name="destination" required></div><div><label>Projet</label><select name="projet">${opts(projs.map(p=>[p.id,libProj(p)]),'','— aucun —')}</select></div><div><label>Départ</label><input name="date_depart" type="date" required></div><div><label>Retour</label><input name="date_retour" type="date" required></div>
-  <div><label>Barème</label><select name="bareme">${opts(S.baremes.map(b=>[`${b.categorie}|${b.zone}`,`${b.categorie} · ${b.zone} · ${num(b.per_diem)}/jour`]),'',S.baremes.length?'— choisir —':'aucun barème fixé')}</select></div><div><label>Per diem par jour (si pas de barème)</label><input name="per_diem" type="number" min="0"></div><div><label>Transport (moyen)</label><input name="transport" placeholder="ex. car, moto de service"></div><div><label>Frais de transport (FCFA)</label><input name="frais_transport" type="number" min="0" value="0"></div><div><label>Autres frais (FCFA)</label><input name="autres_frais" type="number" min="0" value="0"></div><div><button class="btn sm" type="submit">Envoyer la demande</button></div></form></details></section>
+ ${p07?omForm():`<p class="note">Pour établir des ordres de mission complets, exécutez le script 07 dans Supabase.</p>`}</section>
  <section class="card"><h3>Mes demandes d'achat (${mC.length})</h3>${svT(['Date','Objet','Demandeur','#Montant','Statut',''],mC.map(acLigne),'Aucune demande d\'achat.')}
  ${mC.filter(a=>a.statut==='commandee'&&a.commande_par!==me.id).map(a=>`<div class="card" style="margin-top:.5rem"><b>Réception de « ${esc(a.objet)} »</b> (${esc(a.bc_numero||'')})${acRecForm(a)}</div>`).join('')}
  <details style="margin-top:.6rem"><summary>Faire une demande d'achat</summary><form data-form="mdAchat" class="grid" style="margin-top:.6rem;align-items:end"><div style="grid-column:span 2"><label>Objet</label><input name="objet" required></div><div><label>Quantité</label><input name="quantite"></div><div><label>Montant estimé (FCFA)</label><input name="montant" type="number" min="1" required></div><div><label>Projet</label><select name="projet">${opts(projs.map(p=>[p.id,libProj(p)]),'','— aucun —')}</select></div><div><label>Pour le</label><input name="date_besoin" type="date"></div><div style="grid-column:1/-1"><label>Description et spécifications</label><textarea name="description" rows="2"></textarea></div><div><button class="btn sm" type="submit">Envoyer la demande</button></div></form></details></section>`}
@@ -2455,9 +2451,6 @@ function svMesDem(){const mA=S.avances.filter(a=>a.beneficiaire_id===me.id||a.de
 /* ---------- documents imprimables : ordre de mission, bon de commande ---------- */
 function docImprimable(titre,corps){const w=window.open('','_blank');if(!w){alert('Autorisez les fenêtres pour imprimer.');return}
  w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${esc(titre)}</title><style>body{font-family:Arial,sans-serif;margin:18mm;color:#111;font-size:11pt}img{height:70px}h1{font-size:15pt;text-align:center;margin:10px 0 18px;text-transform:uppercase}table{border-collapse:collapse;width:100%;margin:8px 0}th,td{border:1px solid #555;padding:5px 7px;text-align:left;vertical-align:top}th{background:#eee;width:34%}.sig{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:40px}.sig div{border-top:1px solid #555;padding-top:4px;font-size:9.5pt;min-height:60px}@media print{button{display:none}}</style></head><body><img src="${LOGO}" alt="Logo ONG Sécurité Vie"><div style="font-size:9.5pt">${esc(S.org.nom)}</div><h1>${esc(titre)}</h1>${corps}<p style="margin-top:24px"><button onclick="print()">Imprimer</button></p></body></html>`);w.document.close()}
-function ordreMission(m){const u=S.staff.find(x=>x.id===m.agent_id)||{},tot=Math.round(Number(m.per_diem_jour)*Number(m.nb_jours))+Number(m.frais_transport)+Number(m.autres_frais);
- docImprimable('Ordre de mission',`<table><tr><th>Agent</th><td>${esc(u.nom||'')} · ${esc(u.posteId?posteLib(u):'')}</td></tr><tr><th>Objet</th><td>${esc(m.objet)}</td></tr><tr><th>Destination</th><td>${esc(m.destination)}</td></tr><tr><th>Période</th><td>du ${fmtD(m.date_depart)} au ${fmtD(m.date_retour)} (${num(m.nb_jours)} jour(s))</td></tr><tr><th>Projet</th><td>${esc(m.projet_id?libProj(projet(m.projet_id)):'—')}</td></tr><tr><th>Moyen de transport</th><td>${esc(m.transport||'—')}</td></tr><tr><th>Per diem</th><td>${num(m.per_diem_jour)} FCFA × ${num(m.nb_jours)} = ${num(Math.round(m.per_diem_jour*m.nb_jours))} FCFA</td></tr><tr><th>Transport · autres frais</th><td>${num(m.frais_transport)} · ${num(m.autres_frais)} FCFA</td></tr><tr><th>Total prévu</th><td><b>${num(tot)} FCFA</b></td></tr><tr><th>Statut</th><td>${MI_ST[m.statut][0]}${m.approuve_par?' · approuvée par '+esc(who(m.approuve_par))+' le '+fmtD(m.approuve_le):''}</td></tr></table>
- <p style="font-size:9.5pt">Visa des autorités du lieu de mission (arrivée et départ) :</p><table><tr><th style="width:50%">Arrivée le … à …</th><th>Départ le … à …</th></tr><tr><td style="height:60px"></td><td></td></tr></table><div class="sig"><div>L'agent</div><div>Le responsable hiérarchique</div><div>Le Directeur exécutif</div></div>`)}
 function bonCommande(a){const f=S.fournisseurs.find(x=>x.id===a.fournisseur_id)||{};
  docImprimable(`Bon de commande ${a.bc_numero||''}`,`<table><tr><th>Fournisseur</th><td>${esc(f.nom||'')}<br>${esc([f.adresse,f.telephone,f.email].filter(Boolean).join(' · '))}<br>${esc([f.rccm?'RCCM '+f.rccm:'',f.ncc?'NCC '+f.ncc:''].filter(Boolean).join(' · '))}</td></tr><tr><th>Date</th><td>${fmtD(a.commande_le||today())}</td></tr><tr><th>Objet</th><td>${esc(a.objet)}${a.quantite?' · quantité : '+esc(a.quantite):''}<br>${esc(a.description||'')}</td></tr><tr><th>Projet</th><td>${esc(a.projet_id?libProj(projet(a.projet_id)):'—')}</td></tr><tr><th>Montant</th><td><b>${num(a.montant_retenu)} FCFA</b></td></tr><tr><th>Livraison souhaitée</th><td>${fmtD(a.date_besoin)}</td></tr></table>
  <p style="font-size:9.5pt">La facture doit rappeler le numéro de ce bon de commande. Le paiement intervient après réception conforme constatée par OSV.</p><div class="sig"><div>Établi par</div><div>Le Responsable administratif et financier</div><div>Le Directeur exécutif</div></div>`)}
@@ -2500,9 +2493,7 @@ document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.tar
    await upd('avances',`id=eq.${a.id}`,{statut:'justifiee',montant_justifie:j,montant_rembourse:r,document_id:doc});await notifierSrv(S.staff.filter(u=>['RA','CPT'].includes(u.role)&&accesOK(u)).map(u=>u.id),`Justification d'avance à contrôler : ${me.nom}, ${a.objet}`,'adm',a.id)},'Justification déposée : la comptabilité va la contrôler.');return}
  if(t==='mdRapport'){const m=S.missions.find(x=>x.id===f.dataset.id);action(async()=>{const doc=await arDeposer({departement:'COMPTA',type_doc:'Rapport de mission',titre:`Rapport de mission – ${m.objet}`,projet:m.projet_id,annee:String(m.date_retour).slice(0,4),statut:'valide',perso:true},file,{objet:'mission'});
   await upd('missions',`id=eq.${m.id}`,{statut:'rapport',rapport_doc_id:doc});await notifierSrv(S.staff.filter(u=>['RA','CPT'].includes(u.role)&&accesOK(u)).map(u=>u.id),`Mission à liquider : ${me.nom}, ${m.objet}`,'adm',m.id)},'Rapport déposé : la mission va être liquidée.');return}
- if(t==='mdMission'){if(d.date_retour<d.date_depart){alert('La date de retour doit suivre la date de départ.');return}const b=d.bareme&&S.baremes.find(x=>`${x.categorie}|${x.zone}`===d.bareme),pd=b?Number(b.per_diem):(nbr(d.per_diem)||0);
-  action(async()=>{await ins('missions',{org_id:o,agent_id:me.id,projet_id:d.projet||null,objet:String(d.objet).trim(),destination:String(d.destination).trim(),date_depart:d.date_depart,date_retour:d.date_retour,transport:d.transport||null,per_diem_jour:pd,nb_jours:jours(d.date_depart,d.date_retour),frais_transport:nbr(d.frais_transport)||0,autres_frais:nbr(d.autres_frais)||0});
-   await notifierSrv([me.supId,...S.staff.filter(u=>u.role==='DP'&&accesOK(u)).map(u=>u.id)].filter(Boolean),`Mission à approuver : ${me.nom}, ${d.objet} (${d.destination})`,'mesdem',null)},'Demande de mission envoyée.');return}
+ if(t==='mdMission'){omEtablir(f,d);return}
  if(t==='mdAchat'){action(async()=>{await ins('achats',{org_id:o,projet_id:d.projet||null,objet:String(d.objet).trim(),description:d.description||null,quantite:d.quantite||null,montant_estime:nbr(d.montant),date_besoin:d.date_besoin||null});
   await notifierSrv(S.staff.filter(u=>['DE','RA','DP'].includes(u.role)&&accesOK(u)&&u.id!==me.id).map(u=>u.id),`Demande d'achat à approuver : ${d.objet} (${num(d.montant)} FCFA)`,'adm',null)},'Demande d\'achat envoyée.');return}
 },true);
@@ -2577,6 +2568,1784 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.targ
  const p=impPkg,er=impValider(p);if(er.length){impErr=er.join(' ');impPkg=null;render();return}
  let pid=null;action(async()=>{pid=await impExec(p);impPkg=null;impErr=''},'Projet importé en brouillon. Complétez l\'équipe, le chef de projet et la convention, puis demandez le contrôle du DE.').then(()=>{if(pid&&projet(pid)){dosSel=pid;dosTab='id';view='dossier';render();scrollTo(0,0)}})},true);
 
+/* QR Code Generator for JavaScript · (c) 2009 Kazuhiko Arase · licence MIT · « QR Code » est une marque déposée de DENSO WAVE */
+const QRGEN=(function(){var qrcode = function() {
+/**
+* qrcode
+* @param typeNumber 1 to 40
+* @param errorCorrectionLevel 'L','M','Q','H'
+*/
+var qrcode = function(typeNumber, errorCorrectionLevel) {
+var PAD0 = 0xEC;
+var PAD1 = 0x11;
+var _typeNumber = typeNumber;
+var _errorCorrectionLevel = QRErrorCorrectionLevel[errorCorrectionLevel];
+var _modules = null;
+var _moduleCount = 0;
+var _dataCache = null;
+var _dataList = [];
+var _this = {};
+var makeImpl = function(test, maskPattern) {
+_moduleCount = _typeNumber * 4 + 17;
+_modules = function(moduleCount) {
+var modules = new Array(moduleCount);
+for (var row = 0; row < moduleCount; row += 1) {
+modules[row] = new Array(moduleCount);
+for (var col = 0; col < moduleCount; col += 1) {
+modules[row][col] = null;
+}
+}
+return modules;
+}(_moduleCount);
+setupPositionProbePattern(0, 0);
+setupPositionProbePattern(_moduleCount - 7, 0);
+setupPositionProbePattern(0, _moduleCount - 7);
+setupPositionAdjustPattern();
+setupTimingPattern();
+setupTypeInfo(test, maskPattern);
+if (_typeNumber >= 7) {
+setupTypeNumber(test);
+}
+if (_dataCache == null) {
+_dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
+}
+mapData(_dataCache, maskPattern);
+};
+var setupPositionProbePattern = function(row, col) {
+for (var r = -1; r <= 7; r += 1) {
+if (row + r <= -1 || _moduleCount <= row + r) continue;
+for (var c = -1; c <= 7; c += 1) {
+if (col + c <= -1 || _moduleCount <= col + c) continue;
+if ( (0 <= r && r <= 6 && (c == 0 || c == 6) )
+|| (0 <= c && c <= 6 && (r == 0 || r == 6) )
+|| (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+_modules[row + r][col + c] = true;
+} else {
+_modules[row + r][col + c] = false;
+}
+}
+}
+};
+var getBestMaskPattern = function() {
+var minLostPoint = 0;
+var pattern = 0;
+for (var i = 0; i < 8; i += 1) {
+makeImpl(true, i);
+var lostPoint = QRUtil.getLostPoint(_this);
+if (i == 0 || minLostPoint > lostPoint) {
+minLostPoint = lostPoint;
+pattern = i;
+}
+}
+return pattern;
+};
+var setupTimingPattern = function() {
+for (var r = 8; r < _moduleCount - 8; r += 1) {
+if (_modules[r][6] != null) {
+continue;
+}
+_modules[r][6] = (r % 2 == 0);
+}
+for (var c = 8; c < _moduleCount - 8; c += 1) {
+if (_modules[6][c] != null) {
+continue;
+}
+_modules[6][c] = (c % 2 == 0);
+}
+};
+var setupPositionAdjustPattern = function() {
+var pos = QRUtil.getPatternPosition(_typeNumber);
+for (var i = 0; i < pos.length; i += 1) {
+for (var j = 0; j < pos.length; j += 1) {
+var row = pos[i];
+var col = pos[j];
+if (_modules[row][col] != null) {
+continue;
+}
+for (var r = -2; r <= 2; r += 1) {
+for (var c = -2; c <= 2; c += 1) {
+if (r == -2 || r == 2 || c == -2 || c == 2
+|| (r == 0 && c == 0) ) {
+_modules[row + r][col + c] = true;
+} else {
+_modules[row + r][col + c] = false;
+}
+}
+}
+}
+}
+};
+var setupTypeNumber = function(test) {
+var bits = QRUtil.getBCHTypeNumber(_typeNumber);
+for (var i = 0; i < 18; i += 1) {
+var mod = (!test && ( (bits >> i) & 1) == 1);
+_modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
+}
+for (var i = 0; i < 18; i += 1) {
+var mod = (!test && ( (bits >> i) & 1) == 1);
+_modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+}
+};
+var setupTypeInfo = function(test, maskPattern) {
+var data = (_errorCorrectionLevel << 3) | maskPattern;
+var bits = QRUtil.getBCHTypeInfo(data);
+for (var i = 0; i < 15; i += 1) {
+var mod = (!test && ( (bits >> i) & 1) == 1);
+if (i < 6) {
+_modules[i][8] = mod;
+} else if (i < 8) {
+_modules[i + 1][8] = mod;
+} else {
+_modules[_moduleCount - 15 + i][8] = mod;
+}
+}
+for (var i = 0; i < 15; i += 1) {
+var mod = (!test && ( (bits >> i) & 1) == 1);
+if (i < 8) {
+_modules[8][_moduleCount - i - 1] = mod;
+} else if (i < 9) {
+_modules[8][15 - i - 1 + 1] = mod;
+} else {
+_modules[8][15 - i - 1] = mod;
+}
+}
+_modules[_moduleCount - 8][8] = (!test);
+};
+var mapData = function(data, maskPattern) {
+var inc = -1;
+var row = _moduleCount - 1;
+var bitIndex = 7;
+var byteIndex = 0;
+var maskFunc = QRUtil.getMaskFunction(maskPattern);
+for (var col = _moduleCount - 1; col > 0; col -= 2) {
+if (col == 6) col -= 1;
+while (true) {
+for (var c = 0; c < 2; c += 1) {
+if (_modules[row][col - c] == null) {
+var dark = false;
+if (byteIndex < data.length) {
+dark = ( ( (data[byteIndex] >>> bitIndex) & 1) == 1);
+}
+var mask = maskFunc(row, col - c);
+if (mask) {
+dark = !dark;
+}
+_modules[row][col - c] = dark;
+bitIndex -= 1;
+if (bitIndex == -1) {
+byteIndex += 1;
+bitIndex = 7;
+}
+}
+}
+row += inc;
+if (row < 0 || _moduleCount <= row) {
+row -= inc;
+inc = -inc;
+break;
+}
+}
+}
+};
+var createBytes = function(buffer, rsBlocks) {
+var offset = 0;
+var maxDcCount = 0;
+var maxEcCount = 0;
+var dcdata = new Array(rsBlocks.length);
+var ecdata = new Array(rsBlocks.length);
+for (var r = 0; r < rsBlocks.length; r += 1) {
+var dcCount = rsBlocks[r].dataCount;
+var ecCount = rsBlocks[r].totalCount - dcCount;
+maxDcCount = Math.max(maxDcCount, dcCount);
+maxEcCount = Math.max(maxEcCount, ecCount);
+dcdata[r] = new Array(dcCount);
+for (var i = 0; i < dcdata[r].length; i += 1) {
+dcdata[r][i] = 0xff & buffer.getBuffer()[i + offset];
+}
+offset += dcCount;
+var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+var rawPoly = qrPolynomial(dcdata[r], rsPoly.getLength() - 1);
+var modPoly = rawPoly.mod(rsPoly);
+ecdata[r] = new Array(rsPoly.getLength() - 1);
+for (var i = 0; i < ecdata[r].length; i += 1) {
+var modIndex = i + modPoly.getLength() - ecdata[r].length;
+ecdata[r][i] = (modIndex >= 0)? modPoly.getAt(modIndex) : 0;
+}
+}
+var totalCodeCount = 0;
+for (var i = 0; i < rsBlocks.length; i += 1) {
+totalCodeCount += rsBlocks[i].totalCount;
+}
+var data = new Array(totalCodeCount);
+var index = 0;
+for (var i = 0; i < maxDcCount; i += 1) {
+for (var r = 0; r < rsBlocks.length; r += 1) {
+if (i < dcdata[r].length) {
+data[index] = dcdata[r][i];
+index += 1;
+}
+}
+}
+for (var i = 0; i < maxEcCount; i += 1) {
+for (var r = 0; r < rsBlocks.length; r += 1) {
+if (i < ecdata[r].length) {
+data[index] = ecdata[r][i];
+index += 1;
+}
+}
+}
+return data;
+};
+var createData = function(typeNumber, errorCorrectionLevel, dataList) {
+var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectionLevel);
+var buffer = qrBitBuffer();
+for (var i = 0; i < dataList.length; i += 1) {
+var data = dataList[i];
+buffer.put(data.getMode(), 4);
+buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+data.write(buffer);
+}
+var totalDataCount = 0;
+for (var i = 0; i < rsBlocks.length; i += 1) {
+totalDataCount += rsBlocks[i].dataCount;
+}
+if (buffer.getLengthInBits() > totalDataCount * 8) {
+throw 'code length overflow. ('
++ buffer.getLengthInBits()
++ '>'
++ totalDataCount * 8
++ ')';
+}
+if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+buffer.put(0, 4);
+}
+while (buffer.getLengthInBits() % 8 != 0) {
+buffer.putBit(false);
+}
+while (true) {
+if (buffer.getLengthInBits() >= totalDataCount * 8) {
+break;
+}
+buffer.put(PAD0, 8);
+if (buffer.getLengthInBits() >= totalDataCount * 8) {
+break;
+}
+buffer.put(PAD1, 8);
+}
+return createBytes(buffer, rsBlocks);
+};
+_this.addData = function(data, mode) {
+mode = mode || 'Byte';
+var newData = null;
+switch(mode) {
+case 'Numeric' :
+newData = qrNumber(data);
+break;
+case 'Alphanumeric' :
+newData = qrAlphaNum(data);
+break;
+case 'Byte' :
+newData = qr8BitByte(data);
+break;
+case 'Kanji' :
+newData = qrKanji(data);
+break;
+default :
+throw 'mode:' + mode;
+}
+_dataList.push(newData);
+_dataCache = null;
+};
+_this.isDark = function(row, col) {
+if (row < 0 || _moduleCount <= row || col < 0 || _moduleCount <= col) {
+throw row + ',' + col;
+}
+return _modules[row][col];
+};
+_this.getModuleCount = function() {
+return _moduleCount;
+};
+_this.make = function() {
+if (_typeNumber < 1) {
+var typeNumber = 1;
+for (; typeNumber < 40; typeNumber++) {
+var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, _errorCorrectionLevel);
+var buffer = qrBitBuffer();
+for (var i = 0; i < _dataList.length; i++) {
+var data = _dataList[i];
+buffer.put(data.getMode(), 4);
+buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+data.write(buffer);
+}
+var totalDataCount = 0;
+for (var i = 0; i < rsBlocks.length; i++) {
+totalDataCount += rsBlocks[i].dataCount;
+}
+if (buffer.getLengthInBits() <= totalDataCount * 8) {
+break;
+}
+}
+_typeNumber = typeNumber;
+}
+makeImpl(false, getBestMaskPattern() );
+};
+_this.createTableTag = function(cellSize, margin) {
+cellSize = cellSize || 2;
+margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+var qrHtml = '';
+qrHtml += '<table style="';
+qrHtml += ' border-width: 0px; border-style: none;';
+qrHtml += ' border-collapse: collapse;';
+qrHtml += ' padding: 0px; margin: ' + margin + 'px;';
+qrHtml += '">';
+qrHtml += '<tbody>';
+for (var r = 0; r < _this.getModuleCount(); r += 1) {
+qrHtml += '<tr>';
+for (var c = 0; c < _this.getModuleCount(); c += 1) {
+qrHtml += '<td style="';
+qrHtml += ' border-width: 0px; border-style: none;';
+qrHtml += ' border-collapse: collapse;';
+qrHtml += ' padding: 0px; margin: 0px;';
+qrHtml += ' width: ' + cellSize + 'px;';
+qrHtml += ' height: ' + cellSize + 'px;';
+qrHtml += ' background-color: ';
+qrHtml += _this.isDark(r, c)? '#000000' : '#ffffff';
+qrHtml += ';';
+qrHtml += '"/>';
+}
+qrHtml += '</tr>';
+}
+qrHtml += '</tbody>';
+qrHtml += '</table>';
+return qrHtml;
+};
+_this.createSvgTag = function(cellSize, margin, alt, title) {
+var opts = {};
+if (typeof arguments[0] == 'object') {
+opts = arguments[0];
+cellSize = opts.cellSize;
+margin = opts.margin;
+alt = opts.alt;
+title = opts.title;
+}
+cellSize = cellSize || 2;
+margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+alt = (typeof alt === 'string') ? {text: alt} : alt || {};
+alt.text = alt.text || null;
+alt.id = (alt.text) ? alt.id || 'qrcode-description' : null;
+title = (typeof title === 'string') ? {text: title} : title || {};
+title.text = title.text || null;
+title.id = (title.text) ? title.id || 'qrcode-title' : null;
+var size = _this.getModuleCount() * cellSize + margin * 2;
+var c, mc, r, mr, qrSvg='', rect;
+rect = 'l' + cellSize + ',0 0,' + cellSize +
+' -' + cellSize + ',0 0,-' + cellSize + 'z ';
+qrSvg += '<svg version="1.1" xmlns="http://www.w3.org/2000/svg"';
+qrSvg += !opts.scalable ? ' width="' + size + 'px" height="' + size + 'px"' : '';
+qrSvg += ' viewBox="0 0 ' + size + ' ' + size + '" ';
+qrSvg += ' preserveAspectRatio="xMinYMin meet"';
+qrSvg += (title.text || alt.text) ? ' role="img" aria-labelledby="' +
+escapeXml([title.id, alt.id].join(' ').trim() ) + '"' : '';
+qrSvg += '>';
+qrSvg += (title.text) ? '<title id="' + escapeXml(title.id) + '">' +
+escapeXml(title.text) + '</title>' : '';
+qrSvg += (alt.text) ? '<description id="' + escapeXml(alt.id) + '">' +
+escapeXml(alt.text) + '</description>' : '';
+qrSvg += '<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>';
+qrSvg += '<path d="';
+for (r = 0; r < _this.getModuleCount(); r += 1) {
+mr = r * cellSize + margin;
+for (c = 0; c < _this.getModuleCount(); c += 1) {
+if (_this.isDark(r, c) ) {
+mc = c*cellSize+margin;
+qrSvg += 'M' + mc + ',' + mr + rect;
+}
+}
+}
+qrSvg += '" stroke="transparent" fill="black"/>';
+qrSvg += '</svg>';
+return qrSvg;
+};
+_this.createDataURL = function(cellSize, margin) {
+cellSize = cellSize || 2;
+margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+var size = _this.getModuleCount() * cellSize + margin * 2;
+var min = margin;
+var max = size - margin;
+return createDataURL(size, size, function(x, y) {
+if (min <= x && x < max && min <= y && y < max) {
+var c = Math.floor( (x - min) / cellSize);
+var r = Math.floor( (y - min) / cellSize);
+return _this.isDark(r, c)? 0 : 1;
+} else {
+return 1;
+}
+} );
+};
+_this.createImgTag = function(cellSize, margin, alt) {
+cellSize = cellSize || 2;
+margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+var size = _this.getModuleCount() * cellSize + margin * 2;
+var img = '';
+img += '<img';
+img += '\u0020src="';
+img += _this.createDataURL(cellSize, margin);
+img += '"';
+img += '\u0020width="';
+img += size;
+img += '"';
+img += '\u0020height="';
+img += size;
+img += '"';
+if (alt) {
+img += '\u0020alt="';
+img += escapeXml(alt);
+img += '"';
+}
+img += '/>';
+return img;
+};
+var escapeXml = function(s) {
+var escaped = '';
+for (var i = 0; i < s.length; i += 1) {
+var c = s.charAt(i);
+switch(c) {
+case '<': escaped += '&lt;'; break;
+case '>': escaped += '&gt;'; break;
+case '&': escaped += '&amp;'; break;
+case '"': escaped += '&quot;'; break;
+default : escaped += c; break;
+}
+}
+return escaped;
+};
+var _createHalfASCII = function(margin) {
+var cellSize = 1;
+margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+var size = _this.getModuleCount() * cellSize + margin * 2;
+var min = margin;
+var max = size - margin;
+var y, x, r1, r2, p;
+var blocks = {
+'██': '█',
+'█ ': '▀',
+' █': '▄',
+'  ': ' '
+};
+var blocksLastLineNoMargin = {
+'██': '▀',
+'█ ': '▀',
+' █': ' ',
+'  ': ' '
+};
+var ascii = '';
+for (y = 0; y < size; y += 2) {
+r1 = Math.floor((y - min) / cellSize);
+r2 = Math.floor((y + 1 - min) / cellSize);
+for (x = 0; x < size; x += 1) {
+p = '█';
+if (min <= x && x < max && min <= y && y < max && _this.isDark(r1, Math.floor((x - min) / cellSize))) {
+p = ' ';
+}
+if (min <= x && x < max && min <= y+1 && y+1 < max && _this.isDark(r2, Math.floor((x - min) / cellSize))) {
+p += ' ';
+}
+else {
+p += '█';
+}
+ascii += (margin < 1 && y+1 >= max) ? blocksLastLineNoMargin[p] : blocks[p];
+}
+ascii += '\n';
+}
+if (size % 2 && margin > 0) {
+return ascii.substring(0, ascii.length - size - 1) + Array(size+1).join('▀');
+}
+return ascii.substring(0, ascii.length-1);
+};
+_this.createASCII = function(cellSize, margin) {
+cellSize = cellSize || 1;
+if (cellSize < 2) {
+return _createHalfASCII(margin);
+}
+cellSize -= 1;
+margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+var size = _this.getModuleCount() * cellSize + margin * 2;
+var min = margin;
+var max = size - margin;
+var y, x, r, p;
+var white = Array(cellSize+1).join('██');
+var black = Array(cellSize+1).join('  ');
+var ascii = '';
+var line = '';
+for (y = 0; y < size; y += 1) {
+r = Math.floor( (y - min) / cellSize);
+line = '';
+for (x = 0; x < size; x += 1) {
+p = 1;
+if (min <= x && x < max && min <= y && y < max && _this.isDark(r, Math.floor((x - min) / cellSize))) {
+p = 0;
+}
+line += p ? white : black;
+}
+for (r = 0; r < cellSize; r += 1) {
+ascii += line + '\n';
+}
+}
+return ascii.substring(0, ascii.length-1);
+};
+_this.renderTo2dContext = function(context, cellSize) {
+cellSize = cellSize || 2;
+var length = _this.getModuleCount();
+for (var row = 0; row < length; row++) {
+for (var col = 0; col < length; col++) {
+context.fillStyle = _this.isDark(row, col) ? 'black' : 'white';
+context.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+}
+}
+}
+return _this;
+};
+qrcode.stringToBytesFuncs = {
+'default' : function(s) {
+var bytes = [];
+for (var i = 0; i < s.length; i += 1) {
+var c = s.charCodeAt(i);
+bytes.push(c & 0xff);
+}
+return bytes;
+}
+};
+qrcode.stringToBytes = qrcode.stringToBytesFuncs['default'];
+/**
+* @param unicodeData base64 string of byte array.
+* [16bit Unicode],[16bit Bytes], ...
+* @param numChars
+*/
+qrcode.createStringToBytes = function(unicodeData, numChars) {
+var unicodeMap = function() {
+var bin = base64DecodeInputStream(unicodeData);
+var read = function() {
+var b = bin.read();
+if (b == -1) throw 'eof';
+return b;
+};
+var count = 0;
+var unicodeMap = {};
+while (true) {
+var b0 = bin.read();
+if (b0 == -1) break;
+var b1 = read();
+var b2 = read();
+var b3 = read();
+var k = String.fromCharCode( (b0 << 8) | b1);
+var v = (b2 << 8) | b3;
+unicodeMap[k] = v;
+count += 1;
+}
+if (count != numChars) {
+throw count + ' != ' + numChars;
+}
+return unicodeMap;
+}();
+var unknownChar = '?'.charCodeAt(0);
+return function(s) {
+var bytes = [];
+for (var i = 0; i < s.length; i += 1) {
+var c = s.charCodeAt(i);
+if (c < 128) {
+bytes.push(c);
+} else {
+var b = unicodeMap[s.charAt(i)];
+if (typeof b == 'number') {
+if ( (b & 0xff) == b) {
+bytes.push(b);
+} else {
+bytes.push(b >>> 8);
+bytes.push(b & 0xff);
+}
+} else {
+bytes.push(unknownChar);
+}
+}
+}
+return bytes;
+};
+};
+var QRMode = {
+MODE_NUMBER :    1 << 0,
+MODE_ALPHA_NUM : 1 << 1,
+MODE_8BIT_BYTE : 1 << 2,
+MODE_KANJI :     1 << 3
+};
+var QRErrorCorrectionLevel = {
+L : 1,
+M : 0,
+Q : 3,
+H : 2
+};
+var QRMaskPattern = {
+PATTERN000 : 0,
+PATTERN001 : 1,
+PATTERN010 : 2,
+PATTERN011 : 3,
+PATTERN100 : 4,
+PATTERN101 : 5,
+PATTERN110 : 6,
+PATTERN111 : 7
+};
+var QRUtil = function() {
+var PATTERN_POSITION_TABLE = [
+[],
+[6, 18],
+[6, 22],
+[6, 26],
+[6, 30],
+[6, 34],
+[6, 22, 38],
+[6, 24, 42],
+[6, 26, 46],
+[6, 28, 50],
+[6, 30, 54],
+[6, 32, 58],
+[6, 34, 62],
+[6, 26, 46, 66],
+[6, 26, 48, 70],
+[6, 26, 50, 74],
+[6, 30, 54, 78],
+[6, 30, 56, 82],
+[6, 30, 58, 86],
+[6, 34, 62, 90],
+[6, 28, 50, 72, 94],
+[6, 26, 50, 74, 98],
+[6, 30, 54, 78, 102],
+[6, 28, 54, 80, 106],
+[6, 32, 58, 84, 110],
+[6, 30, 58, 86, 114],
+[6, 34, 62, 90, 118],
+[6, 26, 50, 74, 98, 122],
+[6, 30, 54, 78, 102, 126],
+[6, 26, 52, 78, 104, 130],
+[6, 30, 56, 82, 108, 134],
+[6, 34, 60, 86, 112, 138],
+[6, 30, 58, 86, 114, 142],
+[6, 34, 62, 90, 118, 146],
+[6, 30, 54, 78, 102, 126, 150],
+[6, 24, 50, 76, 102, 128, 154],
+[6, 28, 54, 80, 106, 132, 158],
+[6, 32, 58, 84, 110, 136, 162],
+[6, 26, 54, 82, 110, 138, 166],
+[6, 30, 58, 86, 114, 142, 170]
+];
+var G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
+var G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
+var G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
+var _this = {};
+var getBCHDigit = function(data) {
+var digit = 0;
+while (data != 0) {
+digit += 1;
+data >>>= 1;
+}
+return digit;
+};
+_this.getBCHTypeInfo = function(data) {
+var d = data << 10;
+while (getBCHDigit(d) - getBCHDigit(G15) >= 0) {
+d ^= (G15 << (getBCHDigit(d) - getBCHDigit(G15) ) );
+}
+return ( (data << 10) | d) ^ G15_MASK;
+};
+_this.getBCHTypeNumber = function(data) {
+var d = data << 12;
+while (getBCHDigit(d) - getBCHDigit(G18) >= 0) {
+d ^= (G18 << (getBCHDigit(d) - getBCHDigit(G18) ) );
+}
+return (data << 12) | d;
+};
+_this.getPatternPosition = function(typeNumber) {
+return PATTERN_POSITION_TABLE[typeNumber - 1];
+};
+_this.getMaskFunction = function(maskPattern) {
+switch (maskPattern) {
+case QRMaskPattern.PATTERN000 :
+return function(i, j) { return (i + j) % 2 == 0; };
+case QRMaskPattern.PATTERN001 :
+return function(i, j) { return i % 2 == 0; };
+case QRMaskPattern.PATTERN010 :
+return function(i, j) { return j % 3 == 0; };
+case QRMaskPattern.PATTERN011 :
+return function(i, j) { return (i + j) % 3 == 0; };
+case QRMaskPattern.PATTERN100 :
+return function(i, j) { return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 == 0; };
+case QRMaskPattern.PATTERN101 :
+return function(i, j) { return (i * j) % 2 + (i * j) % 3 == 0; };
+case QRMaskPattern.PATTERN110 :
+return function(i, j) { return ( (i * j) % 2 + (i * j) % 3) % 2 == 0; };
+case QRMaskPattern.PATTERN111 :
+return function(i, j) { return ( (i * j) % 3 + (i + j) % 2) % 2 == 0; };
+default :
+throw 'bad maskPattern:' + maskPattern;
+}
+};
+_this.getErrorCorrectPolynomial = function(errorCorrectLength) {
+var a = qrPolynomial([1], 0);
+for (var i = 0; i < errorCorrectLength; i += 1) {
+a = a.multiply(qrPolynomial([1, QRMath.gexp(i)], 0) );
+}
+return a;
+};
+_this.getLengthInBits = function(mode, type) {
+if (1 <= type && type < 10) {
+switch(mode) {
+case QRMode.MODE_NUMBER    : return 10;
+case QRMode.MODE_ALPHA_NUM : return 9;
+case QRMode.MODE_8BIT_BYTE : return 8;
+case QRMode.MODE_KANJI     : return 8;
+default :
+throw 'mode:' + mode;
+}
+} else if (type < 27) {
+switch(mode) {
+case QRMode.MODE_NUMBER    : return 12;
+case QRMode.MODE_ALPHA_NUM : return 11;
+case QRMode.MODE_8BIT_BYTE : return 16;
+case QRMode.MODE_KANJI     : return 10;
+default :
+throw 'mode:' + mode;
+}
+} else if (type < 41) {
+switch(mode) {
+case QRMode.MODE_NUMBER    : return 14;
+case QRMode.MODE_ALPHA_NUM : return 13;
+case QRMode.MODE_8BIT_BYTE : return 16;
+case QRMode.MODE_KANJI     : return 12;
+default :
+throw 'mode:' + mode;
+}
+} else {
+throw 'type:' + type;
+}
+};
+_this.getLostPoint = function(qrcode) {
+var moduleCount = qrcode.getModuleCount();
+var lostPoint = 0;
+for (var row = 0; row < moduleCount; row += 1) {
+for (var col = 0; col < moduleCount; col += 1) {
+var sameCount = 0;
+var dark = qrcode.isDark(row, col);
+for (var r = -1; r <= 1; r += 1) {
+if (row + r < 0 || moduleCount <= row + r) {
+continue;
+}
+for (var c = -1; c <= 1; c += 1) {
+if (col + c < 0 || moduleCount <= col + c) {
+continue;
+}
+if (r == 0 && c == 0) {
+continue;
+}
+if (dark == qrcode.isDark(row + r, col + c) ) {
+sameCount += 1;
+}
+}
+}
+if (sameCount > 5) {
+lostPoint += (3 + sameCount - 5);
+}
+}
+};
+for (var row = 0; row < moduleCount - 1; row += 1) {
+for (var col = 0; col < moduleCount - 1; col += 1) {
+var count = 0;
+if (qrcode.isDark(row, col) ) count += 1;
+if (qrcode.isDark(row + 1, col) ) count += 1;
+if (qrcode.isDark(row, col + 1) ) count += 1;
+if (qrcode.isDark(row + 1, col + 1) ) count += 1;
+if (count == 0 || count == 4) {
+lostPoint += 3;
+}
+}
+}
+for (var row = 0; row < moduleCount; row += 1) {
+for (var col = 0; col < moduleCount - 6; col += 1) {
+if (qrcode.isDark(row, col)
+&& !qrcode.isDark(row, col + 1)
+&&  qrcode.isDark(row, col + 2)
+&&  qrcode.isDark(row, col + 3)
+&&  qrcode.isDark(row, col + 4)
+&& !qrcode.isDark(row, col + 5)
+&&  qrcode.isDark(row, col + 6) ) {
+lostPoint += 40;
+}
+}
+}
+for (var col = 0; col < moduleCount; col += 1) {
+for (var row = 0; row < moduleCount - 6; row += 1) {
+if (qrcode.isDark(row, col)
+&& !qrcode.isDark(row + 1, col)
+&&  qrcode.isDark(row + 2, col)
+&&  qrcode.isDark(row + 3, col)
+&&  qrcode.isDark(row + 4, col)
+&& !qrcode.isDark(row + 5, col)
+&&  qrcode.isDark(row + 6, col) ) {
+lostPoint += 40;
+}
+}
+}
+var darkCount = 0;
+for (var col = 0; col < moduleCount; col += 1) {
+for (var row = 0; row < moduleCount; row += 1) {
+if (qrcode.isDark(row, col) ) {
+darkCount += 1;
+}
+}
+}
+var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+lostPoint += ratio * 10;
+return lostPoint;
+};
+return _this;
+}();
+var QRMath = function() {
+var EXP_TABLE = new Array(256);
+var LOG_TABLE = new Array(256);
+for (var i = 0; i < 8; i += 1) {
+EXP_TABLE[i] = 1 << i;
+}
+for (var i = 8; i < 256; i += 1) {
+EXP_TABLE[i] = EXP_TABLE[i - 4]
+^ EXP_TABLE[i - 5]
+^ EXP_TABLE[i - 6]
+^ EXP_TABLE[i - 8];
+}
+for (var i = 0; i < 255; i += 1) {
+LOG_TABLE[EXP_TABLE[i] ] = i;
+}
+var _this = {};
+_this.glog = function(n) {
+if (n < 1) {
+throw 'glog(' + n + ')';
+}
+return LOG_TABLE[n];
+};
+_this.gexp = function(n) {
+while (n < 0) {
+n += 255;
+}
+while (n >= 256) {
+n -= 255;
+}
+return EXP_TABLE[n];
+};
+return _this;
+}();
+function qrPolynomial(num, shift) {
+if (typeof num.length == 'undefined') {
+throw num.length + '/' + shift;
+}
+var _num = function() {
+var offset = 0;
+while (offset < num.length && num[offset] == 0) {
+offset += 1;
+}
+var _num = new Array(num.length - offset + shift);
+for (var i = 0; i < num.length - offset; i += 1) {
+_num[i] = num[i + offset];
+}
+return _num;
+}();
+var _this = {};
+_this.getAt = function(index) {
+return _num[index];
+};
+_this.getLength = function() {
+return _num.length;
+};
+_this.multiply = function(e) {
+var num = new Array(_this.getLength() + e.getLength() - 1);
+for (var i = 0; i < _this.getLength(); i += 1) {
+for (var j = 0; j < e.getLength(); j += 1) {
+num[i + j] ^= QRMath.gexp(QRMath.glog(_this.getAt(i) ) + QRMath.glog(e.getAt(j) ) );
+}
+}
+return qrPolynomial(num, 0);
+};
+_this.mod = function(e) {
+if (_this.getLength() - e.getLength() < 0) {
+return _this;
+}
+var ratio = QRMath.glog(_this.getAt(0) ) - QRMath.glog(e.getAt(0) );
+var num = new Array(_this.getLength() );
+for (var i = 0; i < _this.getLength(); i += 1) {
+num[i] = _this.getAt(i);
+}
+for (var i = 0; i < e.getLength(); i += 1) {
+num[i] ^= QRMath.gexp(QRMath.glog(e.getAt(i) ) + ratio);
+}
+return qrPolynomial(num, 0).mod(e);
+};
+return _this;
+};
+var QRRSBlock = function() {
+var RS_BLOCK_TABLE = [
+[1, 26, 19],
+[1, 26, 16],
+[1, 26, 13],
+[1, 26, 9],
+[1, 44, 34],
+[1, 44, 28],
+[1, 44, 22],
+[1, 44, 16],
+[1, 70, 55],
+[1, 70, 44],
+[2, 35, 17],
+[2, 35, 13],
+[1, 100, 80],
+[2, 50, 32],
+[2, 50, 24],
+[4, 25, 9],
+[1, 134, 108],
+[2, 67, 43],
+[2, 33, 15, 2, 34, 16],
+[2, 33, 11, 2, 34, 12],
+[2, 86, 68],
+[4, 43, 27],
+[4, 43, 19],
+[4, 43, 15],
+[2, 98, 78],
+[4, 49, 31],
+[2, 32, 14, 4, 33, 15],
+[4, 39, 13, 1, 40, 14],
+[2, 121, 97],
+[2, 60, 38, 2, 61, 39],
+[4, 40, 18, 2, 41, 19],
+[4, 40, 14, 2, 41, 15],
+[2, 146, 116],
+[3, 58, 36, 2, 59, 37],
+[4, 36, 16, 4, 37, 17],
+[4, 36, 12, 4, 37, 13],
+[2, 86, 68, 2, 87, 69],
+[4, 69, 43, 1, 70, 44],
+[6, 43, 19, 2, 44, 20],
+[6, 43, 15, 2, 44, 16],
+[4, 101, 81],
+[1, 80, 50, 4, 81, 51],
+[4, 50, 22, 4, 51, 23],
+[3, 36, 12, 8, 37, 13],
+[2, 116, 92, 2, 117, 93],
+[6, 58, 36, 2, 59, 37],
+[4, 46, 20, 6, 47, 21],
+[7, 42, 14, 4, 43, 15],
+[4, 133, 107],
+[8, 59, 37, 1, 60, 38],
+[8, 44, 20, 4, 45, 21],
+[12, 33, 11, 4, 34, 12],
+[3, 145, 115, 1, 146, 116],
+[4, 64, 40, 5, 65, 41],
+[11, 36, 16, 5, 37, 17],
+[11, 36, 12, 5, 37, 13],
+[5, 109, 87, 1, 110, 88],
+[5, 65, 41, 5, 66, 42],
+[5, 54, 24, 7, 55, 25],
+[11, 36, 12, 7, 37, 13],
+[5, 122, 98, 1, 123, 99],
+[7, 73, 45, 3, 74, 46],
+[15, 43, 19, 2, 44, 20],
+[3, 45, 15, 13, 46, 16],
+[1, 135, 107, 5, 136, 108],
+[10, 74, 46, 1, 75, 47],
+[1, 50, 22, 15, 51, 23],
+[2, 42, 14, 17, 43, 15],
+[5, 150, 120, 1, 151, 121],
+[9, 69, 43, 4, 70, 44],
+[17, 50, 22, 1, 51, 23],
+[2, 42, 14, 19, 43, 15],
+[3, 141, 113, 4, 142, 114],
+[3, 70, 44, 11, 71, 45],
+[17, 47, 21, 4, 48, 22],
+[9, 39, 13, 16, 40, 14],
+[3, 135, 107, 5, 136, 108],
+[3, 67, 41, 13, 68, 42],
+[15, 54, 24, 5, 55, 25],
+[15, 43, 15, 10, 44, 16],
+[4, 144, 116, 4, 145, 117],
+[17, 68, 42],
+[17, 50, 22, 6, 51, 23],
+[19, 46, 16, 6, 47, 17],
+[2, 139, 111, 7, 140, 112],
+[17, 74, 46],
+[7, 54, 24, 16, 55, 25],
+[34, 37, 13],
+[4, 151, 121, 5, 152, 122],
+[4, 75, 47, 14, 76, 48],
+[11, 54, 24, 14, 55, 25],
+[16, 45, 15, 14, 46, 16],
+[6, 147, 117, 4, 148, 118],
+[6, 73, 45, 14, 74, 46],
+[11, 54, 24, 16, 55, 25],
+[30, 46, 16, 2, 47, 17],
+[8, 132, 106, 4, 133, 107],
+[8, 75, 47, 13, 76, 48],
+[7, 54, 24, 22, 55, 25],
+[22, 45, 15, 13, 46, 16],
+[10, 142, 114, 2, 143, 115],
+[19, 74, 46, 4, 75, 47],
+[28, 50, 22, 6, 51, 23],
+[33, 46, 16, 4, 47, 17],
+[8, 152, 122, 4, 153, 123],
+[22, 73, 45, 3, 74, 46],
+[8, 53, 23, 26, 54, 24],
+[12, 45, 15, 28, 46, 16],
+[3, 147, 117, 10, 148, 118],
+[3, 73, 45, 23, 74, 46],
+[4, 54, 24, 31, 55, 25],
+[11, 45, 15, 31, 46, 16],
+[7, 146, 116, 7, 147, 117],
+[21, 73, 45, 7, 74, 46],
+[1, 53, 23, 37, 54, 24],
+[19, 45, 15, 26, 46, 16],
+[5, 145, 115, 10, 146, 116],
+[19, 75, 47, 10, 76, 48],
+[15, 54, 24, 25, 55, 25],
+[23, 45, 15, 25, 46, 16],
+[13, 145, 115, 3, 146, 116],
+[2, 74, 46, 29, 75, 47],
+[42, 54, 24, 1, 55, 25],
+[23, 45, 15, 28, 46, 16],
+[17, 145, 115],
+[10, 74, 46, 23, 75, 47],
+[10, 54, 24, 35, 55, 25],
+[19, 45, 15, 35, 46, 16],
+[17, 145, 115, 1, 146, 116],
+[14, 74, 46, 21, 75, 47],
+[29, 54, 24, 19, 55, 25],
+[11, 45, 15, 46, 46, 16],
+[13, 145, 115, 6, 146, 116],
+[14, 74, 46, 23, 75, 47],
+[44, 54, 24, 7, 55, 25],
+[59, 46, 16, 1, 47, 17],
+[12, 151, 121, 7, 152, 122],
+[12, 75, 47, 26, 76, 48],
+[39, 54, 24, 14, 55, 25],
+[22, 45, 15, 41, 46, 16],
+[6, 151, 121, 14, 152, 122],
+[6, 75, 47, 34, 76, 48],
+[46, 54, 24, 10, 55, 25],
+[2, 45, 15, 64, 46, 16],
+[17, 152, 122, 4, 153, 123],
+[29, 74, 46, 14, 75, 47],
+[49, 54, 24, 10, 55, 25],
+[24, 45, 15, 46, 46, 16],
+[4, 152, 122, 18, 153, 123],
+[13, 74, 46, 32, 75, 47],
+[48, 54, 24, 14, 55, 25],
+[42, 45, 15, 32, 46, 16],
+[20, 147, 117, 4, 148, 118],
+[40, 75, 47, 7, 76, 48],
+[43, 54, 24, 22, 55, 25],
+[10, 45, 15, 67, 46, 16],
+[19, 148, 118, 6, 149, 119],
+[18, 75, 47, 31, 76, 48],
+[34, 54, 24, 34, 55, 25],
+[20, 45, 15, 61, 46, 16]
+];
+var qrRSBlock = function(totalCount, dataCount) {
+var _this = {};
+_this.totalCount = totalCount;
+_this.dataCount = dataCount;
+return _this;
+};
+var _this = {};
+var getRsBlockTable = function(typeNumber, errorCorrectionLevel) {
+switch(errorCorrectionLevel) {
+case QRErrorCorrectionLevel.L :
+return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+case QRErrorCorrectionLevel.M :
+return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+case QRErrorCorrectionLevel.Q :
+return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+case QRErrorCorrectionLevel.H :
+return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+default :
+return undefined;
+}
+};
+_this.getRSBlocks = function(typeNumber, errorCorrectionLevel) {
+var rsBlock = getRsBlockTable(typeNumber, errorCorrectionLevel);
+if (typeof rsBlock == 'undefined') {
+throw 'bad rs block @ typeNumber:' + typeNumber +
+'/errorCorrectionLevel:' + errorCorrectionLevel;
+}
+var length = rsBlock.length / 3;
+var list = [];
+for (var i = 0; i < length; i += 1) {
+var count = rsBlock[i * 3 + 0];
+var totalCount = rsBlock[i * 3 + 1];
+var dataCount = rsBlock[i * 3 + 2];
+for (var j = 0; j < count; j += 1) {
+list.push(qrRSBlock(totalCount, dataCount) );
+}
+}
+return list;
+};
+return _this;
+}();
+var qrBitBuffer = function() {
+var _buffer = [];
+var _length = 0;
+var _this = {};
+_this.getBuffer = function() {
+return _buffer;
+};
+_this.getAt = function(index) {
+var bufIndex = Math.floor(index / 8);
+return ( (_buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+};
+_this.put = function(num, length) {
+for (var i = 0; i < length; i += 1) {
+_this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+}
+};
+_this.getLengthInBits = function() {
+return _length;
+};
+_this.putBit = function(bit) {
+var bufIndex = Math.floor(_length / 8);
+if (_buffer.length <= bufIndex) {
+_buffer.push(0);
+}
+if (bit) {
+_buffer[bufIndex] |= (0x80 >>> (_length % 8) );
+}
+_length += 1;
+};
+return _this;
+};
+var qrNumber = function(data) {
+var _mode = QRMode.MODE_NUMBER;
+var _data = data;
+var _this = {};
+_this.getMode = function() {
+return _mode;
+};
+_this.getLength = function(buffer) {
+return _data.length;
+};
+_this.write = function(buffer) {
+var data = _data;
+var i = 0;
+while (i + 2 < data.length) {
+buffer.put(strToNum(data.substring(i, i + 3) ), 10);
+i += 3;
+}
+if (i < data.length) {
+if (data.length - i == 1) {
+buffer.put(strToNum(data.substring(i, i + 1) ), 4);
+} else if (data.length - i == 2) {
+buffer.put(strToNum(data.substring(i, i + 2) ), 7);
+}
+}
+};
+var strToNum = function(s) {
+var num = 0;
+for (var i = 0; i < s.length; i += 1) {
+num = num * 10 + chatToNum(s.charAt(i) );
+}
+return num;
+};
+var chatToNum = function(c) {
+if ('0' <= c && c <= '9') {
+return c.charCodeAt(0) - '0'.charCodeAt(0);
+}
+throw 'illegal char :' + c;
+};
+return _this;
+};
+var qrAlphaNum = function(data) {
+var _mode = QRMode.MODE_ALPHA_NUM;
+var _data = data;
+var _this = {};
+_this.getMode = function() {
+return _mode;
+};
+_this.getLength = function(buffer) {
+return _data.length;
+};
+_this.write = function(buffer) {
+var s = _data;
+var i = 0;
+while (i + 1 < s.length) {
+buffer.put(
+getCode(s.charAt(i) ) * 45 +
+getCode(s.charAt(i + 1) ), 11);
+i += 2;
+}
+if (i < s.length) {
+buffer.put(getCode(s.charAt(i) ), 6);
+}
+};
+var getCode = function(c) {
+if ('0' <= c && c <= '9') {
+return c.charCodeAt(0) - '0'.charCodeAt(0);
+} else if ('A' <= c && c <= 'Z') {
+return c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+} else {
+switch (c) {
+case ' ' : return 36;
+case '$' : return 37;
+case '%' : return 38;
+case '*' : return 39;
+case '+' : return 40;
+case '-' : return 41;
+case '.' : return 42;
+case '/' : return 43;
+case ':' : return 44;
+default :
+throw 'illegal char :' + c;
+}
+}
+};
+return _this;
+};
+var qr8BitByte = function(data) {
+var _mode = QRMode.MODE_8BIT_BYTE;
+var _data = data;
+var _bytes = qrcode.stringToBytes(data);
+var _this = {};
+_this.getMode = function() {
+return _mode;
+};
+_this.getLength = function(buffer) {
+return _bytes.length;
+};
+_this.write = function(buffer) {
+for (var i = 0; i < _bytes.length; i += 1) {
+buffer.put(_bytes[i], 8);
+}
+};
+return _this;
+};
+var qrKanji = function(data) {
+var _mode = QRMode.MODE_KANJI;
+var _data = data;
+var stringToBytes = qrcode.stringToBytesFuncs['SJIS'];
+if (!stringToBytes) {
+throw 'sjis not supported.';
+}
+!function(c, code) {
+var test = stringToBytes(c);
+if (test.length != 2 || ( (test[0] << 8) | test[1]) != code) {
+throw 'sjis not supported.';
+}
+}('\u53cb', 0x9746);
+var _bytes = stringToBytes(data);
+var _this = {};
+_this.getMode = function() {
+return _mode;
+};
+_this.getLength = function(buffer) {
+return ~~(_bytes.length / 2);
+};
+_this.write = function(buffer) {
+var data = _bytes;
+var i = 0;
+while (i + 1 < data.length) {
+var c = ( (0xff & data[i]) << 8) | (0xff & data[i + 1]);
+if (0x8140 <= c && c <= 0x9FFC) {
+c -= 0x8140;
+} else if (0xE040 <= c && c <= 0xEBBF) {
+c -= 0xC140;
+} else {
+throw 'illegal char at ' + (i + 1) + '/' + c;
+}
+c = ( (c >>> 8) & 0xff) * 0xC0 + (c & 0xff);
+buffer.put(c, 13);
+i += 2;
+}
+if (i < data.length) {
+throw 'illegal char at ' + (i + 1);
+}
+};
+return _this;
+};
+var byteArrayOutputStream = function() {
+var _bytes = [];
+var _this = {};
+_this.writeByte = function(b) {
+_bytes.push(b & 0xff);
+};
+_this.writeShort = function(i) {
+_this.writeByte(i);
+_this.writeByte(i >>> 8);
+};
+_this.writeBytes = function(b, off, len) {
+off = off || 0;
+len = len || b.length;
+for (var i = 0; i < len; i += 1) {
+_this.writeByte(b[i + off]);
+}
+};
+_this.writeString = function(s) {
+for (var i = 0; i < s.length; i += 1) {
+_this.writeByte(s.charCodeAt(i) );
+}
+};
+_this.toByteArray = function() {
+return _bytes;
+};
+_this.toString = function() {
+var s = '';
+s += '[';
+for (var i = 0; i < _bytes.length; i += 1) {
+if (i > 0) {
+s += ',';
+}
+s += _bytes[i];
+}
+s += ']';
+return s;
+};
+return _this;
+};
+var base64EncodeOutputStream = function() {
+var _buffer = 0;
+var _buflen = 0;
+var _length = 0;
+var _base64 = '';
+var _this = {};
+var writeEncoded = function(b) {
+_base64 += String.fromCharCode(encode(b & 0x3f) );
+};
+var encode = function(n) {
+if (n < 0) {
+} else if (n < 26) {
+return 0x41 + n;
+} else if (n < 52) {
+return 0x61 + (n - 26);
+} else if (n < 62) {
+return 0x30 + (n - 52);
+} else if (n == 62) {
+return 0x2b;
+} else if (n == 63) {
+return 0x2f;
+}
+throw 'n:' + n;
+};
+_this.writeByte = function(n) {
+_buffer = (_buffer << 8) | (n & 0xff);
+_buflen += 8;
+_length += 1;
+while (_buflen >= 6) {
+writeEncoded(_buffer >>> (_buflen - 6) );
+_buflen -= 6;
+}
+};
+_this.flush = function() {
+if (_buflen > 0) {
+writeEncoded(_buffer << (6 - _buflen) );
+_buffer = 0;
+_buflen = 0;
+}
+if (_length % 3 != 0) {
+var padlen = 3 - _length % 3;
+for (var i = 0; i < padlen; i += 1) {
+_base64 += '=';
+}
+}
+};
+_this.toString = function() {
+return _base64;
+};
+return _this;
+};
+var base64DecodeInputStream = function(str) {
+var _str = str;
+var _pos = 0;
+var _buffer = 0;
+var _buflen = 0;
+var _this = {};
+_this.read = function() {
+while (_buflen < 8) {
+if (_pos >= _str.length) {
+if (_buflen == 0) {
+return -1;
+}
+throw 'unexpected end of file./' + _buflen;
+}
+var c = _str.charAt(_pos);
+_pos += 1;
+if (c == '=') {
+_buflen = 0;
+return -1;
+} else if (c.match(/^\s$/) ) {
+continue;
+}
+_buffer = (_buffer << 6) | decode(c.charCodeAt(0) );
+_buflen += 6;
+}
+var n = (_buffer >>> (_buflen - 8) ) & 0xff;
+_buflen -= 8;
+return n;
+};
+var decode = function(c) {
+if (0x41 <= c && c <= 0x5a) {
+return c - 0x41;
+} else if (0x61 <= c && c <= 0x7a) {
+return c - 0x61 + 26;
+} else if (0x30 <= c && c <= 0x39) {
+return c - 0x30 + 52;
+} else if (c == 0x2b) {
+return 62;
+} else if (c == 0x2f) {
+return 63;
+} else {
+throw 'c:' + c;
+}
+};
+return _this;
+};
+var gifImage = function(width, height) {
+var _width = width;
+var _height = height;
+var _data = new Array(width * height);
+var _this = {};
+_this.setPixel = function(x, y, pixel) {
+_data[y * _width + x] = pixel;
+};
+_this.write = function(out) {
+out.writeString('GIF87a');
+out.writeShort(_width);
+out.writeShort(_height);
+out.writeByte(0x80); // 2bit
+out.writeByte(0);
+out.writeByte(0);
+out.writeByte(0x00);
+out.writeByte(0x00);
+out.writeByte(0x00);
+out.writeByte(0xff);
+out.writeByte(0xff);
+out.writeByte(0xff);
+out.writeString(',');
+out.writeShort(0);
+out.writeShort(0);
+out.writeShort(_width);
+out.writeShort(_height);
+out.writeByte(0);
+var lzwMinCodeSize = 2;
+var raster = getLZWRaster(lzwMinCodeSize);
+out.writeByte(lzwMinCodeSize);
+var offset = 0;
+while (raster.length - offset > 255) {
+out.writeByte(255);
+out.writeBytes(raster, offset, 255);
+offset += 255;
+}
+out.writeByte(raster.length - offset);
+out.writeBytes(raster, offset, raster.length - offset);
+out.writeByte(0x00);
+out.writeString(';');
+};
+var bitOutputStream = function(out) {
+var _out = out;
+var _bitLength = 0;
+var _bitBuffer = 0;
+var _this = {};
+_this.write = function(data, length) {
+if ( (data >>> length) != 0) {
+throw 'length over';
+}
+while (_bitLength + length >= 8) {
+_out.writeByte(0xff & ( (data << _bitLength) | _bitBuffer) );
+length -= (8 - _bitLength);
+data >>>= (8 - _bitLength);
+_bitBuffer = 0;
+_bitLength = 0;
+}
+_bitBuffer = (data << _bitLength) | _bitBuffer;
+_bitLength = _bitLength + length;
+};
+_this.flush = function() {
+if (_bitLength > 0) {
+_out.writeByte(_bitBuffer);
+}
+};
+return _this;
+};
+var getLZWRaster = function(lzwMinCodeSize) {
+var clearCode = 1 << lzwMinCodeSize;
+var endCode = (1 << lzwMinCodeSize) + 1;
+var bitLength = lzwMinCodeSize + 1;
+var table = lzwTable();
+for (var i = 0; i < clearCode; i += 1) {
+table.add(String.fromCharCode(i) );
+}
+table.add(String.fromCharCode(clearCode) );
+table.add(String.fromCharCode(endCode) );
+var byteOut = byteArrayOutputStream();
+var bitOut = bitOutputStream(byteOut);
+bitOut.write(clearCode, bitLength);
+var dataIndex = 0;
+var s = String.fromCharCode(_data[dataIndex]);
+dataIndex += 1;
+while (dataIndex < _data.length) {
+var c = String.fromCharCode(_data[dataIndex]);
+dataIndex += 1;
+if (table.contains(s + c) ) {
+s = s + c;
+} else {
+bitOut.write(table.indexOf(s), bitLength);
+if (table.size() < 0xfff) {
+if (table.size() == (1 << bitLength) ) {
+bitLength += 1;
+}
+table.add(s + c);
+}
+s = c;
+}
+}
+bitOut.write(table.indexOf(s), bitLength);
+bitOut.write(endCode, bitLength);
+bitOut.flush();
+return byteOut.toByteArray();
+};
+var lzwTable = function() {
+var _map = {};
+var _size = 0;
+var _this = {};
+_this.add = function(key) {
+if (_this.contains(key) ) {
+throw 'dup key:' + key;
+}
+_map[key] = _size;
+_size += 1;
+};
+_this.size = function() {
+return _size;
+};
+_this.indexOf = function(key) {
+return _map[key];
+};
+_this.contains = function(key) {
+return typeof _map[key] != 'undefined';
+};
+return _this;
+};
+return _this;
+};
+var createDataURL = function(width, height, getPixel) {
+var gif = gifImage(width, height);
+for (var y = 0; y < height; y += 1) {
+for (var x = 0; x < width; x += 1) {
+gif.setPixel(x, y, getPixel(x, y) );
+}
+}
+var b = byteArrayOutputStream();
+gif.write(b);
+var base64 = base64EncodeOutputStream();
+var bytes = b.toByteArray();
+for (var i = 0; i < bytes.length; i += 1) {
+base64.writeByte(bytes[i]);
+}
+base64.flush();
+return 'data:image/gif;base64,' + base64;
+};
+return qrcode;
+}();
+!function() {
+qrcode.stringToBytesFuncs['UTF-8'] = function(s) {
+function toUTF8Array(str) {
+var utf8 = [];
+for (var i=0; i < str.length; i++) {
+var charcode = str.charCodeAt(i);
+if (charcode < 0x80) utf8.push(charcode);
+else if (charcode < 0x800) {
+utf8.push(0xc0 | (charcode >> 6),
+0x80 | (charcode & 0x3f));
+}
+else if (charcode < 0xd800 || charcode >= 0xe000) {
+utf8.push(0xe0 | (charcode >> 12),
+0x80 | ((charcode>>6) & 0x3f),
+0x80 | (charcode & 0x3f));
+}
+else {
+i++;
+charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+| (str.charCodeAt(i) & 0x3ff));
+utf8.push(0xf0 | (charcode >>18),
+0x80 | ((charcode>>12) & 0x3f),
+0x80 | ((charcode>>6) & 0x3f),
+0x80 | (charcode & 0x3f));
+}
+}
+return utf8;
+}
+return toUTF8Array(s);
+};
+}();
+return qrcode})();
+
+/* ===== Ordres de mission authentifiés (script 07) ===== */
+let p07=false,omVerif=null;
+const OM_TYPES=['Activité de terrain','Supervision','Formation ou atelier','Collecte de données','Réunion ou plaidoyer','Mission avec le bailleur','Mission administrative'];
+const OM_TRANSP=['Véhicule OSV','Véhicule de location','Véhicule du partenaire','Transport en commun','Moto de service','Avion'];
+const OM_HEB=['Couvert par le per diem','Réservé et payé par OSV','Pris en charge par la structure d\'accueil','Sans nuitée'];
+const OM_SECU="Signaler son arrivée et son départ de chaque localité au contact d'urgence. Aucun déplacement de nuit sur les axes routiers. Ceinture de sécurité obligatoire, casque pour les deux-roues, aucun passager non autorisé à bord des véhicules d'OSV. Respect du Code de conduite d'OSV : tolérance zéro face à l'exploitation, aux abus et au harcèlement sexuels, et à toute forme de corruption.";
+const OM_SIGN={DE:'Le Directeur exécutif',DP:'P/O le Directeur exécutif empêché,<br>le Directeur des programmes',CA:'Le Président du Conseil d\'administration'};
+const omMembres=m=>S.mmembres.filter(x=>x.mission_id===m.id).sort((a,b)=>a.ordre-b.ordre);
+const omMissionnaires=m=>[m.agent_id,...omMembres(m).map(x=>x.user_id).filter(Boolean)];
+const omDEPart=ids=>ids.some(id=>(S.staff.find(u=>u.id===id)||{}).role==='DE');
+const omPeutSigner=m=>m.statut==='demandee'&&(omDEPart(omMissionnaires(m))?me.role==='CA':['DE','DP'].includes(me.role))&&!omMissionnaires(m).includes(me.id);
+const omPeutAnnuler=m=>m.statut==='approuvee'&&(['DE','DP'].includes(me.role)||(me.role==='CA'&&m.signe_role==='CA'));
+const miTotal=m=>Math.round(Number(m.per_diem_jour)*Number(m.nb_jours))+Number(m.frais_transport)+Number(m.autres_frais)+somme(omMembres(m),x=>Math.round(Number(x.per_diem_jour)*Number(x.nb_jours)));
+const omLien=c=>{const u=new URL(location.origin+location.pathname);['mode','srv'].forEach(k=>{const v=QS.get(k);if(v)u.searchParams.set(k,v)});u.searchParams.set('om',c);return u.toString()};
+const omDate=t=>{t=String(t||'').trim();let m=t.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;return /^\d{4}-\d{2}-\d{2}$/.test(t)?t:null};
+
+function miLigne(m){const n=omMembres(m).length;
+ return [`${m.numero?`<b>${esc(m.numero)}</b><br>`:''}${esc(who(m.agent_id))}${n?`<br><span class="muted">+ ${n} missionnaire(s)</span>`:''}`,`${esc(m.objet)}<br><span class="muted">${esc(m.destination)}${m.projet_id?' · '+esc(libProj(projet(m.projet_id))):''}</span>`,`${fmtD(m.date_depart)} → ${fmtD(m.date_retour)}`,`${num(m.nb_jours)} j × ${num(m.per_diem_jour)}${n?` <span class="muted">(par personne)</span>`:''}<br><span class="muted">transport ${num(m.frais_transport)}${Number(m.autres_frais)?' · autres '+num(m.autres_frais):''}</span>`,num(m.montant_liquide??miTotal(m)),
+  tag(MI_ST[m.statut])+(m.statut==='approuvee'&&m.signe_role?`<br><span class="muted">signé par ${esc(who(m.approuve_par))}${m.signe_role==='DP'?' (P/O)':''}</span>`:'')+(m.rapport_doc_id?`<br>${docLien(m.rapport_doc_id)}`:'')+(m.motif?`<br><span class="muted">${esc(m.motif)}</span>`:''),
+  `<div class="row">${miAppr(m)?`<button class="btn sm" data-act="miSt" data-v="approuvee" data-id="${m.id}">Signer</button><button class="btn ghost sm" data-act="miRej" data-id="${m.id}">Rejeter</button>`:''}${miLiq(m)?`<button class="btn sm" data-act="miSt" data-v="liquidee" data-id="${m.id}">Liquider</button>`:''}<button class="btn ghost sm" data-act="miOM" data-id="${m.id}">${m.numero?'Ordre de mission':'Aperçu de l\'ordre'}</button>${omPeutAnnuler(m)?`<button class="btn ghost sm" data-act="miAnn" data-id="${m.id}">Annuler l'ordre</button>`:''}</div>`]}
+
+/* ---------- formulaire : établir un ordre de mission ---------- */
+function omForm(){if(!p07)return '';const tous=gAdm()||['DP','CP'].includes(me.role);
+ const ag=S.staff.filter(u=>accesOK(u)&&u.role!=='EXT'&&(tous||u.id===me.id||auDessusC(u.id))).sort((a,b)=>a.nom.localeCompare(b.nom));
+ const autres=S.staff.filter(u=>accesOK(u)&&u.role!=='EXT').sort((a,b)=>a.nom.localeCompare(b.nom));
+ const acts=S.cadre.filter(c=>c.niveau==='act'),proj=S.projets.filter(p=>!['cloture','archive','rejete'].includes(p.statut));
+ const h=t=>`<h4 style="grid-column:1/-1;margin:.8rem 0 0;border-bottom:1px solid var(--line,#ddd);padding-bottom:.2rem">${t}</h4>`;
+ return `<details style="margin-top:.6rem"><summary><b>Établir un ordre de mission</b></summary>
+ <p class="muted" style="margin-top:.5rem">Le responsable hiérarchique prépare l'ordre ; il est signé par le Directeur exécutif ou, à défaut, par le Directeur des programmes. Quand le Directeur exécutif part lui-même en mission, l'ordre est signé par le Président du Conseil d'administration. À la signature, l'ordre reçoit un numéro officiel et un QR code qui permet à toute autorité de vérifier son authenticité.</p>
+ <form data-form="mdMission" class="grid" style="align-items:end">
+ ${h('1. Objet et cadre')}
+ <div><label>Type de mission</label><select name="type_mission">${opts(OM_TYPES.map(x=>[x,x]),OM_TYPES[0])}</select></div>
+ <div style="grid-column:span 2"><label>Objet de la mission</label><input name="objet" required placeholder="ex. Sensibilisation des riverains du chantier"></div>
+ <div><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),'','— hors projet —')}</select></div>
+ <div style="grid-column:span 2"><label>Activité du cadre logique</label><select name="activite">${opts(acts.map(a=>[a.id,`${(projet(a.projet_id)||{}).code||''} · ${a.code?a.code+' ':''}${a.libelle}`.slice(0,140)]),'','— aucune —')}</select></div>
+ <div style="grid-column:span 2"><label>Ligne budgétaire imputée</label><select name="ligne">${opts(S.blignes.filter(l=>proj.some(p=>p.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''} · ${l.code?l.code+' ':''}${l.libelle}`.slice(0,140)]),'','— à préciser par la comptabilité —')}</select></div>
+ ${h('2. Missionnaires')}
+ <div><label>Chef de mission</label><select name="agent" required>${opts(ag.map(u=>[u.id,`${u.nom} (${posteLib(u)})`]),me.id)}</select></div>
+ <div style="grid-column:span 2"><label>Autres membres d'OSV</label><div class="domChk" style="max-height:9rem;overflow:auto;border:1px solid var(--line,#ccc);padding:.3rem .5rem;border-radius:6px">${autres.map(u=>`<label style="display:block;font-weight:normal"><input type="checkbox" name="membres" value="${u.id}"> ${esc(u.nom)} <span class="muted">· ${esc(posteLib(u))}</span></label>`).join('')}</div></div>
+ <div style="grid-column:1/-1"><label>Personnes sans compte (consultant, enquêteur, chauffeur, partenaire) : une par ligne, « nom ; fonction ; structure »</label><textarea name="externes" rows="2" placeholder="KOUASSI Aya ; Enquêtrice ; OSV"></textarea></div>
+ ${h('3. Itinéraire et calendrier')}
+ <div><label>Destination principale</label><input name="destination" required placeholder="ex. Kong"></div>
+ <div><label>Départ</label><input name="date_depart" type="date" required></div>
+ <div><label>Retour</label><input name="date_retour" type="date" required></div>
+ <div style="grid-column:1/-1"><label>Étapes : une par ligne, « date ; heure ; de ; à ; moyen »</label><textarea name="itineraire" rows="3" placeholder="03/11/2026 ; 06:00 ; Yamoussoukro ; Kong ; Véhicule OSV&#10;06/11/2026 ; 14:00 ; Kong ; Yamoussoukro ; Véhicule OSV"></textarea></div>
+ <div style="grid-column:1/-1"><label>Structures d'accueil et personnes à rencontrer : une par ligne, « structure ; localité ; contact »</label><textarea name="accueil" rows="3" placeholder="Préfecture de Kong ; Kong ; Secrétaire général&#10;Base vie EBOMAF ; Kong ; Responsable HSE"></textarea></div>
+ ${h('4. Moyens logistiques')}
+ <div><label>Moyen de transport</label><select name="transport">${opts(OM_TRANSP.map(x=>[x,x]),OM_TRANSP[0])}</select></div>
+ <div><label>Véhicule (immatriculation)</label><input name="vehicule" placeholder="ex. 1234 AB 01"></div>
+ <div><label>Chauffeur</label><input name="chauffeur"></div>
+ <div><label>Hébergement</label><select name="hebergement">${opts(OM_HEB.map(x=>[x,x]),OM_HEB[0])}</select></div>
+ ${h('5. Termes de référence')}
+ <div style="grid-column:1/-1"><label>Objectifs et tâches</label><textarea name="tdr" rows="3" required></textarea></div>
+ <div style="grid-column:1/-1"><label>Résultats et livrables attendus</label><textarea name="resultats" rows="2" placeholder="ex. rapport de mission, listes de présence, photos"></textarea></div>
+ ${h('6. Prise en charge financière')}
+ <div><label>Barème du per diem</label><select name="bareme">${opts(S.baremes.map(b=>[`${b.categorie}|${b.zone}`,`${b.categorie} · ${b.zone} · ${num(b.per_diem)}/jour`]),'',S.baremes.length?'— choisir —':'aucun barème fixé')}</select></div>
+ <div><label>Per diem par jour et par personne (sans barème)</label><input name="per_diem" type="number" min="0"></div>
+ <div><label>Frais de transport (FCFA)</label><input name="frais_transport" type="number" min="0" value="0"></div>
+ <div><label>Autres frais (FCFA)</label><input name="autres_frais" type="number" min="0" value="0"></div>
+ ${h('7. Sécurité')}
+ <div style="grid-column:span 2"><label>Contact d'urgence pendant la mission (nom et téléphone)</label><input name="urgence" required></div>
+ <div style="grid-column:1/-1"><label>Consignes de sécurité</label><textarea name="securite" rows="3">${esc(OM_SECU)}</textarea></div>
+ <div style="grid-column:1/-1"><button class="btn" type="submit">Envoyer pour signature</button></div></form></details>`}
+
+async function omEtablir(f,d){const o=S.org.id;
+ if(d.date_retour<d.date_depart){alert('La date de retour doit suivre la date de départ.');return}
+ const ac=d.activite&&S.cadre.find(x=>x.id===d.activite),li=d.ligne&&S.blignes.find(x=>x.id===d.ligne);
+ if((ac||li)&&!d.projet){alert('Choisissez le projet auquel se rattachent l\'activité et la ligne budgétaire.');return}
+ if(ac&&ac.projet_id!==d.projet){alert('L\'activité choisie n\'appartient pas à ce projet.');return}
+ if(li&&li.projet_id!==d.projet){alert('La ligne budgétaire choisie n\'appartient pas à ce projet.');return}
+ const it=[];for(const c of lignesTexte(d.itineraire)){const dt=omDate(c[0]);if(!dt){alert(`Itinéraire : date illisible « ${c[0]} » (format jj/mm/aaaa).`);return}
+  if(dt<d.date_depart||dt>d.date_retour){alert(`Itinéraire : le ${fmtD(dt)} est hors des dates de la mission.`);return}it.push({date:dt,heure:c[1]||'',de:c[2]||'',a:c[3]||'',moyen:c[4]||''})}
+ const acc=lignesTexte(d.accueil).map(c=>({structure:c[0]||'',localite:c[1]||'',contact:c[2]||''})).filter(x=>x.structure);
+ const ext=lignesTexte(d.externes).map(c=>({nom:c[0]||'',fonction:c[1]||'',structure:c[2]||''})).filter(x=>x.nom);
+ const mb=[...f.querySelectorAll('[name=membres]:checked')].map(x=>x.value).filter(id=>id!==d.agent);
+ const ids=[d.agent,...mb],nb=jours(d.date_depart,d.date_retour);
+ const conflit=S.missions.filter(m=>['demandee','approuvee'].includes(m.statut)&&m.date_depart<=d.date_retour&&m.date_retour>=d.date_depart&&omMissionnaires(m).some(x=>ids.includes(x)));
+ if(conflit.length&&!confirm(`Attention : ${[...new Set(conflit.flatMap(m=>omMissionnaires(m).filter(x=>ids.includes(x))))].map(who).join(', ')} a (ont) déjà une mission sur ces dates (${conflit.map(m=>m.numero||m.objet).join(', ')}). Continuer quand même ?`))return;
+ const b=d.bareme&&S.baremes.find(x=>`${x.categorie}|${x.zone}`===d.bareme),pd=b?Number(b.per_diem):(nbr(d.per_diem)||0),mid=uuid();
+ const deP=omDEPart(ids),sign=S.staff.filter(u=>accesOK(u)&&(deP?u.role==='CA':u.role==='DE')).map(u=>u.id);
+ action(async()=>{
+  await ins('missions',{id:mid,org_id:o,agent_id:d.agent,projet_id:d.projet||null,activite_id:d.activite||null,ligne_id:d.ligne||null,type_mission:d.type_mission,objet:String(d.objet).trim(),destination:String(d.destination).trim(),date_depart:d.date_depart,date_retour:d.date_retour,
+   transport:d.transport||null,vehicule:(d.vehicule||'').trim()||null,chauffeur:(d.chauffeur||'').trim()||null,hebergement:d.hebergement||null,tdr:(d.tdr||'').trim()||null,resultats:(d.resultats||'').trim()||null,itineraire:it,accueil:acc,urgence:(d.urgence||'').trim()||null,securite:(d.securite||'').trim()||null,
+   per_diem_jour:pd,nb_jours:nb,frais_transport:nbr(d.frais_transport)||0,autres_frais:nbr(d.autres_frais)||0});
+  const rows=[...mb.map((id,i)=>{const u=S.staff.find(x=>x.id===id);return {org_id:o,mission_id:mid,user_id:id,nom:u.nom,fonction:posteLib(u),structure:S.org.nom,role_mission:'Membre',per_diem_jour:pd,nb_jours:nb,ordre:i+1}}),
+   ...ext.map((x,i)=>({org_id:o,mission_id:mid,user_id:null,nom:x.nom,fonction:x.fonction||null,structure:x.structure||null,role_mission:'Membre',per_diem_jour:pd,nb_jours:nb,ordre:mb.length+i+1}))];
+  if(rows.length)await ins('mission_membres',rows);
+  await notifierSrv(sign.length?sign:S.staff.filter(u=>u.role==='DP'&&accesOK(u)).map(u=>u.id),`Ordre de mission à signer : ${d.objet} (${d.destination}, ${fmtD(d.date_depart)})`,'mesdem',mid);
+  await notifierSrv(ids,`Vous êtes désigné(e) pour la mission « ${d.objet} » (${d.destination}, du ${fmtD(d.date_depart)} au ${fmtD(d.date_retour)}) : ordre en attente de signature`,'mesdem',mid)},
+ deP?'Ordre de mission envoyé au Président du Conseil d\'administration pour signature.':'Ordre de mission envoyé au Directeur exécutif pour signature.')}
+
+/* ---------- le document : ordre de mission imprimable ---------- */
+function ordreMission(m){if(!m)return;const w=window.open('','_blank');if(!w){alert('Autorisez les fenêtres pour imprimer.');return}
+ const valide=['approuvee','rapport','liquidee'].includes(m.statut),annule=m.statut==='annulee',mm=omMembres(m),chef=S.staff.find(x=>x.id===m.agent_id)||{};
+ const roleS=m.signe_role||(omDEPart(omMissionnaires(m))?'CA':'DE'),p=m.projet_id&&projet(m.projet_id),ac=m.activite_id&&S.cadre.find(x=>x.id===m.activite_id),li=m.ligne_id&&S.blignes.find(x=>x.id===m.ligne_id);
+ const pers=[{nom:chef.nom||'',fonction:chef.posteId||chef.role?posteLib(chef):'',structure:S.org.nom,role:'Chef de mission',pd:m.per_diem_jour,nb:m.nb_jours},...mm.map(x=>({nom:x.nom,fonction:x.fonction||'',structure:x.structure||'',role:x.role_mission,pd:x.per_diem_jour,nb:x.nb_jours}))];
+ const it=m.itineraire||[],acc=m.accueil||[],tot=miTotal(m);
+ let qr='';if(valide&&m.code_verif){try{const q=QRGEN(0,'M');q.addData(omLien(m.code_verif));q.make();qr=q.createSvgTag(3,0)}catch(e){}}
+ const T=(rows)=>`<table class="kv">${rows.filter(r=>r[1]).map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('')}</table>`;
+ const intro=`${OM_SIGN[roleS].replace('<br>',' ')} de l'${esc(S.org.nom)} ordonne aux personnes désignées ci-dessous de se rendre en mission à <b>${esc(m.destination)}</b>, du <b>${fmtD(m.date_depart)}</b> au <b>${fmtD(m.date_retour)}</b> (${num(m.nb_jours)} jour(s)), dans les conditions fixées par le présent ordre.`;
+ const visas=[...acc.map(a=>({s:a.structure,l:a.localite})),...Array(Math.max(0,4-acc.length)).fill({s:'',l:''})];
+ w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Ordre de mission ${esc(m.numero||'(projet)')}</title><style>
+ @page{size:A4;margin:14mm 14mm 16mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#111;font-size:10pt;line-height:1.35;margin:0}
+ .page{position:relative;padding:0 2mm}.ent{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;border-bottom:2px solid #1f3b2c;padding-bottom:8px}
+ .ent img{height:62px}.org b{font-size:12pt;display:block}.org span{font-size:8.5pt;color:#444}.ref{text-align:right;font-size:9pt}.ref b{font-size:11pt}
+ h1{text-align:center;font-size:15pt;letter-spacing:.12em;margin:14px 0 2px}.sous{text-align:center;font-size:9pt;color:#444;margin-bottom:10px}
+ h2{font-size:10pt;text-transform:uppercase;background:#eef2ee;border-left:4px solid #1f3b2c;padding:3px 7px;margin:12px 0 5px}
+ table{border-collapse:collapse;width:100%}th,td{border:1px solid #777;padding:3px 6px;text-align:left;vertical-align:top;font-size:9.5pt}thead th{background:#f1f1f1}
+ table.kv th{width:30%;background:#f7f7f7;font-weight:bold}.num{text-align:right;white-space:nowrap}p{margin:5px 0}.pre{white-space:pre-wrap}
+ .sig{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px}.sig div{border:1px solid #777;padding:6px;min-height:105px;font-size:9pt}.sig b{display:block;margin-bottom:3px}
+ .auth{display:flex;gap:12px;align-items:center;border:1px dashed #1f3b2c;padding:7px;margin-top:12px;font-size:8.5pt}.auth svg{width:96px;height:96px;flex:none}
+ .wm{position:fixed;top:40%;left:0;right:0;text-align:center;font-size:54pt;color:rgba(180,0,0,.13);transform:rotate(-28deg);font-weight:bold;pointer-events:none;z-index:0}
+ .saut{page-break-before:always;break-before:page}.pied{font-size:8pt;color:#555;margin-top:10px;border-top:1px solid #bbb;padding-top:4px}
+ .bar{position:sticky;top:0;background:#fff;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:8px}.bar button{font-size:11pt;padding:6px 14px;margin-right:6px}
+ @media print{.bar{display:none}}</style></head><body>
+ <div class="bar"><button onclick="print()">Imprimer ou enregistrer en PDF</button><button onclick="close()">Fermer</button>${valide?'':` <b style="color:#a00">${annule?'Ordre annulé : document sans valeur.':'Ordre non signé : document de travail sans valeur.'}</b>`}</div>
+ ${valide?'':`<div class="wm">${annule?'ANNULÉ':'NON SIGNÉ – SANS VALEUR'}</div>`}
+ <div class="page"><div class="ent"><img src="${LOGO}" alt="Logo ONG Sécurité Vie"><div class="org"><b>${esc(S.org.nom)}</b><span>Organisation non gouvernementale · Direction exécutive</span></div>
+  <div class="ref">N° <b>${esc(m.numero||'— (attribué à la signature)')}</b><br>Établi le ${fmtD(m.cree_le)}<br>par ${esc(who(m.demande_par))}</div></div>
+ <h1>ORDRE DE MISSION</h1><div class="sous">${esc(m.type_mission||'Mission')}</div>
+ <p>${intro}</p>
+ <h2>1. Missionnaires</h2><table><thead><tr><th>N°</th><th>Nom et prénoms</th><th>Fonction</th><th>Structure</th><th>Rôle dans la mission</th></tr></thead><tbody>${pers.map((x,i)=>`<tr><td>${i+1}</td><td><b>${esc(x.nom)}</b></td><td>${esc(x.fonction)}</td><td>${esc(x.structure)}</td><td>${esc(x.role)}</td></tr>`).join('')}</tbody></table>
+ <h2>2. Objet et cadre de la mission</h2>${T([['Objet',`<b>${esc(m.objet)}</b>`],['Projet',p?esc(libProj(p)):'Hors projet'],['Bailleur',p&&p.bailleur?esc(p.bailleur):''],['Activité du cadre logique',ac?esc(`${ac.code?ac.code+' · ':''}${ac.libelle}`):''],['Ligne budgétaire',li?esc(`${li.code?li.code+' · ':''}${li.libelle}`):'']])}
+ ${m.tdr||m.resultats?`<h2>3. Termes de référence</h2>${T([['Objectifs et tâches',m.tdr?`<div class="pre">${esc(m.tdr)}</div>`:''],['Résultats et livrables attendus',m.resultats?`<div class="pre">${esc(m.resultats)}</div>`:'']])}`:''}
+ <h2>4. Itinéraire et calendrier</h2>${it.length?`<table><thead><tr><th>Date</th><th>Heure</th><th>De</th><th>À</th><th>Moyen</th></tr></thead><tbody>${it.map(e=>`<tr><td>${fmtD(e.date)}</td><td>${esc(e.heure)}</td><td>${esc(e.de)}</td><td>${esc(e.a)}</td><td>${esc(e.moyen)}</td></tr>`).join('')}</tbody></table>`:`<p>Départ le ${fmtD(m.date_depart)}, retour le ${fmtD(m.date_retour)}.</p>`}
+ ${acc.length?`<h2>5. Structures d'accueil et personnes à rencontrer</h2><table><thead><tr><th>Structure</th><th>Localité</th><th>Contact</th></tr></thead><tbody>${acc.map(a=>`<tr><td>${esc(a.structure)}</td><td>${esc(a.localite)}</td><td>${esc(a.contact)}</td></tr>`).join('')}</tbody></table>`:''}
+ <h2>6. Moyens logistiques</h2>${T([['Moyen de transport',esc(m.transport||'—')],['Véhicule',esc(m.vehicule||'')],['Chauffeur',esc(m.chauffeur||'')],['Hébergement',esc(m.hebergement||'')]])}
+ <h2>7. Prise en charge financière</h2><table><thead><tr><th>Missionnaire</th><th class="num">Per diem / jour</th><th class="num">Jours</th><th class="num">Montant (FCFA)</th></tr></thead><tbody>${pers.map(x=>`<tr><td>${esc(x.nom)}</td><td class="num">${num(x.pd)}</td><td class="num">${num(x.nb)}</td><td class="num">${num(Math.round(x.pd*x.nb))}</td></tr>`).join('')}
+  <tr><td colspan="3">Frais de transport</td><td class="num">${num(m.frais_transport)}</td></tr>${Number(m.autres_frais)?`<tr><td colspan="3">Autres frais</td><td class="num">${num(m.autres_frais)}</td></tr>`:''}<tr><th colspan="3">Total prévisionnel</th><th class="num">${num(tot)}</th></tr></tbody></table>
+ <p style="font-size:8.5pt">Les frais sont liquidés au retour, sur présentation du rapport de mission et des pièces justificatives, selon le barème en vigueur.</p>
+ <h2>8. Sécurité et conduite</h2>${T([['Contact d\'urgence',esc(m.urgence||'')],['Consignes',m.securite?`<div class="pre">${esc(m.securite)}</div>`:'']])}
+ <p style="font-size:8.5pt">Au retour, le chef de mission remet le rapport de mission dans les cinq (5) jours ouvrables, avec les listes de présence et pièces justificatives. Toute modification de l'itinéraire ou des dates est soumise à l'accord préalable du signataire.</p>
+ <div class="sig"><div><b>Établi par</b>${esc(who(m.demande_par))}<br>le ${fmtD(m.cree_le)}</div><div><b>Le chef de mission</b>« Lu et pris connaissance »<br>${esc(chef.nom||'')}</div>
+  <div><b>${OM_SIGN[roleS]}</b>${valide?`${esc(who(m.approuve_par))}<br><span style="font-size:8pt">Signé électroniquement dans OSV Gestion le ${new Date(m.approuve_le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}</span><br><span style="font-size:8pt">Cachet :</span>`:'<i>en attente de signature</i>'}</div></div>
+ ${valide&&qr?`<div class="auth">${qr}<div><b>Authenticité vérifiable</b><br>Scannez ce QR code, ou ouvrez <b>${esc(omLien(m.code_verif).replace(/^https?:\/\//,''))}</b><br>Code de vérification : <b style="font-family:monospace;font-size:10pt">${esc(m.code_verif)}</b><br>La page affiche les missionnaires, la destination, les dates et la validité de l'ordre. Un ordre annulé y apparaît comme annulé.</div></div>`:''}
+ <div class="pied">${esc(S.org.nom)} · Ordre de mission ${esc(m.numero||'non signé')} · page 1/2</div></div>
+ <div class="page saut"><div class="ent"><img src="${LOGO}" alt=""><div class="org"><b>${esc(S.org.nom)}</b><span>Ordre de mission ${esc(m.numero||'non signé')} · ${esc(chef.nom||'')} et ${pers.length-1} autre(s)</span></div><div class="ref">${fmtD(m.date_depart)} → ${fmtD(m.date_retour)}</div></div>
+ <h1 style="font-size:13pt">VISAS DES STRUCTURES D'ACCUEIL</h1><div class="sous">Attestation de passage : à faire viser à l'arrivée et au départ de chaque structure. Pièce justificative du per diem.</div>
+ <table><thead><tr><th style="width:24%">Structure et localité</th><th style="width:19%">Arrivée (date, heure)</th><th style="width:19%">Départ (date, heure)</th><th>Nom, qualité, signature et cachet</th></tr></thead><tbody>${visas.map(v=>`<tr><td style="height:92px">${esc(v.s)}${v.l?`<br><span style="font-size:8.5pt">${esc(v.l)}</span>`:''}</td><td></td><td></td><td></td></tr>`).join('')}</tbody></table>
+ <h2>Observations du chef de mission au retour</h2><div style="border:1px solid #777;height:90px"></div>
+ <div class="sig"><div><b>Le chef de mission</b>Date et signature</div><div><b>Visa de la comptabilité</b>Liquidation</div><div><b>${OM_SIGN[roleS]}</b>Vu au retour</div></div>
+ <div class="pied">${esc(S.org.nom)} · Ordre de mission ${esc(m.numero||'non signé')} · page 2/2</div></div></body></html>`);w.document.close()}
+
+/* ---------- vérification publique (QR code) ---------- */
+function omVerifHTML(){const r=omVerif.res,ok=r&&['approuvee','rapport','liquidee'].includes(r.statut),fini=ok&&r.retour<today();
+ const etat=!r?['bad','Document non authentique','Aucun ordre de mission ne correspond à ce code. Le document présenté n\'a pas été émis par OSV Gestion, ou le code a été mal saisi.']
+  :r.statut==='annulee'?['bad','Ordre de mission annulé',`Cet ordre a été annulé le ${fmtD(r.annule_le)} : il n'est plus valable.`]
+  :ok?['ok',fini?'Ordre de mission authentique · mission terminée':'Ordre de mission authentique et valide',fini?`La mission s'est achevée le ${fmtD(r.retour)}.`:`Valable du ${fmtD(r.depart)} au ${fmtD(r.retour)}.`]:['bad','Ordre de mission non valable',''];
+ return `<div class="login"><div class="card" style="max-width:620px;margin:2rem auto"><div style="display:flex;gap:.8rem;align-items:center"><img src="${LOGO}" alt="Logo ONG Sécurité Vie" style="height:56px"><div><b>OSV Gestion</b><br><span class="muted">Vérification d'un ordre de mission</span></div></div>
+ ${omVerif.err?`<p class="err" role="alert">${esc(omVerif.err)}</p>`:`<p class="tag ${etat[0]}" style="display:block;font-size:1.1rem;padding:.7rem;margin:1rem 0 .4rem" role="status">${etat[1]}</p><p>${etat[2]}</p>
+ ${r?`<div class="facts"><div><span>Organisation</span><b>${esc(r.organisation)}</b></div><div><span>Numéro</span><b>${esc(r.numero)}</b></div><div><span>Type</span><b>${esc(r.type||'Mission')}</b></div><div><span>Destination</span><b>${esc(r.destination)}</b></div><div><span>Période</span><b>${fmtD(r.depart)} → ${fmtD(r.retour)}</b></div><div><span>Signé par</span><b>${esc(r.signe_par||'—')}${r.signe_role==='CA'?' (Président du CA)':r.signe_role==='DP'?' (P/O le Directeur exécutif)':r.signe_role==='DE'?' (Directeur exécutif)':''}, le ${fmtD(r.signe_le)}</b></div></div>
+ <h3>Missionnaires</h3><ol>${(r.missionnaires||[]).map(x=>`<li>${esc(x.nom||'')} <span class="muted">· ${esc(x.role||'')}</span></li>`).join('')}</ol>
+ <p class="muted">Comparez ces informations avec le document présenté et avec la pièce d'identité des personnes. En cas de doute, contactez l'${esc(r.organisation)}.</p>`:''}`}
+ <p><button class="btn ghost" data-act="omFermer">Fermer</button></p></div></div>`}
+async function omVerifCharger(){const c=QS.get('om');if(!c)return;omVerif={code:c,res:null};
+ if(!/^[0-9a-f]{20}$/.test(c)){return}
+ try{omVerif.res=await api('/rest/v1/rpc/verifier_om',{method:'POST',body:{code:c},anon:true})}catch(e){omVerif.err='Vérification impossible pour le moment : '+e.message}}
+document.addEventListener('click',e=>{if(MODE!=='srv')return;const b=e.target.closest('[data-act="omFermer"],[data-act="miAnn"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
+ if(b.dataset.act==='omFermer'){omVerif=null;try{history.replaceState(null,'',location.pathname+location.search.replace(/([?&])om=[^&]*&?/,'$1').replace(/[?&]$/,''))}catch(_){}render();return}
+ const x=S.missions.find(y=>y.id===b.dataset.id);if(!x||!me)return;const m=prompt(`Motif de l'annulation de l'ordre ${x.numero||''} :`);if(!m||!m.trim())return;
+ action(async()=>{await upd('missions',`id=eq.${x.id}`,{statut:'annulee',motif:m.trim()});await notifierSrv(omMissionnaires(x),`Ordre de mission ${x.numero||''} « ${x.objet} » annulé. Motif : ${m.trim()}`,'mesdem',x.id)},'Ordre de mission annulé : il apparaît comme annulé à la vérification.')},true);
+
 /* ---------- démarrage ---------- */
 async function srvInit(){
  if(MODE!=='srv'){render();return}
@@ -2585,7 +4354,7 @@ async function srvInit(){
  loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
  render=srvRender;
  viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
- S=srvVide();me=null;sess=sessLire();
+ S=srvVide();me=null;sess=sessLire();await omVerifCharger();
  const h=new URLSearchParams(location.hash.slice(1));                // retour d'un lien « mot de passe oublié »
  if(h.get('access_token')){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
   if(h.get('error_description'))loginErr='Ce lien est invalide ou a expiré : demandez un nouveau lien avec « Mot de passe oublié ? ».';
@@ -2596,6 +4365,7 @@ async function srvInit(){
  render()}
 
 function srvRender(){const root=document.getElementById('root');
+ if(omVerif){root.innerHTML=omVerifHTML();return}
  if(!me){root.innerHTML=pubView?publicHTML():loginHTML();if(!pubView)document.getElementById('email')?.focus();return}
  const nav=ROLES[me.role].nav;if(view!=='home'&&!nav.includes(view)&&!(view==='dossier'&&p03&&nav.includes('projets')))view='home';
  const cur=view==='dossier'?'projets':view;
