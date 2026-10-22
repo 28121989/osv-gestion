@@ -1869,7 +1869,7 @@ function svPortefeuille(){const creer=saisieDP(),tous=pilote();let ps=S.projets.
  if(pfF.q){const q=pfF.q.toLowerCase();ps=ps.filter(p=>[p.nom,p.code,p.bailleur,p.zone].join(' ').toLowerCase().includes(q))}
  const tot=ps.reduce((s,p)=>s+(p.budgetApprouve||p.montant||0),0),parSt={};S.projets.forEach(p=>parSt[p.statut]=(parSt[p.statut]||0)+1);
  return head('Portefeuille des projets',tous?'Tous les projets de l\'organisation. Un projet est créé en brouillon puis suit le circuit : configuration, vérification, validation, activation, exécution, clôture, archivage.':'Les projets auxquels vous êtes affecté(e).')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
- (me.role==='DE'&&!creer?'<p class="note">L\'enregistrement des projets est confié au Directeur des programmes. Vous suivez ici la qualité de chaque dossier ; ouvrez-le pour envoyer vos observations ou décider de sa validation.</p>':'')+(creer?`<details class="card" ${S.projets.length?'':'open'}><summary><b>Enregistrer un projet</b></summary><form data-form="srvProjet" style="margin-top:.8rem"><div class="grid">
+ (me.role==='DE'&&!creer?'<p class="note">L\'enregistrement des projets est confié au Directeur des programmes. Vous suivez ici la qualité de chaque dossier ; ouvrez-le pour envoyer vos observations ou décider de sa validation.</p>':'')+impApercu()+(creer?`<details class="card" ${S.projets.length?'':'open'}><summary><b>Enregistrer un projet</b></summary><form data-form="srvProjet" style="margin-top:.8rem"><div class="grid">
   <div style="grid-column:span 2"><label>Intitulé du projet</label><textarea name="nom" rows="2" required></textarea></div><div><label>Code</label><input name="code"></div>
   <div style="grid-column:span 2"><label>Programme</label><select name="programme">${opts(S.programmes.map(g=>[g.id,libProg(g)]),'','— à rattacher plus tard —')}</select>${S.programmes.length?'':`<span class="muted">Aucun programme n'existe encore. Créez-le d'abord dans <button type="button" class="lnk" data-act="go" data-v="programmes">Programmes et opérations</button>, ou rattachez le projet plus tard depuis son dossier.</span>`}</div><div><label>Bailleur</label><input name="bailleur"></div>
   <div><label>Budget approuvé (FCFA)</label><input name="montant" type="number" min="0"></div><div><label>Début</label><input name="debut" type="date"></div><div><label>Fin</label><input name="fin" type="date"></div><div><label>Zone d'intervention</label><input name="zone"></div>
@@ -2536,6 +2536,46 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.targ
 document.addEventListener('change',e=>{if(MODE!=='srv'||!me)return;const t=e.target;if(!t.classList)return;
  if(t.classList.contains('biDet')||t.classList.contains('biEtat')){e.stopImmediatePropagation();const b=S.biens.find(x=>x.id===t.dataset.id),det=t.classList.contains('biDet');
   action(async()=>{await upd('biens',`id=eq.${b.id}`,det?{detenteur_id:t.value||null}:{etat:t.value});logO('archive',b.id,det?`Bien ${b.code} confié à ${who(t.value)}`:`Bien ${b.code} : état ${BI_ET[t.value]}`);if(det&&t.value)await notifierSrv([t.value],`Le bien ${b.code} (${b.designation}) vous est confié`,'mesdem',b.id)},'Enregistré.')}},true);
+
+
+/* ===== Import d'un projet préparé (fichier .json « osv-projet ») ===== */
+let impPkg=null,impErr='';
+const IMP_RUB=Object.keys(RUB),IMP_NIV=['og','os','res','act'],IMP_CH=['impact','effet','extrant','processus'];
+function impValider(p){const e=[];if(!p||p.format!=='osv-projet'||p.version!==1)return ['Ce fichier n\'est pas un projet préparé pour OSV Gestion.'];
+ const pr=p.projet||{};if(!pr.nom||!pr.code)e.push('Intitulé ou code du projet manquant.');if(pr.debut&&pr.fin&&pr.fin<pr.debut)e.push('Dates du projet incohérentes.');
+ if(S.projets.some(x=>(x.code||'').toLowerCase()===String(pr.code||'').toLowerCase()))e.push(`Un projet de code « ${pr.code} » existe déjà : import refusé pour éviter un doublon.`);
+ (p.budget||[]).forEach((b,i)=>{if(!b.libelle||!IMP_RUB.includes(b.rubrique)||!(Number(b.quantite)>=0)||!(Number(b.cout_unitaire)>=0))e.push(`Budget, ligne ${i+1} illisible.`)});
+ const refs=new Set();(p.cadre||[]).forEach((c,i)=>{if(!c.ref||!c.libelle||!IMP_NIV.includes(c.niveau))e.push(`Cadre logique, élément ${i+1} illisible.`);if(c.parent&&!refs.has(c.parent))e.push(`Cadre logique : « ${c.ref} » est rattaché à « ${c.parent} », qui doit le précéder.`);refs.add(c.ref)});
+ (p.indicateurs||[]).forEach((x,i)=>{if(!x.libelle||!IMP_CH.includes(x.chaine)||!['cumul','dernier'].includes(x.mode_periode))e.push(`Indicateur ${i+1} illisible.`);if(x.cadre&&!refs.has(x.cadre))e.push(`Indicateur ${x.code||i+1} : élément du cadre « ${x.cadre} » introuvable.`)});
+ (p.risques||[]).forEach((r,i)=>{if(!r.libelle||!(r.probabilite>=1&&r.probabilite<=5)||!(r.impact>=1&&r.impact<=5))e.push(`Risque ${i+1} illisible.`)});
+ return e}
+function impApercu(){if(!saisieDP())return '';const p=impPkg;
+ return `<details class="card" ${p||impErr?'open':''}><summary><b>Importer un projet préparé</b> <span class="muted">(fichier .json)</span></summary><div style="margin-top:.7rem">
+ <p class="muted">Charge en une fois le programme, le projet, son budget, son cadre logique, ses indicateurs et ses risques. Le projet est créé en brouillon : l'équipe, le chef de projet et la convention se complètent ensuite, et le DE contrôle la qualité avant l'activation.</p>
+ <input type="file" accept=".json,application/json" class="impFichier" aria-label="Fichier du projet préparé">${impErr?`<p class="err" role="alert">${esc(impErr)}</p>`:''}
+ ${p?`<div class="card" style="margin-top:.7rem"><h3 style="margin-top:0">${esc(p.projet.nom)}</h3><div class="facts"><div><span>Code</span><b>${esc(p.projet.code)}</b></div><div><span>Bailleur</span><b>${esc(p.projet.bailleur||'—')}</b></div><div><span>Période</span><b>${fmtD(p.projet.debut)} → ${fmtD(p.projet.fin)}</b></div><div><span>Programme</span><b>${esc(p.programme?p.programme.nom:'—')}${p.programme&&S.programmes.some(g=>g.nom===p.programme.nom)?' (existant)':' (sera créé)'}</b></div>
+ <div><span>Budget</span><b>${(p.budget||[]).length} lignes · ${num(somme(p.budget||[],b=>Math.round(b.quantite*b.cout_unitaire)))} FCFA</b></div><div><span>Cadre logique</span><b>${(p.cadre||[]).length} éléments</b></div><div><span>Indicateurs</span><b>${(p.indicateurs||[]).length}</b></div><div><span>Risques</span><b>${(p.risques||[]).length}</b></div></div>
+ ${p.projet.montant&&Math.round(p.projet.montant)!==Math.round(somme(p.budget||[],b=>b.quantite*b.cout_unitaire))?'<p class="note">Le total du budget diffère du montant du projet : vérifiez après l\'import.</p>':''}
+ <div class="row"><button class="btn" data-act="impGo">Importer ce projet</button><button class="btn ghost" data-act="impAnnul">Annuler</button></div></div>`:''}</div></details>`}
+async function impExec(p){const o=S.org.id;let gid=null;
+ if(p.programme){const g=S.programmes.find(x=>x.nom===p.programme.nom);if(g)gid=g.id;else{gid=uuid();const x=p.programme;await ins('programmes',{id:gid,org_id:o,type:x.type==='operation'?'operation':'programme',code:x.code||null,nom:x.nom,domaine:x.domaine||null,description:x.description||null,cree_par:me.id});logO('programme',gid,`Programme créé par import : ${x.nom}`)}}
+ const pr=p.projet,pid=uuid(),bu=pr.bureau_ville&&S.bureaux.find(b=>b.ville.toLowerCase()===String(pr.bureau_ville).toLowerCase());
+ await ins('projets',{id:pid,org_id:o,nom:pr.nom,code:pr.code,programme_id:gid,bailleur:pr.bailleur||null,montant:pr.montant||null,budget_approuve:pr.montant||null,debut:pr.debut||null,fin:pr.fin||null,zone:pr.zone||null,domaine:pr.domaine||null,bureau_id:bu?bu.id:null});
+ logO('projet',pid,`Projet importé depuis un fichier préparé : ${(p.budget||[]).length} lignes de budget, ${(p.cadre||[]).length} éléments du cadre logique, ${(p.indicateurs||[]).length} indicateurs, ${(p.risques||[]).length} risques`);
+ if((p.budget||[]).length)await ins('budget_lignes',p.budget.map((b,i)=>({org_id:o,projet_id:pid,code:b.code||null,rubrique:b.rubrique,libelle:b.libelle,unite:b.unite||null,quantite:Number(b.quantite),cout_unitaire:Number(b.cout_unitaire),montant:Math.round(b.quantite*b.cout_unitaire),source:['bailleur','osv','autre'].includes(b.source)?b.source:'bailleur',ordre:i+1})));
+ const ids={};for(const niv of IMP_NIV){const L=(p.cadre||[]).filter(c=>c.niveau===niv);if(!L.length)continue;
+  const rows=L.map((c,i)=>{ids[c.ref]=uuid();return {id:ids[c.ref],org_id:o,projet_id:pid,parent_id:c.parent?ids[c.parent]:null,niveau:c.niveau,code:c.code||null,libelle:c.libelle,hypotheses:c.hypotheses||null,ordre:i+1}});await ins('cadre_logique',rows)}
+ if((p.indicateurs||[]).length)await ins('indicateurs',p.indicateurs.map(x=>({org_id:o,niveau:'projet',projet_id:pid,cadre_id:x.cadre?ids[x.cadre]:null,code:x.code||null,libelle:x.libelle,chaine:x.chaine,unite:x.unite||'nombre',mode_periode:x.mode_periode,mode_agregat:'somme',baseline:x.baseline??null,cible:x.cible??null,source_verif:x.source_verif||null,frequence:x.frequence||null,desagregation:x.desagregation||null,sensible:!!x.sensible})));
+ if((p.risques||[]).length)await ins('risques',p.risques.map(r=>({org_id:o,projet_id:pid,programme_id:gid,libelle:r.libelle,categorie:r.categorie||null,probabilite:r.probabilite,impact:r.impact,mesures:r.mesures||null,cree_par:me.id})));
+ await notifierSrv(S.staff.filter(u=>u.role==='DE'&&accesOK(u)).map(u=>u.id),`Projet importé à contrôler : « ${pr.nom} »`,'projet',pid);
+ return pid}
+document.addEventListener('change',e=>{if(MODE!=='srv'||!me)return;const t=e.target;if(!t.classList||!t.classList.contains('impFichier'))return;e.stopImmediatePropagation();
+ const f=t.files&&t.files[0];impPkg=null;impErr='';if(!f)return render();if(f.size>2*1024*1024){impErr='Fichier trop lourd.';return render()}
+ f.text().then(txt=>{let p;try{p=JSON.parse(txt)}catch(_){impErr='Fichier illisible : ce n\'est pas un projet préparé.';return render()}const er=impValider(p);if(er.length)impErr=er.slice(0,6).join(' ');else impPkg=p;render()})},true);
+document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.target.closest('[data-act="impGo"],[data-act="impAnnul"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
+ if(b.dataset.act==='impAnnul'){impPkg=null;impErr='';render();return}
+ const p=impPkg,er=impValider(p);if(er.length){impErr=er.join(' ');impPkg=null;render();return}
+ let pid=null;action(async()=>{pid=await impExec(p);impPkg=null;impErr=''},'Projet importé en brouillon. Complétez l\'équipe, le chef de projet et la convention, puis demandez le contrôle du DE.').then(()=>{if(pid&&projet(pid)){dosSel=pid;dosTab='id';view='dossier';render();scrollTo(0,0)}})},true);
 
 /* ---------- démarrage ---------- */
 async function srvInit(){
