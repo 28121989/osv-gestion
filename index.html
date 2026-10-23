@@ -1633,7 +1633,7 @@ async function srvLoad(){
  const T6=await Promise.all(['comptes_tresorerie','mouvements','rapprochements','avances','fournisseurs','seuils_achat','achats','devis','baremes_mission','missions','biens','inventaires','plan_comptable','correspondances'].map(t=>sel(t,f)).concat([sel('inventaire_lignes')]).map(opt));p06=T6[3]!==null;
  const T7=await opt(sel('mission_membres',f+'&order=ordre'));p07=T7!==null;N.mmembres=T7||[];
  const T8=await Promise.all([sel('tdrs',f+'&order=cree_le.desc'),sel('tdr_avis',f+'&order=le'),sel('acces_budget',f)].map(opt));p08=T8[0]!==null;N.tdrs=T8[0]||[];N.tavis=T8[1]||[];N.accBud=T8[2]||[];
- const T10=await opt(sel('contrats',f+'&order=redige_le.desc'));p10=T10!==null;N.contrats=T10||[];
+ const T10=await opt(sel('contrats',f+'&order=redige_le.desc'));p10=T10!==null;N.contrats=T10||[];p10f=p10&&(await opt(sel('contrats','select=fiche&limit=1')))!==null;
  [N.comptes,N.mouvements,N.rapprochements,N.avances,N.fournisseurs,N.seuilsAchat,N.achats,N.devis,N.baremes,N.missions,N.biens,N.inventaires,N.pcomptes,N.correspondances,N.invLignes]=T6.map(x=>x||[]);
  S=N;me=S.staff.find(x=>x.id===uid);
  Object.keys(ROLES).forEach(k=>ROLES[k].nav=srvNav(k));
@@ -4597,7 +4597,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act="go"]'
 
 
 /* ===== Contrats et conventions du personnel non salarié (script 10) ===== */
-let p10=false,ctrSel=null,ctrEdit=null,ctrPre=null;
+let p10=false,p10f=false,ctrTab='contrats',ctrSel=null,ctrEdit=null,ctrPre=null;
 ICO.contrats='<path d="M14.364 13.634a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506l4.013-4.009a1 1 0 0 0-3.004-3.004z"/><path d="M14.487 7.858A1 1 0 0 1 14 7V2"/><path d="M20 19.645V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l2.516 2.516"/><path d="M8 18h1"/>';
 const CTR_TYPE={prestation:'Contrat de prestation de services (consultant individuel)',prestation_entreprise:'Contrat de prestation de services (cabinet ou entreprise)',benevolat:'Convention de bénévolat'};
 const CTR_COURT={prestation:'Consultance',prestation_entreprise:'Prestation (cabinet)',benevolat:'Bénévolat'};
@@ -4622,8 +4622,9 @@ function svContrats(){if(!p10)return head('Contrats et conventions','')+'<p clas
  return head('Contrats et conventions','Contrats des consultants, des cabinets et des bénévoles. Les RH, le Directeur des programmes ou le Directeur exécutif rédigent ; le Directeur exécutif valide et signe au nom d\'OSV ; le contrat est signé quand le scan signé par les deux parties est archivé.')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
  `<div class="kpis"><div class="kpi"><span>En cours (signés)</span><b>${S.contrats.filter(ctrEnCours).length}</b></div><div class="kpi"><span>À valider · à faire signer</span><b>${S.contrats.filter(c=>c.statut==='brouillon').length} · ${S.contrats.filter(c=>c.statut==='a_signer').length}</b></div><div class="kpi"><span>Montant engagé</span><b>${num(eng)}</b><span>FCFA, contrats validés ou signés</span></div><div class="kpi"><span>Chefs de projet non salariés sans contrat</span><b>${A.filter(a=>a[1].startsWith('Chef de projet')).length}</b></div></div>
  ${A.length?`<section class="card notif"><h3>Points d'attention (${A.length})</h3>${alerteHTML(A)}</section>`:''}
- ${ctrGere()?`<p class="row"><button class="btn" data-act="ctrNouveau">Rédiger un contrat</button></p>`:''}
- <section class="card"><h3>Contrats (${L.length})</h3>${svT(CTR_COLS,L.map(ctrLigne),'Aucun contrat. Rédigez le premier : consultant, cabinet ou bénévole.')}</section>
+ <nav class="subnav"><button data-act="ctrTab" data-v="contrats" ${ctrTab==='contrats'?'aria-current="page"':''}>Contrats (${L.length})</button><button data-act="ctrTab" data-v="fiches" ${ctrTab==='fiches'?'aria-current="page"':''}>Fiches de poste (${FICHES.length})</button></nav>
+ ${ctrTab==='fiches'?`<section class="card"><h3>Fiches de poste types</h3><p class="muted">Elles servent au recrutement et s'annexent au contrat. Dans chaque contrat, la fiche se reprend puis s'adapte : qualité, tâches, livrables.</p>${svT(['Poste','Rattachement','Mission',''],FICHES.map(f=>[`<b>${esc(f.intitule)}</b>`,esc(f.rattache),`<span class="muted">${esc(f.mission)}</span>`,`<button class="btn ghost sm" data-act="ctrFicheVoir" data-v="${f.code}">Aperçu et Word</button>`]))}</section>`:
+ `${ctrGere()?`<p class="row"><button class="btn" data-act="ctrNouveau">Rédiger un contrat</button></p>`:''}<section class="card"><h3>Contrats (${L.length})</h3>${svT(CTR_COLS,L.map(ctrLigne),'Aucun contrat. Rédigez le premier : consultant, cabinet ou bénévole.')}</section>`}
  <p class="legend">Les numéros de pièce d'identité et de compte bancaire ne sont jamais enregistrés dans l'application : ils se complètent à la main sur l'exemplaire imprimé.</p>`}
 
 function ctrEditeur(c){const pre=ctrPre||{};c=c||{type:'prestation',preavis_jours:15,mode_remun:'journalier',echeancier:[{libelle:'à la signature du contrat',pourcentage:30},{libelle:'à la validation du rapport final',pourcentage:70}],livrables:[],...pre};
@@ -4642,6 +4643,7 @@ function ctrEditeur(c){const pre=ctrPre||{};c=c||{type:'prestation',preavis_jour
  <div><label>Téléphone</label><input name="telephone" value="${esc(c.telephone||'')}"></div><div><label>E-mail</label><input name="email" type="email" value="${esc(c.email||'')}"></div>
  <div><label>RCCM (cabinet)</label><input name="rccm" value="${esc(c.rccm||'')}"></div><div><label>N° de compte contribuable</label><input name="ncc" value="${esc(c.ncc||'')}"></div>
  <h3 style="grid-column:1/-1">La mission</h3>
+ <div style="grid-column:span 2"><label>Fiche de poste</label><select name="fiche_code">${opts(FICHES.map(f=>[f.code,f.intitule]),c.fiche&&c.fiche.code||'','— sans fiche de poste —')}</select></div><div style="grid-column:span 2"><button type="button" class="btn ghost sm" data-act="ctrFiche">Remplir la qualité, les tâches et les livrables depuis la fiche</button></div>
  <div style="grid-column:span 2"><label>Projet</label><select name="projet_id">${opts(proj.map(x=>[x.id,libProj(x)]),c.projet_id||'','— hors projet —')}</select></div>
  <div style="grid-column:span 2"><label>Ligne budgétaire</label><select name="ligne_id">${opts(S.blignes.filter(l=>proj.some(x=>x.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''} · ${l.code?l.code+' ':''}${l.libelle}`.slice(0,140)]),c.ligne_id||'','— à préciser —')}</select></div>
  <div style="grid-column:1/-1"><label>Objet du contrat</label><input name="objet" required value="${esc(c.objet||'')}" placeholder="ex. Coordination de la mission d'appui socio-environnemental du chantier de l'aéroport de Kong"></div>
@@ -4684,7 +4686,7 @@ const ctrLire=(f,d)=>{const lv=lignesTexte(d.livrables).map(x=>({libelle:x[0]||'
  const u=d.user_id&&S.staff.find(x=>x.id===d.user_id),t=nbr(d.taux_journalier),j=nbr(d.nb_jours);let m=nbr(d.montant);
  if(d.mode_remun==='journalier'&&t&&j&&!m)m=Math.round(t*j);if(d.type==='benevolat')m=null;
  const r={type:d.type,user_id:d.user_id||null,nom:(d.nom||'').trim()||(u?u.nom:''),representant:d.representant||null,qualite:d.qualite||null,profession:d.profession||null,adresse:d.adresse||null,telephone:d.telephone||null,email:(d.email||'').trim()||(u&&u.email)||null,rccm:d.rccm||null,ncc:d.ncc||null,
-  projet_id:d.projet_id||null,ligne_id:d.ligne_id||null,objet:(d.objet||'').trim(),taches:(d.taches||'').trim()||null,livrables:lv,lieu:d.lieu||null,debut:d.debut,fin:d.fin,mode_remun:d.type==='benevolat'?'aucune':d.mode_remun,taux_journalier:t,nb_jours:j,montant:m,echeancier:d.type==='benevolat'?[]:ech,frais:d.frais||null,superviseur_id:d.superviseur_id||null,preavis_jours:nbr(d.preavis_jours)??15,clauses_part:d.clauses_part||null};
+  ...(p10f?{fiche:d.fiche_code?(()=>{const f=ficheDe(d.fiche_code)||(S.contrats.find(x=>x.fiche&&x.fiche.code===d.fiche_code)||{}).fiche;return f?{code:f.code,intitule:f.intitule,rattache:f.rattache,mission:f.mission,profil:f.profil,indicateurs:f.indicateurs}:null})():null}:{}),projet_id:d.projet_id||null,ligne_id:d.ligne_id||null,objet:(d.objet||'').trim(),taches:(d.taches||'').trim()||null,livrables:lv,lieu:d.lieu||null,debut:d.debut,fin:d.fin,mode_remun:d.type==='benevolat'?'aucune':d.mode_remun,taux_journalier:t,nb_jours:j,montant:m,echeancier:d.type==='benevolat'?[]:ech,frais:d.frais||null,superviseur_id:d.superviseur_id||null,preavis_jours:nbr(d.preavis_jours)??15,clauses_part:d.clauses_part||null};
  const err=[];if(!r.nom)err.push('le nom du cocontractant');if(!r.objet)err.push('l\'objet');if(r.fin<r.debut)err.push('des dates cohérentes');
  if(lv.some(x=>x.echeance==='?'))err.push('des échéances au format jj/mm/aaaa');
  if(ech.length&&Math.round(somme(ech,e=>e.pourcentage))!==100)err.push(`un échéancier totalisant 100 % (actuellement ${somme(ech,e=>e.pourcentage)} %)`);
@@ -4706,6 +4708,11 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.targ
  if(a==='ctrModif'){ctrEdit=id;render();scrollTo(0,0);return}
  if(a==='ctrImprimer'){ctrImprimer(c);return}
  if(a==='ctrWord'){ctrWord(c);return}
+ if(a==='ctrFiche'){const f=b.closest('form'),fi=ficheDe(f.querySelector('[name=fiche_code]').value);if(!fi){alert('Choisissez d\'abord une fiche de poste.');return}
+  const q=f.querySelector('[name=qualite]'),ta=f.querySelector('[name=taches]'),lv=f.querySelector('[name=livrables]');if((ta.value.trim()||lv.value.trim())&&!confirm('Remplacer les tâches et les livrables déjà saisis par ceux de la fiche ?'))return;
+  q.value=q.value.trim()||fi.intitule;ta.value=fi.taches.join('\n');lv.value=fi.livrables.map(x=>x+' ; ').join('\n');return}
+ if(a==='ctrFicheVoir'){const fi=ficheDe(b.dataset.v);if(fi)ouvrirPapier(`Fiche de poste ${fi.intitule}`,ficheCorps(fi),{nom:`Fiche_de_poste_${fi.code}`,ref:'Fiche de poste'});return}
+ if(a==='ctrTab'){ctrTab=b.dataset.v;render();return}
  if(a==='ctrActs'){const f=b.closest('form'),pid=f.querySelector('[name=projet_id]').value,ta=f.querySelector('[name=taches]');const acts=S.cadre.filter(x=>x.projet_id===pid&&x.niveau==='act').sort((x,y)=>String(x.code||'').localeCompare(String(y.code||''),'fr',{numeric:true}));
   if(!acts.length){alert('Ce projet n\'a pas encore d\'activités dans son cadre logique.');return}ta.value=(ta.value.trim()?ta.value.trim()+'\n':'')+acts.map(x=>`${x.code?x.code+' : ':''}${x.libelle}`).join('\n');return}
  if(a==='ctrNouveauPour'){const p=projet(b.dataset.p),u=S.staff.find(x=>x.id===id),m=p&&p.membres.find(x=>x.staffId===id);ctrPre={user_id:id,nom:u?u.nom:'',email:u?u.email:'',qualite:m?m.roleProjet:'',projet_id:p?p.id:'',debut:(m&&m.debut)||(p&&p.debut)||'',fin:(m&&m.fin)||(p&&p.fin)||'',type:u&&u.statut==='Bénévole'?'benevolat':'prestation',ligne_id:m&&m.ligneId||''};
@@ -4736,7 +4743,7 @@ thead th,tr.th th{background:#EEF2EF;font-family:Arial,Helvetica,sans-serif;font
 .num{text-align:right;white-space:nowrap}.pre{white-space:pre-wrap}.petit{font-size:8.5pt;color:#333}
 .sig{display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:12px;margin-top:14px;break-inside:avoid;page-break-inside:avoid}.sig div{border:.6pt solid #8a9993;padding:6px;min-height:100px;font-size:9pt}.sig b{display:block;margin-bottom:3px;color:#0B3D2E}
 .bloc{break-inside:avoid;page-break-inside:avoid}.saut{break-before:page;page-break-before:always}
-.auth{display:flex;gap:12px;align-items:center;border:.8pt dashed #0B3D2E;padding:7px;margin-top:12px;font-size:8.5pt;break-inside:avoid}.auth svg{width:92px;height:92px;flex:none}
+.auth{display:flex;gap:12px;align-items:center;border:.8pt dashed #0B3D2E;padding:7px;margin-top:12px;font-size:8.5pt;break-inside:avoid}.auth svg,.auth img{width:92px;height:92px;flex:none}
 .wm{position:fixed;top:42%;left:0;right:0;text-align:center;font-family:Arial,sans-serif;font-size:50pt;color:rgba(170,0,0,.12);transform:rotate(-28deg);font-weight:bold;pointer-events:none;z-index:9}
 .barre{font-family:Arial,sans-serif;padding:8px 12px;border-bottom:1px solid #ddd;background:#fff}.barre button{font-size:11pt;padding:6px 14px;margin-right:6px}.barre b{color:#a00}
 @media screen{body{background:#e9ecea}.feuille{background:#fff;max-width:210mm;margin:12px auto;padding:14mm 17mm;box-shadow:0 1px 4px rgba(0,0,0,.2)}}
@@ -4746,10 +4753,10 @@ thead th,tr.th th{background:#EEF2EF;font-family:Arial,Helvetica,sans-serif;font
 function papierHTML(titre,corps,o={}){
  const tete=`<header class="pe-tete"><img src="${LOGO}" alt="Logo ONG Sécurité Vie"><div class="pe-org"><b>${esc(S.org.nom.toUpperCase())}</b><span>Agir pour sauver des vies au quotidien</span><small>Organisation non gouvernementale · Côte d'Ivoire</small></div>${o.ref?`<div class="pe-ref">${o.ref}</div>`:''}</header>`;
  const pied=`<footer class="pe-pied"><div>${OSV_COORD.siege} · Tél. <b>${OSV_COORD.telSiege}</b></div><div>${OSV_COORD.nord} · Tél. <b>${OSV_COORD.telNord}</b></div><div>${OSV_COORD.mails} · ${OSV_COORD.site}</div>${o.paraphes?`<div class="pe-par">Paraphes : OSV ________ &nbsp;&nbsp; ${esc(o.paraphes)} ________</div>`:''}</footer>`;
- return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${esc(titre)}</title><style>${PAPIER_CSS}${o.css||''}</style></head><body>${o.barre?`<div class="barre"><button onclick="print()">Imprimer ou enregistrer en PDF</button><button onclick="close()">Fermer</button>${o.avis?` <b>${esc(o.avis)}</b>`:''}</div>`:''}${o.filigrane?`<div class="wm">${esc(o.filigrane)}</div>`:''}
+ return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${esc(titre)}</title><style>${PAPIER_CSS}${o.css||''}</style></head><body>${o.barre?`<div class="barre"><button onclick="print()">Imprimer ou enregistrer en PDF</button>${o.wordKey?`<button onclick="opener&&opener.osvWord('${o.wordKey}')">Télécharger en Word</button>`:''}<button onclick="close()">Fermer</button>${o.avis?` <b>${esc(o.avis)}</b>`:''}</div>`:''}${o.filigrane?`<div class="wm">${esc(o.filigrane)}</div>`:''}
  <div class="feuille">${tete}<table class="pe-cadre"><thead><tr><td><div class="pe-esp-h"></div></td></tr></thead><tbody><tr><td><main class="pe-corps">${corps}</main></td></tr></tbody><tfoot><tr><td><div class="pe-esp-b"></div></td></tr></tfoot></table>${pied}</div></body></html>`}
-function ouvrirPapier(titre,corps,o={}){const w=window.open('','_blank');if(!w){alert('Autorisez les fenêtres pour imprimer.');return null}w.document.write(papierHTML(titre,corps,{...o,barre:true}));w.document.close();return w}
-function telechargerWord(nom,titre,corps,o={}){const b=new Blob(['﻿'+papierHTML(titre,corps,{...o,barre:false,filigrane:null})],{type:'application/msword'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=nom;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function ouvrirPapier(titre,corps,o={}){const w=window.open('','_blank');if(!w){alert('Autorisez les fenêtres pour imprimer.');return null}const k='d'+Date.now()+Math.floor(Math.random()*1e4);OSV_DOCS[k]={nom:(o.nom||titre).replace(/[\\/:*?"<>|]+/g,'-').replace(/\s+/g,'_')+'.docx',titre,corps,o};
+ w.document.write(papierHTML(titre,corps,{...o,barre:true,wordKey:k}));w.document.close();return w}
 
 /* ---------- bon de commande et documents simples ---------- */
 function docImprimable(titre,corps,ref){ouvrirPapier(titre,`<h1 class="doc-t">${esc(titre.toUpperCase())}</h1>${corps.replace('<table>','<table class="kv">')}`,{ref:ref||`Le ${fmtD(today())}`})}
@@ -4760,7 +4767,7 @@ function ordreMission(m){if(!m)return;
  const roleS=m.signe_role||(omDEPart(omMissionnaires(m))?'CA':'DE'),p=m.projet_id&&projet(m.projet_id),ac=m.activite_id&&S.cadre.find(x=>x.id===m.activite_id),li=m.ligne_id&&S.blignes.find(x=>x.id===m.ligne_id);
  const pers=[{nom:chef.nom||'',fonction:chef.posteId||chef.role?posteLib(chef):'',structure:S.org.nom,role:'Chef de mission',pd:m.per_diem_jour,nb:m.nb_jours},...mm.map(x=>({nom:x.nom,fonction:x.fonction||'',structure:x.structure||'',role:x.role_mission,pd:x.per_diem_jour,nb:x.nb_jours}))];
  const it=m.itineraire||[],acc=m.accueil||[],tot=miTotal(m);
- let qr='';if(valide&&m.code_verif){try{const q=QRGEN(0,'M');q.addData(omLien(m.code_verif));q.make();qr=q.createSvgTag(3,0)}catch(e){}}
+ let qr='';if(valide&&m.code_verif){try{const q=QRGEN(0,'M');q.addData(omLien(m.code_verif));q.make();qr=`<img src="${q.createDataURL(3,0)}" width="92" height="92" alt="QR code de vérification">`}catch(e){}}
  const T=rows=>`<table class="kv">${rows.filter(r=>r[1]).map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('')}</table>`;
  const visas=[...acc.map(a=>({s:a.structure,l:a.localite})),...Array(Math.max(0,4-acc.length)).fill({s:'',l:''})];let n=0;const h=t=>`<h2>${++n}. ${t}</h2>`;
  const corps=`<h1 class="doc-t">ORDRE DE MISSION</h1><p class="doc-s">${esc(m.type_mission||'Mission')}</p>
@@ -4783,7 +4790,7 @@ function ordreMission(m){if(!m)return;
  <table><thead><tr><th style="width:24%">Structure et localité</th><th style="width:19%">Arrivée (date, heure)</th><th style="width:19%">Départ (date, heure)</th><th>Nom, qualité, signature et cachet</th></tr></thead><tbody>${visas.map(v=>`<tr><td style="height:88px">${esc(v.s)}${v.l?`<br><span class="petit">${esc(v.l)}</span>`:''}</td><td></td><td></td><td></td></tr>`).join('')}</tbody></table>
  <h2>Observations du chef de mission au retour</h2><div style="border:.6pt solid #8a9993;height:80px"></div>
  <div class="sig"><div><b>Le chef de mission</b>Date et signature</div><div><b>Visa de la comptabilité</b>Liquidation</div><div><b>${OM_SIGN[roleS]}</b>Vu au retour</div></div>`;
- ouvrirPapier(`Ordre de mission ${m.numero||'(projet)'}`,corps,{ref:`N° <b>${esc(m.numero||'—')}</b><br>Établi le ${fmtD(m.cree_le)}<br>par ${esc(who(m.demande_par))}`,filigrane:valide?null:annule?'ANNULÉ':'NON SIGNÉ – SANS VALEUR',avis:valide?'':annule?'Ordre annulé : document sans valeur.':'Ordre non signé : document de travail sans valeur.'})}
+ ouvrirPapier(`Ordre de mission ${m.numero||'(projet)'}`,corps,{nom:`Ordre_de_mission_${(m.numero||'projet').replace(/\//g,'-')}`,ref:`N° <b>${esc(m.numero||'—')}</b><br>Établi le ${fmtD(m.cree_le)}<br>par ${esc(who(m.demande_par))}`,filigrane:valide?null:annule?'ANNULÉ':'NON SIGNÉ – SANS VALEUR',avis:valide?'':annule?'Ordre annulé : document sans valeur.':'Ordre non signé : document de travail sans valeur.'})}
 
 /* ---------- termes de référence ---------- */
 function tdrImprimer(t){if(!t)return;const av=S.tavis.filter(a=>a.tdr_id===t.id).sort((a,b)=>a.le<b.le?-1:1),ok=t.statut==='valide',tot=tdrTot(t),p=t.projet_id&&projet(t.projet_id);
@@ -4792,14 +4799,14 @@ function tdrImprimer(t){if(!t)return;const av=S.tavis.filter(a=>a.tdr_id===t.id)
  ${(t.budget||[]).length?`<div class="bloc"><h2>${TDR_SEC.length+1}. Budget estimatif</h2><table><thead><tr><th>Poste</th><th class="num">Quantité</th><th>Unité</th><th class="num">Coût unitaire</th><th class="num">Montant (FCFA)</th></tr></thead><tbody>${t.budget.map(b=>`<tr><td>${esc(b.libelle)}</td><td class="num">${num(b.quantite)}</td><td>${esc(b.unite||'')}</td><td class="num">${num(b.cout)}</td><td class="num">${num(Math.round(b.quantite*b.cout))}</td></tr>`).join('')}<tr class="th"><th colspan="4">Total</th><th class="num">${num(tot)}</th></tr></tbody></table></div>`:''}
  <div class="bloc"><h2>Circuit de validation</h2><table><thead><tr><th>Étape</th><th>Nom</th><th>Décision</th><th>Date</th></tr></thead><tbody><tr><td>Rédaction</td><td>${esc(who(t.auteur_id))}</td><td>Rédigé</td><td>${fmtD(t.cree_le)}</td></tr>${av.filter(a=>!['brouillon','a_corriger'].includes(a.etape)).map(a=>`<tr><td>${esc(TDR_ETAPE[a.etape]||a.etape)}</td><td>${esc(who(a.par))}</td><td>${esc((TDR_ST[a.decision]||[a.decision])[0])}${a.commentaire?' : '+esc(a.commentaire):''}</td><td>${fmtD(a.le)}</td></tr>`).join('')}</tbody></table>
  ${ok?`<p>Validé électroniquement dans OSV Gestion par ${esc(who(t.valide_par))} le ${new Date(t.valide_le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}.</p>`:''}</div>`;
- ouvrirPapier(`TDR ${t.numero||''} ${t.titre}`,corps,{ref:`TDR N° <b>${esc(t.numero||'—')}</b><br>Rédigé par ${esc(who(t.auteur_id))}`,filigrane:ok?null:'PROJET NON VALIDÉ'})}
+ ouvrirPapier(`TDR ${t.numero||''} ${t.titre}`,corps,{nom:`TDR_${(t.numero||'brouillon').replace(/\//g,'-')}`,ref:`TDR N° <b>${esc(t.numero||'—')}</b><br>Rédigé par ${esc(who(t.auteur_id))}`,filigrane:ok?null:'PROJET NON VALIDÉ'})}
 
 /* ---------- contrats ---------- */
 function ctrCorps(c){const p=c.projet_id&&projet(c.projet_id),ben=c.type==='benevolat',ent=c.type==='prestation_entreprise',d=ctrDE(),sup=c.superviseur_id&&S.staff.find(u=>u.id===c.superviseur_id);
  const P=ben?'le Bénévole':'le Prestataire',Pm=ben?'Le Bénévole':'Le Prestataire',Pd=ben?'du Bénévole':'du Prestataire',acte=ben?'la présente convention':'le présent contrat',Acte=ben?'La présente convention':'Le présent contrat',de_l=ben?'de la convention':'du contrat',li=c.ligne_id&&S.blignes.find(l=>l.id===c.ligne_id);
  const lst=t=>{const L=String(t||'').split(/\r?\n/).map(x=>x.replace(/^[-•*\s]+/,'').trim()).filter(Boolean);return L.length?`<ul>${L.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<p>…</p>'};
  const blanc='……………………………';let n=0;const art=t=>`<h3>Article ${++n} – ${t}</h3>`;
- const annexes=ben?['Code de conduite d\'OSV','Déclaration d\'engagement du Bénévole']:[...(p?['Termes de référence de la mission']:[]),...(ent||!ben?['Offre technique et financière '+Pd+' (le cas échéant)']:[]),'Code de conduite d\'OSV','Déclaration '+Pd];
+ const annexes=[...(c.fiche?['Fiche de poste']:[]),...(ben?['Code de conduite d\'OSV','Déclaration d\'engagement du Bénévole']:[...(p?['Termes de référence de la mission']:[]),...(ent||!ben?['Offre technique et financière '+Pd+' (le cas échéant)']:[]),'Code de conduite d\'OSV','Déclaration '+Pd])];
  return `<h1 class="doc-t">${esc(CTR_TYPE[c.type].replace(/ \(.*\)/,'').toUpperCase())}</h1><p class="doc-s">N° ${esc(c.numero||'(attribué à la validation)')}${p?`<br>Projet : ${esc(libProj(p))}${p.bailleur?` · financement : ${esc(p.bailleur)}`:''}`:''}</p>
  <p><b>Entre les soussignés :</b></p>
  <p>L'<b>${esc(S.org.nom)}</b> (ci-après « OSV »), organisation non gouvernementale de droit ivoirien dont le siège est à Yamoussoukro, 220 Zouessi, BP 1605 Yamoussoukro, représentée par <b>${esc(d.nom||blanc)}</b>, Directeur exécutif, dûment habilité,</p><p style="text-align:right">d'une part,</p>
@@ -4812,7 +4819,7 @@ function ctrCorps(c){const p=c.projet_id&&projet(c.projet_id),ben=c.type==='bene
  <p><b>En conséquence, il a été convenu et arrêté ce qui suit :</b></p>
  ${art('Objet')}<p>${ben?`OSV accueille ${P}, qui s'engage librement et sans contrepartie financière à apporter son concours à l'action suivante`:`OSV confie à ${P}, qui l'accepte, la réalisation de la prestation suivante`} : <b>${esc(c.objet)}</b>${c.qualite?`, en qualité de <b>${esc(c.qualite)}</b>`:''}${p?`, dans le cadre du projet « ${esc(p.nom)} »`:''}.</p>
  ${art('Documents contractuels')}<p>${Acte} comprend, par ordre de priorité décroissant : ${acte} lui-même, puis ses annexes : ${annexes.map((a,i)=>`(${i+1}) ${esc(a)}`).join(' ; ')}. En cas de contradiction, le document de rang supérieur prévaut.</p>
- ${art(ben?'Activités confiées':'Description des prestations')}<p>${Pm} assure notamment les tâches suivantes :</p>${lst(c.taches)}
+ ${art(ben?'Activités confiées':'Description des prestations')}${c.fiche&&c.fiche.mission?`<p>${esc(c.fiche.mission)}</p>`:''}<p>${Pm} assure notamment les tâches suivantes :</p>${lst(c.taches)}${c.fiche?`<p>La fiche de poste annexée précise la mission, le profil requis et les indicateurs de performance.</p>`:''}
  ${(c.livrables||[]).length?`${art('Livrables et calendrier')}<table><thead><tr><th>N°</th><th>Livrable</th><th>Échéance</th></tr></thead><tbody>${c.livrables.map((l,i)=>`<tr><td>${i+1}</td><td>${esc(l.libelle)}</td><td>${l.echeance?fmtD(l.echeance):'—'}</td></tr>`).join('')}</tbody></table><p>Les livrables sont remis par écrit, en français, en version électronique modifiable et, sur demande, en version papier. Un livrable est réputé accepté après validation écrite d'OSV, qui fait connaître ses observations dans un délai de dix (10) jours ouvrables ; ${P} remet alors une version corrigée dans les cinq (5) jours ouvrables.</p>`:''}
  ${art('Durée et lieu d\'exécution')}<p>${Acte} prend effet le <b>${fmtD(c.debut)}</b> et prend fin le <b>${fmtD(c.fin)}</b>. Il ne peut être prolongé que par avenant écrit signé des deux Parties ; aucune reconduction tacite n'est possible. Les activités se déroulent à ${esc(c.lieu||blanc)} et, en tant que de besoin, en tout lieu requis par la mission, sur ordre de mission d'OSV établi à partir de termes de référence validés.</p>
  ${art('Obligations d\'OSV')}<p>OSV s'engage à : mettre à la disposition ${Pd} les documents et informations utiles à la mission ; faciliter ses contacts avec les autorités, les partenaires et les communautés ; ${ben?'rembourser les frais prévus à la présente convention':'payer les sommes dues dans les conditions prévues au présent contrat'} ; l'informer sans délai de toute circonstance susceptible d'affecter la mission.</p>
@@ -4841,13 +4848,196 @@ function ctrCorps(c){const p=c.projet_id&&projet(c.projet_id),ben=c.type==='bene
  <div class="bloc">${art('Dispositions finales')}<p>${Acte}, avec ses annexes, constitue l'intégralité de l'accord des Parties et remplace tout échange antérieur. Toute modification fait l'objet d'un avenant écrit signé des deux Parties. ${Acte} est établi en langue française ; il entre en vigueur à la date de sa signature par les deux Parties.</p>
  <p style="margin-top:12px">Fait à Yamoussoukro, le ${blanc}, en deux (2) exemplaires originaux, dont un pour chaque Partie.</p>
  <div class="sig" style="--n:2"><div><b>Pour OSV</b>Le Directeur exécutif<br>${esc(d.nom||'')}<br><br><br>Signature et cachet</div><div><b>${ben?'Le Bénévole':'Le Prestataire'}</b>« Lu et approuvé »<br>${esc(ent?(c.representant||c.nom):c.nom)}<br><br><br>Signature</div></div></div>
- <div class="saut"></div><h1 class="doc-t" style="font-size:12.5pt">ANNEXE – DÉCLARATION ${ben?'D\'ENGAGEMENT':'DU PRESTATAIRE'}</h1><p class="doc-s">${ben?'Convention':'Contrat'} n° ${esc(c.numero||'…')}</p>
+ ${c.fiche?`<div class="saut"></div>${ficheCorps(c.fiche,c)}`:''}<div class="saut"></div><h1 class="doc-t" style="font-size:12.5pt">ANNEXE – DÉCLARATION ${ben?'D\'ENGAGEMENT':'DU PRESTATAIRE'}</h1><p class="doc-s">${ben?'Convention':'Contrat'} n° ${esc(c.numero||'…')}</p>
  <p>Je soussigné(e), <b>${esc(ent?(c.representant||blanc):c.nom)}</b>${ent?`, représentant la société ${esc(c.nom)}`:''}, déclare sur l'honneur :</p>
  <ul><li>avoir reçu, lu et compris le Code de conduite d'OSV et m'engager à le respecter ;</li><li>n'avoir aucun conflit d'intérêts avec la mission confiée, ou avoir déclaré par écrit toute situation pouvant en créer un ;</li><li>ne figurer sur aucune liste de sanctions des Nations unies, de l'Union européenne, des États-Unis ou de la Banque mondiale ;</li><li>n'avoir jamais fait l'objet d'une condamnation ou d'une sanction pour exploitation, abus ou harcèlement sexuels, ou pour atteinte à un enfant ;</li><li>m'engager à signaler sans délai à OSV tout soupçon de manquement à ces règles ;</li><li>accepter que tout manquement à ces engagements entraîne la résiliation immédiate ${de_l}.</li></ul>
  <p style="margin-top:14px">Fait à ${blanc}, le ${blanc}</p><p>Signature, précédée de la mention « Lu et approuvé » :</p>`}
 const ctrOpts=c=>({ref:`${c.type==='benevolat'?'Convention':'Contrat'} N° <b>${esc(c.numero||'—')}</b><br>${esc(c.nom)}`,paraphes:c.type==='benevolat'?'Bénévole':'Prestataire',filigrane:c.statut==='brouillon'?'BROUILLON':['annule','resilie'].includes(c.statut)?(c.statut==='annule'?'ANNULÉ':'RÉSILIÉ'):null,avis:c.statut==='brouillon'?'Brouillon : à faire valider par le Directeur exécutif avant signature.':''});
-function ctrImprimer(c){if(c)ouvrirPapier(`${c.numero||'Contrat'} ${c.nom}`,ctrCorps(c),ctrOpts(c))}
-function ctrWord(c){if(c)telechargerWord(`Contrat_${(c.numero||'brouillon').replace(/\//g,'-')}_${c.nom.replace(/[^\wÀ-ÿ-]+/g,'_')}.doc`,`${c.numero||'Contrat'} ${c.nom}`,ctrCorps(c),ctrOpts(c))}
+function ctrImprimer(c){if(c)ouvrirPapier(`${c.numero||'Contrat'} ${c.nom}`,ctrCorps(c),{...ctrOpts(c),nom:`Contrat_${(c.numero||'brouillon').replace(/\//g,'-')}_${c.nom}`})}
+function ctrWord(c){if(c)telechargerWord(`Contrat_${(c.numero||'brouillon').replace(/\//g,'-')}_${c.nom.replace(/[^\wÀ-ÿ-]+/g,'_')}.docx`,`${c.numero||'Contrat'} ${c.nom}`,ctrCorps(c),ctrOpts(c))}
+
+
+/* ===== Fiches de poste types (modifiables dans chaque contrat) ===== */
+const FICHES=[
+{code:'chef_projet',intitule:'Chef de projet / Chef de mission',rattache:'Directeur des programmes',
+ mission:'Assurer la coordination technique, administrative et financière du projet afin d\'atteindre les résultats attendus dans les délais, le budget et le respect des standards de qualité, de redevabilité et de protection d\'OSV et du bailleur.',
+ taches:['Élaborer le plan de travail détaillé et le chronogramme des activités, et les tenir à jour','Coordonner, encadrer et évaluer l\'équipe du projet (spécialistes, superviseurs, enquêteurs, relais)','Assurer la liaison avec le bailleur, la mission de contrôle, les autorités administratives, sanitaires et coutumières','Rédiger les termes de référence des missions et des activités, et veiller à leur bonne exécution','Superviser la collecte, la qualité et la transmission des données de suivi','Veiller à l\'utilisation conforme du budget et à la justification des dépenses','Assurer le fonctionnement du mécanisme de gestion des plaintes et le traitement confidentiel des cas sensibles','Préparer et présenter les rapports d\'étape et le rapport final','Identifier les risques du projet et proposer les mesures d\'atténuation'],
+ livrables:['Plan de travail et chronogramme détaillés','Rapport de démarrage','Rapports d\'étape mensuels','Rapport final et base de données des participants'],
+ profil:['Diplôme de niveau Bac+4/5 en santé publique, sciences sociales, gestion de projets ou domaine équivalent','Au moins cinq (5) ans d\'expérience en gestion de projets communautaires, dont trois (3) en coordination d\'équipe','Expérience de travail avec des entreprises de BTP, des bailleurs institutionnels ou des projets d\'infrastructures, un atout','Maîtrise de la gestion axée sur les résultats, du suivi-évaluation et des principes de protection (PSEA)','Excellentes capacités de rédaction, de communication et de négociation ; maîtrise d\'une langue locale de la zone, un atout'],
+ indicateurs:['Taux de réalisation des activités du plan de travail','Respect des délais de remise des rapports','Taux d\'exécution budgétaire et absence de dépenses inéligibles','Délai moyen de traitement des plaintes']},
+{code:'assistant_chef',intitule:'Assistant(e) chef de mission',rattache:'Chef de mission',
+ mission:'Appuyer le chef de mission dans la planification, l\'organisation et le suivi des activités du projet, et assurer son intérim en cas d\'absence.',
+ taches:['Préparer la logistique des activités (lieux, matériel, convocations, listes de présence)','Appuyer la coordination quotidienne de l\'équipe de terrain','Tenir à jour le tableau de suivi des activités et des indicateurs','Rédiger les comptes rendus de réunions et les rapports d\'activité','Assurer le classement et l\'archivage des pièces justificatives','Assurer l\'intérim du chef de mission sur délégation écrite'],
+ livrables:['Comptes rendus de réunions','Tableau de suivi des activités à jour','Rapports d\'activités'],
+ profil:['Diplôme de niveau Bac+3/4 en sciences sociales, gestion ou domaine équivalent','Au moins trois (3) ans d\'expérience dans des projets communautaires','Bonne maîtrise des outils bureautiques et des techniques de rédaction','Sens de l\'organisation, rigueur et discrétion'],
+ indicateurs:['Activités préparées dans les délais','Qualité et ponctualité des comptes rendus','Complétude des pièces justificatives archivées']},
+{code:'vbg',intitule:'Spécialiste VBG / exploitation, abus et harcèlement sexuels (EAS/HS)',rattache:'Chef de mission',
+ mission:'Concevoir et conduire les actions de prévention et de réponse aux violences basées sur le genre, à l\'exploitation, aux abus et au harcèlement sexuels liés au projet, dans le respect d\'une approche centrée sur les survivant(e)s.',
+ taches:['Cartographier les services de prise en charge (santé, psychosocial, juridique, sécurité) et établir le circuit de référencement','Former les travailleurs, l\'équipe et les relais sur la prévention des VBG/EAS/HS et le code de conduite','Animer les séances de sensibilisation communautaire, en particulier auprès des femmes et des adolescentes','Recevoir et orienter les signalements dans le respect strict de la confidentialité et du consentement','Appuyer le traitement des plaintes sensibles selon le protocole d\'OSV','Produire des données agrégées et anonymisées sur les activités et les signalements'],
+ livrables:['Cartographie des services et circuit de référencement','Modules et rapports de formation','Rapports de sensibilisation avec listes de présence','Rapport de fin de mission'],
+ profil:['Diplôme de niveau Bac+3/4 en sciences sociales, santé, droit ou genre','Au moins trois (3) ans d\'expérience en prévention et réponse aux VBG','Connaissance des standards de l\'approche centrée sur les survivant(e)s et de la PSEA','Maîtrise d\'une langue locale de la zone, un atout'],
+ indicateurs:['Nombre de personnes sensibilisées, désagrégé par sexe et âge','Nombre de travailleurs formés et ayant signé le code de conduite','Délai de référencement des cas signalés']},
+{code:'vih',intitule:'Spécialiste santé IST/VIH',rattache:'Chef de mission',
+ mission:'Conduire les actions de prévention des IST/VIH auprès des travailleurs et des communautés riveraines, et faciliter l\'accès au dépistage et aux services de santé.',
+ taches:['Animer des causeries et sessions de sensibilisation sur les IST/VIH','Organiser avec les structures sanitaires les séances de dépistage volontaire et de référencement','Assurer la distribution et le suivi des préservatifs et supports éducatifs','Collecter et transmettre les données de prévention dans le respect de la confidentialité','Collaborer avec le district sanitaire et les prestataires de santé'],
+ livrables:['Plan de sensibilisation et supports validés','Rapports de séances avec listes de présence','Rapport des séances de dépistage (données agrégées)'],
+ profil:['Diplôme en santé (médecin, infirmier(ère), sage-femme) ou en santé publique','Au moins trois (3) ans d\'expérience en prévention des IST/VIH','Bonne connaissance du système de santé ivoirien','Capacité d\'animation en langue locale, un atout'],
+ indicateurs:['Nombre de personnes sensibilisées','Nombre de personnes dépistées et référées','Nombre de préservatifs distribués']},
+{code:'securite_routiere',intitule:'Spécialiste sécurité routière et signalisation',rattache:'Chef de mission',
+ mission:'Réduire les risques d\'accidents liés au chantier et au trafic par la sensibilisation des usagers, des riverains et des conducteurs, et le suivi de la signalisation.',
+ taches:['Identifier les points à risque autour du chantier et des itinéraires','Animer des séances de sensibilisation pour les élèves, conducteurs, motos-taxis et riverains','Former les conducteurs et les signaleurs du chantier aux règles de sécurité','Vérifier la présence et l\'état de la signalisation temporaire et proposer des corrections','Collecter les données sur les incidents et accidents'],
+ livrables:['Cartographie des points à risque','Rapports de sensibilisation et de formation','Rapport de suivi de la signalisation'],
+ profil:['Diplôme en sécurité routière, transport, génie civil ou domaine équivalent','Au moins trois (3) ans d\'expérience en sensibilisation à la sécurité routière','Connaissance de la réglementation ivoirienne de la circulation routière'],
+ indicateurs:['Nombre d\'usagers sensibilisés par catégorie','Nombre de conducteurs formés','Nombre d\'incidents signalés et traités']},
+{code:'communication',intitule:'Chargé(e) de communication et de mobilisation communautaire',rattache:'Chef de mission',
+ mission:'Assurer l\'information des communautés, la mobilisation des participants et la visibilité du projet, dans le respect des règles du bailleur et d\'OSV.',
+ taches:['Concevoir le plan de communication et les supports (affiches, messages radio, dépliants) en langues locales','Mobiliser les autorités coutumières, religieuses, les leaders de femmes et de jeunes','Organiser les campagnes de proximité et les émissions radiophoniques','Documenter les activités (photos avec consentement, témoignages)','Veiller au respect des règles de visibilité du bailleur'],
+ livrables:['Plan de communication','Supports de communication validés','Rapport de couverture médiatique et photothèque'],
+ profil:['Diplôme en communication, journalisme ou sciences sociales','Au moins trois (3) ans d\'expérience en communication pour le changement de comportement','Aisance relationnelle et maîtrise d\'une langue locale de la zone'],
+ indicateurs:['Nombre de personnes touchées par les campagnes','Nombre de diffusions radio','Taux de participation aux activités']},
+{code:'hse',intitule:'Spécialiste hygiène, santé, sécurité et environnement (HSE)',rattache:'Chef de mission',
+ mission:'Appuyer la prise en compte des exigences d\'hygiène, de santé, de sécurité et d\'environnement auprès des travailleurs et des communautés riveraines.',
+ taches:['Sensibiliser les travailleurs aux risques professionnels et au port des équipements de protection','Animer des séances sur l\'hygiène, la gestion des déchets et la protection de l\'environnement','Suivre la mise en œuvre des mesures environnementales et sociales prévues','Signaler les situations dangereuses et proposer des mesures correctives'],
+ livrables:['Plan de sensibilisation HSE','Rapports de séances et de visites','Rapport de fin de mission'],
+ profil:['Diplôme en HSE, environnement, santé au travail ou domaine équivalent','Au moins trois (3) ans d\'expérience sur des chantiers ou projets d\'infrastructures'],
+ indicateurs:['Nombre de travailleurs sensibilisés','Nombre de non-conformités relevées et levées']},
+{code:'suivi_evaluation',intitule:'Chargé(e) de suivi-évaluation',rattache:'Chef de projet',
+ mission:'Mettre en place et animer le dispositif de suivi-évaluation du projet afin de produire des données fiables, désagrégées et utiles à la décision.',
+ taches:['Élaborer le plan de suivi-évaluation et les outils de collecte','Former les enquêteurs et superviseurs à la collecte et à la qualité des données','Contrôler, saisir, nettoyer et analyser les données','Conduire les enquêtes de référence et de fin (connaissances, attitudes, pratiques)','Produire les tableaux de bord et contribuer aux rapports'],
+ livrables:['Plan de suivi-évaluation et outils de collecte','Rapports d\'enquête de référence et de fin','Tableaux de bord périodiques','Base de données nettoyée'],
+ profil:['Diplôme de niveau Bac+4/5 en statistique, démographie, santé publique ou suivi-évaluation','Au moins trois (3) ans d\'expérience en suivi-évaluation de projets','Maîtrise des outils de collecte numérique et d\'analyse de données'],
+ indicateurs:['Taux de complétude et de qualité des données','Respect des délais de production des rapports']},
+{code:'superviseur',intitule:'Superviseur(e) de terrain',rattache:'Chef de projet',
+ mission:'Encadrer au quotidien les équipes de terrain et garantir la qualité des activités et des données collectées dans sa zone.',
+ taches:['Planifier et superviser les activités des enquêteurs et relais de sa zone','Vérifier la qualité et la complétude des fiches et listes de présence','Assurer la liaison avec les autorités et leaders locaux','Remonter les difficultés, plaintes et incidents dans les 24 heures','Rédiger un rapport hebdomadaire de supervision'],
+ livrables:['Rapports hebdomadaires de supervision','Fiches et listes de présence vérifiées'],
+ profil:['Diplôme de niveau Bac+2/3','Au moins deux (2) ans d\'expérience en encadrement d\'équipes de terrain','Bonne connaissance de la zone et maîtrise d\'une langue locale'],
+ indicateurs:['Taux de réalisation des activités de la zone','Taux de fiches conformes']},
+{code:'enqueteur',intitule:'Enquêteur / enquêtrice',rattache:'Superviseur(e) de terrain',
+ mission:'Collecter des données fiables auprès des ménages et des participants selon les protocoles d\'OSV et dans le respect du consentement.',
+ taches:['Participer à la formation sur les outils et l\'éthique de la collecte','Administrer les questionnaires et recueillir le consentement éclairé','Vérifier ses fiches avant transmission au superviseur','Respecter la confidentialité des données et des personnes interrogées'],
+ livrables:['Questionnaires complétés et vérifiés','Rapport journalier de collecte'],
+ profil:['Niveau baccalauréat au moins','Expérience de collecte de données, un atout','Résidence dans la zone et maîtrise d\'une langue locale'],
+ indicateurs:['Nombre de questionnaires conformes','Respect du calendrier de collecte']},
+{code:'relais',intitule:'Relais / agent communautaire',rattache:'Superviseur(e) de terrain',
+ mission:'Relayer les messages du projet dans sa communauté, mobiliser les participants et faciliter le recueil des plaintes.',
+ taches:['Mobiliser les membres de la communauté pour les activités','Animer des causeries de proximité','Recueillir et transmettre les plaintes et préoccupations','Tenir les listes de présence des activités qu\'il/elle anime'],
+ livrables:['Listes de présence','Fiches de plaintes transmises'],
+ profil:['Résidence dans la communauté et bonne réputation','Savoir lire et écrire, un atout','Maîtrise de la langue locale'],
+ indicateurs:['Nombre de personnes mobilisées','Nombre de causeries animées']},
+{code:'formateur',intitule:'Consultant(e) formateur / formatrice',rattache:'Chef de projet',
+ mission:'Concevoir et animer des sessions de formation répondant aux besoins identifiés, et en mesurer les acquis.',
+ taches:['Analyser les besoins et proposer le programme de formation','Concevoir les modules, supports et outils d\'évaluation','Animer les sessions selon une pédagogie participative','Évaluer les acquis par pré-test et post-test','Rédiger le rapport de formation'],
+ livrables:['Programme et modules de formation','Résultats des pré-tests et post-tests','Rapport de formation'],
+ profil:['Diplôme de niveau Bac+4/5 dans le domaine de la formation','Au moins cinq (5) ans d\'expérience en formation d\'adultes'],
+ indicateurs:['Progression moyenne entre pré-test et post-test','Taux de satisfaction des participants']},
+{code:'comptable',intitule:'Assistant(e) comptable de projet',rattache:'Responsable administratif et financier',
+ mission:'Assurer la tenue comptable et la justification financière du projet conformément aux procédures d\'OSV et aux exigences du bailleur.',
+ taches:['Vérifier et enregistrer les pièces justificatives des dépenses','Tenir la caisse et le suivi bancaire du projet','Préparer les paiements et les états de rapprochement','Suivre l\'exécution budgétaire par ligne et alerter en cas de dépassement','Préparer les rapports financiers et les dossiers d\'audit'],
+ livrables:['Journal des dépenses à jour','Rapprochements bancaires mensuels','Rapports financiers'],
+ profil:['Diplôme de niveau Bac+2/3 en comptabilité ou finance','Au moins deux (2) ans d\'expérience en comptabilité de projets','Maîtrise d\'un logiciel comptable et d\'Excel'],
+ indicateurs:['Taux de dépenses justifiées','Respect des délais de clôture mensuelle']},
+{code:'logisticien',intitule:'Logisticien(ne)',rattache:'Responsable administratif et financier',
+ mission:'Assurer l\'approvisionnement, la gestion des biens, des stocks et des déplacements du projet dans le respect des procédures d\'achat.',
+ taches:['Organiser les achats selon les procédures de mise en concurrence','Gérer les stocks et les distributions avec traçabilité','Planifier les déplacements et le suivi des véhicules','Tenir l\'inventaire des biens du projet'],
+ livrables:['Fiches de stock et bons de sortie','Inventaire des biens','Rapport logistique mensuel'],
+ profil:['Diplôme de niveau Bac+2/3 en logistique, gestion ou domaine équivalent','Au moins deux (2) ans d\'expérience en logistique de projets'],
+ indicateurs:['Écarts d\'inventaire','Respect des délais d\'approvisionnement']},
+{code:'chauffeur',intitule:'Chauffeur',rattache:'Logisticien(ne)',
+ mission:'Assurer en toute sécurité le transport des équipes et du matériel du projet.',
+ taches:['Conduire les véhicules dans le respect strict du code de la route et des consignes d\'OSV','Assurer l\'entretien courant du véhicule et signaler toute panne','Tenir le carnet de bord (kilométrage, carburant, trajets)','N\'accepter aucun passager non autorisé'],
+ livrables:['Carnet de bord à jour'],
+ profil:['Permis de conduire de catégorie adaptée en cours de validité','Au moins trois (3) ans d\'expérience de conduite sur route et piste','Aucun antécédent d\'accident responsable grave'],
+ indicateurs:['Nombre d\'incidents','Tenue du carnet de bord']}];
+const ficheDe=k=>FICHES.find(f=>f.code===k);
+function ficheCorps(f,c){const L=a=>`<ul>${(a||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;const sup=c&&c.superviseur_id&&S.staff.find(u=>u.id===c.superviseur_id);
+ return `<h1 class="doc-t" style="font-size:12.5pt">${c?'ANNEXE – ':''}FICHE DE POSTE</h1><p class="doc-s"><b>${esc(c&&c.qualite||f.intitule)}</b>${c&&c.numero?`<br>${c.type==='benevolat'?'Convention':'Contrat'} n° ${esc(c.numero)}`:''}</p>
+ <table class="kv"><tr><th>Intitulé du poste</th><td>${esc(c&&c.qualite||f.intitule)}</td></tr><tr><th>Rattachement</th><td>${esc(sup?`${sup.nom} (${posteLib(sup)})`:f.rattache)}</td></tr>${c?`<tr><th>Lieu</th><td>${esc(c.lieu||'—')}</td></tr><tr><th>Période</th><td>du ${fmtD(c.debut)} au ${fmtD(c.fin)}</td></tr>`:''}</table>
+ <h2>1. Mission du poste</h2><p>${esc(f.mission)}</p>
+ <h2>2. Tâches et responsabilités</h2>${L(c&&c.taches?String(c.taches).split(/\r?\n/).map(x=>x.trim()).filter(Boolean):f.taches)}
+ <h2>3. Livrables attendus</h2>${L(c&&(c.livrables||[]).length?c.livrables.map(l=>l.libelle+(l.echeance?` (au ${fmtD(l.echeance)})`:'')):f.livrables)}
+ <h2>4. Profil requis</h2>${L(f.profil)}
+ <h2>5. Indicateurs de performance</h2>${L(f.indicateurs)}
+ <h2>6. Valeurs et conduite</h2><p>Le titulaire du poste adhère aux valeurs d'OSV et respecte son Code de conduite, notamment la tolérance zéro en matière d'exploitation, d'abus et de harcèlement sexuels, de fraude et de corruption.</p>`}
+
+/* ===== Export Word (.docx) fidèle au papier à en-tête : en-tête et pied de page sur chaque page ===== */
+const DX_V='0B3D2E',DX_O='EB6A0F',DX_W=9978;
+const dxE=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const dxB64=u=>{const b=atob(u.split(',')[1]),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a};
+function dxRun(t,f){if(t==='')return '';return `<w:r><w:rPr>${f.font?`<w:rFonts w:ascii="${f.font}" w:hAnsi="${f.font}" w:cs="${f.font}"/>`:''}${f.b?'<w:b/><w:bCs/>':''}${f.i?'<w:i/>':''}${f.color?`<w:color w:val="${f.color}"/>`:''}${f.sz?`<w:sz w:val="${f.sz}"/><w:szCs w:val="${f.sz}"/>`:''}${f.sp?`<w:spacing w:val="${f.sp}"/>`:''}</w:rPr><w:t xml:space="preserve">${dxE(t)}</w:t></w:r>`}
+function dxImg(ctx,src,wPx,hPx){const id=ctx.imgs.length+1,rid='rIdI'+id,ext=src.startsWith('data:image/gif')?'gif':'png';ctx.imgs.push({rid,nom:`img${id}.${ext}`,data:dxB64(src)});
+ const cx=Math.round(wPx*9525),cy=Math.round(hPx*9525);ctx.n++;
+ return `<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:docPr id="${ctx.n}" name="Image${ctx.n}"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="${ctx.n}" name="Image${ctx.n}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="${rid}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>`}
+function dxInline(ctx,node,f){let o='';node.childNodes.forEach(n=>{
+ if(n.nodeType===3){const t=n.textContent.replace(/\s+/g,' ');if(f.pre){n.textContent.split('\n').forEach((l,i)=>{if(i)o+='<w:r><w:br/></w:r>';o+=dxRun(l,f)})}else o+=dxRun(t,f);return}
+ if(n.nodeType!==1)return;const tg=n.tagName.toLowerCase(),c=n.classList;
+ if(tg==='br'){o+='<w:r><w:br/></w:r>';return}
+ if(tg==='img'){o+=dxImg(ctx,n.getAttribute('src'),Number(n.getAttribute('width'))||90,Number(n.getAttribute('height'))||90);return}
+ if(tg==='svg')return;
+ const g={...f};if(tg==='b'||tg==='strong')g.b=true;if(tg==='i'||tg==='em')g.i=true;if(c.contains('petit')||tg==='small')g.sz=16;if(c.contains('pre'))g.pre=true;
+ if(['ul','ol','table','p','div','h1','h2','h3'].includes(tg)){o+=dxInline(ctx,n,g);return}
+ o+=dxInline(ctx,n,g)});return o}
+const dxP=(runs,p={})=>`<w:p><w:pPr>${p.keep?'<w:keepNext/>':''}${p.bord?`<w:pBdr><w:bottom w:val="single" w:sz="${p.bord.sz||4}" w:space="1" w:color="${p.bord.c||'B9C7C0'}"/></w:pBdr>`:''}<w:spacing w:before="${p.av??0}" w:after="${p.ap??100}"${p.line?` w:line="${p.line}" w:lineRule="auto"`:''}/>${p.ind?`<w:ind w:left="${p.ind}" w:hanging="${p.hang||0}"/>`:''}<w:jc w:val="${p.jc||'both'}"/></w:pPr>${runs}</w:p>`;
+const dxBrd=(sz='4',c='8A9993')=>`<w:tblBorders>${['top','left','bottom','right','insideH','insideV'].map(b=>`<w:${b} w:val="single" w:sz="${sz}" w:space="0" w:color="${c}"/>`).join('')}</w:tblBorders>`;
+function dxCell(ctx,td,head,kvTh,w){const span=Number(td.getAttribute('colspan'))||1,shade=head?'EEF2EF':kvTh?'F5F7F5':null;
+ const hasBlock=[...td.children].some(x=>['ul','p','div','table'].includes(x.tagName.toLowerCase()));
+ const al=td.classList.contains('num')?'right':'left';
+ const inner=hasBlock?dxBlocks(ctx,td,{cell:true}):dxP(dxInline(ctx,td,{sz:head?17:19,b:head||kvTh,font:head?'Arial':null,color:head?DX_V:null}),{ap:0,jc:al});
+ return `<w:tc><w:tcPr>${w?`<w:tcW w:w="${w}" w:type="dxa"/>`:''}${span>1?`<w:gridSpan w:val="${span}"/>`:''}${shade?`<w:shd w:val="clear" w:color="auto" w:fill="${shade}"/>`:''}<w:tcMar><w:top w:w="40" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/></w:tcMar></w:tcPr>${inner||'<w:p/>'}</w:tc>`}
+function dxTable(ctx,t){const kv=t.classList.contains('kv'),rows=[...t.querySelectorAll(':scope>thead>tr,:scope>tbody>tr,:scope>tr')];
+ const ncol=Math.max(1,...rows.map(r=>[...r.children].reduce((s,c)=>s+(Number(c.getAttribute('colspan'))||1),0)));
+ const widths=kv?[Math.round(DX_W*.3),DX_W-Math.round(DX_W*.3)]:Array(ncol).fill(Math.floor(DX_W/ncol));
+ return `<w:tbl><w:tblPr><w:tblW w:w="${DX_W}" w:type="dxa"/>${dxBrd()}<w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="90" w:type="dxa"/><w:right w:w="90" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${widths.map(w=>`<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>`+
+  rows.map(r=>{const head=r.parentElement.tagName==='THEAD'||r.classList.contains('th'),cells=[...r.children],h=(r.querySelector('[style*="height"]')||{}).style;let ci=0;
+   return `<w:tr><w:trPr><w:cantSplit/>${head&&r.parentElement.tagName==='THEAD'?'<w:tblHeader/>':''}${h&&h.height?`<w:trHeight w:val="${Math.round(parseFloat(h.height)*15)}" w:hRule="atLeast"/>`:''}</w:trPr>${cells.map(c=>{const sp=Number(c.getAttribute('colspan'))||1,w=widths.slice(ci,ci+sp).reduce((a,b)=>a+b,0);ci+=sp;return dxCell(ctx,c,head,kv&&c.tagName==='TH',w)}).join('')}</w:tr>`}).join('')+`</w:tbl>${dxP('',{ap:60})}`}
+function dxBoites(ctx,div,hRow){const cells=[...div.children],w=Math.floor(DX_W/cells.length);
+ return `<w:tbl><w:tblPr><w:tblW w:w="${DX_W}" w:type="dxa"/>${dxBrd()}<w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid>${cells.map(()=>`<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid><w:tr><w:trPr><w:cantSplit/>${hRow?`<w:trHeight w:val="${hRow}" w:hRule="atLeast"/>`:''}</w:trPr>${cells.map(c=>`<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/></w:tcPr>${dxP(dxInline(ctx,c,{sz:18}),{ap:0,jc:'left'})}</w:tc>`).join('')}</w:tr></w:tbl>${dxP('',{ap:60})}`}
+function dxBlocks(ctx,el,o={}){let x='';el.childNodes.forEach(n=>{
+ if(n.nodeType===3){if(n.textContent.trim())x+=dxP(dxRun(n.textContent.trim(),{}),{});return}
+ if(n.nodeType!==1)return;const tg=n.tagName.toLowerCase(),c=n.classList,al=(n.style&&n.style.textAlign)||'';
+ if(tg==='h1')x+=dxP(dxInline(ctx,n,{b:true,font:'Arial',sz:28,color:DX_V,sp:30}),{jc:'center',av:120,ap:40,keep:true});
+ else if(tg==='h2')x+=dxP(dxInline(ctx,n,{b:true,font:'Arial',sz:19,color:DX_V}),{jc:'left',av:200,ap:80,keep:true,bord:{sz:4}});
+ else if(tg==='h3')x+=dxP(dxInline(ctx,n,{b:true,sz:21,color:DX_V}),{jc:'left',av:160,ap:40,keep:true});
+ else if(tg==='p')x+=dxP(dxInline(ctx,n,{sz:c.contains('petit')?16:o.cell?19:21,pre:c.contains('pre')}),{jc:c.contains('doc-s')||al==='center'?'center':al==='right'?'right':o.cell?'left':'both',ap:o.cell?0:100});
+ else if(tg==='ul'||tg==='ol')[...n.children].forEach((li,i)=>{x+=dxP(dxRun(tg==='ol'?`${i+1}. `:'•  ',{sz:o.cell?19:21})+dxInline(ctx,li,{sz:o.cell?19:21}),{ind:360,hang:240,ap:40,jc:'left'})});
+ else if(tg==='table')x+=dxTable(ctx,n);
+ else if(c.contains('saut'))x+='<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
+ else if(c.contains('sig'))x+=dxBoites(ctx,n,1700);
+ else if(c.contains('auth'))x+=dxBoites(ctx,n,0);
+ else if(c.contains('wm')||c.contains('barre'))return;
+ else if(tg==='div'&&!n.children.length&&n.style&&n.style.height)x+=dxBoites(ctx,{children:[n]},Math.round(parseFloat(n.style.height)*15));
+ else if(tg==='div'&&c.contains('pre'))x+=dxP(dxInline(ctx,n,{sz:o.cell?19:21,pre:true}),{jc:'left',ap:o.cell?0:100});
+ else x+=dxBlocks(ctx,n,o)});return x}
+function dxEntete(ctx,ref){const dp=new DOMParser().parseFromString(`<div>${ref||''}</div>`,'text/html').body.firstChild;
+ const logo=dxImg(ctx,LOGO,64,59),w1=1300,w3=2700,w2=DX_W-w1-w3,nb='<w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(b=>`<w:${b} w:val="nil"/>`).join('')+'</w:tblBorders>';
+ return `<w:tbl><w:tblPr><w:tblW w:w="${DX_W}" w:type="dxa"/>${nb}<w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid><w:gridCol w:w="${w1}"/><w:gridCol w:w="${w2}"/><w:gridCol w:w="${w3}"/></w:tblGrid><w:tr>
+ <w:tc><w:tcPr><w:tcW w:w="${w1}" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>${dxP(logo,{ap:0,jc:'left'})}</w:tc>
+ <w:tc><w:tcPr><w:tcW w:w="${w2}" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>${dxP(dxRun(S.org.nom.toUpperCase(),{b:true,font:'Arial',sz:26,color:DX_V,sp:20}),{ap:0,jc:'left'})}${dxP(dxRun('Agir pour sauver des vies au quotidien',{i:true,sz:18,color:'4A5A53'}),{ap:0,jc:'left'})}${dxP(dxRun('Organisation non gouvernementale · Côte d\'Ivoire',{font:'Arial',sz:15,color:'4A5A53'}),{ap:0,jc:'left'})}</w:tc>
+ <w:tc><w:tcPr><w:tcW w:w="${w3}" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>${dxP(dxInline(ctx,dp,{font:'Arial',sz:17,color:'333333'}),{ap:0,jc:'right'})}</w:tc></w:tr></w:tbl>
+ <w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="12" w:space="1" w:color="${DX_V}"/></w:pBdr><w:spacing w:before="0" w:after="0"/><w:rPr><w:sz w:val="4"/></w:rPr></w:pPr></w:p><w:p><w:pPr><w:pBdr><w:top w:val="single" w:sz="6" w:space="0" w:color="${DX_O}"/></w:pBdr><w:spacing w:before="20" w:after="0"/><w:rPr><w:sz w:val="4"/></w:rPr></w:pPr></w:p>`}
+function dxPied(par){const f={font:'Arial',sz:14,color:'3D4A44'},fb={...f,b:true,color:DX_V},pp={ap:0,jc:'center'};
+ const num=`<w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="14"/></w:rPr><w:t xml:space="preserve">Page </w:t></w:r><w:fldSimple w:instr=" PAGE "><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="14"/></w:rPr><w:t>1</w:t></w:r></w:fldSimple><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="14"/></w:rPr><w:t xml:space="preserve"> / </w:t></w:r><w:fldSimple w:instr=" NUMPAGES "><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="14"/></w:rPr><w:t>1</w:t></w:r></w:fldSimple>`;
+ return `<w:p><w:pPr><w:pBdr><w:top w:val="single" w:sz="6" w:space="3" w:color="${DX_V}"/></w:pBdr><w:spacing w:before="0" w:after="0"/><w:jc w:val="center"/></w:pPr>${dxRun(OSV_COORD.siege+' · Tél. ',f)}${dxRun(OSV_COORD.telSiege,fb)}</w:p>`+dxP(dxRun(OSV_COORD.nord+' · Tél. ',f)+dxRun(OSV_COORD.telNord,fb),pp)+dxP(dxRun(OSV_COORD.mails+' · '+OSV_COORD.site,f),pp)+
+ `<w:p><w:pPr><w:tabs><w:tab w:val="right" w:pos="${DX_W}"/></w:tabs><w:spacing w:before="40" w:after="0"/></w:pPr>${par?dxRun(`Paraphes : OSV ________    ${par} ________`,{font:'Arial',sz:15}):''}<w:r><w:tab/></w:r>${num}</w:p>`}
+async function docxBlob(corps,o={}){const ctx={imgs:[],n:0},doc=new DOMParser().parseFromString(`<div id="r">${corps}</div>`,'text/html').getElementById('r');
+ const body=dxBlocks(ctx,doc),hImgs0=ctx.imgs.length,hdr=dxEntete(ctx,o.ref+(o.filigrane?`<br><b>${o.filigrane}</b>`:'')),hImgs=ctx.imgs.slice(hImgs0),bImgs=ctx.imgs.slice(0,hImgs0),ftr=dxPied(o.paraphes);
+ const NS='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"';
+ const rels=L=>`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${L.join('')}</Relationships>`;
+ const te=new TextEncoder(),F=(name,str)=>({name,data:te.encode(str)});
+ const files=[F('[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="gif" ContentType="image/gif"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`),
+  F('_rels/.rels',rels(['<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>','<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>'])),
+  F('docProps/core.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${dxE(o.titre||'')}</dc:title><dc:creator>${dxE(S.org.nom)}</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString().slice(0,19)}Z</dcterms:created></cp:coreProperties>`),
+  F('word/styles.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Cambria" w:hAnsi="Cambria" w:cs="Cambria" w:eastAsia="Cambria"/><w:color w:val="16211D"/><w:sz w:val="21"/><w:szCs w:val="21"/><w:lang w:val="fr-FR"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="100" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style></w:styles>`),
+  F('word/document.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ${NS}><w:body>${body}<w:sectPr><w:headerReference w:type="default" r:id="rIdH"/><w:footerReference w:type="default" r:id="rIdF"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="2381" w:right="964" w:bottom="1814" w:left="964" w:header="510" w:footer="397" w:gutter="0"/></w:sectPr></w:body></w:document>`),
+  F('word/_rels/document.xml.rels',rels(['<Relationship Id="rIdS" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>','<Relationship Id="rIdH" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>','<Relationship Id="rIdF" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>',...bImgs.map(i=>`<Relationship Id="${i.rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${i.nom}"/>`)])),
+  F('word/header1.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr ${NS}>${hdr}</w:hdr>`),
+  F('word/_rels/header1.xml.rels',rels(hImgs.map(i=>`<Relationship Id="${i.rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${i.nom}"/>`))),
+  F('word/footer1.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr ${NS}>${ftr}</w:ftr>`),
+  ...ctx.imgs.map(i=>({name:'word/media/'+i.nom,data:i.data}))];
+ return new Blob([await zipper(files).arrayBuffer()],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})}
+async function telechargerWord(nom,titre,corps,o={}){try{const b=await docxBlob(corps,{...o,titre}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=nom.replace(/\.doc$/,'.docx');document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800)}catch(e){alert('Le fichier Word n\'a pas pu être créé : '+e.message)}}
+/* bouton « Word » dans chaque aperçu imprimable */
+const OSV_DOCS={};window.osvWord=k=>{const d=OSV_DOCS[k];if(d)telechargerWord(d.nom,d.titre,d.corps,d.o)};
 
 /* ---------- démarrage ---------- */
 async function srvInit(){
