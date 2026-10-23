@@ -301,6 +301,7 @@ details>summary{cursor:pointer}
 }
 @media print{.rail,.topbar,.skip{display:none!important}.shell{display:block}.stage main{padding:0}}
 .sec-t{font-size:1.1rem;margin:1.8rem 0 .8rem}
+.tdrDoc h3{margin:1.1rem 0 .3rem}.tdrDoc .pre,.pre{white-space:pre-wrap}.circuit{margin:0 0 1.2rem}
 </style>
 </head>
 <body>
@@ -1600,14 +1601,15 @@ async function authRefresh(){const s=sess;if(!s)return;sess=null;
 async function authLogout(){try{if(sess)await api('/auth/v1/logout',{method:'POST'})}catch(e){}sessEcrire(null)}
 
 /* ---------- chargement des données autorisées ---------- */
-function srvVide(){return {org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
+function srvVide(){return {org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
 async function srvLoad(){
  const uid=sess.user.id,mine=await sel('membres',`select=*&user_id=eq.${uid}&actif=is.true`);
  const m=(mine||[]).find(x=>!x.fin_acces||x.fin_acces>=today());
  if(!m){me=null;throw new Error('Votre compte n\'est rattaché à aucune organisation, ou votre accès a expiré. Contactez le Directeur exécutif ou les RH.')}
  const o=m.org_id,f=`org_id=eq.${o}`;
+ const mp=await rpc('montants_projets',{}).catch(()=>null);p09=Array.isArray(mp);
  const [org,mb,bu,po,pr,af,dd,vv,pp,hh,pj,ac,nt]=await Promise.all([sel('organisations',`select=id,nom&id=eq.${o}`),sel('membres',f+'&order=nom'),sel('bureaux',f+'&order=ville'),sel('postes',f+'&order=intitule'),
-  sel('projets',f+'&order=cree_le.desc'),sel('affectations',f),sel('pol_documents',f),
+  sel('projets',(p09?'select='+PCOLS+'&':'')+f+'&order=cree_le.desc'),sel('affectations',f),sel('pol_documents',f),
   sel('pol_versions','select=id,document_id,org_id,numero,statut,redemande_lecture,date_approbation,date_effet,date_revision,texte,note,fichier_chemin,fichier_nom,fichier_taille,auteur_id,cree_le,publie_le&'+f+'&order=cree_le'),
   sel('pol_publics'),sel('pol_habilitations'),sel('pol_projets'),sel('pol_accuses',f),sel('notifications',`user_id=eq.${uid}&order=cree_le.desc&limit=100`)]);
  const N=srvVide();N.org={id:o,nom:(org[0]||{}).nom||''};
@@ -1615,6 +1617,7 @@ async function srvLoad(){
  N.bureaux=bu.map(x=>({id:x.id,nom:x.nom,ville:x.ville}));N.postes=po.map(x=>({id:x.id,intitule:x.intitule,niveau:x.niveau}));
  N.projets=pr.map(p=>({id:p.id,nom:p.nom,code:p.code||'',programmeId:p.programme_id||'',budgetApprouve:Number(p.budget_approuve)||0,bailleur:p.bailleur||'',montant:Number(p.montant)||0,debut:p.debut||'',fin:p.fin||'',zone:p.zone||'',domaine:p.domaine||'',bureau:p.bureau_id,chefId:p.chef_id,statut:p.statut,valideLe:p.valide_le,validePar:p.valide_par,prevus:[],indicateurs:[],
   membres:af.filter(a=>a.projet_id===p.id).map(a=>({affId:a.id,staffId:a.user_id,roleProjet:a.role_projet,debut:a.debut||'',fin:a.fin||'',taux:a.taux_imputation??'',ligneId:a.ligne_id||''}))}));
+ if(p09)N.projets.forEach(p=>{const x=mp.find(y=>y.id===p.id);if(x){p.montant=Number(x.montant)||0;p.budgetApprouve=Number(x.budget_approuve)||0}else p.montantMasque=true});
  const ext=n=>(n||'').split('.').pop().toLowerCase();
  N.pol.docs=dd.map(d=>({id:d.id,org:d.org_id,titre:d.titre,categorie:d.categorie,description:d.description||'',responsable:d.responsable,niveau:d.niveau,obligatoire:d.obligatoire,dl:d.telechargeable,archive:d.archive,auteurId:d.auteur_id,creeLe:(d.cree_le||'').slice(0,10),
   publics:pp.filter(x=>x.document_id===d.id).map(x=>x.role),habilites:hh.filter(x=>x.document_id===d.id).map(x=>x.user_id),projets:pj.filter(x=>x.document_id===d.id).map(x=>x.projet_id),
@@ -1627,6 +1630,7 @@ async function srvLoad(){
  const T5=await Promise.all([sel('budget_lignes',f),sel('depenses',f),sel('financements',f),sel('seuils_approbation',f)].map(opt));p05=T5[0]!==null;[N.blignes,N.depenses,N.financements,N.seuils]=T5.map(x=>x||[]);
  const T6=await Promise.all(['comptes_tresorerie','mouvements','rapprochements','avances','fournisseurs','seuils_achat','achats','devis','baremes_mission','missions','biens','inventaires','plan_comptable','correspondances'].map(t=>sel(t,f)).concat([sel('inventaire_lignes')]).map(opt));p06=T6[3]!==null;
  const T7=await opt(sel('mission_membres',f+'&order=ordre'));p07=T7!==null;N.mmembres=T7||[];
+ const T8=await Promise.all([sel('tdrs',f+'&order=cree_le.desc'),sel('tdr_avis',f+'&order=le'),sel('acces_budget',f)].map(opt));p08=T8[0]!==null;N.tdrs=T8[0]||[];N.tavis=T8[1]||[];N.accBud=T8[2]||[];
  [N.comptes,N.mouvements,N.rapprochements,N.avances,N.fournisseurs,N.seuilsAchat,N.achats,N.devis,N.baremes,N.missions,N.biens,N.inventaires,N.pcomptes,N.correspondances,N.invLignes]=T6.map(x=>x||[]);
  S=N;me=S.staff.find(x=>x.id===uid);
  Object.keys(ROLES).forEach(k=>ROLES[k].nav=srvNav(k));
@@ -1636,7 +1640,7 @@ const APPUI=['RH','RA','CPT','LOG'];
 function srvNav(r){if(r==='EXT')return ['politiques'];const appui=APPUI.includes(r),n=[];
  if(p03&&['DE','DP','CA'].includes(r))n.push('strategie','programmes');
  if(!appui)n.push('projets');if(p03&&['DE','DP','CA',...APPUI].includes(r))n.push('equipes');if(p05&&['DE','DP','CA','RA','CPT'].includes(r))n.push('finances');if(p06&&['DE','DP','CA','RA','CPT','LOG'].includes(r))n.push('adm');
- if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');if(p06)n.push('mesdem');
+ if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');if(p08)n.push('missions');if(p06)n.push('mesdem');
  if(['DE','RH'].includes(r))n.push('personnel');if(r==='DE')n.push('audit');return n}
 async function notifierSrv(dest,texte,lien,ref){const ids=[...new Set(dest.filter(Boolean))].filter(id=>id!==me.id&&S.staff.some(u=>u.id===id));
  if(!ids.length)return 0;await ins('notifications',ids.map(id=>({org_id:S.org.id,user_id:id,texte,lien,ref,envoye_par:me.id})));return ids.length}
@@ -1646,7 +1650,7 @@ async function action(fn,msg){if(srvBusy)return;srvBusy=true;document.body.class
 
 /* ---------- écrans du mode serveur ---------- */
 function srvHome(){const n=ROLES[me.role].nav,pa=polEnAttente().length;
- const D={adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
+ const D={adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
  return accHero()+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+notifBox()+
  (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:'')+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
  `<h2 class="sec-t">Vos espaces de travail</h2><div class="tiles">${n.map(v=>`<button class="tile" data-act="go" data-v="${v}">${ico(v,'tico')}<h2>${VIEWS[v]} ${v==='politiques'&&pa?`<span class="badge">${pa}</span>`:''}</h2><p>${D[v]||''}</p></button>`).join('')}</div>
@@ -1688,7 +1692,7 @@ function srvProjets(){const creer=['DE','DP'].includes(me.role),ps=S.projets,act
  (ps.length?ps.map(p=>{const [sl,sc]=PSTAT[p.statut]||[p.statut,''],ge=srvGereEq(p);return `<section class="card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3 style="margin:0">${esc(p.nom)}</h3><p class="muted" style="margin:.2rem 0 0">${esc(p.bailleur||'Bailleur non renseigné')}${p.domaine?' · '+esc(p.domaine):''}</p></div>
   <div class="row"><span class="tag ${sc}">${sl}</span>${creer?`<select class="srvStatutSel" data-id="${p.id}" aria-label="Changer le statut">${Object.entries(PSTAT).map(([k,[l]])=>`<option value="${k}" ${k===p.statut?'selected':''}>${l}</option>`).join('')}</select>`:''}</div></div>
   <div class="facts" style="margin-top:.7rem"><div><span>Budget</span><b>${p.montant?fcfa(p.montant):'—'}</b></div><div><span>Période</span><b>${p.debut?fmtD(p.debut):'—'} → ${p.fin?fmtD(p.fin):'—'}</b></div><div><span>Zone</span><b>${esc(p.zone||'—')}</b></div><div><span>Chef de projet</span><b>${p.chefId?esc(who(p.chefId)):'à désigner'}</b></div>${p.valideLe?`<div><span>Validé</span><b>${fmtD(p.valideLe)} · ${esc(who(p.validePar))}</b></div>`:''}</div>
-  ${creer||p.chefId===me.id?`<details style="margin:.6rem 0"><summary>Modifier les informations du projet</summary><form data-form="srvProjetMaj" data-p="${p.id}" class="grid" style="margin-top:.6rem;align-items:end"><div style="grid-column:span 2"><label>Intitulé</label><input name="nom" required value="${esc(p.nom)}"></div><div><label>Bailleur</label><input name="bailleur" value="${esc(p.bailleur)}"></div><div><label>Budget (FCFA)</label><input name="montant" type="number" min="0" value="${p.montant||''}"></div><div><label>Début</label><input name="debut" type="date" value="${p.debut}"></div><div><label>Fin</label><input name="fin" type="date" value="${p.fin}"></div><div><label>Zone</label><input name="zone" value="${esc(p.zone)}"></div><div><label>Domaine</label><select name="domaine"><option value="">—</option>${DOMAINES.map(x=>`<option ${x===p.domaine?'selected':''}>${esc(x)}</option>`).join('')}</select></div>${creer?`<div><label>Chef de projet</label><select name="chef"><option value="">— à désigner —</option>${actifs.map(u=>`<option value="${u.id}" ${u.id===p.chefId?'selected':''}>${esc(u.nom)}</option>`).join('')}</select></div>`:''}<div><button class="btn sm" type="submit">Enregistrer</button></div></form></details>`:''}
+  ${creer||p.chefId===me.id?`<details style="margin:.6rem 0"><summary>Modifier les informations du projet</summary><form data-form="srvProjetMaj" data-p="${p.id}" class="grid" style="margin-top:.6rem;align-items:end"><div style="grid-column:span 2"><label>Intitulé</label><input name="nom" required value="${esc(p.nom)}"></div><div><label>Bailleur</label><input name="bailleur" value="${esc(p.bailleur)}"></div>${p.montantMasque?'':`<div><label>Budget (FCFA)</label><input name="montant" type="number" min="0" value="${p.montant||''}"></div>`}<div><label>Début</label><input name="debut" type="date" value="${p.debut}"></div><div><label>Fin</label><input name="fin" type="date" value="${p.fin}"></div><div><label>Zone</label><input name="zone" value="${esc(p.zone)}"></div><div><label>Domaine</label><select name="domaine"><option value="">—</option>${DOMAINES.map(x=>`<option ${x===p.domaine?'selected':''}>${esc(x)}</option>`).join('')}</select></div>${creer?`<div><label>Chef de projet</label><select name="chef"><option value="">— à désigner —</option>${actifs.map(u=>`<option value="${u.id}" ${u.id===p.chefId?'selected':''}>${esc(u.nom)}</option>`).join('')}</select></div>`:''}<div><button class="btn sm" type="submit">Enregistrer</button></div></form></details>`:''}
   <h4>Équipe affectée (${p.membres.length})</h4>${p.membres.length?`<div class="tbl"><table><thead><tr><th>Personne</th><th>Rôle dans le projet</th><th>Du</th><th>Au</th>${ge?'<th></th>':''}</tr></thead><tbody>${p.membres.map(m=>`<tr><td>${esc(who(m.staffId))}</td><td>${esc(m.roleProjet)}</td><td>${fmtD(m.debut)}</td><td>${fmtD(m.fin)}</td>${ge?`<td><button class="btn danger sm" data-act="srvDelAff" data-id="${m.affId}">Retirer</button></td>`:''}</tr>`).join('')}</tbody></table></div>`:'<p class="empty">Personne n\'est encore affecté.</p>'}
   ${ge?`<form data-form="srvAff" data-p="${p.id}" class="grid" style="margin-top:.6rem;align-items:end"><div><label>Personne</label><select name="user" required>${actifs.map(u=>`<option value="${u.id}">${esc(u.nom)} (${esc(posteLib(u))})</option>`).join('')}</select></div><div><label>Rôle dans le projet</label><select name="role">${ROLES_PROJET.map(r=>`<option>${r}</option>`).join('')}</select></div><div><label>Du</label><input type="date" name="debut"></div><div><label>Au</label><input type="date" name="fin"></div><div><button class="btn sm" type="submit">Affecter</button></div></form>`:''}</section>`}).join(''):'<section class="card"><p class="empty">Aucun projet visible pour vous.</p></section>')+
  '<p class="legend">Cadre logique, indicateurs, budget détaillé, activités et rapports du projet arrivent sur le serveur avec le dossier unique du projet (Phase 4).</p>'}
@@ -1730,7 +1734,7 @@ document.addEventListener('submit',e=>{if(MODE!=='srv')return;const f=e.target,t
    if(d.chef){await ins('affectations',{org_id:S.org.id,projet_id:id,user_id:d.chef,role_projet:'Chef de projet',debut:d.debut||null,fin:d.fin||null,cree_par:me.id});await notifierSrv([d.chef],`Vous êtes désigné(e) chef du projet « ${String(d.nom).trim()} »`,'projet',id)}
    log(`Projet enregistré : ${d.nom}`);if(p03){logO('projet',id,`Projet enregistré en brouillon : ${d.nom}`);dosSel=id;dosTab='id';view='dossier'}},'Projet enregistré en brouillon.');return}
  if(t==='srvProjetMaj'){const p=S.projets.find(x=>x.id===f.dataset.p);if(d.debut&&d.fin&&d.fin<d.debut){alert('La date de fin doit être après la date de début.');return}
-  const patch={nom:String(d.nom).trim(),bailleur:d.bailleur||null,montant:d.montant===''?null:Number(d.montant),debut:d.debut||null,fin:d.fin||null,zone:d.zone||null,domaine:d.domaine||null};if('chef' in d)patch.chef_id=d.chef||null;if(p03){patch.budget_approuve=patch.montant;if('code' in d)patch.code=d.code||null;if('programme' in d)patch.programme_id=d.programme||null;delete actChk[p.id]}
+  const patch={nom:String(d.nom).trim(),bailleur:d.bailleur||null,montant:d.montant===''?null:Number(d.montant),debut:d.debut||null,fin:d.fin||null,zone:d.zone||null,domaine:d.domaine||null};if('chef' in d)patch.chef_id=d.chef||null;if(!('montant' in d))delete patch.montant;if(p03){if('montant' in d)patch.budget_approuve=patch.montant;if('code' in d)patch.code=d.code||null;if('programme' in d)patch.programme_id=d.programme||null;delete actChk[p.id]}
   action(async()=>{await upd('projets',`id=eq.${p.id}`,patch);if('chef' in d&&d.chef&&d.chef!==p.chefId){if(!p.membres.some(m=>m.staffId===d.chef&&m.roleProjet==='Chef de projet'))await ins('affectations',{org_id:S.org.id,projet_id:p.id,user_id:d.chef,role_projet:'Chef de projet',debut:d.debut||null,fin:d.fin||null,cree_par:me.id});await notifierSrv([d.chef],`Vous êtes désigné(e) chef du projet « ${patch.nom} »`,'projet',p.id)}log(`Projet modifié : ${patch.nom}`);if(p03)logO('projet',p.id,'Informations du projet modifiées')},'Informations du projet enregistrées.');return}
  if(t==='srvAff'){const p=S.projets.find(x=>x.id===f.dataset.p);if(d.debut&&d.fin&&d.fin<d.debut){alert('La date de fin doit être après la date de début.');return}
   action(async()=>{await ins('affectations',{org_id:S.org.id,projet_id:p.id,user_id:d.user,role_projet:d.role,debut:d.debut||null,fin:d.fin||null,cree_par:me.id,...(p05&&'taux' in d?{taux_imputation:d.taux===''?null:Number(d.taux),ligne_id:d.ligne||null}:{})});await notifierSrv([d.user],`Vous êtes affecté(e) au projet « ${p.nom} » (${d.role})`,'projet',p.id);await notifierAppui(`Personnel du projet « ${p.nom} » : ${who(d.user)} affecté(e) comme ${d.role}${d.debut?' à partir du '+fmtD(d.debut):''}`,p.id);log(`${who(d.user)} affecté(e) à ${p.nom} (${d.role})`);if(p03)logO('projet',p.id,`${who(d.user)} affecté(e) : ${d.role}`)},`${who(d.user)} est affecté(e) au projet.`);return}
@@ -1762,6 +1766,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv')return;const b=e.target.cl
  if(a==='logout'){stop();log('Déconnexion');authLogout().then(()=>{me=null;S=srvVide();view='home';polDoc=polEdit=null;render()});return}
  if(a==='notifOuvrir'){const n=S.pol.notifs.find(x=>x.id===b.dataset.id);if(n){upd('notifications',`id=eq.${n.id}`,{lu:true}).catch(()=>{});if(n.lien==='adm'||n.lien==='mesdem'){stop();n.lus.push(me.id);view=n.lien==='adm'&&ROLES[me.role].nav.includes('adm')?'adm':'mesdem';render();return}
   if(n.lien==='finances'){stop();n.lus.push(me.id);finSel=n.ref||null;if(ROLES[me.role].nav.includes('finances'))view='finances';else{dosSel=n.ref;dosTab='fin';view='dossier'}render();return}
+  if(n.lien==='missions'){stop();n.lus.push(me.id);tdrSel=n.ref||null;tdrEdit=null;view=ROLES[me.role].nav.includes('missions')?'missions':'home';render();return}
   if(n.lien==='equipes'){stop();n.lus.push(me.id);eqF.proj=n.ref||'';eqF.etat='';view='equipes';render();return}
   if(n.lien==='projet'||n.lien==='programme'){stop();n.lus.push(me.id);if(n.lien==='projet'&&p03&&projet(n.ref)){dosSel=n.ref;dosTab='id';view='dossier'}else if(n.lien==='programme'&&programme(n.ref)){pgSel=n.ref;view='programmes'}else view='projets';render();return}}return}
  if(a==='notifLu'){stop();action(()=>upd('notifications',`user_id=eq.${me.id}&lu=is.false`,{lu:true}));return}
@@ -1908,7 +1913,7 @@ function alertes(){const A=[],t=today(),d60=new Date(Date.now()+60*864e5).toISOS
  S.jalons.filter(j=>j.echeance&&j.echeance<t&&!['fait','abandonne'].includes(j.statut)).forEach(j=>A.push(['bad',`Jalon en retard : ${j.libelle} (${fmtD(j.echeance)}) · ${libProg(programme(j.programme_id))}`,'svPg',j.programme_id]));
  S.risques.filter(r=>r.statut!=='clos'&&r.probabilite*r.impact>=15).forEach(r=>A.push(['bad',`Risque élevé (${r.probabilite*r.impact}) : ${r.libelle}`,r.projet_id?'svDos':'svPg',r.projet_id||r.programme_id,'rq']));
  S.inds.filter(i=>indPerf(i).st==='bad').slice(0,8).forEach(i=>A.push(['bad',`Indicateur en retard : ${i.libelle}`,i.projet_id?'svDos':i.programme_id?'svPg':'go',i.projet_id||i.programme_id||'strategie','ind']));
- return A.concat(finAlertes(),admAlertes())}
+ return A.concat(finAlertes(),admAlertes(),tdrAlertes())}
 function alerteHTML(A){return A.length?`<ul class="svAl">${A.slice(0,15).map(([c,t,act,id,tab])=>`<li class="${c}"><button class="lnk" data-act="${act}" ${act==='go'?`data-v="${id}"`:`data-id="${id||''}"`} ${tab?`data-tab="${tab}"`:''}>${esc(t)}</button></li>`).join('')}</ul>${A.length>15?`<p class="muted">… et ${A.length-15} autre(s).</p>`:''}`:'<p class="empty">Aucune alerte. Tout est à jour.</p>'}
 function pilotageHTML(){const pl=planCourant(),pp=perfPlan(pl),ps=S.projets,actifs=ps.filter(p=>['active','execution'].includes(p.statut));
  const s=synth(S.inds),budget=ps.filter(p=>!['rejete','archive'].includes(p.statut)).reduce((x,p)=>x+(p.budgetApprouve||p.montant||0),0),A=alertes();
@@ -1972,7 +1977,7 @@ function svProgramme(g){const pf=perfProg(g),m=mobilise(g),ps=projsProg(g),js=S.
  <section class="card"><h3>Indicateurs du programme (${pi.length})</h3><p class="muted">Un indicateur de programme peut être calculé à partir des indicateurs des projets qui y contribuent (somme ou moyenne), ou mesuré directement.</p>${indTable(pi,{suppr:true,vide:'Aucun indicateur de programme : la performance est alors calculée sur les indicateurs des projets rattachés.'})}</section>
  ${pil?indForm('svIndP',`data-g="${g.id}"`,parents):''}
  ${pi.length?mesuresBloc(pi):''}
- <section class="card"><h3>Projets rattachés (${ps.length})</h3>${svT(['Projet','Bailleur','#Budget','Période','Chef de projet','Performance','Statut'],ps.map(p=>{const s=synth(indsProjet(p));return [`<button class="lnk" data-act="svDos" data-id="${p.id}">${esc(libProj(p))}</button>`,esc(p.bailleur||'—'),num(p.budgetApprouve||p.montant),`${fmtD(p.debut)} → ${fmtD(p.fin)}`,esc(who(p.chefId)),`${tx(s.score)}${s.score!=null?barre(s.score,rythme(p.debut,p.fin)):''}`,tag(PSTAT[p.statut]||[p.statut])]}),'Aucun projet rattaché.')}
+ <section class="card"><h3>Projets rattachés (${ps.length})</h3>${svT(['Projet','Bailleur','#Budget','Période','Chef de projet','Performance','Statut'],ps.map(p=>{const s=synth(indsProjet(p));return [`<button class="lnk" data-act="svDos" data-id="${p.id}">${esc(libProj(p))}</button>`,esc(p.bailleur||'—'),(p.montantMasque?'<span class="muted">confidentiel</span>':num(p.budgetApprouve||p.montant)),`${fmtD(p.debut)} → ${fmtD(p.fin)}`,esc(who(p.chefId)),`${tx(s.score)}${s.score!=null?barre(s.score,rythme(p.debut,p.fin)):''}`,tag(PSTAT[p.statut]||[p.statut])]}),'Aucun projet rattaché.')}
  ${pil&&S.projets.some(p=>p.programmeId!==g.id)?`<div class="row" style="margin-top:.6rem"><label for="pgLier">Rattacher un projet :</label><select id="pgLier" class="svLier" data-g="${g.id}"><option value="">— choisir —</option>${S.projets.filter(p=>p.programmeId!==g.id).map(p=>`<option value="${p.id}">${esc(libProj(p))}${p.programmeId?' (déjà dans '+esc(libProg(programme(p.programmeId)))+')':''}</option>`).join('')}</select></div>`:''}</section>
  <section class="card"><h3>Jalons (${js.length})</h3>${svT(['Jalon','Échéance','Responsable','Statut'],js.map(j=>[esc(j.libelle),`${fmtD(j.echeance)}${j.echeance&&j.echeance<today()&&!['fait','abandonne'].includes(j.statut)?' <span class="tag bad">En retard</span>':''}`,esc(who(j.responsable_id)),pil||j.responsable_id===me.id?`<select class="svJalSt" data-id="${j.id}" aria-label="Statut du jalon">${opts(Object.entries(JAL_ST),j.statut)}</select>`:esc(JAL_ST[j.statut])]),'Aucun jalon.')}
  ${pil?`<form data-form="svJalon" data-g="${g.id}" class="grid" style="margin-top:.6rem;align-items:end"><div style="grid-column:span 2"><label>Nouveau jalon</label><input name="libelle" required></div><div><label>Échéance</label><input name="echeance" type="date"></div><div><label>Responsable</label><select name="resp">${staffOpts('')}</select></div><div><button class="btn sm" type="submit">Ajouter</button></div></form>`:''}</section>
@@ -2007,7 +2012,7 @@ function svPortefeuille(){const creer=saisieDP(),tous=pilote();let ps=S.projets.
   <div><label for="pfD">Domaine</label><select id="pfD" data-flt="pf.dom">${opts(DOMAINES.map(x=>[x,x]),pfF.dom,'Tous')}</select></div>
   <div><label for="pfQ">Recherche</label><input id="pfQ" data-flt="pf.q" value="${esc(pfF.q)}" placeholder="intitulé, bailleur, zone"></div></div>
  ${svT(['Projet','Programme','Bailleur','#Budget (FCFA)','Période','Chef de projet','Qualité du dossier','Avancement des indicateurs','Statut',''],ps.map(p=>{const s=synth(indsProjet(p)),q=qualite(p);
-  return [`<b>${esc(libProj(p))}</b>${p.zone?`<br><span class="muted">${esc(p.zone)}</span>`:''}`,esc(libProg(programme(p.programmeId))),esc(p.bailleur||'—'),num(p.budgetApprouve||p.montant),`${fmtD(p.debut)} → ${fmtD(p.fin)}`,esc(who(p.chefId)),`${tx(q.score)}${barre(q.score,null)}`,
+  return [`<b>${esc(libProj(p))}</b>${p.zone?`<br><span class="muted">${esc(p.zone)}</span>`:''}`,esc(libProg(programme(p.programmeId))),esc(p.bailleur||'—'),(p.montantMasque?'<span class="muted">confidentiel</span>':num(p.budgetApprouve||p.montant)),`${fmtD(p.debut)} → ${fmtD(p.fin)}`,esc(who(p.chefId)),`${tx(q.score)}${barre(q.score,null)}`,
    s.n?`${tx(s.score)}${s.score!=null?barre(s.score,rythme(p.debut,p.fin)):''}<span class="muted">${s.nData}/${s.n} indicateur(s) renseigné(s)</span>`:'<span class="muted">Aucun indicateur</span>',tag(PSTAT[p.statut]||[p.statut]),`<button class="btn sm" data-act="svDos" data-id="${p.id}">Ouvrir le dossier</button>`]}),'Aucun projet ne correspond.')}
  <p class="legend">${ps.length} projet(s) · budget cumulé ${num(tot)} FCFA. Le trait vertical sur les barres indique le rythme attendu à la date du jour.</p></section>`}
 
@@ -2021,10 +2026,10 @@ function svDossier(){const p=projet(dosSel);if(!p){view='projets';return svPorte
  `<nav class="subnav" aria-label="Volets du dossier">${dosTabs(p).map(([k,l])=>`<button data-act="svDosTab" data-v="${k}" ${dosTab===k?'aria-current="page"':''}>${l}</button>`).join('')}</nav>`+
  ({id:dosId,cl:dosCadre,ind:dosInd,eq:dosEquipe,rq:p=>risquesBloc(S.risques.filter(r=>r.projet_id===p.id),{projet:p.id}),doc:dosDocs,hist:dosHist,act:dosAct,fin:p=>voitFin(p)?finDetail(p).replace(/^<div class="head">[\s\S]*?<\/div>/,''):''}[dosTab]||dosId)(p)}
 function dosId(p){const creer=pilote(),ge=gereProj(p),g=programme(p.programmeId);
- return (pilote()||p.chefId===me.id?qualiteBloc(p):'')+`<section class="card"><div class="facts"><div><span>Programme</span><b>${esc(libProg(g))}</b></div><div><span>Code</span><b>${esc(p.code||'—')}</b></div><div><span>Budget approuvé</span><b>${num(p.budgetApprouve||p.montant)} FCFA</b></div><div><span>Période</span><b>${fmtD(p.debut)} → ${fmtD(p.fin)}</b></div><div><span>Zone</span><b>${esc(p.zone||'—')}</b></div><div><span>Domaine</span><b>${esc(p.domaine||'—')}</b></div><div><span>Bureau</span><b>${esc(bur(p.bureau))}</b></div><div><span>Chef de projet</span><b>${esc(p.chefId?who(p.chefId):'à désigner')}</b></div>${p.valideLe?`<div><span>Validé</span><b>${fmtD(p.valideLe)} · ${esc(who(p.validePar))}</b></div>`:''}<div><span>Temps écoulé</span><b>${tx(rythme(p.debut,p.fin))}</b></div></div>
+ return (pilote()||p.chefId===me.id?qualiteBloc(p):'')+`<section class="card"><div class="facts"><div><span>Programme</span><b>${esc(libProg(g))}</b></div><div><span>Code</span><b>${esc(p.code||'—')}</b></div><div><span>Budget approuvé</span><b>${p.montantMasque?'confidentiel':num(p.budgetApprouve||p.montant)+' FCFA'}</b></div><div><span>Période</span><b>${fmtD(p.debut)} → ${fmtD(p.fin)}</b></div><div><span>Zone</span><b>${esc(p.zone||'—')}</b></div><div><span>Domaine</span><b>${esc(p.domaine||'—')}</b></div><div><span>Bureau</span><b>${esc(bur(p.bureau))}</b></div><div><span>Chef de projet</span><b>${esc(p.chefId?who(p.chefId):'à désigner')}</b></div>${p.valideLe?`<div><span>Validé</span><b>${fmtD(p.valideLe)} · ${esc(who(p.validePar))}</b></div>`:''}<div><span>Temps écoulé</span><b>${tx(rythme(p.debut,p.fin))}</b></div></div>
  ${creer?`<div class="row"><label for="stP">Statut du projet :</label><select id="stP" class="srvStatutSel" data-id="${p.id}">${Object.entries(PSTAT).map(([k,[l]])=>`<option value="${k}" ${k===p.statut?'selected':''}>${l}</option>`).join('')}</select></div>`:''}
  ${ge?`<details style="margin-top:.6rem"><summary>Modifier les informations du projet</summary><form data-form="srvProjetMaj" data-p="${p.id}" class="grid" style="margin-top:.6rem;align-items:end"><div style="grid-column:span 2"><label>Intitulé</label><textarea name="nom" rows="2" required>${esc(p.nom)}</textarea></div><div><label>Code</label><input name="code" value="${esc(p.code||'')}"></div>
-  ${creer?`<div style="grid-column:span 2"><label>Programme</label><select name="programme">${opts(S.programmes.map(x=>[x.id,libProg(x)]),p.programmeId||'','— non rattaché —')}</select></div>`:''}<div><label>Bailleur</label><input name="bailleur" value="${esc(p.bailleur)}"></div><div><label>Budget approuvé (FCFA)</label><input name="montant" type="number" min="0" value="${(p.budgetApprouve||p.montant)||''}"></div><div><label>Début</label><input name="debut" type="date" value="${p.debut}"></div><div><label>Fin</label><input name="fin" type="date" value="${p.fin}"></div><div><label>Zone</label><input name="zone" value="${esc(p.zone)}"></div>${creer?`<div><label>Chef de projet</label><select name="chef">${staffOpts(p.chefId||'')}</select></div>`:''}${domChk(p.domaine)}<div><button class="btn sm" type="submit">Enregistrer</button></div></form></details>`:''}</section>
+  ${creer?`<div style="grid-column:span 2"><label>Programme</label><select name="programme">${opts(S.programmes.map(x=>[x.id,libProg(x)]),p.programmeId||'','— non rattaché —')}</select></div>`:''}<div><label>Bailleur</label><input name="bailleur" value="${esc(p.bailleur)}"></div>${p.montantMasque?'':`<div><label>Budget approuvé (FCFA)</label><input name="montant" type="number" min="0" value="${(p.budgetApprouve||p.montant)||''}"></div>`}<div><label>Début</label><input name="debut" type="date" value="${p.debut}"></div><div><label>Fin</label><input name="fin" type="date" value="${p.fin}"></div><div><label>Zone</label><input name="zone" value="${esc(p.zone)}"></div>${creer?`<div><label>Chef de projet</label><select name="chef">${staffOpts(p.chefId||'')}</select></div>`:''}${domChk(p.domaine)}<div><button class="btn sm" type="submit">Enregistrer</button></div></form></details>`:''}</section>
  <div class="tiles six">${dosTabs(p).slice(1).map(([k,l])=>{const n={fin:p05&&voitFin(p)?depP(p).length:null,cl:S.cadre.filter(c=>c.projet_id===p.id).length,ind:indsProjet(p).length,eq:p.membres.length,rq:S.risques.filter(r=>r.projet_id===p.id&&r.statut!=='clos').length,doc:S.docs.filter(d=>d.projet_id===p.id).length}[k];return `<button class="tile" data-act="svDosTab" data-v="${k}"><h2>${l}</h2><p>${n!=null?n+' élément(s)':''}</p></button>`}).join('')}</div>`}
 function dosCadre(p){const cl=S.cadre.filter(c=>c.projet_id===p.id),ge=gereProj(p),ordre=['og','os','res','act'];
  const branche=(par,prof)=>cl.filter(c=>(c.parent_id||null)===par).sort((a,b)=>ordre.indexOf(a.niveau)-ordre.indexOf(b.niveau)||a.ordre-b.ordre||String(a.code).localeCompare(b.code)).map(c=>{const inds=S.inds.filter(i=>i.cadre_id===c.id);
@@ -2036,7 +2041,7 @@ function dosCadre(p){const cl=S.cadre.filter(c=>c.projet_id===p.id),ge=gereProj(
 function dosInd(p){const inds=indsProjet(p),g=programme(p.programmeId),parents=S.inds.filter(i=>(i.niveau==='programme'&&i.programme_id===p.programmeId)||(i.niveau==='strategique'&&g&&i.objectif_id===g.objectif_id));
  return `<section class="card"><h3>Indicateurs du projet (${inds.length})</h3>${indTable(inds,{suppr:true})}</section>${gereProj(p)?indForm('svIndJ',`data-p="${p.id}"`,parents,`<div style="grid-column:span 2"><label>Niveau du cadre logique mesuré</label><select name="cadre_id">${opts(S.cadre.filter(c=>c.projet_id===p.id).map(c=>[c.id,`${CL_NIV[c.niveau]} · ${c.code?c.code+' · ':''}${c.libelle}`]),'','—')}</select></div>`):''}${mesuresBloc(inds)}`}
 function dosEquipe(p){const ge=srvGereEq(p),actifs=S.staff.filter(u=>u.actif&&u.role!=='EXT');
- return `<section class="card"><h3>Équipe affectée (${p.membres.length})</h3>${p.membres.length?`<div class="tbl"><table><thead><tr><th>Personne</th><th>Rôle dans le projet</th><th class="num">Imputation</th><th>Du</th><th>Au</th>${ge?'<th></th>':''}</tr></thead><tbody>${p.membres.map(m=>`<tr><td>${esc(who(m.staffId))}</td><td>${esc(m.roleProjet)}</td><td class="num">${m.taux!==''&&m.taux!=null?m.taux+' %':'—'}</td><td>${fmtD(m.debut)}</td><td>${fmtD(m.fin)}</td>${ge?`<td><button class="btn danger sm" data-act="srvDelAff" data-id="${m.affId}">Retirer</button></td>`:''}</tr>`).join('')}</tbody></table></div>`:'<p class="empty">Personne n\'est encore affecté.</p>'}
+ return `<section class="card"><h3>Équipe affectée (${p.membres.length})</h3>${p.membres.length?`<div class="tbl"><table><thead><tr><th>Personne</th><th>Rôle dans le projet</th><th class="num">Imputation</th><th>Du</th><th>Au</th>${p09&&['DE','DP','RA'].includes(me.role)?'<th>Accès au budget</th>':''}${ge?'<th></th>':''}</tr></thead><tbody>${p.membres.map(m=>`<tr><td>${esc(who(m.staffId))}</td><td>${esc(m.roleProjet)}</td><td class="num">${m.taux!==''&&m.taux!=null?m.taux+' %':'—'}</td><td>${fmtD(m.debut)}</td><td>${fmtD(m.fin)}</td>${p09&&['DE','DP','RA'].includes(me.role)?`<td>${budCell(p,m)}</td>`:''}${ge?`<td><button class="btn danger sm" data-act="srvDelAff" data-id="${m.affId}">Retirer</button></td>`:''}</tr>`).join('')}</tbody></table></div>`:'<p class="empty">Personne n\'est encore affecté.</p>'}
  ${ge?`<form data-form="srvAff" data-p="${p.id}" class="grid" style="margin-top:.6rem;align-items:end"><div><label>Personne</label><select name="user" required>${actifs.map(u=>`<option value="${u.id}">${esc(u.nom)} (${esc(posteLib(u))})</option>`).join('')}</select></div><div><label>Rôle dans le projet</label><select name="role">${ROLES_PROJET.map(r=>`<option>${r}</option>`).join('')}</select></div>${p05?`<div><label>Part du temps payée par le projet (%)</label><input name="taux" type="number" min="0" max="100" placeholder="ex. 100"></div><div><label>Ligne budgétaire</label><select name="ligne">${opts(lignesP(p).filter(l=>['personnel','charges_sociales'].includes(l.rubrique)).map(l=>[l.id,`${l.code||''} ${l.libelle}`]),'','—')}</select></div>`:''}<div><label>Du</label><input type="date" name="debut"></div><div><label>Au</label><input type="date" name="fin"></div><div><button class="btn sm" type="submit">Affecter</button></div></form>`:''}</section>`}
 function dosDocs(p){const ds=S.docs.filter(d=>d.projet_id===p.id);
  return `<section class="card"><h3>Documents du projet (${ds.length})</h3><p class="muted">Vous voyez les documents que vos droits permettent de consulter. Les pièces comptables restent dans les archives de la comptabilité.</p>${docsTable(ds)}
@@ -2248,9 +2253,9 @@ const FACT_ST={emise:['Émise','warn'],payee_partiel:['Payée en partie','warn']
 const SRC={bailleur:'Bailleur',osv:'Contribution OSV',autre:'Autre source'};
 let p05=true,finSel=null,finPer={du:'',au:''};
 const PRE_ACT=['brouillon','configuration','verification','a_corriger'];
-const voitFin=p=>p&&(['DE','DP','CA','RA','CPT'].includes(me.role)||p.chefId===me.id);
-const gereBud=p=>p&&(['DE','RA'].includes(me.role)||((me.role==='DP'||p.chefId===me.id)&&PRE_ACT.includes(p.statut)));
-const saisitDep=p=>p&&(['DE','DP','RA','CPT'].includes(me.role)||p.chefId===me.id);
+const voitFin=p=>p&&(p09?(['DE','DP','CA','RA'].includes(me.role)||(me.role==='CPT'&&employeC(p,me.id))||(employeC(p,me.id)&&me.statut==='Salarié'&&accBud(p,me.id))):(['DE','DP','CA','RA','CPT'].includes(me.role)||p.chefId===me.id));
+const gereBud=p=>voitFin(p)&&(['DE','RA'].includes(me.role)||((me.role==='DP'||p.chefId===me.id)&&PRE_ACT.includes(p.statut)));
+const saisitDep=p=>voitFin(p)&&(['DE','DP','RA','CPT'].includes(me.role)||p.chefId===me.id);
 const estReal=d=>d.statut==='approuvee'||d.statut==='payee';
 const estEng=d=>d.statut==='saisie'||d.statut==='verifiee';
 const lignesP=p=>S.blignes.filter(l=>l.projet_id===p.id).sort((a,b)=>a.ordre-b.ordre||String(a.code||'').localeCompare(String(b.code||''),'fr',{numeric:true}));
@@ -2515,7 +2520,7 @@ function admFourn(){const ge=['DE','RA','CPT','LOG'].includes(me.role);
 /* ---------- missions ---------- */
 const MI_COLS=['N° · Missionnaires','Objet et destination','Dates','Per diem et frais','#Total (FCFA)','Statut',''];
 function admMissions(){const L=S.missions.slice().sort((a,b)=>a.date_depart<b.date_depart?1:-1);
- return `<section class="card"><h3>Missions (${L.length})</h3><p class="muted">Circuit : ordre de mission établi par le responsable hiérarchique → signé par le DE (à défaut le DP ; par le PCA quand le DE part en mission), qui lui attribue un numéro et un QR code d'authenticité → rapport de mission déposé au retour → liquidation des per diem et frais par la comptabilité, sur la base du barème.</p>${svT(MI_COLS,L.map(miLigne),'Aucune mission.')}${['DE','DP','RA','CPT'].includes(me.role)&&p07?omForm():''}</section>`}
+ return `<section class="card"><h3>Missions (${L.length})</h3><p class="muted">Circuit : ordre de mission établi par le responsable hiérarchique → signé par le DE (à défaut le DP ; par le PCA quand le DE part en mission), qui lui attribue un numéro et un QR code d'authenticité → rapport de mission déposé au retour → liquidation des per diem et frais par la comptabilité, sur la base du barème.</p>${svT(MI_COLS,L.map(miLigne),'Aucune mission.')}${['DE','DP','RA','CPT'].includes(me.role)&&p07&&!p08?omForm():''}</section>`}
 
 /* ---------- biens et inventaire ---------- */
 function admBiens(){const ge=['DE','RA','CPT','LOG'].includes(me.role),L=S.biens.slice().sort((a,b)=>String(a.code).localeCompare(String(b.code),'fr',{numeric:true}));
@@ -2567,7 +2572,7 @@ function svMesDem(){const mA=S.avances.filter(a=>a.beneficiaire_id===me.id||a.de
  <details style="margin-top:.6rem"><summary>Demander une avance</summary><form data-form="mdAvance" class="grid" style="margin-top:.6rem;align-items:end"><div style="grid-column:span 2"><label>Objet</label><input name="objet" required placeholder="ex. Causeries éducatives, village B"></div><div><label>Montant (FCFA)</label><input name="montant" type="number" min="1" required></div><div><label>Projet</label><select name="projet">${opts(projs.map(p=>[p.id,libProj(p)]),'','— aucun —')}</select></div><div><label>Justification au plus tard le</label><input name="date_limite" type="date" required min="${today()}"></div><div><button class="btn sm" type="submit">Envoyer la demande</button></div></form></details></section>
  <section class="card"><h3>Mes missions (${mM.length})</h3>${svT(MI_COLS.slice(1),mM.map(m=>miLigne(m).slice(1)),'Aucune mission.')}
  ${mM.filter(m=>m.statut==='approuvee'&&m.agent_id===me.id).map(m=>`<form data-form="mdRapport" data-id="${m.id}" class="row" style="margin-top:.5rem"><span>Rapport de la mission « ${esc(m.objet)} » :</span><input name="fichier" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required aria-label="Rapport de mission"><button class="btn sm" type="submit">Déposer</button></form>`).join('')}
- ${p07?omForm():`<p class="note">Pour établir des ordres de mission complets, exécutez le script 07 dans Supabase.</p>`}</section>
+ ${p08?`<p class="note">Un ordre de mission s'établit à partir d'un TDR validé : <button class="lnk" data-act="go" data-v="missions">TDR et ordres de mission</button>.</p>`:p07?omForm():`<p class="note">Pour établir des ordres de mission complets, exécutez le script 07 dans Supabase.</p>`}</section>
  <section class="card"><h3>Mes demandes d'achat (${mC.length})</h3>${svT(['Date','Objet','Demandeur','#Montant','Statut',''],mC.map(acLigne),'Aucune demande d\'achat.')}
  ${mC.filter(a=>a.statut==='commandee'&&a.commande_par!==me.id).map(a=>`<div class="card" style="margin-top:.5rem"><b>Réception de « ${esc(a.objet)} »</b> (${esc(a.bc_numero||'')})${acRecForm(a)}</div>`).join('')}
  <details style="margin-top:.6rem"><summary>Faire une demande d'achat</summary><form data-form="mdAchat" class="grid" style="margin-top:.6rem;align-items:end"><div style="grid-column:span 2"><label>Objet</label><input name="objet" required></div><div><label>Quantité</label><input name="quantite"></div><div><label>Montant estimé (FCFA)</label><input name="montant" type="number" min="1" required></div><div><label>Projet</label><select name="projet">${opts(projs.map(p=>[p.id,libProj(p)]),'','— aucun —')}</select></div><div><label>Pour le</label><input name="date_besoin" type="date"></div><div style="grid-column:1/-1"><label>Description et spécifications</label><textarea name="description" rows="2"></textarea></div><div><button class="btn sm" type="submit">Envoyer la demande</button></div></form></details></section>`}
@@ -4330,28 +4335,28 @@ function miLigne(m){const n=omMembres(m).length;
   `<div class="row">${miAppr(m)?`<button class="btn sm" data-act="miSt" data-v="approuvee" data-id="${m.id}">Signer</button><button class="btn ghost sm" data-act="miRej" data-id="${m.id}">Rejeter</button>`:''}${miLiq(m)?`<button class="btn sm" data-act="miSt" data-v="liquidee" data-id="${m.id}">Liquider</button>`:''}<button class="btn ghost sm" data-act="miOM" data-id="${m.id}">${m.numero?'Ordre de mission':'Aperçu de l\'ordre'}</button>${omPeutAnnuler(m)?`<button class="btn ghost sm" data-act="miAnn" data-id="${m.id}">Annuler l'ordre</button>`:''}</div>`]}
 
 /* ---------- formulaire : établir un ordre de mission ---------- */
-function omForm(){if(!p07)return '';const tous=gAdm()||['DP','CP'].includes(me.role);
+function omForm(t){if(!p07)return '';t=t||{};const tous=gAdm()||['DP','CP'].includes(me.role);
  const ag=S.staff.filter(u=>accesOK(u)&&u.role!=='EXT'&&(tous||u.id===me.id||auDessusC(u.id))).sort((a,b)=>a.nom.localeCompare(b.nom));
  const autres=S.staff.filter(u=>accesOK(u)&&u.role!=='EXT').sort((a,b)=>a.nom.localeCompare(b.nom));
  const acts=S.cadre.filter(c=>c.niveau==='act'),proj=S.projets.filter(p=>!['cloture','archive','rejete'].includes(p.statut));
  const h=t=>`<h4 style="grid-column:1/-1;margin:.8rem 0 0;border-bottom:1px solid var(--line,#ddd);padding-bottom:.2rem">${t}</h4>`;
- return `<details style="margin-top:.6rem"><summary><b>Établir un ordre de mission</b></summary>
+ return `<details style="margin-top:.6rem" ${t.id?'open':''}><summary><b>Établir un ordre de mission</b></summary>
  <p class="muted" style="margin-top:.5rem">Le responsable hiérarchique prépare l'ordre ; il est signé par le Directeur exécutif ou, à défaut, par le Directeur des programmes. Quand le Directeur exécutif part lui-même en mission, l'ordre est signé par le Président du Conseil d'administration. À la signature, l'ordre reçoit un numéro officiel et un QR code qui permet à toute autorité de vérifier son authenticité.</p>
- <form data-form="mdMission" class="grid" style="align-items:end">
+ <form data-form="mdMission" class="grid" style="align-items:end">${t.id?`<input type="hidden" name="tdr_id" value="${t.id}"><p class="note" style="grid-column:1/-1">Prérempli depuis le TDR ${esc(t.numero||'')} « ${esc(t.titre)} ».</p>`:''}
  ${h('1. Objet et cadre')}
- <div><label>Type de mission</label><select name="type_mission">${opts(OM_TYPES.map(x=>[x,x]),OM_TYPES[0])}</select></div>
- <div style="grid-column:span 2"><label>Objet de la mission</label><input name="objet" required placeholder="ex. Sensibilisation des riverains du chantier"></div>
- <div><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),'','— hors projet —')}</select></div>
- <div style="grid-column:span 2"><label>Activité du cadre logique</label><select name="activite">${opts(acts.map(a=>[a.id,`${(projet(a.projet_id)||{}).code||''} · ${a.code?a.code+' ':''}${a.libelle}`.slice(0,140)]),'','— aucune —')}</select></div>
- <div style="grid-column:span 2"><label>Ligne budgétaire imputée</label><select name="ligne">${opts(S.blignes.filter(l=>proj.some(p=>p.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''} · ${l.code?l.code+' ':''}${l.libelle}`.slice(0,140)]),'','— à préciser par la comptabilité —')}</select></div>
+ <div><label>Type de mission</label><select name="type_mission">${opts(OM_TYPES.map(x=>[x,x]),t.type_mission||OM_TYPES[0])}</select></div>
+ <div style="grid-column:span 2"><label>Objet de la mission</label><input name="objet" required value="${esc(t.titre||'')}" placeholder="ex. Sensibilisation des riverains du chantier"></div>
+ <div><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),t.projet_id||'','— hors projet —')}</select></div>
+ <div style="grid-column:span 2"><label>Activité du cadre logique</label><select name="activite">${opts(acts.map(a=>[a.id,`${(projet(a.projet_id)||{}).code||''} · ${a.code?a.code+' ':''}${a.libelle}`.slice(0,140)]),t.activite_id||'','— aucune —')}</select></div>
+ <div style="grid-column:span 2"><label>Ligne budgétaire imputée</label><select name="ligne">${opts(S.blignes.filter(l=>proj.some(p=>p.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''} · ${l.code?l.code+' ':''}${l.libelle}`.slice(0,140)]),t.ligne_id||'','— à préciser par la comptabilité —')}</select></div>
  ${h('2. Missionnaires')}
- <div><label>Chef de mission</label><select name="agent" required>${opts(ag.map(u=>[u.id,`${u.nom} (${posteLib(u)})`]),me.id)}</select></div>
+ <div><label>Chef de mission</label><select name="agent" required>${opts(ag.map(u=>[u.id,`${u.nom} (${posteLib(u)})`]),t.auteur_id||me.id)}</select></div>
  <div style="grid-column:span 2"><label>Autres membres d'OSV</label><div class="domChk" style="max-height:9rem;overflow:auto;border:1px solid var(--line,#ccc);padding:.3rem .5rem;border-radius:6px">${autres.map(u=>`<label style="display:block;font-weight:normal"><input type="checkbox" name="membres" value="${u.id}"> ${esc(u.nom)} <span class="muted">· ${esc(posteLib(u))}</span></label>`).join('')}</div></div>
  <div style="grid-column:1/-1"><label>Personnes sans compte (consultant, enquêteur, chauffeur, partenaire) : une par ligne, « nom ; fonction ; structure »</label><textarea name="externes" rows="2" placeholder="KOUASSI Aya ; Enquêtrice ; OSV"></textarea></div>
  ${h('3. Itinéraire et calendrier')}
- <div><label>Destination principale</label><input name="destination" required placeholder="ex. Kong"></div>
- <div><label>Départ</label><input name="date_depart" type="date" required></div>
- <div><label>Retour</label><input name="date_retour" type="date" required></div>
+ <div><label>Destination principale</label><input name="destination" required value="${esc(t.destination||'')}" placeholder="ex. Kong"></div>
+ <div><label>Départ</label><input name="date_depart" type="date" required value="${t.date_debut||''}"></div>
+ <div><label>Retour</label><input name="date_retour" type="date" required value="${t.date_fin||''}"></div>
  <div style="grid-column:1/-1"><label>Étapes : une par ligne, « date ; heure ; de ; à ; moyen »</label><textarea name="itineraire" rows="3" placeholder="03/11/2026 ; 06:00 ; Yamoussoukro ; Kong ; Véhicule OSV&#10;06/11/2026 ; 14:00 ; Kong ; Yamoussoukro ; Véhicule OSV"></textarea></div>
  <div style="grid-column:1/-1"><label>Structures d'accueil et personnes à rencontrer : une par ligne, « structure ; localité ; contact »</label><textarea name="accueil" rows="3" placeholder="Préfecture de Kong ; Kong ; Secrétaire général&#10;Base vie EBOMAF ; Kong ; Responsable HSE"></textarea></div>
  ${h('4. Moyens logistiques')}
@@ -4360,8 +4365,8 @@ function omForm(){if(!p07)return '';const tous=gAdm()||['DP','CP'].includes(me.r
  <div><label>Chauffeur</label><input name="chauffeur"></div>
  <div><label>Hébergement</label><select name="hebergement">${opts(OM_HEB.map(x=>[x,x]),OM_HEB[0])}</select></div>
  ${h('5. Termes de référence')}
- <div style="grid-column:1/-1"><label>Objectifs et tâches</label><textarea name="tdr" rows="3" required></textarea></div>
- <div style="grid-column:1/-1"><label>Résultats et livrables attendus</label><textarea name="resultats" rows="2" placeholder="ex. rapport de mission, listes de présence, photos"></textarea></div>
+ <div style="grid-column:1/-1"><label>Objectifs et tâches</label><textarea name="tdr" rows="3" required>${esc([t.objectif_general,t.objectifs_specifiques].filter(Boolean).join('\n'))}</textarea></div>
+ <div style="grid-column:1/-1"><label>Résultats et livrables attendus</label><textarea name="resultats" rows="2" placeholder="ex. rapport de mission, listes de présence, photos">${esc([t.resultats,t.livrables].filter(Boolean).join('\n'))}</textarea></div>
  ${h('6. Prise en charge financière')}
  <div><label>Barème du per diem</label><select name="bareme">${opts(S.baremes.map(b=>[`${b.categorie}|${b.zone}`,`${b.categorie} · ${b.zone} · ${num(b.per_diem)}/jour`]),'',S.baremes.length?'— choisir —':'aucun barème fixé')}</select></div>
  <div><label>Per diem par jour et par personne (sans barème)</label><input name="per_diem" type="number" min="0"></div>
@@ -4372,7 +4377,7 @@ function omForm(){if(!p07)return '';const tous=gAdm()||['DP','CP'].includes(me.r
  <div style="grid-column:1/-1"><label>Consignes de sécurité</label><textarea name="securite" rows="3">${esc(OM_SECU)}</textarea></div>
  <div style="grid-column:1/-1"><button class="btn" type="submit">Envoyer pour signature</button></div></form></details>`}
 
-async function omEtablir(f,d){const o=S.org.id;
+async function omEtablir(f,d){const o=S.org.id;if(p08&&!d.tdr_id){alert('Un ordre de mission s\'établit à partir d\'un TDR validé : ouvrez « TDR et ordres de mission ».');return}
  if(d.date_retour<d.date_depart){alert('La date de retour doit suivre la date de départ.');return}
  const ac=d.activite&&S.cadre.find(x=>x.id===d.activite),li=d.ligne&&S.blignes.find(x=>x.id===d.ligne);
  if((ac||li)&&!d.projet){alert('Choisissez le projet auquel se rattachent l\'activité et la ligne budgétaire.');return}
@@ -4389,7 +4394,7 @@ async function omEtablir(f,d){const o=S.org.id;
  const b=d.bareme&&S.baremes.find(x=>`${x.categorie}|${x.zone}`===d.bareme),pd=b?Number(b.per_diem):(nbr(d.per_diem)||0),mid=uuid();
  const deP=omDEPart(ids),sign=S.staff.filter(u=>accesOK(u)&&(deP?u.role==='CA':u.role==='DE')).map(u=>u.id);
  action(async()=>{
-  await ins('missions',{id:mid,org_id:o,agent_id:d.agent,projet_id:d.projet||null,activite_id:d.activite||null,ligne_id:d.ligne||null,type_mission:d.type_mission,objet:String(d.objet).trim(),destination:String(d.destination).trim(),date_depart:d.date_depart,date_retour:d.date_retour,
+  await ins('missions',{id:mid,org_id:o,agent_id:d.agent,...(d.tdr_id?{tdr_id:d.tdr_id}:{}),projet_id:d.projet||null,activite_id:d.activite||null,ligne_id:d.ligne||null,type_mission:d.type_mission,objet:String(d.objet).trim(),destination:String(d.destination).trim(),date_depart:d.date_depart,date_retour:d.date_retour,
    transport:d.transport||null,vehicule:(d.vehicule||'').trim()||null,chauffeur:(d.chauffeur||'').trim()||null,hebergement:d.hebergement||null,tdr:(d.tdr||'').trim()||null,resultats:(d.resultats||'').trim()||null,itineraire:it,accueil:acc,urgence:(d.urgence||'').trim()||null,securite:(d.securite||'').trim()||null,
    per_diem_jour:pd,nb_jours:nb,frais_transport:nbr(d.frais_transport)||0,autres_frais:nbr(d.autres_frais)||0});
   const rows=[...mb.map((id,i)=>{const u=S.staff.find(x=>x.id===id);return {org_id:o,mission_id:mid,user_id:id,nom:u.nom,fonction:posteLib(u),structure:S.org.nom,role_mission:'Membre',per_diem_jour:pd,nb_jours:nb,ordre:i+1}}),
@@ -4517,14 +4522,149 @@ function accHero(){const n=mesNotifs().length,a=p03?alertes().length:0,anim=dsAn
  return `<section class="hero${anim}"><p class="hero-date">${ico('cal')}${dateLongue()}</p><h1>Bonjour, ${esc(prenom)}.</h1><p class="hero-msg">${msg}</p>
  <p class="hero-meta">${esc(posteLib(me))}${me.bureau?' · '+esc(bur(me.bureau)):''} · ${esc(S.org.nom)}</p><span class="route" aria-hidden="true"></span></section>`}
 
+
+/* ===== Accès au budget (script 09) ===== */
+let p09=false;
+const PCOLS='id,org_id,nom,bailleur,debut,fin,zone,domaine,bureau_id,chef_id,statut,cree_par,cree_le,valide_par,valide_le,programme_id,code';
+const employeC=(p,u)=>p.chefId===u||(p.membres||[]).some(m=>m.staffId===u&&(!m.fin||m.fin>=today()));
+const accBud=(p,u)=>(S.accBud||[]).some(a=>a.projet_id===p.id&&a.user_id===u);
+function budCell(p,m){const u=S.staff.find(x=>x.id===m.staffId)||{};
+ if(['DE','DP','RA','CA'].includes(u.role))return '<span class="muted">d\'office</span>';
+ if(u.role==='CPT')return '<span class="tag ok">oui</span> <span class="muted">comptable affecté</span>';
+ if(u.statut!=='Salarié')return `<span class="muted">non (${esc((u.statut||'').toLowerCase())})</span>`;
+ const a=accBud(p,u.id),peut=['DE','DP'].includes(me.role);
+ return a?`<span class="tag ok">autorisé</span>${peut?` <button class="btn ghost sm" data-act="budRet" data-p="${p.id}" data-id="${u.id}">Retirer</button>`:''}`:(peut?`<button class="btn ghost sm" data-act="budOk" data-p="${p.id}" data-id="${u.id}">Autoriser</button>`:'<span class="muted">non</span>');}
+document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.target.closest('[data-act="budOk"],[data-act="budRet"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
+ const p=projet(b.dataset.p),u=b.dataset.id,ok=b.dataset.act==='budOk';if(!p)return;
+ if(ok&&!confirm(`Autoriser ${who(u)} à voir le budget, les dépenses et les factures du projet « ${p.nom} » ?`))return;
+ action(async()=>{if(ok)await ins('acces_budget',{projet_id:p.id,user_id:u,org_id:S.org.id});else await del('acces_budget',`projet_id=eq.${p.id}&user_id=eq.${u}`);
+  await notifierSrv([u],ok?`Vous avez maintenant accès au budget du projet « ${p.nom} »`:`Votre accès au budget du projet « ${p.nom} » a été retiré`,'projet',p.id)},ok?'Accès au budget ouvert.':'Accès au budget retiré.')},true);
+
+/* ===== Termes de référence (TDR) des missions (script 08) ===== */
+let p08=false,tdrSel=null,tdrEdit=null;
+const TDR_ST={brouillon:['Brouillon',''],sup:['Chez le supérieur hiérarchique','warn'],dp:['Vérification du DP','warn'],de:['Validation du DE','warn'],ca:['Validation du PCA','warn'],valide:['Validé','ok'],a_corriger:['À corriger','bad'],rejete:['Rejeté','bad'],annule:['Retiré','']};
+const TDR_ETAPE={sup:'Approbation du supérieur hiérarchique',dp:'Vérification du Directeur des programmes',de:'Validation du Directeur exécutif',ca:'Validation du Président du Conseil d\'administration',brouillon:'Soumission',a_corriger:'Soumission'};
+const TDR_BTN={sup:'Approuver et transmettre',dp:'Vérifié : transmettre au DE',de:'Valider le TDR',ca:'Valider le TDR'};
+const TDR_SEC=[['contexte','Contexte et justification','Pourquoi cette mission, maintenant : situation de départ, problème constaté, données disponibles, lien avec le projet.'],
+ ['objectif_general','Objectif général','Le changement auquel la mission contribue, en une phrase.'],
+ ['objectifs_specifiques','Objectifs spécifiques','Ce que la mission doit atteindre, un objectif par ligne.'],
+ ['resultats','Résultats attendus (chiffrés)','ex. 300 riverains sensibilisés, dont au moins 50 % de femmes ; 4 séances tenues ; 20 plaintes enregistrées et transmises sous 72 h.'],
+ ['cibles','Publics cibles','Qui, combien, où : effectifs prévus par village, par sexe et par tranche d\'âge.'],
+ ['inclusion','Inclusion','Comment la mission atteint les femmes, les jeunes, les personnes âgées, les personnes handicapées et les non-lettrés : langue locale, horaires, lieux accessibles, interprète.'],
+ ['methodologie','Démarche et activités','Déroulement, outils (causeries, porte-à-porte, théâtre forum…), supports, partenaires mobilisés.'],
+ ['equipe','Composition de l\'équipe','Chef de mission, membres, rôle de chacun.'],
+ ['chronogramme','Chronogramme','Jour par jour : date, lieu, activité.'],
+ ['risques','Risques, sécurité et protection','Risques (route, santé, tensions, météo) et mesures ; rappel du code de conduite et de la protection contre l\'exploitation et les abus sexuels.'],
+ ['indicateurs','Indicateurs de suivi','Indicateur, cible, source de vérification (listes de présence, fiches, photos).'],
+ ['livrables','Livrables','ex. rapport de mission sous 5 jours ouvrables, listes de présence signées, base de données des participants.']];
+const tdrTot=t=>somme(t.budget||[],b=>Number(b.quantite)*Number(b.cout));
+const tdrComplet=t=>{const c=['titre','destination','date_debut','date_fin',...TDR_SEC.map(s=>s[0])].filter(k=>String(t[k]||'').trim()).length+((t.budget||[]).length?1:0);return c/(TDR_SEC.length+5)};
+function tdrActeur(t){if(!t||t.auteur_id===me.id)return false;const a=S.staff.find(u=>u.id===t.auteur_id)||{};
+ return t.statut==='sup'?a.supId===me.id:t.statut==='dp'?me.role==='DP':t.statut==='de'?me.role==='DE':t.statut==='ca'?me.role==='CA':false}
+const tdrOM=t=>S.missions.find(m=>m.tdr_id===t.id&&!['rejetee','annulee'].includes(m.statut));
+const tdrPeutOM=t=>t.statut==='valide'&&!tdrOM(t)&&(t.auteur_id===me.id||gAdm()||['DP','CP'].includes(me.role)||auDessusC(t.auteur_id));
+function tdrAlertes(){if(!p08)return [];const A=[],m=S.tdrs.filter(tdrActeur);
+ if(m.length)A.push(['warn',`${m.length} TDR à traiter (${m.map(t=>TDR_ST[t.statut][0].toLowerCase()).filter((x,i,a)=>a.indexOf(x)===i).join(', ')})`,'go','missions']);
+ const c=S.tdrs.filter(t=>t.auteur_id===me.id&&t.statut==='a_corriger').length;if(c)A.push(['bad',`${c} de vos TDR renvoyé(s) pour correction`,'go','missions']);
+ const o=S.tdrs.filter(t=>t.auteur_id===me.id&&tdrPeutOM(t)).length;if(o)A.push(['warn',`${o} TDR validé(s) : établissez l'ordre de mission`,'go','missions']);return A}
+const TDR_COLS=['TDR','Mission','Dates','Rédigé par','Statut','Ordre de mission',''];
+const tdrLigne=t=>{const om=tdrOM(t);return [`${t.numero?`<b>${esc(t.numero)}</b><br>`:''}${esc(t.titre)}`,`${esc(t.destination||'—')}${t.projet_id?`<br><span class="muted">${esc(libProj(projet(t.projet_id)))}</span>`:''}`,`${fmtD(t.date_debut)} → ${fmtD(t.date_fin)}`,esc(who(t.auteur_id)),tag(TDR_ST[t.statut]),
+ om?`${esc(om.numero||'')} ${tag(MI_ST[om.statut])}`:t.statut==='valide'?'<span class="muted">à établir</span>':'—',`<button class="btn sm${tdrActeur(t)?'':' ghost'}" data-act="tdrOuvrir" data-id="${t.id}">${tdrActeur(t)?'Traiter':'Ouvrir'}</button>`]};
+
+function svMissions(){if(!p08)return head('TDR et ordres de mission','')+'<p class="note">Exécutez le script 08 dans Supabase pour activer les TDR.</p>';
+ if(tdrEdit)return tdrEditeur(tdrEdit==='new'?null:S.tdrs.find(t=>t.id===tdrEdit));
+ if(tdrSel&&S.tdrs.find(t=>t.id===tdrSel))return tdrDetail(S.tdrs.find(t=>t.id===tdrSel));
+ const aT=S.tdrs.filter(tdrActeur),mes=S.tdrs.filter(t=>t.auteur_id===me.id&&t.statut!=='annule'),autres=S.tdrs.filter(t=>t.auteur_id!==me.id&&!aT.includes(t)&&t.statut!=='annule');
+ const n=k=>S.tdrs.filter(t=>t.statut===k).length,enCours=['sup','dp','de','ca'].reduce((s,k)=>s+n(k),0);
+ return head('TDR et ordres de mission','Chaque mission part de ses termes de référence. Le chef de mission rédige le TDR ; son supérieur l\'approuve, le Directeur des programmes le vérifie, le Directeur exécutif le valide. L\'ordre de mission s\'établit ensuite à partir du TDR validé.')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
+ `<ol class="svSteps circuit"><li>Rédaction par le chef de mission</li><li>Approbation du supérieur</li><li>Vérification du DP</li><li>Validation du DE</li><li>Ordre de mission établi</li><li>Ordre signé</li></ol>
+ <div class="kpis"><div class="kpi"><span>TDR en circuit de validation</span><b>${enCours}</b></div><div class="kpi"><span>À corriger</span><b>${n('a_corriger')}</b></div><div class="kpi"><span>Validés</span><b>${n('valide')}</b><span>${S.tdrs.filter(t=>t.statut==='valide'&&!tdrOM(t)).length} sans ordre de mission</span></div><div class="kpi"><span>Ordres de mission signés</span><b>${S.missions.filter(m=>m.numero).length}</b></div></div>
+ <p><button class="btn" data-act="tdrNouveau">Rédiger un TDR</button></p>
+ ${aT.length?`<section class="card notif"><h3>À traiter (${aT.length})</h3>${svT(TDR_COLS,aT.map(tdrLigne))}</section>`:''}
+ <section class="card"><h3>Mes TDR (${mes.length})</h3>${svT(TDR_COLS,mes.map(tdrLigne),'Vous n\'avez pas encore rédigé de TDR. Chaque mission commence par là : « Rédiger un TDR ».')}</section>
+ ${autres.length?`<section class="card"><h3>Autres TDR que vous pouvez consulter (${autres.length})</h3>${svT(TDR_COLS,autres.map(tdrLigne))}</section>`:''}`}
+
+function tdrEditeur(t){t=t||{};const proj=S.projets.filter(p=>!['cloture','archive','rejete'].includes(p.statut)),acts=S.cadre.filter(c=>c.niveau==='act'),c=Math.round(tdrComplet(t)*100);
+ const bud=(t.budget||[]).map(b=>`${b.libelle} ; ${b.quantite} ; ${b.unite||''} ; ${b.cout}`).join('\n');
+ const cor=t.id&&S.tavis.filter(a=>a.tdr_id===t.id&&a.decision==='a_corriger').slice(-1)[0];
+ return `<p><button class="lnk" data-act="tdrRetour">← TDR et ordres de mission</button></p>`+head(t.id?'Modifier le TDR':'Rédiger un TDR','Remplissez ce que vous savez ; le brouillon s\'enregistre et se complète plus tard. Pour soumettre, l\'objectif général, les résultats attendus, la destination et les dates sont obligatoires.')+
+ (cor?`<section class="card notif"><h3>Corrections demandées par ${esc(who(cor.par))}</h3><p class="pre">${esc(cor.commentaire||'')}</p></section>`:'')+
+ `<form data-form="tdrForm" data-id="${t.id||''}" class="card grid tdrF" style="align-items:end">
+ <h3 style="grid-column:1/-1">Identification de la mission</h3>
+ <div style="grid-column:span 2"><label>Intitulé de la mission</label><input name="titre" required value="${esc(t.titre||'')}" placeholder="ex. Sensibilisation des riverains du chantier de l'aéroport de Kong"></div>
+ <div><label>Type de mission</label><select name="type_mission">${opts(OM_TYPES.map(x=>[x,x]),t.type_mission||OM_TYPES[0])}</select></div>
+ <div><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),t.projet_id||'','— hors projet —')}</select></div>
+ <div style="grid-column:span 2"><label>Activité du cadre logique</label><select name="activite">${opts(acts.map(a=>[a.id,`${(projet(a.projet_id)||{}).code||''} · ${a.code?a.code+' ':''}${a.libelle}`.slice(0,140)]),t.activite_id||'','— aucune —')}</select></div>
+ <div style="grid-column:span 2"><label>Ligne budgétaire</label><select name="ligne">${opts(S.blignes.filter(l=>proj.some(p=>p.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''} · ${l.code?l.code+' ':''}${l.libelle}`.slice(0,140)]),t.ligne_id||'','— à préciser —')}</select></div>
+ <div><label>Destination</label><input name="destination" value="${esc(t.destination||'')}" placeholder="ex. Kong"></div>
+ <div><label>Du</label><input name="date_debut" type="date" value="${t.date_debut||''}"></div><div><label>Au</label><input name="date_fin" type="date" value="${t.date_fin||''}"></div>
+ ${TDR_SEC.map(([k,l,ph],i)=>`<div style="grid-column:1/-1"><label for="tdr_${k}">${i+1}. ${l}${['objectif_general','resultats'].includes(k)?' <span class="req">*</span>':''}</label><textarea id="tdr_${k}" name="${k}" rows="${['contexte','methodologie','chronogramme'].includes(k)?4:3}" placeholder="${esc(ph)}">${esc(t[k]||'')}</textarea></div>`).join('')}
+ <div style="grid-column:1/-1"><label for="tdr_budget">${TDR_SEC.length+1}. Budget estimatif : une ligne par poste, « libellé ; quantité ; unité ; coût unitaire »</label><textarea id="tdr_budget" name="budget" rows="4" placeholder="Per diem équipe ; 12 ; personne-jour ; 15000&#10;Carburant ; 200 ; litre ; 875&#10;Location de sonorisation ; 4 ; séance ; 25000">${esc(bud)}</textarea></div>
+ <div style="grid-column:1/-1" class="row"><button class="btn ghost" type="submit" value="brouillon">Enregistrer le brouillon</button><button class="btn" type="submit" value="soumettre">Enregistrer et soumettre</button>${t.id?'':''}<span class="muted">${t.id?`Complet à ${c} %`:''}</span></div></form>`}
+
+function tdrDetail(t){const om=tdrOM(t),av=S.tavis.filter(a=>a.tdr_id===t.id).sort((a,b)=>a.le<b.le?-1:1),act=tdrActeur(t),auteur=t.auteur_id===me.id,c=Math.round(tdrComplet(t)*100),tot=tdrTot(t);
+ return `<p><button class="lnk" data-act="tdrRetour">← TDR et ordres de mission</button></p>${srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:''}
+ <div class="head"><h1>${esc(t.titre)}</h1><p>${t.numero?`<b>${esc(t.numero)}</b> · `:''}${esc(t.type_mission||'Mission')} · ${esc(t.destination||'—')} · du ${fmtD(t.date_debut)} au ${fmtD(t.date_fin)} · rédigé par ${esc(who(t.auteur_id))}</p></div>
+ <div class="row" style="margin-bottom:1rem">${tag(TDR_ST[t.statut])}<span class="muted">TDR complet à ${c} %</span>${om?`<span>Ordre de mission ${esc(om.numero||'en attente de signature')} ${tag(MI_ST[om.statut])}</span>`:''}</div>
+ ${act?`<section class="card notif"><h3>${TDR_ETAPE[t.statut]}</h3><p class="muted">Lisez le TDR ci-dessous. Vous pouvez le faire avancer, ou le renvoyer au rédacteur avec vos corrections.</p>
+  <form data-form="tdrDecision" data-id="${t.id}"><label for="tdrAvis">Votre avis (obligatoire pour un renvoi)</label><textarea id="tdrAvis" name="avis" rows="3" placeholder="ex. Préciser les villages et les effectifs attendus par village ; ajouter la langue des séances."></textarea>
+  <div class="row" style="margin-top:.6rem"><button class="btn" type="submit" value="ok">${TDR_BTN[t.statut]}</button><button class="btn ghost" type="submit" value="a_corriger">Renvoyer pour correction</button>${['de','ca'].includes(t.statut)?'<button class="btn danger" type="submit" value="rejete">Rejeter</button>':''}</div></form></section>`:''}
+ ${auteur&&['brouillon','a_corriger'].includes(t.statut)?`<div class="row" style="margin-bottom:1rem"><button class="btn" data-act="tdrModif" data-id="${t.id}">Modifier</button><button class="btn ghost" data-act="tdrSoumettre" data-id="${t.id}">Soumettre</button><button class="btn danger sm" data-act="tdrRetirer" data-id="${t.id}">Retirer ce TDR</button></div>`:''}
+ ${tdrPeutOM(t)?`<section class="card notif"><h3>Le TDR est validé : établissez l'ordre de mission</h3><p class="muted">Le formulaire est prérempli à partir du TDR. Complétez les missionnaires, l'itinéraire, les structures d'accueil et les moyens, puis envoyez-le à la signature.</p>${omForm(t)}</section>`:''}
+ <div class="row" style="margin-bottom:1rem"><button class="btn ghost sm" data-act="tdrImprimer" data-id="${t.id}">Imprimer ou enregistrer en PDF</button>${om?`<button class="btn ghost sm" data-act="miOM" data-id="${om.id}">Voir l'ordre de mission</button>`:''}</div>
+ <article class="card tdrDoc">${t.projet_id&&projet(t.projet_id)?`<p class="muted">Projet : ${esc(libProj(projet(t.projet_id)))}${t.activite_id&&S.cadre.find(x=>x.id===t.activite_id)?` · activité ${esc(S.cadre.find(x=>x.id===t.activite_id).code||'')} ${esc(S.cadre.find(x=>x.id===t.activite_id).libelle)}`:''}</p>`:''}
+ ${TDR_SEC.map(([k,l],i)=>`<h3>${i+1}. ${l}</h3>${t[k]?`<p class="pre">${esc(t[k])}</p>`:'<p class="muted">Non renseigné.</p>'}`).join('')}
+ <h3>${TDR_SEC.length+1}. Budget estimatif</h3>${(t.budget||[]).length?svT(['Poste','#Quantité','Unité','#Coût unitaire','#Montant (FCFA)'],[...t.budget.map(b=>[esc(b.libelle),num(b.quantite),esc(b.unite||''),num(b.cout),num(Math.round(b.quantite*b.cout))]),['<b>Total</b>','','','',`<b>${num(tot)}</b>`]]):'<p class="muted">Non renseigné.</p>'}</article>
+ <section class="card"><h3>Circuit de validation</h3>${av.length?svT(['Date','Étape','Décision','Par','Avis'],av.map(a=>[new Date(a.le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'}),esc(TDR_ETAPE[a.etape]||a.etape),tag(TDR_ST[a.decision]||[a.decision,'']),esc(who(a.par)),esc(a.commentaire||'')])):'<p class="muted">Pas encore soumis.</p>'}</section>`}
+
+function tdrImprimer(t){const w=window.open('','_blank');if(!w){alert('Autorisez les fenêtres pour imprimer.');return}
+ const av=S.tavis.filter(a=>a.tdr_id===t.id).sort((a,b)=>a.le<b.le?-1:1),ok=t.statut==='valide',tot=tdrTot(t),p=t.projet_id&&projet(t.projet_id);
+ w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>TDR ${esc(t.numero||'')} ${esc(t.titre)}</title><style>@page{size:A4;margin:18mm 16mm}body{font-family:Cambria,Georgia,"Times New Roman",serif;font-size:11pt;line-height:1.45;color:#111;margin:0}
+ .ent{display:flex;gap:12px;align-items:center;border-bottom:1px solid #111;padding-bottom:8px}.ent img{height:70px}.ent b{font-size:12pt}h1{text-align:center;font-size:15pt;letter-spacing:.06em;margin:18px 0 4px}.s{text-align:center;margin:0 0 14px}h2{font-size:11.5pt;margin:14px 0 4px}p{margin:3px 0 6px;white-space:pre-wrap}
+ table{border-collapse:collapse;width:100%;margin:4px 0 8px}th,td{border:1px solid #777;padding:3px 6px;font-size:10pt;text-align:left;vertical-align:top}th{background:#eee}.n{text-align:right}.wm{position:fixed;top:40%;left:0;right:0;text-align:center;font-size:48pt;color:rgba(170,0,0,.12);transform:rotate(-25deg);font-family:Arial}
+ .bar{padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:8px;font-family:Arial}@media print{.bar{display:none}}</style></head><body><div class="bar"><button onclick="print()">Imprimer ou enregistrer en PDF</button> <button onclick="close()">Fermer</button></div>${ok?'':'<div class="wm">PROJET NON VALIDÉ</div>'}
+ <div class="ent"><img src="${LOGO}" alt="Logo ONG Sécurité Vie"><div><b>${esc(S.org.nom)}</b><br>Termes de référence ${esc(t.numero||'(en cours de validation)')}</div></div>
+ <h1>TERMES DE RÉFÉRENCE</h1><p class="s"><b>${esc(t.titre)}</b><br>${esc(t.type_mission||'Mission')} · ${esc(t.destination||'')} · du ${fmtD(t.date_debut)} au ${fmtD(t.date_fin)}${p?`<br>Projet : ${esc(libProj(p))}${p.bailleur?' · bailleur : '+esc(p.bailleur):''}`:''}</p>
+ ${TDR_SEC.map(([k,l],i)=>t[k]?`<h2>${i+1}. ${l}</h2><p>${esc(t[k])}</p>`:'').join('')}
+ ${(t.budget||[]).length?`<h2>${TDR_SEC.length+1}. Budget estimatif</h2><table><tr><th>Poste</th><th class="n">Quantité</th><th>Unité</th><th class="n">Coût unitaire</th><th class="n">Montant (FCFA)</th></tr>${t.budget.map(b=>`<tr><td>${esc(b.libelle)}</td><td class="n">${num(b.quantite)}</td><td>${esc(b.unite||'')}</td><td class="n">${num(b.cout)}</td><td class="n">${num(Math.round(b.quantite*b.cout))}</td></tr>`).join('')}<tr><th colspan="4">Total</th><th class="n">${num(tot)}</th></tr></table>`:''}
+ <h2>Circuit de validation</h2><table><tr><th>Étape</th><th>Nom</th><th>Décision</th><th>Date</th></tr><tr><td>Rédaction</td><td>${esc(who(t.auteur_id))}</td><td>Rédigé</td><td>${fmtD(t.cree_le)}</td></tr>${av.filter(a=>!['brouillon','a_corriger'].includes(a.etape)).map(a=>`<tr><td>${esc(TDR_ETAPE[a.etape]||a.etape)}</td><td>${esc(who(a.par))}</td><td>${esc((TDR_ST[a.decision]||[a.decision])[0])}${a.commentaire?' : '+esc(a.commentaire):''}</td><td>${fmtD(a.le)}</td></tr>`).join('')}</table>
+ ${ok?`<p style="margin-top:14px">Validé électroniquement dans OSV Gestion par ${esc(who(t.valide_par))} le ${new Date(t.valide_le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}.</p>`:''}</body></html>`);w.document.close()}
+
+const tdrPatch=d=>{const budget=lignesTexte(d.budget).map(c=>({libelle:c[0]||'',quantite:nbr(c[1])||0,unite:c[2]||'',cout:nbr(c[3])||0})).filter(b=>b.libelle);
+ const r={titre:String(d.titre||'').trim(),type_mission:d.type_mission||null,projet_id:d.projet||null,activite_id:d.activite||null,ligne_id:d.ligne||null,destination:(d.destination||'').trim()||null,date_debut:d.date_debut||null,date_fin:d.date_fin||null,budget};
+ TDR_SEC.forEach(([k])=>r[k]=(d[k]||'').trim()||null);return r};
+async function tdrNotifier(id){const r=(await sel('tdrs',`select=id,statut,titre,auteur_id&id=eq.${id}`))[0];if(!r)return;const a=S.staff.find(u=>u.id===r.auteur_id)||{},R=x=>S.staff.filter(u=>u.role===x&&accesOK(u)).map(u=>u.id);
+ const dest={sup:[a.supId],dp:R('DP'),de:R('DE'),ca:R('CA')}[r.statut];
+ if(dest)await notifierSrv(dest,`TDR à traiter (${TDR_ST[r.statut][0].toLowerCase()}) : ${r.titre}`,'missions',id);
+ if(['valide','a_corriger','rejete'].includes(r.statut))await notifierSrv([r.auteur_id],r.statut==='valide'?`Votre TDR « ${r.titre} » est validé : établissez l'ordre de mission`:r.statut==='a_corriger'?`Votre TDR « ${r.titre} » est renvoyé pour correction`:`Votre TDR « ${r.titre} » est rejeté`,'missions',id)}
+document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target,t=f.dataset&&f.dataset.form;if(!['tdrForm','tdrDecision'].includes(t))return;e.preventDefault();e.stopImmediatePropagation();
+ const d=Object.fromEntries(new FormData(f)),go=e.submitter&&e.submitter.value;srvMsg='';
+ if(t==='tdrForm'){const r=tdrPatch(d);if(!r.titre){alert('Donnez un intitulé à la mission.');return}if(r.date_debut&&r.date_fin&&r.date_fin<r.date_debut){alert('La date de fin doit suivre la date de début.');return}
+  const ac=r.activite_id&&S.cadre.find(x=>x.id===r.activite_id),li=r.ligne_id&&S.blignes.find(x=>x.id===r.ligne_id);
+  if((ac&&ac.projet_id!==r.projet_id)||(li&&li.projet_id!==r.projet_id)){alert('L\'activité et la ligne budgétaire doivent appartenir au projet choisi.');return}
+  let id=f.dataset.id;action(async()=>{if(id)await upd('tdrs',`id=eq.${id}`,r);else{id=uuid();await ins('tdrs',{id,org_id:S.org.id,...r})}
+   if(go==='soumettre'){await upd('tdrs',`id=eq.${id}`,{statut:'sup',avis_courant:null});await tdrNotifier(id)}tdrEdit=null;tdrSel=id},go==='soumettre'?'TDR soumis : il suit maintenant le circuit de validation.':'Brouillon enregistré.');return}
+ const id=f.dataset.id,av=(d.avis||'').trim();if(go!=='ok'&&!av){alert('Écrivez votre avis : le rédacteur doit savoir quoi corriger.');return}
+ if(go==='rejete'&&!confirm('Rejeter définitivement ce TDR ?'))return;
+ action(async()=>{await upd('tdrs',`id=eq.${id}`,{statut:go,avis_courant:av||null});await tdrNotifier(id)},go==='ok'?'Décision enregistrée : le TDR passe à l\'étape suivante.':go==='a_corriger'?'TDR renvoyé au rédacteur pour correction.':'TDR rejeté.')},true);
+document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.target.closest('[data-act^="tdr"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const a=b.dataset.act,id=b.dataset.id;srvMsg='';
+ if(a==='tdrNouveau'){tdrEdit='new';render();scrollTo(0,0);return}
+ if(a==='tdrRetour'){tdrEdit=null;tdrSel=null;render();scrollTo(0,0);return}
+ if(a==='tdrOuvrir'){tdrSel=id;tdrEdit=null;render();scrollTo(0,0);return}
+ if(a==='tdrModif'){tdrEdit=id;render();scrollTo(0,0);return}
+ if(a==='tdrImprimer'){tdrImprimer(S.tdrs.find(t=>t.id===id));return}
+ if(a==='tdrSoumettre'){action(async()=>{await upd('tdrs',`id=eq.${id}`,{statut:'sup',avis_courant:null});await tdrNotifier(id)},'TDR soumis : il suit maintenant le circuit de validation.');return}
+ if(a==='tdrRetirer'){if(!confirm('Retirer ce TDR ? Il ne sera plus soumis.'))return;action(async()=>{await upd('tdrs',`id=eq.${id}`,{statut:'annule'})},'TDR retiré.');tdrSel=null;return}},true);
+document.addEventListener('click',e=>{const b=e.target.closest('[data-act="go"]');if(b&&b.dataset.v==='missions'){tdrSel=null;tdrEdit=null}},true);
+
 /* ---------- démarrage ---------- */
 async function srvInit(){
  if(MODE!=='srv'){render();return}
  save=function(){};                                              // rien de réel n'est gardé dans le navigateur
  const _log=log;log=function(a){if(me&&S.org&&S.org.id)ins('audit',{org_id:S.org.id,user_id:me.id,action:String(a).slice(0,500)}).catch(()=>{})};
- loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
+ loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{missions:'TDR et ordres de mission',adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
  render=srvRender;
- viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
+ viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,missions:svMissions,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
  S=srvVide();me=null;sess=sessLire();await omVerifCharger();
  const h=new URLSearchParams(location.hash.slice(1));                // retour d'un lien « mot de passe oublié »
  if(h.get('access_token')){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
