@@ -119,7 +119,7 @@ td{padding:.55rem .5rem;border-bottom:1px solid var(--line);vertical-align:top}
 .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:1rem;align-items:start}@media (max-width:980px){.split{grid-template-columns:1fr}}
 table.edt input,table.edt select{min-width:90px;padding:.35rem .4rem}td.num,th.num{text-align:right;white-space:nowrap}
 form.trait{display:grid;gap:.3rem;min-width:180px}
-.doc{background:#fff;color:#111;border:1px solid var(--line);padding:2rem clamp(1rem,4vw,3rem);font-family:Cambria,Georgia,'Times New Roman',serif;font-size:15px;line-height:1.55;max-width:900px}
+.doc{background:#fff;color:#111;border:1px solid var(--line);padding:2rem clamp(1rem,4vw,3rem);font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;max-width:900px}
 .doc h1,.doc h2,.doc h3,.doc h4,.doc h5{font-family:inherit;font-stretch:100%;color:#111}.doc h2{font-size:1.15rem;margin:1.6rem 0 .5rem}.doc h2.ph{border-bottom:1px solid #111;padding-bottom:.2rem}.doc h3{font-size:1.02rem;margin:1.1rem 0 .4rem}.doc h4{font-size:.98rem;margin:1rem 0 .3rem}.doc h5{font-size:.95rem;margin:.8rem 0 .3rem;font-style:italic}
 .doc table.dt{width:100%;border-collapse:collapse;margin:.4rem 0 .8rem;font-size:.9rem}.doc table.dt th,.doc table.dt td{border:1px solid #777;padding:.3rem .45rem;text-align:left;vertical-align:top}.doc table.dt th{background:#f0f0f0;font-weight:700}.doc table.dt .num{text-align:right}
 .doc .muted{color:#555}.doc ul{margin:.3rem 0 .6rem;padding-left:1.3rem}
@@ -302,7 +302,7 @@ details>summary{cursor:pointer}
 @media print{.rail,.topbar,.skip{display:none!important}.shell{display:block}.stage main{padding:0}}
 .sec-t{font-size:1.1rem;margin:1.8rem 0 .8rem}
 .tdrDoc h3{margin:1.1rem 0 .3rem}.tdrDoc .pre,.pre{white-space:pre-wrap}.circuit{margin:0 0 1.2rem}
-.ctrApercu{font-family:Cambria,Georgia,"Times New Roman",serif;font-size:15px;line-height:1.6;max-width:82ch}.ctrApercu h2,.ctrApercu h3{font-family:inherit}.ctrApercu .ct-t{text-align:center;font-size:1.2rem;margin:.6rem 0 .2rem}.ctrApercu .ct-s{text-align:center}.ctrApercu h3{font-size:1rem;margin:1rem 0 .2rem}.ctrApercu table{border-collapse:collapse;width:100%;margin:.4rem 0}.ctrApercu td,.ctrApercu th{border:1px solid var(--line);padding:.3rem .5rem;text-align:left}.ctrApercu .ct-annexe{border-top:2px dashed var(--line);margin-top:1.5rem;padding-top:1rem}
+.ctrApercu{font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;max-width:82ch}.ctrApercu h2,.ctrApercu h3{font-family:inherit}.ctrApercu .ct-t{text-align:center;font-size:1.2rem;margin:.6rem 0 .2rem}.ctrApercu .ct-s{text-align:center}.ctrApercu h3{font-size:1rem;margin:1rem 0 .2rem}.ctrApercu table{border-collapse:collapse;width:100%;margin:.4rem 0}.ctrApercu td,.ctrApercu th{border:1px solid var(--line);padding:.3rem .5rem;text-align:left}.ctrApercu .ct-annexe{border-top:2px dashed var(--line);margin-top:1.5rem;padding-top:1rem}
 .ctrApercu .doc-t{text-align:center;font-size:1.15rem;letter-spacing:.06em;margin:.4rem 0 .1rem}.ctrApercu .doc-s{text-align:center;color:var(--muted)}.ctrApercu h2{font-size:1rem;margin:1rem 0 .3rem}.ctrApercu .sig{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.ctrApercu .sig div{border:1px solid var(--line);padding:.6rem;min-height:90px}.ctrApercu .saut{border-top:2px dashed var(--line);margin:1.5rem 0 1rem}
 </style>
 </head>
@@ -1314,7 +1314,7 @@ function polSauver(){try{localStorage.setItem(KEY,JSON.stringify(S));return true
 async function polTelecharger(d){const v=vCour(d);if(!v||!d.dl)return;
  let nom,data,type;
  if(v.fichier){nom=v.fichier.nom;data=polBlob(v.fichier);type=data.type}
- else{const css='body{font-family:Cambria,Georgia,serif;font-size:11pt}h1{font-size:15pt;text-align:center}img{width:80px;height:80px}table{border-collapse:collapse}td{border:1px solid #999;padding:3pt 6pt;font-size:10pt}';
+ else{const css='body{font-family:Arial,Helvetica,sans-serif;font-size:10.5pt}h1{font-size:15pt;text-align:center}img{width:80px;height:80px}table{border-collapse:collapse}td{border:1px solid #999;padding:3pt 6pt;font-size:10pt}';
   nom=`${d.titre.replace(/[^A-Za-z0-9À-ÿ]+/g,'_').slice(0,60)}_v${v.v}.doc`;type='application/msword';
   data=`<html><head><meta charset="utf-8"><style>${css}</style></head><body><p><img src="${LOGO}" alt="Logo"></p><p>${esc(S.org.nom)}</p><h1>${esc(d.titre)}</h1><table><tr><td>Catégorie</td><td>${esc(d.categorie)}</td></tr><tr><td>Version</td><td>${esc(v.v)}</td></tr><tr><td>Approuvée le</td><td>${fmtD(v.dateApp)}</td></tr><tr><td>En vigueur le</td><td>${fmtD(v.dateEffet||v.publieLe)}</td></tr><tr><td>Responsable</td><td>${esc(d.responsable||'')}</td></tr></table>${LN(v.texte).map(t=>`<p>${esc(t)}</p>`).join('')}</body></html>`}
  if(me)log(`Document téléchargé : ${d.titre} (v${v.v})`);
@@ -1532,7 +1532,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
  const f=S.fdr.find(x=>x.id===(b.dataset.f||b.dataset.id));if(!f)return;const u=S.staff.find(x=>x.id===f.userId);
  if(a==='fdrPrint'||a==='fdrWord'){const html=docFdr(f);
   if(a==='fdrPrint'){const z=document.createElement('div');z.id='printzone';z.className='doc';z.innerHTML=html;document.body.appendChild(z);document.body.classList.add('print-doc');setTimeout(()=>{window.print();setTimeout(()=>{z.remove();document.body.classList.remove('print-doc')},500)},50)}
-  else fichier(`Feuille_de_route_${u.nom.replace(/[^A-Za-z0-9À-ÿ]+/g,'_')}.doc`,`<html><head><meta charset="utf-8"><style>body{font-family:Cambria,Georgia,serif;font-size:11pt}h1{font-size:15pt;text-align:center;text-transform:uppercase}h2{font-size:12.5pt;margin-top:14pt}table{border-collapse:collapse;width:100%}th,td{border:1px solid #999;padding:3pt 5pt;font-size:10pt;text-align:left}th{background:#eee}img{width:80px;height:80px}</style></head><body>${html}</body></html>`,'application/msword');
+  else fichier(`Feuille_de_route_${u.nom.replace(/[^A-Za-z0-9À-ÿ]+/g,'_')}.doc`,`<html><head><meta charset="utf-8"><style>body{font-family:Arial,Helvetica,sans-serif;font-size:10.5pt}h1{font-size:15pt;text-align:center;text-transform:uppercase}h2{font-size:12.5pt;margin-top:14pt}table{border-collapse:collapse;width:100%}th,td{border:1px solid #999;padding:3pt 5pt;font-size:10pt;text-align:left}th{background:#eee}img{width:80px;height:80px}</style></head><body>${html}</body></html>`,'application/msword');
   log(`Feuille de route ${a==='fdrPrint'?'imprimée':'téléchargée'} : ${u.nom}`);return}
  const self=u.id===me.id,val=peutValider(u),ed=(self||val)&&['brouillon','a_revoir'].includes(f.statut);
  if(a==='fdrDelObj'&&ed){f.objectifs=f.objectifs.filter(o=>o.id!==b.dataset.id);f.taches.forEach(t=>{if(t.objId===b.dataset.id)t.objId=''});histo(f,'Objectif retiré');save();render()}
@@ -4726,7 +4726,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act="go"]'
 
 /* ===== Papier à en-tête d'OSV : tous les documents imprimés ===== */
 const OSV_COORD={siege:'Siège : Yamoussoukro, 220 Zouessi · BP 1605 Yamoussoukro',telSiege:'27 35 98 86 15 / 07 48 47 51 28',nord:'Bureaux du Nord : Dabakala, au sein du district sanitaire de Dabakala',telNord:'07 69 56 10 02 / 05 01 29 52 52',mails:'contact@ongsecuritevie.org · securitevie25@gmail.com',site:'www.ongsecuritevie.org'};
-const PAPIER_CSS=`*{box-sizing:border-box}html,body{margin:0}body{font-family:Cambria,Georgia,"Times New Roman",serif;font-size:10.5pt;line-height:1.45;color:#16211d}
+const PAPIER_CSS=`*{box-sizing:border-box}html,body{margin:0}body{font-family:Arial,Helvetica,sans-serif;font-size:10pt;line-height:1.45;color:#16211d}
 .pe-tete{display:flex;align-items:center;gap:12px;padding-bottom:7px;border-bottom:1.4pt solid #0B3D2E;box-shadow:0 2.2pt 0 -0.6pt #EB6A0F}
 .pe-tete img{width:62px;height:62px;object-fit:contain}.pe-org{flex:1}.pe-org b{display:block;font-family:Arial,Helvetica,sans-serif;font-size:13pt;letter-spacing:.06em;color:#0B3D2E}
 .pe-org span{display:block;font-style:italic;font-size:9pt;color:#4a5a53}.pe-org small{display:block;font-family:Arial,Helvetica,sans-serif;font-size:7.5pt;color:#4a5a53;letter-spacing:.02em}
@@ -4982,7 +4982,7 @@ const dxBrd=(sz='4',c='8A9993')=>`<w:tblBorders>${['top','left','bottom','right'
 function dxCell(ctx,td,head,kvTh,w){const span=Number(td.getAttribute('colspan'))||1,shade=head?'EEF2EF':kvTh?'F5F7F5':null;
  const hasBlock=[...td.children].some(x=>['ul','p','div','table'].includes(x.tagName.toLowerCase()));
  const al=td.classList.contains('num')?'right':'left';
- const inner=hasBlock?dxBlocks(ctx,td,{cell:true}):dxP(dxInline(ctx,td,{sz:head?17:19,b:head||kvTh,font:head?'Arial':null,color:head?DX_V:null}),{ap:0,jc:al});
+ const inner=hasBlock?dxBlocks(ctx,td,{cell:true}):dxP(dxInline(ctx,td,{sz:head?17:18,b:head||kvTh,font:head?'Arial':null,color:head?DX_V:null}),{ap:0,jc:al});
  return `<w:tc><w:tcPr>${w?`<w:tcW w:w="${w}" w:type="dxa"/>`:''}${span>1?`<w:gridSpan w:val="${span}"/>`:''}${shade?`<w:shd w:val="clear" w:color="auto" w:fill="${shade}"/>`:''}<w:tcMar><w:top w:w="40" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/></w:tcMar></w:tcPr>${inner||'<w:p/>'}</w:tc>`}
 function dxTable(ctx,t){const kv=t.classList.contains('kv'),rows=[...t.querySelectorAll(':scope>thead>tr,:scope>tbody>tr,:scope>tr')];
  const ncol=Math.max(1,...rows.map(r=>[...r.children].reduce((s,c)=>s+(Number(c.getAttribute('colspan'))||1),0)));
@@ -4997,16 +4997,16 @@ function dxBlocks(ctx,el,o={}){let x='';el.childNodes.forEach(n=>{
  if(n.nodeType!==1)return;const tg=n.tagName.toLowerCase(),c=n.classList,al=(n.style&&n.style.textAlign)||'';
  if(tg==='h1')x+=dxP(dxInline(ctx,n,{b:true,font:'Arial',sz:28,color:DX_V,sp:30}),{jc:'center',av:120,ap:40,keep:true});
  else if(tg==='h2')x+=dxP(dxInline(ctx,n,{b:true,font:'Arial',sz:19,color:DX_V}),{jc:'left',av:200,ap:80,keep:true,bord:{sz:4}});
- else if(tg==='h3')x+=dxP(dxInline(ctx,n,{b:true,sz:21,color:DX_V}),{jc:'left',av:160,ap:40,keep:true});
- else if(tg==='p')x+=dxP(dxInline(ctx,n,{sz:c.contains('petit')?16:o.cell?19:21,pre:c.contains('pre')}),{jc:c.contains('doc-s')||al==='center'?'center':al==='right'?'right':o.cell?'left':'both',ap:o.cell?0:100});
- else if(tg==='ul'||tg==='ol')[...n.children].forEach((li,i)=>{x+=dxP(dxRun(tg==='ol'?`${i+1}. `:'•  ',{sz:o.cell?19:21})+dxInline(ctx,li,{sz:o.cell?19:21}),{ind:360,hang:240,ap:40,jc:'left'})});
+ else if(tg==='h3')x+=dxP(dxInline(ctx,n,{b:true,sz:20,color:DX_V}),{jc:'left',av:160,ap:40,keep:true});
+ else if(tg==='p')x+=dxP(dxInline(ctx,n,{sz:c.contains('petit')?16:o.cell?18:20,pre:c.contains('pre')}),{jc:c.contains('doc-s')||al==='center'?'center':al==='right'?'right':o.cell?'left':'both',ap:o.cell?0:100});
+ else if(tg==='ul'||tg==='ol')[...n.children].forEach((li,i)=>{x+=dxP(dxRun(tg==='ol'?`${i+1}. `:'•  ',{sz:o.cell?18:20})+dxInline(ctx,li,{sz:o.cell?18:20}),{ind:360,hang:240,ap:40,jc:'left'})});
  else if(tg==='table')x+=dxTable(ctx,n);
  else if(c.contains('saut'))x+='<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
  else if(c.contains('sig'))x+=dxBoites(ctx,n,1700);
  else if(c.contains('auth'))x+=dxBoites(ctx,n,0);
  else if(c.contains('wm')||c.contains('barre'))return;
  else if(tg==='div'&&!n.children.length&&n.style&&n.style.height)x+=dxBoites(ctx,{children:[n]},Math.round(parseFloat(n.style.height)*15));
- else if(tg==='div'&&c.contains('pre'))x+=dxP(dxInline(ctx,n,{sz:o.cell?19:21,pre:true}),{jc:'left',ap:o.cell?0:100});
+ else if(tg==='div'&&c.contains('pre'))x+=dxP(dxInline(ctx,n,{sz:o.cell?18:20,pre:true}),{jc:'left',ap:o.cell?0:100});
  else x+=dxBlocks(ctx,n,o)});return x}
 function dxEntete(ctx,ref){const dp=new DOMParser().parseFromString(`<div>${ref||''}</div>`,'text/html').body.firstChild;
  const logo=dxImg(ctx,LOGO,64,59),w1=1300,w3=2700,w2=DX_W-w1-w3,nb='<w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(b=>`<w:${b} w:val="nil"/>`).join('')+'</w:tblBorders>';
@@ -5027,7 +5027,7 @@ async function docxBlob(corps,o={}){const ctx={imgs:[],n:0},doc=new DOMParser().
  const files=[F('[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="gif" ContentType="image/gif"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`),
   F('_rels/.rels',rels(['<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>','<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>'])),
   F('docProps/core.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${dxE(o.titre||'')}</dc:title><dc:creator>${dxE(S.org.nom)}</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString().slice(0,19)}Z</dcterms:created></cp:coreProperties>`),
-  F('word/styles.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Cambria" w:hAnsi="Cambria" w:cs="Cambria" w:eastAsia="Cambria"/><w:color w:val="16211D"/><w:sz w:val="21"/><w:szCs w:val="21"/><w:lang w:val="fr-FR"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="100" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style></w:styles>`),
+  F('word/styles.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial" w:eastAsia="Arial"/><w:color w:val="16211D"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:lang w:val="fr-FR"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="100" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style></w:styles>`),
   F('word/document.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ${NS}><w:body>${body}<w:sectPr><w:headerReference w:type="default" r:id="rIdH"/><w:footerReference w:type="default" r:id="rIdF"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="2381" w:right="964" w:bottom="1814" w:left="964" w:header="510" w:footer="397" w:gutter="0"/></w:sectPr></w:body></w:document>`),
   F('word/_rels/document.xml.rels',rels(['<Relationship Id="rIdS" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>','<Relationship Id="rIdH" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>','<Relationship Id="rIdF" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>',...bImgs.map(i=>`<Relationship Id="${i.rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${i.nom}"/>`)])),
   F('word/header1.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr ${NS}>${hdr}</w:hdr>`),
@@ -5433,7 +5433,7 @@ document.addEventListener('click',e=>{
  if(a==='delAct'){const x=curA();if(!confirm('Supprimer définitivement cette activité, ses TDR, son rapport et ses dépenses ?'))return;S.activites=S.activites.filter(y=>y!==x);log(`Activité supprimée : ${x.titre}`);actCur=null;save();render()}
  if(a==='validerRap'){const x=curA();x.statut='Rapport validé';log(`Rapport validé : ${x.titre}`);save();render()}
  if(a==='printDoc'){const z=document.createElement('div');z.id='printzone';z.className='doc';z.innerHTML=document.getElementById('doc').innerHTML;document.body.appendChild(z);document.body.classList.add('print-doc');log('Document imprimé');setTimeout(()=>{window.print();setTimeout(()=>{z.remove();document.body.classList.remove('print-doc')},500)},50)}
- if(a==='wordDoc'){const d=document.getElementById('doc');const css=`body{font-family:Cambria,Georgia,'Times New Roman',serif;font-size:11pt;color:#000}h1{font-size:16pt;text-align:center;text-transform:uppercase}h2{font-size:13pt;margin-top:16pt}h3{font-size:12pt}h4,h5{font-size:11pt}table{border-collapse:collapse;width:100%;margin:6pt 0}th,td{border:1px solid #444;padding:3pt 5pt;font-size:10pt;text-align:left}th{background:#eee}img{width:70px;height:70px}.doc-garde{text-align:center}.doc-garde img{width:140px;height:140px}.muted{color:#555}`;
+ if(a==='wordDoc'){const d=document.getElementById('doc');const css=`body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;color:#000}h1{font-size:16pt;text-align:center;text-transform:uppercase}h2{font-size:13pt;margin-top:16pt}h3{font-size:12pt}h4,h5{font-size:11pt}table{border-collapse:collapse;width:100%;margin:6pt 0}th,td{border:1px solid #444;padding:3pt 5pt;font-size:10pt;text-align:left}th{background:#eee}img{width:70px;height:70px}.doc-garde{text-align:center}.doc-garde img{width:140px;height:140px}.muted{color:#555}`;
   fichier(`${b.dataset.n}_${(curA()?curA().titre:projAct().nom).replace(/[^A-Za-z0-9À-ÿ]+/g,'_').slice(0,60)}.doc`,`<html><head><meta charset="utf-8"><style>${css}</style></head><body>${d.innerHTML}</body></html>`,'application/msword');log('Document téléchargé (Word)')}
  if(a==='dem'){const d=S.demandes.find(x=>x.id===b.dataset.id);d.statut=b.dataset.to;log(`Demande ${d.statut.toLowerCase()} : ${d.objet}`);render()}
 });
