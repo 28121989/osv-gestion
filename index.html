@@ -421,6 +421,77 @@ details>summary{font-size:.9rem}
 .bande .route{position:absolute;left:0;right:0;bottom:0;height:2px;background:repeating-linear-gradient(to right,var(--accent) 0 18px,transparent 18px 32px);opacity:.6}
 @media (prefers-reduced-motion:reduce){.bande-defile li{transition:none}}
 @media (max-width:860px){.kpis{grid-template-columns:1fr 1fr;gap:.7rem}.bande-id{padding-right:4.5rem!important}.bande{flex-wrap:wrap;gap:.5rem 1rem}.bande-id{border-right:0;padding-right:0;flex-direction:row;align-items:baseline;gap:.6rem}.bande-defile{flex-basis:100%;height:2.8rem}.bande-defile li{white-space:normal}.bande-pts{position:absolute;right:1rem;top:.9rem}}
+
+/* ===== Collecte terrain ===== */
+:root{--sx-f:#2F6B57;--sx-m:#7FA3C0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--sx-f:#7FC0A6;--sx-m:#8FB3D9}}
+:root[data-theme="dark"]{--sx-f:#7FC0A6;--sx-m:#8FB3D9}
+.trBarre{display:flex;flex-wrap:wrap;gap:.8rem 1.2rem;align-items:end;margin:-.4rem 0 1rem}
+.trBarre>div{min-width:min(100%,260px)}.trBarre select{max-width:100%}
+.trTabs .badge{margin-left:.35rem}
+.tb-grid+section,.tb-grid+.card{margin-top:1.4rem}
+.trFile{display:flex;flex-wrap:wrap;gap:.4rem .8rem;align-items:center}
+.trOutils{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;margin-top:.6rem}
+.trO{display:flex;flex-direction:column;gap:.25rem;text-align:left;padding:.85rem 1rem;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:inherit;cursor:pointer;min-height:4.2rem}
+.trO b{font-size:.9rem;font-weight:600;line-height:1.3}.trO span{font-size:.76rem;color:var(--muted)}
+.trO:hover,.trO:focus-visible{border-color:var(--brand);background:var(--brand-tint)}
+.trForm{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));align-items:start}
+.trForm>div>label,.trForm .lbl{display:block;margin-bottom:.25rem}
+.trL{grid-column:1/-1}
+.trSec{grid-column:1/-1;margin:1rem 0 0;padding-bottom:.25rem;border-bottom:1px solid var(--line);font-size:.86rem;color:var(--brand)}
+.trForm .trSec:first-child{margin-top:0}
+.trForm fieldset{border:1px solid var(--line);border-radius:8px;padding:.6rem .8rem;margin:0;min-width:0}
+.trForm legend{font-size:.8rem;font-weight:500;padding:0 .3rem}
+.trMulti{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.25rem .9rem}
+.trMulti legend{grid-column:1/-1}.trMulti label,.trChk{display:flex;gap:.45rem;align-items:flex-start;font-weight:400;font-size:.85rem;line-height:1.35;cursor:pointer}
+.trMulti input,.trChk input{width:auto;margin-top:.15rem;flex:none}
+.trForm small{display:block;margin-top:.2rem;font-size:.74rem}
+.req{color:var(--bad)}
+.trGps{display:flex;flex-wrap:wrap;gap:.3rem .6rem;align-items:center}.trGps .lbl{width:100%;font-size:.8rem;font-weight:500}
+.trPresW{overflow-x:auto;margin:.3rem 0 .5rem}
+.trPres{width:100%;border-collapse:collapse;font-size:.84rem}
+.trPres th{font-size:.72rem;font-weight:600;text-align:left;color:var(--muted);padding:.3rem;border-bottom:1px solid var(--line);white-space:nowrap}
+.trPres td{padding:.25rem;border-bottom:1px solid var(--line);vertical-align:middle}
+.trPres input:not([type=checkbox]),.trPres select{padding:.35rem .4rem;font-size:.84rem;min-width:0;width:100%}
+.trPres td:nth-child(2){min-width:11rem}.trPres td:nth-child(4){width:4.6rem}.trPres td:nth-child(3){width:4.6rem}.trPres td:nth-child(5){min-width:7.5rem}.trPres td:nth-child(7){min-width:9rem}
+.trPres .trN{color:var(--muted);font-variant-numeric:tabular-nums;width:2rem;text-align:center}
+.trPres .trChk{font-size:.76rem;white-space:nowrap}
+@media (max-width:760px){
+ .trPres thead{display:none}.trPres,.trPres tbody{display:block}
+ .trPres tr{display:grid;grid-auto-flow:row dense;grid-template-columns:2rem 1fr 4.6rem 4.6rem;gap:.35rem .4rem;padding:.55rem 0;border-bottom:1px solid var(--line);align-items:center}
+ .trPres td{border:0;padding:0;width:auto!important;min-width:0!important}
+ .trPres td:nth-child(2){grid-column:2/-1}.trPres td:nth-child(3){grid-column:2/3}.trPres td:nth-child(4){grid-column:3/-1}.trPres td:nth-child(5){grid-column:2/-1}.trPres td:nth-child(6){grid-column:2/3}.trPres td:nth-child(8){grid-column:3/-1}.trPres td:nth-child(7){grid-column:2/-1}.trPres td:nth-child(9){grid-column:1/2;grid-row:1}
+ .trPres td:nth-child(1){display:none}
+}
+.trDc{max-width:420px}.trDc td input{width:6rem}.trDc th[scope=row]{font-weight:500;font-size:.82rem}
+.trActs{margin-top:.6rem;gap:.5rem}
+.trCons p{margin:.5rem 0 0;font-size:.86rem}
+.trKv{width:100%;border-collapse:collapse;font-size:.86rem;margin-top:.4rem}.trKv th{text-align:left;font-weight:500;color:var(--muted);width:38%;padding:.45rem .6rem .45rem 0;border-top:1px solid var(--line);vertical-align:top}.trKv td{padding:.45rem 0;border-top:1px solid var(--line)}
+.trFiltres{display:flex;flex-wrap:wrap;gap:.6rem 1rem;align-items:end;margin-bottom:.8rem}.trFiltres>div{min-width:min(100%,180px)}
+.trBib{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:.8rem}
+.trB{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;display:flex;flex-direction:column;gap:.4rem}
+.trB h4{margin:0;font-size:.9rem;line-height:1.3}.trB p{margin:0;font-size:.8rem}.trB .row{margin-top:auto}.trBt .tag{margin-right:.2rem}
+.trLien{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:.6rem;align-items:center;padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.84rem}
+@media (max-width:640px){.trLien{grid-template-columns:1fr}}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:.8rem;line-height:1.5}
+.txt-bad{color:var(--bad)}
+.trOd{border-top:1px solid var(--line);padding:.55rem 0}.trOd>summary{cursor:pointer;font-size:.88rem}
+.trOd .tb-bars{margin:.3rem 0 .6rem}
+.card h4{font-size:.86rem;margin:1.1rem 0 .5rem;color:var(--ink)}
+/* graphique mensuel femmes / hommes */
+.trMois{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,1fr);gap:.6rem;align-items:end;height:190px}
+.trMois li{display:flex;flex-direction:column;align-items:center;gap:.25rem;height:100%;justify-content:flex-end;font-size:.72rem;color:var(--muted)}
+.trMois li b{font-size:.76rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.trMb{display:flex;gap:2px;align-items:flex-end;height:130px;width:100%;max-width:46px;justify-content:center}
+.trMb i{display:block;width:calc(50% - 1px);min-height:2px;border-radius:4px 4px 0 0}
+.trMb i.f,.k.trKf{background:var(--sx-f)}.trMb i.h,.k.trKh{background:var(--sx-m)}
+/* pyramide des âges */
+.trPyr{display:grid;gap:.4rem}
+.trPy{display:grid;grid-template-columns:2.6rem 1fr 3.4rem 1fr 2.6rem;align-items:center;gap:.4rem;font-size:.76rem}
+.trPy .trPv{font-variant-numeric:tabular-nums;color:var(--muted)}.trPy .trPv:first-child{text-align:right}
+.trPb{text-align:center;color:var(--ink);font-size:.74rem}
+.trPf,.trPh{display:flex;height:12px}.trPf{justify-content:flex-end}
+.trPf i,.trPh i{display:block;height:100%;min-width:2px}.trPf i{background:var(--sx-f);border-radius:4px 0 0 4px}.trPh i{background:var(--sx-m);border-radius:0 4px 4px 0}
 </style>
 </head>
 <body>
@@ -1720,7 +1791,7 @@ async function authRefresh(){const s=sess;if(!s)return;sess=null;
 async function authLogout(){try{if(sess)await api('/auth/v1/logout',{method:'POST'})}catch(e){}sessEcrire(null)}
 
 /* ---------- chargement des données autorisées ---------- */
-function srvVide(){return {org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
+function srvVide(){return {org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],outils:[],fterrain:[],refs:[],microplans:[],rterrain:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
 async function srvLoad(){
  const uid=sess.user.id,mine=await sel('membres',`select=*&user_id=eq.${uid}&actif=is.true`);
  const m=(mine||[]).find(x=>!x.fin_acces||x.fin_acces>=today());
@@ -1751,6 +1822,7 @@ async function srvLoad(){
  const T7=await opt(sel('mission_membres',f+'&order=ordre'));p07=T7!==null;N.mmembres=T7||[];p11=p07&&(await opt(sel('missions','select=revision&limit=1')))!==null;N.mrev=p11?(await opt(sel('missions_revisions',f+'&order=le')))||[]:[];
  const T8=await Promise.all([sel('tdrs',f+'&order=cree_le.desc'),sel('tdr_avis',f+'&order=le'),sel('acces_budget',f)].map(opt));p08=T8[0]!==null;N.tdrs=T8[0]||[];N.tavis=T8[1]||[];N.accBud=T8[2]||[];
  const T10=await opt(sel('contrats',f+'&order=redige_le.desc'));p10=T10!==null;N.contrats=T10||[];p10f=p10&&(await opt(sel('contrats','select=fiche&limit=1')))!==null;
+ const T12=await Promise.all([sel('outils_collecte',f+'&order=cree_le'),sel('fiches_terrain',f+'&order=date_activite.desc,saisi_le.desc&limit=10000'),sel('references_communautaires',f+'&order=date_reference.desc&limit=10000'),sel('microplans',f),sel('rapports_terrain',f+'&order=mois.desc')].map(opt));p12=T12[0]!==null;[N.outils,N.fterrain,N.refs,N.microplans,N.rterrain]=T12.map(x=>x||[]);
  [N.comptes,N.mouvements,N.rapprochements,N.avances,N.fournisseurs,N.seuilsAchat,N.achats,N.devis,N.baremes,N.missions,N.biens,N.inventaires,N.pcomptes,N.correspondances,N.invLignes]=T6.map(x=>x||[]);
  S=N;me=S.staff.find(x=>x.id===uid);
  Object.keys(ROLES).forEach(k=>ROLES[k].nav=srvNav(k));
@@ -1759,7 +1831,7 @@ async function srvLoad(){
 const APPUI=['RH','RA','CPT','LOG'];
 function srvNav(r){if(r==='EXT')return ['politiques'];const appui=APPUI.includes(r),n=[];
  if(p03&&['DE','DP','CA'].includes(r))n.push('strategie','programmes');
- if(!appui)n.push('projets');if(p03&&['DE','DP','CA',...APPUI].includes(r))n.push('equipes');if(p05&&['DE','DP','CA','RA','CPT'].includes(r))n.push('finances');if(p06&&['DE','DP','CA','RA','CPT','LOG'].includes(r))n.push('adm');
+ if(!appui)n.push('projets');if(p12&&['ASC','SUP','SE','CP','DP','DE','CA'].includes(r)){if(['ASC','SUP'].includes(r))n.splice(n.indexOf('projets'),0,'terrain');else n.push('terrain')}if(p03&&['DE','DP','CA',...APPUI].includes(r))n.push('equipes');if(p05&&['DE','DP','CA','RA','CPT'].includes(r))n.push('finances');if(p06&&['DE','DP','CA','RA','CPT','LOG'].includes(r))n.push('adm');
  if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');if(p08)n.push('missions');if(p06)n.push('mesdem');
  if(p10&&['DE','DP','RH','RA'].includes(r))n.push('contrats');if(['DE','RH'].includes(r))n.push('personnel');if(r==='DE')n.push('audit');return n}
 async function notifierSrv(dest,texte,lien,ref){const ids=[...new Set(dest.filter(Boolean))].filter(id=>id!==me.id&&S.staff.some(u=>u.id===id));
@@ -1770,7 +1842,7 @@ async function action(fn,msg){if(srvBusy)return;srvBusy=true;document.body.class
 
 /* ---------- écrans du mode serveur ---------- */
 function srvHome(){const n=ROLES[me.role].nav,pa=polEnAttente().length;
- const D={adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
+ const D={terrain:'Fiches d\'activité, listes de présence, références, microplans et rapports des agents communautaires',adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
  return accHero()+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+notifBox()+
  (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:'')+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
  `${['DE','DP','CA'].includes(me.role)&&p03?'':accTableauBord()}
@@ -1887,6 +1959,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv')return;const b=e.target.cl
  if(a==='notifOuvrir'){const n=S.pol.notifs.find(x=>x.id===b.dataset.id);if(n){upd('notifications',`id=eq.${n.id}`,{lu:true}).catch(()=>{});if(n.lien==='adm'||n.lien==='mesdem'){stop();n.lus.push(me.id);view=n.lien==='adm'&&ROLES[me.role].nav.includes('adm')?'adm':'mesdem';render();return}
   if(n.lien==='finances'){stop();n.lus.push(me.id);finSel=n.ref||null;if(ROLES[me.role].nav.includes('finances'))view='finances';else{dosSel=n.ref;dosTab='fin';view='dossier'}render();return}
   if(n.lien==='contrats'){stop();n.lus.push(me.id);ctrSel=n.ref||null;ctrEdit=null;view=ROLES[me.role].nav.includes('contrats')?'contrats':'mesdem';render();return}
+  if(n.lien==='terrain'){stop();n.lus.push(me.id);TR.saisie=null;TR.outil=null;TR.fiche=n.ref&&S.fterrain.some(x=>x.id===n.ref)?n.ref:null;view=ROLES[me.role].nav.includes('terrain')?'terrain':'home';render();return}
   if(n.lien==='missions'){stop();n.lus.push(me.id);tdrSel=n.ref||null;tdrEdit=null;view=ROLES[me.role].nav.includes('missions')?'missions':'home';render();return}
   if(n.lien==='equipes'){stop();n.lus.push(me.id);eqF.proj=n.ref||'';eqF.etat='';view='equipes';render();return}
   if(n.lien==='projet'||n.lien==='programme'){stop();n.lus.push(me.id);if(n.lien==='projet'&&p03&&projet(n.ref)){dosSel=n.ref;dosTab='id';view='dossier'}else if(n.lien==='programme'&&programme(n.ref)){pgSel=n.ref;view='programmes'}else view='projets';render();return}}return}
@@ -2034,7 +2107,7 @@ function alertes(){const A=[],t=today(),d60=new Date(Date.now()+60*864e5).toISOS
  S.jalons.filter(j=>j.echeance&&j.echeance<t&&!['fait','abandonne'].includes(j.statut)).forEach(j=>A.push(['bad',`Jalon en retard : ${j.libelle} (${fmtD(j.echeance)}) · ${libProg(programme(j.programme_id))}`,'svPg',j.programme_id]));
  S.risques.filter(r=>r.statut!=='clos'&&r.probabilite*r.impact>=15).forEach(r=>A.push(['bad',`Risque élevé (${r.probabilite*r.impact}) : ${r.libelle}`,r.projet_id?'svDos':'svPg',r.projet_id||r.programme_id,'rq']));
  S.inds.filter(i=>indPerf(i).st==='bad').slice(0,8).forEach(i=>A.push(['bad',`Indicateur en retard : ${i.libelle}`,i.projet_id?'svDos':i.programme_id?'svPg':'go',i.projet_id||i.programme_id||'strategie','ind']));
- return A.concat(finAlertes(),admAlertes(),tdrAlertes(),ctrAlertes())}
+ return A.concat(finAlertes(),admAlertes(),tdrAlertes(),ctrAlertes(),trAlertes())}
 function alerteHTML(A){return A.length?`<ul class="svAl">${A.slice(0,15).map(([c,t,act,id,tab])=>`<li class="${c}"><button class="lnk" data-act="${act}" ${act==='go'?`data-v="${id}"`:`data-id="${id||''}"`} ${tab?`data-tab="${tab}"`:''}>${esc(t)}</button></li>`).join('')}</ul>${A.length>15?`<p class="muted">… et ${A.length-15} autre(s).</p>`:''}`:'<p class="empty">Aucune alerte. Tout est à jour.</p>'}
 function pilotageHTML(){const pl=planCourant(),pp=perfPlan(pl),ps=S.projets,actifs=ps.filter(p=>['active','execution'].includes(p.statut));
  const s=synth(S.inds),budget=ps.filter(p=>!['rejete','archive'].includes(p.statut)).reduce((x,p)=>x+(p.budgetApprouve||p.montant||0),0),A=alertes();
@@ -4758,7 +4831,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act="go"]'
 
 /* ===== Contrats et conventions du personnel non salarié (script 10) ===== */
 let p10=false,p10f=false,ctrTab='contrats',ctrSel=null,ctrEdit=null,ctrPre=null;
-ICO.contrats='<path d="M14.364 13.634a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506l4.013-4.009a1 1 0 0 0-3.004-3.004z"/><path d="M14.487 7.858A1 1 0 0 1 14 7V2"/><path d="M20 19.645V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l2.516 2.516"/><path d="M8 18h1"/>';
+ICO.terrain='<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>';ICO.contrats='<path d="M14.364 13.634a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506l4.013-4.009a1 1 0 0 0-3.004-3.004z"/><path d="M14.487 7.858A1 1 0 0 1 14 7V2"/><path d="M20 19.645V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l2.516 2.516"/><path d="M8 18h1"/>';
 const CTR_TYPE={prestation:'Contrat de prestation de services (consultant individuel)',prestation_entreprise:'Contrat de prestation de services (cabinet ou entreprise)',benevolat:'Convention de bénévolat'};
 const CTR_COURT={prestation:'Consultance',prestation_entreprise:'Prestation (cabinet)',benevolat:'Bénévolat'};
 const CTR_ST={brouillon:['Brouillon',''],a_signer:['Validé, à faire signer','warn'],signe:['Signé','ok'],resilie:['Résilié','bad'],termine:['Terminé',''],annule:['Annulé','']};
@@ -5237,7 +5310,7 @@ function tbActivite(){if(me.role!=='DE'||!srvAudit.length)return '';const L=srvA
 function tbMesProjets(){const L=projetsVisibles?S.projets.filter(p=>p.chefId===me.id||(p.membres||[]).some(m=>m.staffId===me.id)):[];if(!L.length)return '';
  return tbCarte('Mes projets',`${L.length}`,`<ul class="tb-act">${L.map(p=>{const s=synth(indsProjet(p));return `<li><span class="muted">${(PSTAT[p.statut]||[p.statut])[0]} · ${fmtD(p.debut)} → ${fmtD(p.fin)}${s.score!=null?' · indicateurs '+tx(s.score):''}</span><button class="lnk" data-act="svDos" data-id="${p.id}">${esc(libProj(p))}</button></li>`}).join('')}</ul>`)}
 function accTableauBord(){const pil=['DE','DP','CA'].includes(me.role)&&p03;
- const B=pil?[S.projets.some(voitFin)?tbBudget():'',tbIndicateurs(),tbStatuts(),tbEcheances(),tbActivite()]:[tbEcheances(),p03?tbMesProjets():''];
+ const B=pil?[S.projets.some(voitFin)?tbBudget():'',tbIndicateurs(),tbStatuts(),tbEcheances(),tbActivite()]:[tbTerrain(),tbEcheances(),p03?tbMesProjets():''];
  return `<div class="tb-grid">${B.filter(Boolean).join('')}</div>`}
 function piedApp(){return `<footer class="pied-app"><div class="pa-id"><img src="${LOGO}" alt=""><div><b>${esc(S.org.nom||'ONG Sécurité Vie')}</b><span>Agir pour sauver des vies au quotidien</span></div></div>
  <div class="pa-col"><b>Siège</b><span>Yamoussoukro, 220 Zouessi · BP 1605</span><span>${OSV_COORD.telSiege}</span></div>
@@ -5245,14 +5318,678 @@ function piedApp(){return `<footer class="pied-app"><div class="pa-id"><img src=
  <div class="pa-col"><b>Contact</b><span>contact@ongsecuritevie.org</span><span>${OSV_COORD.site}</span></div>
  <p class="pa-bas">OSV Gestion · données hébergées sur le serveur sécurisé de l'organisation · accès réservé au personnel</p></footer>`}
 
+
+/* =====================================================================
+   COLLECTE TERRAIN · agents communautaires (ASC, relais, enquêteurs)
+   Pyramide : agent → superviseur → chef de projet / S&E → DP / DE
+   ===================================================================== */
+let p12=false;
+const TR={tab:null,pid:null,mois:new Date().toISOString().slice(0,7),fiche:null,saisie:null,outil:null,agent:'',statut:'',outilF:'',refForm:false};
+const TR_BANDES=['0-9','10-14','15-19','20-24','25-49','50+'];
+const trBande=a=>{if(a===''||a==null)return 'nd';a=Number(a);if(!(a>=0))return 'nd';return a<10?'0-9':a<15?'10-14':a<20?'15-19':a<25?'20-24':a<50?'25-49':'50+'};
+const FT_ST={soumise:['À vérifier','warn'],verifiee:['Vérifiée, à valider','warn'],validee:['Validée','ok'],a_corriger:['À corriger','bad'],rejetee:['Rejetée','bad']};
+const RF_ST={emise:['En attente de contre-référence','warn'],arrivee:['Prise en charge confirmée','ok'],perdue:['Perdue de vue','bad'],annulee:['Annulée','']};
+const RT_ST={soumis:['Envoyé, à valider','warn'],valide:['Validé','ok'],a_corriger:['À revoir','bad']};
+const MP_ST={soumis:['À valider','warn'],valide:['Validé','ok'],a_corriger:['À revoir','bad']};
+const OUT_TYPES={seance:'Séance de sensibilisation',visite:'Visite à domicile',mobilisation:'Mobilisation communautaire',distribution:'Distribution et émargement',plainte:'Plainte (MGP)',enquete:'Enquête ou questionnaire',suivi:'Suivi d\'un site ou d\'un ouvrage',autre:'Autre'};
+const CH_TYPES={texte:'Texte court',long:'Texte long',nombre:'Nombre',date:'Date',heure:'Heure',choix:'Choix unique',multi:'Choix multiple',ouinon:'Oui / Non',section:'Titre de section'};
+const TR_VULN=['','Femme enceinte ou allaitante','Adolescente ou jeune fille non scolarisée','Personne âgée (60 ans et plus)','Chef de ménage femme','Orphelin ou enfant vulnérable','Personne déplacée','Ménage très pauvre','Autre vulnérabilité'];
+const TR_MOTIFS=['Dépistage IST / VIH','Prise en charge d\'une IST','Planification familiale','Consultation prénatale (CPN)','Accouchement assisté','Vaccination de l\'enfant','Fièvre, suspicion de paludisme','Malnutrition','Diarrhée, déshydratation','VBG – prise en charge médicale (dans les 72 heures)','VBG – soutien psychosocial','VBG – assistance juridique','Santé mentale','Handicap – service social','Accident, blessure','Autre'];
+const TR_DELAI={agent:5,superviseur:10,projet:15};
+const moisLib=m=>{const [a,b]=String(m).split('-');const t=new Date(Number(a),Number(b)-1,1).toLocaleDateString('fr-FR',{month:'long',year:'numeric'});return t.charAt(0).toUpperCase()+t.slice(1)};
+const moisDe=d=>String(d||'').slice(0,7);
+const moisD=m=>m+'-01';
+const finMois=m=>{const [a,b]=m.split('-').map(Number);return new Date(Date.UTC(a,b,0)).toISOString().slice(0,10)};
+const trLimite=(m,niv)=>{const [a,b]=m.split('-').map(Number);return new Date(Date.UTC(a,b,TR_DELAI[niv])).toISOString().slice(0,10)};
+const pcS=(a,b)=>b?Math.round(a/b*100)+' %':'—';
+const trSlug=s=>String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,40)||'champ';
+
+/* ---------- qui fait quoi ---------- */
+const trEmploye=(p,u=me.id)=>!!p&&(p.chefId===u||(p.membres||[]).some(m=>m.staffId===u&&(!m.fin||m.fin>=today())));
+const trValide=p=>!!p&&(['DE','DP'].includes(me.role)||p.chefId===me.id||(me.role==='SE'&&trEmploye(p)));
+const trVerifie=(p,a)=>trValide(p)||auDessusC(a)||(me.role==='SUP'&&trEmploye(p));
+const trProjets=()=>S.projets.filter(p=>!['archive','rejete'].includes(p.statut)&&(['DE','DP','CA'].includes(me.role)||trEmploye(p)));
+const trP=()=>{const L=trProjets();return L.find(p=>p.id===TR.pid)||L.find(p=>['active','execution'].includes(p.statut))||L[0]||null};
+const trAgents=p=>{const ids=[...new Set((p.membres||[]).filter(m=>!m.fin||m.fin>=today()).map(m=>m.staffId))];return ids.map(id=>S.staff.find(u=>u.id===id)).filter(u=>u&&u.role==='ASC'&&u.actif!==false).sort((a,b)=>a.nom.localeCompare(b.nom))};
+const trCollecteurs=p=>{const ids=[...new Set((p.membres||[]).filter(m=>!m.fin||m.fin>=today()).map(m=>m.staffId))];return ids.map(id=>S.staff.find(u=>u.id===id)).filter(u=>u&&['ASC','SUP','SE','CP'].includes(u.role)).sort((a,b)=>a.nom.localeCompare(b.nom))};
+function trNiv(p){if(!p)return 'aucun';if(me.role==='CA')return 'ca';if(trValide(p))return 'projet';if(me.role==='SUP'||trAgents(p).some(u=>u.supId===me.id))return 'sup';return 'agent'}
+const trOrdre=o=>{const i=MOD_OUTILS.findIndex(m=>m.code===o.modele);return i<0?99:i};
+const trOutils=p=>(S.outils||[]).filter(o=>o.projet_id===p.id).sort((a,b)=>trOrdre(a)-trOrdre(b)||String(a.titre).localeCompare(b.titre));
+const trOutil=id=>(S.outils||[]).find(o=>o.id===id);
+const trFiches=p=>(S.fterrain||[]).filter(f=>f.projet_id===p.id);
+const trRefs=p=>(S.refs||[]).filter(r=>r.projet_id===p.id);
+
+/* ---------- consolidation : le cœur de la remontée ---------- */
+function trAgreger(F){const r={n:F.length,total:0,f:0,h:0,hand:0,age:{},loc:{},outil:{},agent:{},mois:{},champs:{},vuln:{}};
+ [...TR_BANDES,'nd'].forEach(b=>r.age[b]={F:0,M:0});
+ const add=(o,k,x)=>{o[k]=o[k]||{n:0,total:0,f:0,h:0};o[k].n++;o[k].total+=x.nb_total;o[k].f+=x.nb_f;o[k].h+=x.nb_h};
+ F.forEach(x=>{r.total+=x.nb_total;r.f+=x.nb_f;r.h+=x.nb_h;r.hand+=x.nb_handicap;
+  (x.participants||[]).forEach(p=>{if(p.sexe==='F'||p.sexe==='M')r.age[trBande(p.age)][p.sexe]++;if(p.vuln)r.vuln[p.vuln]=(r.vuln[p.vuln]||0)+1});
+  ['F','M'].forEach(s=>Object.entries((x.decompte||{})[s]||{}).forEach(([b,v])=>{if(r.age[b])r.age[b][s]+=Number(v)||0}));
+  add(r.loc,String(x.localite||'').trim()||'—',x);add(r.outil,x.outil_id,x);add(r.agent,x.agent_id,x);add(r.mois,moisDe(x.date_activite),x);
+  const o=trOutil(x.outil_id);(o?o.champs:[]).forEach(c=>{const v=(x.donnees||{})[c.id];if(v==null||v===''||(Array.isArray(v)&&!v.length))return;const k=x.outil_id+'|'+c.id;
+   if(c.type==='nombre')r.champs[k]=(r.champs[k]||0)+(Number(v)||0);
+   else if(['choix','ouinon','multi'].includes(c.type)){const z=r.champs[k]=r.champs[k]||{};(Array.isArray(v)?v:[v]).forEach(w=>z[w]=(z[w]||0)+1)}})});
+ return r}
+function trRefStats(R){const em=R.filter(r=>r.statut!=='annulee'),ar=em.filter(r=>r.statut==='arrivee'),pe=em.filter(r=>r.statut==='perdue');
+ const d=ar.filter(r=>r.contre_ref_le).map(r=>(new Date(r.contre_ref_le)-new Date(r.date_reference))/864e5);
+ const mot={};em.forEach(r=>mot[r.motif]=(mot[r.motif]||0)+1);
+ return {emises:em.length,arrivees:ar.length,perdues:pe.length,attente:em.filter(r=>r.statut==='emise').length,delai:d.length?Math.round(d.reduce((a,b)=>a+b,0)/d.length*10)/10:null,motifs:mot,f:em.filter(r=>r.sexe==='F').length,h:em.filter(r=>r.sexe==='M').length,urg:em.filter(r=>r.urgence).length}}
+/* métriques pouvant alimenter un indicateur du projet */
+function trMetriques(o){return [['participants','Personnes touchées (total, avec femmes et hommes)'],['fiches','Nombre de fiches (séances, visites, réunions…)'],['handicap','Personnes vivant avec un handicap touchées'],
+ ...o.champs.filter(c=>c.type==='nombre').map(c=>['champ:'+c.id,'Somme : '+c.label]),...o.champs.filter(c=>c.type==='ouinon').map(c=>['oui:'+c.id,'Nombre de « oui » : '+c.label])]}
+function trValeurMetrique(o,F,m){const A=trAgreger(F);if(m==='participants')return {v:A.total,f:A.f,h:A.h};if(m==='fiches')return {v:F.length};if(m==='handicap')return {v:A.hand};
+ if(m.startsWith('champ:'))return {v:A.champs[o.id+'|'+m.slice(6)]||0};if(m.startsWith('oui:'))return {v:((A.champs[o.id+'|'+m.slice(4)]||{}).oui)||0};return {v:0}}
+
+/* ---------- signaux de qualité des données ---------- */
+function trSignaux(x){const S2=[],o=trOutil(x.outil_id)||{},F=S.fterrain;
+ const ret=Math.round((new Date(x.saisi_le)-new Date(x.date_activite))/864e5);if(ret>7)S2.push(['Saisie tardive ('+ret+' j)','warn']);
+ if(o.presence==='nominative'&&!x.piece_id&&!x.confidentiel)S2.push(['Sans photo de la liste signée','warn']);
+ if(F.some(y=>y.id!==x.id&&y.statut!=='rejetee'&&y.agent_id===x.agent_id&&y.outil_id===x.outil_id&&y.date_activite===x.date_activite&&String(y.localite).trim().toLowerCase()===String(x.localite).trim().toLowerCase()))S2.push(['Doublon possible','bad']);
+ const P=x.participants||[];const sa=P.filter(p=>p.age===''||p.age==null).length;if(sa)S2.push([sa+' âge(s) manquant(s)','warn']);
+ if(o.presence!=='non'&&x.nb_total===0)S2.push(['Aucun participant','bad']);
+ const memes=F.filter(y=>y.outil_id===x.outil_id&&y.nb_total>0).map(y=>y.nb_total).sort((a,b)=>a-b);
+ if(memes.length>=5){const med=memes[Math.floor(memes.length/2)];if(x.nb_total>Math.max(3*med,med+40))S2.push(['Effectif inhabituel ('+x.nb_total+' pour une médiane de '+med+')','warn'])}
+ if(x.heure_debut&&x.heure_fin&&x.heure_fin<x.heure_debut)S2.push(['Heure de fin avant le début','bad']);
+ if(x.lat==null)S2.push(['Sans position GPS','']);
+ return S2}
+const trSigHTML=x=>trSignaux(x).filter(s=>s[1]).map(s=>`<span class="tag ${s[1]}">${esc(s[0])}</span>`).join(' ');
+
+/* ---------- file d'attente hors connexion (sur ce téléphone) ---------- */
+const trCle=k=>`osvTr${k}_${me&&me.id}`;
+const trLS={get(k,d){try{return JSON.parse(localStorage.getItem(trCle(k)))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(trCle(k),JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(trCle(k))}catch(e){}}};
+const trFile=()=>trLS.get('File',[]);
+const trReseau=e=>e instanceof TypeError||/fetch|network|réseau|Load failed/i.test(String(e&&e.message||e));
+let trSyncEnCours=false;
+async function trSync(manuel){const L=trFile();if(!L.length||trSyncEnCours||!me)return;trSyncEnCours=true;let ok=0,err='';const reste=[];
+ for(const q of L){try{if(q.table==='fiches_terrain'||!q.table)await ins('fiches_terrain',q.rec);else await ins(q.table,q.rec);ok++}
+  catch(e){if(/duplicate key|23505/.test(String(e.message)))ok++;else if(trReseau(e)){reste.push(q);err='réseau'}else{reste.push({...q,erreur:e.message});err=e.message}}}
+ trLS.set('File',reste);trSyncEnCours=false;
+ if(ok){try{await srvLoad()}catch(_){}srvMsg=`${ok} envoi(s) en attente transmis au serveur.`+(reste.length?` ${reste.length} reste(nt) en attente.`:'');render()}
+ else if(manuel)alert(err==='réseau'?'Toujours pas de réseau. Les fiches restent gardées sur ce téléphone.':'Envoi impossible : '+err)}
+window.addEventListener('online',()=>{if(MODE==='srv'&&me)trSync(false)});
+
+/* ---------- bibliothèque d'outils OSV (modèles prêts à l'emploi) ---------- */
+const C=(id,label,type,o={})=>({id,label,type,...o});
+const ON=['oui','non'];
+const MOD_OUTILS=[
+ {code:'SEANCE',titre:'Fiche de séance de sensibilisation et liste de présence',type:'seance',presence:'nominative',theme:'Toutes thématiques',
+  desc:'Causerie éducative, séance de masse, porte-à-porte, projection-débat. Liste de présence nominative, désagrégée par sexe, âge et handicap.',
+  consignes:'Faire émarger chaque participant (signature ou empreinte). Noter l\'âge de chaque personne. Ne jamais inscrire le nom d\'une personne qui révèle une violence : orientez-la discrètement et remplissez une fiche de référence confidentielle. Photographier la liste signée et la joindre.',
+  champs:[C('type_act','Type d\'activité','choix',{requis:true,options:['Causerie éducative','Séance de masse (grand public)','Porte-à-porte','Projection-débat','Théâtre-forum','Groupe de discussion','Émission de radio communautaire']}),
+   C('themes','Thèmes abordés','multi',{requis:true,options:['IST / VIH / sida','VBG, EAS / HS','Santé sexuelle et reproductive, planification familiale','Sécurité routière','Sécurité au travail','Eau, hygiène et assainissement','Paludisme','Environnement et climat','Mécanisme de gestion des plaintes','Cohésion sociale']}),
+   C('cibles','Publics présents','multi',{options:['Femmes','Hommes','Adolescentes et jeunes filles','Adolescents et jeunes garçons','Travailleurs du chantier','Conducteurs, motos-taxis','Élèves','Leaders communautaires et religieux','Personnes vivant avec un handicap','Personnes âgées']}),
+   C('langue','Langue utilisée','choix',{options:['Français','Dioula','Baoulé','Sénoufo','Malinké','Koulango','Autre']}),
+   C('supports','Supports utilisés','multi',{options:['Boîte à images','Affiches, dépliants','Vidéo','Démonstration (préservatif, casque…)','Aucun']}),
+   C('preserv_m','Préservatifs masculins distribués','nombre'),C('preserv_f','Préservatifs féminins distribués','nombre'),C('depliants','Dépliants distribués','nombre'),
+   C('orientes','Personnes orientées vers un service','nombre',{aide:'Une fiche de référence par personne orientée.'}),
+   C('questions','Questions posées, rumeurs et fausses croyances entendues','long'),C('obs','Observations','long')]},
+ {code:'MASSE',titre:'Fiche de séance de masse (décompte anonyme)',type:'seance',presence:'anonyme',theme:'Toutes thématiques',
+  desc:'Pour les marchés, gares, cérémonies : on compte les personnes par sexe et tranche d\'âge, sans liste nominative.',
+  consignes:'Compter les personnes réellement présentes pendant au moins la moitié de la séance. En cas de doute sur l\'âge, estimer la tranche.',
+  champs:[C('type_act','Type d\'activité','choix',{requis:true,options:['Séance de masse','Animation au marché','Animation à la gare routière','Caravane de sensibilisation','Cérémonie communautaire']}),
+   C('themes','Thèmes abordés','multi',{requis:true,options:['IST / VIH / sida','VBG, EAS / HS','Sécurité routière','Sécurité au travail','Eau, hygiène et assainissement','Paludisme','Environnement et climat','Mécanisme de gestion des plaintes']}),
+   C('preserv_m','Préservatifs distribués','nombre'),C('depliants','Dépliants distribués','nombre'),C('questions','Questions et rumeurs entendues','long'),C('obs','Observations','long')]},
+ {code:'VAD',titre:'Fiche de visite à domicile',type:'visite',presence:'nominative',theme:'Santé communautaire, WASH, DSSR',
+  desc:'Visite d\'un ménage : membres présents, constats, conseils donnés, orientations et date de la prochaine visite.',
+  consignes:'Se présenter, expliquer le but de la visite et demander l\'accord du ménage. Inscrire les membres présents. Un code ménage stable permet de suivre le ménage d\'une visite à l\'autre.',
+  champs:[C('menage','Code du ménage','texte',{requis:true,aide:'ex. KONG-Q3-014 (localité, quartier, numéro)'}),C('chef_sexe','Chef de ménage','choix',{options:['Femme','Homme']}),C('taille','Nombre de personnes dans le ménage','nombre'),
+   C('enfants5','Enfants de moins de 5 ans','nombre'),C('themes','Thèmes abordés','multi',{options:['IST / VIH / sida','Planification familiale','Consultation prénatale','Vaccination','Paludisme et moustiquaire','Eau de boisson et hygiène','Latrine','VBG et services d\'aide']}),
+   C('constats','Constats','multi',{options:['Pas de moustiquaire imprégnée','Eau de boisson non traitée','Pas de latrine','Enfant non à jour de ses vaccins','Femme enceinte sans consultation prénatale','Enfant présentant des signes de malnutrition','Aucun problème relevé']}),
+   C('conseils','Conseils donnés','long'),C('orientes','Personnes orientées vers un service','nombre'),C('revoir','Nouvelle visite nécessaire','ouinon'),C('prochaine','Date de la prochaine visite','date')]},
+ {code:'MOBIL',titre:'Fiche de mobilisation communautaire (rencontre avec les leaders)',type:'mobilisation',presence:'nominative',theme:'Toutes thématiques',
+  desc:'Rencontres avec la chefferie, les leaders religieux, associations de femmes et de jeunes, comités locaux. Décisions et engagements pris.',
+  consignes:'Inscrire la qualité de chaque participant (chef, notable, présidente des femmes…) dans la colonne vulnérabilité ou observations. Noter les engagements avec un responsable et une date.',
+  champs:[C('type_r','Type de rencontre','choix',{requis:true,options:['Rencontre avec la chefferie','Assemblée villageoise','Rencontre avec les leaders religieux','Rencontre avec les associations de femmes','Rencontre avec les associations de jeunes','Comité local de gestion des plaintes','Réunion avec les autorités administratives ou sanitaires']}),
+   C('objet','Objet de la rencontre','long',{requis:true}),C('decisions','Décisions et engagements pris (qui fait quoi, pour quand)','long'),C('attention','Points d\'attention, réticences exprimées','long'),C('prochaine','Prochaine rencontre prévue le','date')]},
+ {code:'DISTRIB',titre:'Fiche de distribution et liste d\'émargement',type:'distribution',presence:'nominative',theme:'Distribution de kits, moustiquaires, préservatifs, plants',
+  desc:'Chaque bénéficiaire émarge à la réception. Rapprochement des quantités reçues, distribuées et restantes.',
+  consignes:'Un bénéficiaire = une ligne, avec sa signature ou son empreinte. Vérifier que quantité reçue = distribuée + reste ; tout écart est expliqué.',
+  champs:[C('article','Article distribué','texte',{requis:true}),C('q_recue','Quantité reçue pour la distribution','nombre',{requis:true}),C('q_dist','Quantité distribuée','nombre',{requis:true}),C('q_reste','Quantité restante','nombre'),
+   C('criteres','Critères de ciblage appliqués','long'),C('incidents','Incidents, réclamations ou écarts constatés','long')]},
+ {code:'PLAINTE',titre:'Fiche d\'enregistrement d\'une plainte (MGP)',type:'plainte',presence:'non',theme:'Mécanisme de gestion des plaintes',
+  desc:'Enregistrement d\'une préoccupation communautaire liée au projet. Les cas de violences sexuelles ou basées sur le genre sont traités de façon confidentielle.',
+  consignes:'Écouter sans juger, reformuler, ne rien promettre. Si la plainte concerne une violence sexuelle ou basée sur le genre : répondez « oui » à la question VBG, n\'écrivez ni nom ni détail, orientez immédiatement la personne vers la prise en charge et remplissez une fiche de référence.',
+  champs:[C('_vbg','La plainte concerne-t-elle une violence sexuelle ou basée sur le genre (VBG, EAS / HS) ?','ouinon',{requis:true}),
+   C('canal','Canal de réception','choix',{requis:true,options:['Verbal, auprès de l\'agent','Boîte à plaintes','Téléphone, WhatsApp','Comité local de gestion des plaintes','Courrier']}),
+   C('categorie','Catégorie','choix',{requis:true,options:['Accès à l\'information','Nuisances du chantier (bruit, poussière, vibrations)','Dommages aux biens ou aux cultures','Recrutement et emploi local','Sécurité routière, accident','Comportement du personnel','Foncier, indemnisation','Eau, environnement','Autre']}),
+   C('plaignant','Plaignant','choix',{options:['Femme','Homme','Groupe ou communauté','Anonyme']}),C('description','Description de la préoccupation (sans nom si cas sensible)','long',{requis:true}),
+   C('action','Action immédiate ou orientation','long'),C('transmise','Transmise à','texte')]},
+ {code:'SECU',titre:'Causerie sécurité (chantier, atelier) et liste de présence',type:'seance',presence:'nominative',theme:'Sécurité au travail',
+  desc:'Causerie de 15 minutes avant la prise de poste : thème du jour, incidents remontés, port des équipements de protection.',
+  consignes:'Faire signer chaque travailleur. Noter les presque-accidents remontés par l\'équipe, même mineurs : ce sont les meilleurs signaux d\'alerte.',
+  champs:[C('site','Site ou chantier','texte',{requis:true}),C('entreprise','Entreprise','texte'),
+   C('theme','Thème du jour','choix',{requis:true,options:['Port des équipements de protection individuelle','Circulation des engins et des véhicules','Travail en hauteur','Risque électrique','Gestes et postures','Produits dangereux','Premiers secours','Code de conduite, EAS / HS','Prévention du VIH sur le chantier']}),
+   C('epi','Travailleurs portant tous leurs équipements de protection','nombre'),C('incidents','Incidents ou presque-accidents signalés','nombre'),C('details','Détail des incidents signalés','long'),C('obs','Observations','long')]},
+ {code:'ROUTE',titre:'Fiche de sensibilisation à la sécurité routière',type:'seance',presence:'anonyme',theme:'Sécurité routière',
+  desc:'Sensibilisation aux gares, carrefours, écoles et villages riverains ; observation du port du casque.',
+  consignes:'Avant la séance, compter pendant 15 minutes les motocyclistes qui passent et ceux qui portent un casque : c\'est l\'indicateur de comportement suivi dans le temps.',
+  champs:[C('lieu_type','Type de lieu','choix',{requis:true,options:['Gare routière','Marché','Carrefour ou axe routier','École','Village riverain du chantier','Base vie du chantier']}),
+   C('usagers','Usagers touchés','multi',{options:['Conducteurs de motos-taxis','Conducteurs de véhicules','Piétons','Élèves','Commerçants riverains','Transporteurs']}),
+   C('messages','Messages clés','multi',{options:['Port du casque','Respect de la vitesse','Alcool et drogues au volant','Téléphone au volant','Traversée des enfants','Signalisation du chantier','Surcharge']}),
+   C('motos','Motocyclistes observés (15 minutes)','nombre'),C('casques','dont portant un casque','nombre'),C('obs','Observations','long')]},
+ {code:'REBOIS',titre:'Fiche de reboisement et de suivi des plants',type:'suivi',presence:'nominative',theme:'Environnement et résilience climatique',
+  desc:'Mise en terre (liste des participants) puis contrôle du taux de survie des plants.',
+  consignes:'Indiquer le nombre de plants mis en terre le jour même ; lors des contrôles suivants, compter les plants vivants.',
+  champs:[C('site','Site de plantation','texte',{requis:true}),C('espece','Espèces plantées','texte'),C('plants','Plants mis en terre','nombre'),C('surface','Superficie (hectares)','nombre'),C('vivants','Plants vivants au contrôle','nombre'),C('obs','Observations (entretien, pare-feu, divagation des animaux)','long')]},
+ {code:'WASH',titre:'Fiche de suivi d\'un point d\'eau ou d\'un ouvrage d\'assainissement',type:'suivi',presence:'non',theme:'Eau et assainissement',
+  desc:'État de fonctionnement des forages, puits, bornes-fontaines, latrines et dispositifs de lavage des mains.',
+  consignes:'Une fiche par ouvrage et par visite. Photographier l\'ouvrage si possible.',
+  champs:[C('ouvrage','Type d\'ouvrage','choix',{requis:true,options:['Forage équipé d\'une pompe','Puits','Borne-fontaine','Latrine communautaire','Dispositif de lavage des mains']}),C('code','Code ou nom de l\'ouvrage','texte'),
+   C('etat','État','choix',{requis:true,options:['Fonctionnel','Fonctionnel avec réserves','En panne']}),C('menages','Ménages desservis','nombre'),C('comite','Comité de gestion fonctionnel','ouinon'),C('probleme','Problèmes constatés','long'),C('action','Action engagée','long')]},
+ {code:'CAP',titre:'Enquête CAP (questionnaire individuel)',type:'enquete',presence:'non',theme:'Connaissances, attitudes et pratiques',
+  desc:'Questionnaire individuel, de référence et final, pour mesurer l\'évolution des connaissances et des pratiques.',
+  consignes:'Lire le texte de consentement ; sans accord, ne pas poursuivre. Ne pas souffler les réponses. Une fiche par personne interrogée, sans nom.',
+  champs:[C('phase','Phase de l\'enquête','choix',{requis:true,options:['Référence','Finale']}),C('consent','La personne a donné son consentement éclairé','ouinon',{requis:true}),
+   C('sexe','Sexe de la personne interrogée','choix',{requis:true,options:['Femme','Homme']}),C('age','Âge','nombre',{requis:true}),C('instr','Niveau d\'instruction','choix',{options:['Aucun','Primaire','Secondaire','Supérieur']}),
+   C('s1','Connaissances','section'),C('q1','Cite au moins deux moyens de prévention du VIH','ouinon'),C('q2','Sait où se faire dépister gratuitement','ouinon'),C('q3','Connaît au moins un service d\'aide aux victimes de violences','ouinon'),C('q4','Sait comment déposer une plainte liée au projet','ouinon'),
+   C('s2','Attitudes et pratiques','section'),C('q5','Accepterait de partager un repas avec une personne vivant avec le VIH','ouinon'),C('q6','Porte toujours un casque à moto (ou l\'exige du conducteur)','ouinon'),C('q7','A utilisé un préservatif lors du dernier rapport occasionnel','ouinon'),C('q8','Pense qu\'un homme a parfois le droit de frapper sa femme','ouinon',{aide:'Réponse « oui » = attitude défavorable.'})]}];
+
+/* ---------- vue principale ---------- */
+function svTerrain(){
+ if(!p12)return head('Collecte terrain','')+'<p class="note">Exécutez le script 12 dans Supabase pour activer la collecte des données terrain.</p>';
+ if(TR.user!==me.id)Object.assign(TR,{user:me.id,tab:null,pid:null,fiche:null,saisie:null,outil:null,agent:'',statut:'',outilF:'',refForm:false});
+ const L=trProjets(),p=trP();
+ if(!p)return head('Collecte terrain','Fiches d\'activité, listes de présence, références et rapports des agents communautaires.')+'<p class="empty">Vous n\'êtes affecté(e) à aucun projet. Le chef de projet ou le DP vous affecte dans « Personnel des projets ».</p>';
+ TR.pid=p.id;const niv=trNiv(p);
+ if(TR.saisie)return trSaisieVue(p);
+ if(TR.fiche&&S.fterrain.some(f=>f.id===TR.fiche))return trFicheVue(S.fterrain.find(f=>f.id===TR.fiche));
+ if(TR.outil)return trOutilEditeur(p,TR.outil==='new'?null:trOutil(TR.outil));
+ const tabs=niv==='agent'?[['saisir','Saisir'],['fiches','Mes fiches'],['references','Références'],['microplan','Mon microplan'],['rapport','Mon rapport du mois'],['outils','Fiches vierges']]
+  :niv==='sup'?[['verifier','À vérifier'],['agents','Mes agents'],['saisir','Saisir'],['fiches','Fiches'],['references','Références'],['microplan','Microplans'],['rapport','Rapports'],['outils','Fiches vierges']]
+  :niv==='ca'?[['rapport','Rapports validés']]
+  :[['tableau','Tableau de bord'],['verifier','À valider'],['fiches','Fiches'],['references','Références'],['agents','Agents'],['microplan','Microplans'],['rapport','Rapport mensuel'],['qualite','Qualité des données'],['outils','Outils de collecte'],['saisir','Saisir une fiche papier']];
+ if(!tabs.some(t=>t[0]===TR.tab))TR.tab=tabs[0][0];
+ const nb={verifier:trAVerifier(p).length,saisir:trFiches(p).filter(f=>f.statut==='a_corriger'&&[f.agent_id,f.saisi_par].includes(me.id)).length+trFile().length};
+ const file=trFile();
+ const intro={agent:'Vos fiches d\'activité, listes de présence et références remontent à votre superviseur, puis au chef de projet. Seules les fiches validées comptent dans les résultats du projet.',
+  sup:'Vérifiez les fiches de vos agents en les comparant aux fiches papier signées, suivez leur microplan et leurs rapports, puis faites votre synthèse du mois.',
+  projet:'Les données de la communauté remontent ici : agent, superviseur, puis validation. Seules les fiches validées alimentent le tableau de bord, le rapport mensuel et les indicateurs du projet.',ca:'Rapports mensuels des projets, validés par le Directeur des programmes.'}[niv];
+ return head('Collecte terrain',intro)+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
+  (file.length?`<p class="note trFile" role="status"><b>${file.length} envoi(s) gardé(s) sur ce téléphone</b>, en attente de réseau.${file.some(q=>q.erreur)?' Une erreur est signalée : '+esc(file.find(q=>q.erreur).erreur):''} <button class="btn sm" data-act="terSync">Envoyer maintenant</button></p>`:'')+
+  `<div class="trBarre"><div><label for="trPid">Projet</label><select id="trPid" data-ter="pid">${opts(L.map(x=>[x.id,libProj(x)]),p.id)}</select></div>
+   <div><label for="trMois">Mois</label><input id="trMois" type="month" data-ter="mois" value="${TR.mois}" max="${today().slice(0,7)}"></div></div>
+  <nav class="subnav trTabs" aria-label="Collecte terrain">${tabs.map(([k,l])=>`<button data-act="terTab" data-v="${k}" ${TR.tab===k?'aria-current="page"':''}>${l}${nb[k]?` <span class="badge">${nb[k]}</span>`:''}</button>`).join('')}</nav>`+
+  ({saisir:trSaisir,fiches:trListeFiches,references:trReferences,microplan:trMicroplan,rapport:trRapport,outils:trOutilsVue,verifier:trVerifierVue,agents:trAgentsVue,tableau:trTableau,qualite:trQualite}[TR.tab]||trSaisir)(p,niv)}
+
+/* ---------- onglet Saisir ---------- */
+function trSaisir(p,niv){const O=trOutils(p).filter(o=>o.actif),cor=trFiches(p).filter(f=>f.statut==='a_corriger'&&[f.agent_id,f.saisi_par].includes(me.id)),br=trLS.get('Brouillon',null);
+ return (cor.length?`<section class="card notif"><h3>À corriger (${cor.length})</h3><p class="muted">Ces fiches vous ont été renvoyées. Corrigez-les : elles repartent automatiquement à la vérification.</p>
+   ${cor.map(f=>`<div class="q-row"><div><b>${esc((trOutil(f.outil_id)||{}).titre||'Fiche')}</b> · ${fmtD(f.date_activite)} · ${esc(f.localite)}<br><span class="muted">Remarque de ${esc(who(f.retour_par))} : ${esc(f.retour_motif||'')}</span></div><button class="btn sm" data-act="terCorriger" data-id="${f.id}">Corriger</button></div>`).join('')}</section>`:'')+
+  (br&&br.pid===p.id&&trOutil(br.outil)?`<section class="card"><h3>Fiche commencée</h3><div class="q-row"><div><b>${esc(trOutil(br.outil).titre)}</b><br><span class="muted">gardée sur ce téléphone le ${new Date(br.le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}</span></div><div class="row"><button class="btn sm" data-act="terReprendre">Reprendre</button><button class="btn ghost sm" data-act="terAbandon">Abandonner</button></div></div></section>`:'')+
+  `<section class="card"><h3>Remplir une fiche</h3>${O.length?`<p class="muted">Choisissez l'outil qui correspond à l'activité menée. Sans réseau, la fiche est gardée sur ce téléphone et part dès que le réseau revient.</p><div class="trOutils">${O.map(o=>`<button class="trO" data-act="terRemplir" data-id="${o.id}"><b>${esc(o.titre)}</b><span>${esc(OUT_TYPES[o.type]||'')}${o.presence==='nominative'?' · liste de présence':o.presence==='anonyme'?' · décompte anonyme':''}</span></button>`).join('')}</div>`
+   :`<p class="empty">Aucun outil de collecte n'est encore installé pour ce projet.${niv==='projet'?' Ouvrez l\'onglet « Outils de collecte » pour installer les fiches OSV.':' Le chef de projet doit les installer.'}</p>`}</section>`+
+  `<section class="card"><h3>Orienter une personne vers un service</h3><p class="muted">Dépistage, planification familiale, consultation prénatale, prise en charge d'une violence… Chaque orientation a sa fiche de référence, avec un talon de contre-référence à faire remplir par la structure.</p><button class="btn ghost sm" data-act="terTab" data-v="references" data-ref="1">Nouvelle référence</button></section>`}
+
+/* ---------- formulaire d'une fiche ---------- */
+function trChamp(c,v){const n='c_'+c.id,val=v==null?'':v,req=c.requis?' required':'',aide=c.aide?`<small class="muted">${esc(c.aide)}</small>`:'';
+ const lab=`<label for="tf_${c.id}">${esc(c.label)}${c.requis?' <span class="req" aria-hidden="true">*</span>':''}</label>`;
+ if(c.type==='section')return `<h4 class="trSec">${esc(c.label)}</h4>`;
+ if(c.type==='long')return `<div class="trL">${lab}<textarea id="tf_${c.id}" name="${n}" rows="3"${req}>${esc(val)}</textarea>${aide}</div>`;
+ if(c.type==='choix'||c.type==='ouinon'){const O=c.type==='ouinon'?[['oui','Oui'],['non','Non']]:(c.options||[]).map(x=>[x,x]);return `<div${c.type==='choix'&&String(c.label).length>60?' class="trL"':''}>${lab}<select id="tf_${c.id}" name="${n}"${req}>${opts(O,val,'— choisir —')}</select>${aide}</div>`}
+ if(c.type==='multi'){const V=Array.isArray(v)?v:[];return `<fieldset class="trL trMulti"><legend>${esc(c.label)}${c.requis?' <span class="req" aria-hidden="true">*</span>':''}</legend>${(c.options||[]).map(x=>`<label><input type="checkbox" name="${n}" value="${esc(x)}"${V.includes(x)?' checked':''}> ${esc(x)}</label>`).join('')}${aide}</fieldset>`}
+ const t={nombre:'number',date:'date',heure:'time'}[c.type]||'text';
+ return `<div>${lab}<input id="tf_${c.id}" name="${n}" type="${t}"${t==='number'?' min="0" step="any" inputmode="decimal"':''}${t==='date'?` max="${today()}"`:''} value="${esc(val)}"${req}>${aide}</div>`}
+const trLigneP=(x={},i=0)=>`<tr data-p><td class="trN">${i+1}</td><td><input data-k="nom" value="${esc(x.nom||'')}" aria-label="Nom et prénoms" placeholder="Nom et prénoms"></td>
+ <td><select data-k="sexe" aria-label="Sexe"><option value="">Sexe</option><option value="F"${x.sexe==='F'?' selected':''}>F</option><option value="M"${x.sexe==='M'?' selected':''}>M</option></select></td>
+ <td><input data-k="age" type="number" min="0" max="120" inputmode="numeric" value="${x.age??''}" aria-label="Âge" placeholder="Âge"></td>
+ <td><input data-k="tel" inputmode="tel" value="${esc(x.tel||'')}" aria-label="Téléphone" placeholder="Téléphone"></td>
+ <td><label class="trChk"><input type="checkbox" data-k="handicap"${x.handicap?' checked':''}> Handicap</label></td>
+ <td><select data-k="vuln" aria-label="Vulnérabilité">${TR_VULN.map(v=>`<option value="${esc(v)}"${(x.vuln||'')===v?' selected':''}>${v?esc(v):'Vulnérabilité'}</option>`).join('')}</select></td>
+ <td><label class="trChk"><input type="checkbox" data-k="signe"${x.signe===false?'':' checked'}> A signé</label></td><td><button type="button" class="btn ghost sm" data-act="terPDel" aria-label="Retirer cette ligne">×</button></td></tr>`;
+function trPresence(o,v){if(o.presence==='nominative'){const P=(v.participants||[]).length?v.participants:[{},{},{}];
+  return `<fieldset class="trL trPresF"><legend>Liste de présence <span class="muted">(${P.length} ligne(s))</span></legend><p class="muted">Recopiez fidèlement la liste signée. L'âge sert à la désagrégation : ne le laissez pas vide. Les lignes vides sont ignorées.</p>
+  <div class="trPresW"><table class="trPres"><thead><tr><th>N°</th><th>Nom et prénoms</th><th>Sexe</th><th>Âge</th><th>Téléphone</th><th>Handicap</th><th>Vulnérabilité</th><th>Émargement</th><th></th></tr></thead><tbody>${P.map(trLigneP).join('')}</tbody></table></div>
+  <div class="row"><button type="button" class="btn ghost sm" data-act="terPAdd" data-n="1">+ 1 personne</button><button type="button" class="btn ghost sm" data-act="terPAdd" data-n="5">+ 5 lignes</button><span class="muted trPresTot" aria-live="polite"></span></div></fieldset>`}
+ if(o.presence==='anonyme'){const D=v.decompte||{};
+  return `<fieldset class="trL"><legend>Décompte des participants</legend><p class="muted">Nombre de personnes par sexe et par tranche d'âge (en années).</p><div class="tbl"><table class="trDc"><thead><tr><th>Tranche d'âge</th><th>Femmes</th><th>Hommes</th></tr></thead><tbody>
+  ${TR_BANDES.map(b=>`<tr><th scope="row">${b} ans</th>${['F','M'].map(s=>`<td><input type="number" min="0" inputmode="numeric" name="dc_${s}_${b}" value="${(D[s]||{})[b]??''}" aria-label="${s==='F'?'Femmes':'Hommes'} ${b} ans"></td>`).join('')}</tr>`).join('')}
+  <tr><th scope="row">dont personnes vivant avec un handicap</th><td colspan="2"><input type="number" min="0" name="dc_handicap" value="${D.handicap??''}" aria-label="Personnes vivant avec un handicap"></td></tr></tbody></table></div></fieldset>`}
+ return ''}
+function trSaisieVue(p){const s=TR.saisie,o=trOutil(s.outil);if(!o){TR.saisie=null;return svTerrain()}
+ const f=s.id&&S.fterrain.find(x=>x.id===s.id),v=s.v||f||{};const pourAutre=trValide(p)||me.role==='SUP';
+ const ags=trCollecteurs(p).filter(u=>u.id===me.id||trVerifie(p,u.id));const locs=[...new Set(trFiches(p).map(x=>x.localite))].sort();
+ return `<p><button class="lnk" data-act="terFermer">← Collecte terrain</button></p><div class="head"><h1>${esc(o.titre)}</h1><p>${esc(libProj(p))}${s.id?' · correction de la fiche du '+fmtD(f.date_activite):''}</p></div>
+ ${f&&f.retour_motif&&f.statut==='a_corriger'?`<p class="note"><b>À corriger :</b> ${esc(f.retour_motif)} <span class="muted">(${esc(who(f.retour_par))})</span></p>`:''}
+ ${o.consignes?`<details class="card trCons"><summary><b>Consignes de remplissage</b></summary><p>${esc(o.consignes)}</p></details>`:''}
+ <form data-form="terFiche" data-outil="${o.id}" data-id="${s.id||''}" class="card grid trForm" novalidate>
+  <h4 class="trSec">Identification de l'activité</h4>
+  ${pourAutre&&!s.id?`<div><label for="tf_agent">Agent qui a mené l'activité</label><select id="tf_agent" name="agent">${opts(ags.map(u=>[u.id,`${u.nom} (${posteLib(u)})`]),v.agent_id||me.id)}</select></div>`:''}
+  <div><label for="tf_date">Date de l'activité <span class="req" aria-hidden="true">*</span></label><input id="tf_date" name="date_activite" type="date" max="${today()}" required value="${v.date_activite||today()}"></div>
+  <div><label for="tf_hd">Heure de début</label><input id="tf_hd" name="heure_debut" type="time" value="${esc(v.heure_debut||'')}"></div>
+  <div><label for="tf_hf">Heure de fin</label><input id="tf_hf" name="heure_fin" type="time" value="${esc(v.heure_fin||'')}"></div>
+  <div><label for="tf_loc">Localité (village, quartier) <span class="req" aria-hidden="true">*</span></label><input id="tf_loc" name="localite" list="trLocs" required value="${esc(v.localite||'')}"><datalist id="trLocs">${locs.map(l=>`<option value="${esc(l)}">`).join('')}</datalist></div>
+  <div><label for="tf_sp">Sous-préfecture</label><input id="tf_sp" name="sous_prefecture" value="${esc(v.sous_prefecture||'')}"></div>
+  <div><label for="tf_lieu">Lieu précis</label><input id="tf_lieu" name="lieu" value="${esc(v.lieu||'')}" placeholder="ex. place publique, église, base vie"></div>
+  <div class="trGps"><span class="lbl">Position GPS</span><button type="button" class="btn ghost sm" data-act="terGps">Relever ma position</button><span class="muted" data-gps>${v.lat!=null?`${Number(v.lat).toFixed(5)}, ${Number(v.lng).toFixed(5)} (± ${Math.round(v.gps_precision||0)} m)`:'non relevée'}</span>
+   <input type="hidden" name="lat" value="${v.lat??''}"><input type="hidden" name="lng" value="${v.lng??''}"><input type="hidden" name="gps_precision" value="${v.gps_precision??''}"></div>
+  ${o.champs.length?`<h4 class="trSec">Contenu de l'activité</h4>`:''}${o.champs.map(c=>trChamp(c,(v.donnees||{})[c.id])).join('')}
+  ${trPresence(o,v)}
+  <h4 class="trSec">Pièce justificative et confidentialité</h4>
+  <div class="trL"><label for="tf_piece">${o.presence==='nominative'?'Photo de la liste de présence signée':'Photo ou scan de la fiche papier'}</label><input id="tf_piece" name="piece" type="file" accept="image/*,.pdf" capture="environment"><small class="muted">Sans réseau, la photo ne peut pas partir avec la fiche : vous la joindrez ensuite depuis « Mes fiches ».</small></div>
+  <div class="trL"><label class="trChk"><input type="checkbox" name="confidentiel"${v.confidentiel?' checked':''}> Cette fiche concerne un cas sensible (VBG, EAS / HS) : effacer les noms et téléphones, et la réserver au chef de projet</label></div>
+  <div class="trL row trActs"><button class="btn" type="submit">${s.id?'Renvoyer la fiche corrigée':'Envoyer la fiche'}</button><button class="btn ghost" type="button" data-act="terFermer">${s.id?'Annuler':'Garder pour plus tard'}</button>${s.id?'':'<button class="btn ghost" type="button" data-act="terAbandon">Abandonner cette fiche</button>'}</div>
+ </form>`}
+function trLire(f){const o=trOutil(f.dataset.outil),g=n=>String((f.elements[n]||{}).value??'').trim(),err=[];
+ const donnees={};o.champs.forEach(c=>{if(c.type==='section')return;let v;
+  if(c.type==='multi')v=[...f.querySelectorAll(`[name="c_${c.id}"]:checked`)].map(x=>x.value);else{v=g('c_'+c.id);if(c.type==='nombre'&&v!=='')v=Number(String(v).replace(',','.'))}
+  if(c.requis&&(v===''||(Array.isArray(v)&&!v.length)))err.push(c.label);
+  if(c.type==='nombre'&&v!==''&&!(v>=0))err.push(c.label+' (nombre positif)');
+  if(!(v===''||(Array.isArray(v)&&!v.length)))donnees[c.id]=v});
+ const conf=!!(f.elements.confidentiel&&f.elements.confidentiel.checked)||(donnees._vbg==='oui');
+ const participants=[...f.querySelectorAll('tr[data-p]')].map(tr=>{const q=k=>tr.querySelector(`[data-k="${k}"]`);
+  return {nom:q('nom').value.trim(),sexe:q('sexe').value,age:q('age').value===''?null:Number(q('age').value),tel:q('tel').value.trim(),handicap:q('handicap').checked,vuln:q('vuln').value,signe:q('signe').checked}})
+  .filter(x=>x.nom||x.sexe||x.age!=null||x.tel);
+ participants.forEach((x,i)=>{if(!x.sexe)err.push(`ligne ${i+1} de la liste : sexe`);if(!x.nom&&!conf)err.push(`ligne ${i+1} de la liste : nom`);if(x.age!=null&&!(x.age>=0&&x.age<=120))err.push(`ligne ${i+1} : âge invalide`)});
+ const decompte={};if(o.presence==='anonyme'){['F','M'].forEach(s=>{decompte[s]={};TR_BANDES.forEach(b=>{const v=g(`dc_${s}_${b}`);if(v!==''){const n=Number(v);if(!(n>=0))err.push('décompte '+b);else decompte[s][b]=n}})});const h=g('dc_handicap');if(h!=='')decompte.handicap=Number(h)}
+ if(o.presence==='nominative'&&!participants.length)err.push('liste de présence (au moins une personne)');
+ if(o.presence==='anonyme'&&!['F','M'].some(s=>Object.values(decompte[s]||{}).some(n=>n>0)))err.push('décompte des participants');
+ const date=g('date_activite');if(!date)err.push('date de l\'activité');else if(date>today())err.push('date de l\'activité (dans le futur)');
+ if(!g('localite'))err.push('localité');
+ if(g('heure_debut')&&g('heure_fin')&&g('heure_fin')<g('heure_debut'))err.push('heure de fin (avant le début)');
+ const num2=n=>g(n)===''?null:Number(g(n));
+ const rec={date_activite:date,heure_debut:g('heure_debut')||null,heure_fin:g('heure_fin')||null,localite:g('localite'),sous_prefecture:g('sous_prefecture')||null,lieu:g('lieu')||null,lat:num2('lat'),lng:num2('lng'),gps_precision:num2('gps_precision'),
+  donnees,participants:conf?participants.map(({nom,tel,...r})=>r):participants,decompte,confidentiel:conf};
+ if(f.elements.agent)rec.agent_id=f.elements.agent.value;
+ return [rec,err]}
+function trBrouillon(f){if(!f||f.dataset.id||!document.contains(f)||f.dataset.envoi)return;try{const [rec]=trLire(f);trLS.set('Brouillon',{pid:TR.pid,outil:f.dataset.outil,v:rec,le:new Date().toISOString()})}catch(e){}}
+async function trEnvoyerFiche(f){clearTimeout(trTimer);const [rec,err]=trLire(f);if(err.length){alert('À compléter ou corriger :\n· '+[...new Set(err)].join('\n· '));return}
+ const o=trOutil(f.dataset.outil),edit=f.dataset.id,file=f.elements.piece&&f.elements.piece.files[0];f.dataset.envoi='1';
+ if(rec.participants.length&&rec.participants.filter(x=>x.age==null).length>rec.participants.length/2&&!confirm('Plus de la moitié des âges sont vides : la désagrégation par âge sera faussée. Envoyer quand même ?'))return;
+ if(edit){action(async()=>{await upd('fiches_terrain',`id=eq.${edit}`,rec);if(file)await trJoindre(edit,file);TR.saisie=null;
+   const x=S.fterrain.find(y=>y.id===edit);if(x&&x.retour_par)await notifierSrv([x.retour_par],`Fiche corrigée par ${who(me.id)} : ${o.titre} du ${fmtD(rec.date_activite)} (${rec.localite})`,'terrain',edit)},'Fiche corrigée et renvoyée à la vérification.');return}
+ const id=uuid(),full={id,client_uuid:id,org_id:S.org.id,projet_id:TR.pid,outil_id:o.id,agent_id:rec.agent_id||me.id,...rec};
+ if(!navigator.onLine){trMettreEnFile(full,file);return}
+ srvBusy=true;document.body.classList.add('busy');
+ try{await ins('fiches_terrain',full)}catch(e){srvBusy=false;document.body.classList.remove('busy');if(trReseau(e)){trMettreEnFile(full,file);return}alert(e.message||String(e));return}
+ try{if(file)await trJoindre(id,file)}catch(e){alert('La fiche est envoyée, mais la photo n\'a pas pu partir : '+e.message+'. Joignez-la depuis « Mes fiches ».')}
+ trLS.del('Brouillon');TR.saisie=null;try{await srvLoad()}catch(_){}srvBusy=false;document.body.classList.remove('busy');
+ srvMsg=`Fiche envoyée (${full.agent_id===me.id?'':'pour '+who(full.agent_id)+', '}${o.titre}). Elle part à la vérification.`;TR.tab=TR.tab||'saisir';render();scrollTo(0,0)}
+function trMettreEnFile(full,file){const L=trFile();L.push({table:'fiches_terrain',rec:full,le:new Date().toISOString()});trLS.set('File',L);trLS.del('Brouillon');TR.saisie=null;
+ srvMsg=`Pas de réseau : la fiche est gardée sur ce téléphone (${L.length} en attente). Elle partira dès que le réseau revient.${file?' La photo, elle, est à joindre ensuite depuis « Mes fiches ».':''}`;render();scrollTo(0,0)}
+async function trJoindre(id,file){const x=S.fterrain.find(y=>y.id===id)||{id,projet_id:TR.pid,date_activite:today(),localite:''};const o=trOutil(x.outil_id)||{titre:'Fiche terrain'};
+ const did=await arDeposer({departement:'PROGRAMMES',projet:x.projet_id,type_doc:o.presence==='nominative'?'Liste de présence signée':'Fiche terrain',titre:`${o.titre} – ${x.localite} – ${fmtD(x.date_activite)}`,date_doc:x.date_activite},file,{objet:'fiche_terrain',objet_id:id});
+ await upd('fiches_terrain',`id=eq.${id}`,{piece_id:did})}
+
+/* ---------- détail d'une fiche ---------- */
+function trFicheVue(x){const p=projet(x.projet_id),o=trOutil(x.outil_id)||{titre:'Fiche',champs:[]},aut=[x.agent_id,x.saisi_par].includes(me.id);
+ const peutV=x.statut==='soumise'&&!aut&&trVerifie(p,x.agent_id),peutVal=['soumise','verifiee'].includes(x.statut)&&!aut&&trValide(p)&&x.verifie_par!==me.id,peutR=['soumise','verifiee'].includes(x.statut)&&!aut&&trVerifie(p,x.agent_id);
+ const val=(c,v)=>Array.isArray(v)?v.map(esc).join(', '):c.type==='ouinon'?(v==='oui'?'Oui':v==='non'?'Non':''):c.type==='date'?fmtD(v):esc(v);
+ const P=x.participants||[],sig=trSignaux(x);
+ return `<p><button class="lnk" data-act="terFermer">← Collecte terrain</button></p>${srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:''}
+ <div class="head"><h1>${esc(o.titre)}</h1><p>${fmtD(x.date_activite)}${x.heure_debut?' · '+esc(x.heure_debut)+(x.heure_fin?'–'+esc(x.heure_fin):''):''} · ${esc(x.localite)}${x.sous_prefecture?' ('+esc(x.sous_prefecture)+')':''} · ${esc(who(x.agent_id))}</p></div>
+ <div class="row" style="margin-bottom:1rem">${tag(FT_ST[x.statut])}${x.confidentiel?tag(['Confidentiel','bad']):''}${sig.map(s=>tag(s)).join('')}</div>
+ ${x.retour_motif&&['a_corriger','rejetee'].includes(x.statut)?`<p class="note"><b>${x.statut==='rejetee'?'Motif du rejet':'À corriger'} :</b> ${esc(x.retour_motif)} <span class="muted">(${esc(who(x.retour_par))}, ${fmtD(x.retour_le)})</span></p>`:''}
+ ${peutV||peutVal||peutR?`<section class="card notif"><h3>${peutVal?'Validation':'Vérification'}</h3><p class="muted">${peutVal?'En validant, vous confirmez que la fiche est complète et cohérente : elle compte alors dans les résultats du projet.':'Comparez avec la fiche papier signée (photo jointe) : date, lieu, nombre de participants, émargements.'}</p>
+  <div class="row">${peutV&&!peutVal?`<button class="btn" data-act="terSt" data-v="verifiee" data-id="${x.id}">Vérifiée, conforme</button>`:''}${peutVal?`<button class="btn" data-act="terSt" data-v="validee" data-id="${x.id}">Valider</button>`:''}${peutR?`<button class="btn ghost" data-act="terSt" data-v="a_corriger" data-id="${x.id}">Renvoyer pour correction</button>`:''}${peutVal?`<button class="btn danger sm" data-act="terSt" data-v="rejetee" data-id="${x.id}">Rejeter</button>`:''}</div></section>`:''}
+ ${aut&&['soumise','a_corriger'].includes(x.statut)?`<div class="row" style="margin-bottom:1rem"><button class="btn ghost sm" data-act="terCorriger" data-id="${x.id}">Modifier</button>${x.statut==='soumise'?`<button class="btn danger sm" data-act="terSuppr" data-id="${x.id}">Retirer cette fiche</button>`:''}</div>`:''}
+ <section class="card"><div class="facts"><div><span>Projet</span><b>${esc(libProj(p))}</b></div><div><span>Personnes</span><b>${num(x.nb_total)} <span class="muted">(${num(x.nb_f)} F · ${num(x.nb_h)} H${x.nb_handicap?' · '+num(x.nb_handicap)+' handicap':''})</span></b></div>
+  <div><span>Lieu précis</span><b>${esc(x.lieu||'—')}</b></div><div><span>Position</span><b>${x.lat!=null?`<a href="https://www.openstreetmap.org/?mlat=${x.lat}&mlon=${x.lng}#map=16/${x.lat}/${x.lng}" target="_blank" rel="noopener">${Number(x.lat).toFixed(4)}, ${Number(x.lng).toFixed(4)}</a>`:'non relevée'}</b></div>
+  <div><span>Saisie</span><b>${new Date(x.saisi_le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}${x.saisi_par&&x.saisi_par!==x.agent_id?' par '+esc(who(x.saisi_par)):''}</b></div>
+  <div><span>Circuit</span><b>${x.verifie_par?'vérifiée par '+esc(who(x.verifie_par)):'—'}${x.valide_par?' · validée par '+esc(who(x.valide_par)):''}</b></div></div>
+  ${o.champs.filter(c=>c.type!=='section'&&(x.donnees||{})[c.id]!=null).length?`<table class="trKv">${o.champs.filter(c=>c.type!=='section'&&(x.donnees||{})[c.id]!=null&&(x.donnees||{})[c.id]!=='').map(c=>`<tr><th>${esc(c.label)}</th><td>${val(c,x.donnees[c.id])}</td></tr>`).join('')}</table>`:''}
+  <p style="margin-top:.8rem"><b>Pièce jointe :</b> ${x.piece_id?docLien(x.piece_id):'<span class="muted">aucune</span>'}</p>
+  ${aut&&['soumise','a_corriger'].includes(x.statut)&&!x.piece_id?`<form data-form="terPiece" data-id="${x.id}" class="row"><input name="fichier" type="file" accept="image/*,.pdf" capture="environment" required aria-label="Photo de la liste signée"><button class="btn sm" type="submit">Joindre</button></form>`:''}</section>
+ ${P.length?`<section class="card"><h3>Liste de présence (${P.length})</h3>${svT(['N°','Nom et prénoms','Sexe','#Âge','Téléphone','Handicap','Vulnérabilité','Émargement'],P.map((q,i)=>[i+1,esc(q.nom||(x.confidentiel?'(confidentiel)':'')),q.sexe||'',q.age??'—',esc(q.tel||''),q.handicap?'Oui':'',esc(q.vuln||''),q.signe===false?'<span class="tag bad">non</span>':'oui']))}</section>`:''}
+ ${Object.keys(x.decompte||{}).length?`<section class="card"><h3>Décompte</h3>${svT(['Tranche d\'âge','#Femmes','#Hommes'],TR_BANDES.map(b=>[b+' ans',num(((x.decompte.F)||{})[b]||0),num(((x.decompte.M)||{})[b]||0)]))}${x.decompte.handicap?`<p>dont personnes vivant avec un handicap : <b>${num(x.decompte.handicap)}</b></p>`:''}</section>`:''}
+ <p><button class="btn ghost sm" data-act="terImpFiche" data-id="${x.id}">Imprimer ou télécharger en Word</button></p>`}
+
+/* ---------- listes ---------- */
+function trAVerifier(p){const niv=trNiv(p),F=trFiches(p).filter(f=>![f.agent_id,f.saisi_par].includes(me.id));
+ if(niv==='projet')return F.filter(f=>f.statut==='verifiee'&&f.verifie_par!==me.id).concat(F.filter(f=>f.statut==='soumise'));
+ if(niv==='sup')return F.filter(f=>f.statut==='soumise'&&trVerifie(p,f.agent_id));return []}
+function trLigneF(f,coche){const o=trOutil(f.outil_id)||{};
+ return [...(coche?[`<input type="checkbox" class="trSel" value="${f.id}" aria-label="Sélectionner la fiche du ${fmtD(f.date_activite)}">`]:[]),fmtD(f.date_activite),esc(who(f.agent_id)),esc(o.titre||''),esc(f.localite),`${num(f.nb_total)} <span class="muted">(${num(f.nb_f)} F · ${num(f.nb_h)} H)</span>`,trSigHTML(f)||'<span class="muted">—</span>',tag(FT_ST[f.statut]),`<button class="btn ghost sm" data-act="terVoir" data-id="${f.id}">Voir</button>`]}
+function trVerifierVue(p,niv){const L=trAVerifier(p);
+ return `<section class="card"><h3>${niv==='projet'?'Fiches à valider':'Fiches à vérifier'} (${L.length})</h3><p class="muted">${niv==='projet'?'Les fiches déjà vérifiées par un superviseur apparaissent en premier. Ouvrez une fiche pour la renvoyer avec vos remarques ; cochez celles qui sont conformes pour les valider ensemble.':'Comparez chaque fiche à la fiche papier signée. Cochez les fiches conformes ; ouvrez une fiche pour la renvoyer à l\'agent avec vos remarques.'} Les signaux de qualité vous aident à repérer ce qui mérite un contrôle.</p>
+ ${L.length?`<div class="row" style="margin-bottom:.6rem"><label class="trChk"><input type="checkbox" data-ter="tout"> Tout cocher</label><button class="btn sm" data-act="terLot" data-v="${niv==='projet'?'validee':'verifiee'}">${niv==='projet'?'Valider':'Marquer vérifiées'} les fiches cochées</button></div>`:''}
+ ${svT(['','Date','Agent','Outil','Localité','#Personnes','Signaux','Statut',''],L.map(f=>trLigneF(f,true)),'Rien à traiter. Tout est à jour.')}</section>`}
+function trListeFiches(p,niv){let F=trFiches(p).filter(f=>moisDe(f.date_activite)===TR.mois);if(niv==='agent')F=F.filter(f=>f.agent_id===me.id||f.saisi_par===me.id);
+ if(TR.agent)F=F.filter(f=>f.agent_id===TR.agent);if(TR.statut)F=F.filter(f=>f.statut===TR.statut);if(TR.outilF)F=F.filter(f=>f.outil_id===TR.outilF);
+ F.sort((a,b)=>a.date_activite<b.date_activite?1:-1);const A=trAgreger(F.filter(f=>f.statut!=='rejetee'));
+ const ags=[...new Set(trFiches(p).map(f=>f.agent_id))];
+ return `<section class="card"><h3>Fiches de ${moisLib(TR.mois).toLowerCase()} (${F.length})</h3>
+ <div class="trFiltres">${niv!=='agent'?`<div><label for="trFa">Agent</label><select id="trFa" data-ter="agent">${opts(ags.map(id=>[id,who(id)]),TR.agent,'Tous')}</select></div>`:''}
+  <div><label for="trFs">Statut</label><select id="trFs" data-ter="statut">${opts(Object.entries(FT_ST).map(([k,v])=>[k,v[0]]),TR.statut,'Tous')}</select></div>
+  <div><label for="trFo">Outil</label><select id="trFo" data-ter="outilF">${opts(trOutils(p).map(o=>[o.id,o.titre]),TR.outilF,'Tous')}</select></div>
+  ${niv!=='agent'&&F.length?`<div class="row"><button class="btn ghost sm" data-act="terCsv" data-v="fiches">Exporter (Excel)</button>${niv==='projet'?'<button class="btn ghost sm" data-act="terCsv" data-v="participants">Liste des participants (Excel)</button>':''}</div>`:''}</div>
+ <p class="muted">${num(A.n)} fiche(s) hors rejet · ${num(A.total)} personne(s) : ${num(A.f)} femmes (${pcS(A.f,A.f+A.h)}), ${num(A.h)} hommes${A.hand?`, dont ${num(A.hand)} vivant avec un handicap`:''}.</p>
+ ${svT(['Date','Agent','Outil','Localité','#Personnes','Signaux','Statut',''],F.map(f=>trLigneF(f,false)),'Aucune fiche pour ce mois.')}</section>`}
+
+/* ---------- références et contre-références ---------- */
+function trReferences(p,niv){let R=trRefs(p);if(niv==='agent')R=R.filter(r=>r.agent_id===me.id);const Rm=R.filter(r=>moisDe(r.date_reference)===TR.mois),st=trRefStats(Rm);
+ const att=R.filter(r=>r.statut==='emise').sort((a,b)=>a.date_reference<b.date_reference?-1:1),j=r=>Math.round((Date.now()-new Date(r.date_reference))/864e5);
+ const peutSaisir=trEmploye(p)||trValide(p);const structs=[...new Set(trRefs(p).map(r=>r.structure))].sort();
+ return `${peutSaisir?`<details class="card" ${TR.refForm?'open':''}><summary><b>Nouvelle référence</b></summary>
+ <p class="muted" style="margin-top:.5rem">Pour un cas de violence (VBG, EAS / HS), n'écrivez ni nom ni téléphone : le code suffit, la fiche devient confidentielle. Si la personne a subi un viol, la prise en charge médicale doit intervenir dans les 72 heures : accompagnez-la si possible.</p>
+ <form data-form="terRef" class="grid" style="align-items:end">
+  ${trValide(p)||me.role==='SUP'?`<div><label>Agent</label><select name="agent">${opts(trCollecteurs(p).filter(u=>u.id===me.id||trVerifie(p,u.id)).map(u=>[u.id,u.nom]),me.id)}</select></div>`:''}
+  <div><label>Date</label><input name="date_reference" type="date" max="${today()}" value="${today()}" required></div>
+  <div><label>Code de la personne</label><input name="code_beneficiaire" required placeholder="ex. KA-1990-KONG" aria-describedby="trCodeA"><small id="trCodeA" class="muted">Initiales, année de naissance, localité</small></div>
+  <div><label>Motif</label><select name="motif" required data-ter="motif">${opts(TR_MOTIFS.map(m=>[m,m]),'','— choisir —')}</select></div>
+  <div class="trNom"><label>Nom (facultatif)</label><input name="nom" autocomplete="off"></div><div class="trNom"><label>Téléphone (facultatif)</label><input name="telephone" inputmode="tel" autocomplete="off"></div>
+  <div><label>Sexe</label><select name="sexe" required>${opts([['F','Femme'],['M','Homme']],'','—')}</select></div><div><label>Âge</label><input name="age" type="number" min="0" max="120" inputmode="numeric"></div>
+  <div><label>Localité</label><input name="localite" required></div><div><label>Structure de prise en charge</label><input name="structure" list="trStructs" required placeholder="ex. CSU de Kong, maternité, centre social"><datalist id="trStructs">${structs.map(s=>`<option value="${esc(s)}">`).join('')}</datalist></div>
+  <div style="grid-column:1/-1"><label>Précisions</label><input name="motif_detail"></div>
+  <div class="row" style="grid-column:1/-1"><label class="trChk"><input type="checkbox" name="urgence"> Urgence</label><label class="trChk"><input type="checkbox" name="accompagne"> Personne accompagnée par l'agent</label><label class="trChk"><input type="checkbox" name="handicap"> Personne vivant avec un handicap</label></div>
+  <div style="grid-column:1/-1"><button class="btn" type="submit">Enregistrer la référence</button></div></form></details>`:''}
+ <div class="kpis"><div class="kpi"><b>${num(st.emises)}</b><span>références en ${moisLib(TR.mois).toLowerCase()}</span></div><div class="kpi"><b>${pcS(st.arrivees,st.emises)}</b><span>prises en charge confirmées (contre-référence)</span></div>
+  <div class="kpi"><b>${st.delai==null?'—':String(st.delai).replace('.',',')+' j'}</b><span>délai moyen jusqu'à la prise en charge</span></div><div class="kpi"><b>${num(att.length)}</b><span>en attente, tous mois confondus</span></div></div>
+ ${att.length?`<section class="card notif"><h3>Suivi : contre-références attendues (${att.length})</h3><p class="muted">Relancez la personne ou la structure au-delà de 7 jours. Au-delà de 30 jours sans nouvelle, déclarez-la perdue de vue en indiquant les relances faites.</p>
+  ${svT(['N°','Date','Code','Motif','Structure','#Jours','Agent',''],att.map(r=>[esc(r.numero||''),fmtD(r.date_reference),esc(r.code_beneficiaire)+(r.confidentiel?' '+tag(['confidentiel','bad']):'')+(r.urgence?' '+tag(['urgence','bad']):''),esc(r.motif),esc(r.structure),j(r)>7?`<b class="txt-bad">${j(r)}</b>`:j(r),esc(who(r.agent_id)),
+   `<div class="row"><button class="btn sm" data-act="terCref" data-id="${r.id}">Contre-référence reçue</button><button class="btn ghost sm" data-act="terPerdue" data-id="${r.id}">Perdue de vue</button><button class="btn ghost sm" data-act="terImpRef" data-id="${r.id}">Fiche</button></div>`]))}</section>`:''}
+ <section class="card"><h3>Références de ${moisLib(TR.mois).toLowerCase()} (${Rm.length})</h3>${svT(['N°','Date','Code','Sexe','#Âge','Motif','Structure','Statut',''],Rm.sort((a,b)=>a.date_reference<b.date_reference?1:-1).map(r=>[esc(r.numero||''),fmtD(r.date_reference),esc(r.code_beneficiaire),r.sexe||'',r.age??'',esc(r.motif),esc(r.structure),tag(RF_ST[r.statut])+(r.contre_ref_issue?`<br><span class="muted">${esc(r.contre_ref_issue)}</span>`:''),`<button class="btn ghost sm" data-act="terImpRef" data-id="${r.id}">Fiche</button>`]),'Aucune référence ce mois-ci.')}
+ ${Object.keys(st.motifs).length?`<h4 style="margin-top:1rem">Par motif</h4>${trBarres(Object.entries(st.motifs).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[k,v]))}`:''}</section>`}
+
+/* ---------- microplan ---------- */
+function trRealise(mp,F){return (mp.lignes||[]).map(l=>{const f=F.find(x=>x.agent_id===mp.agent_id&&x.date_activite===l.date&&String(x.localite).trim().toLowerCase()===String(l.localite).trim().toLowerCase()&&x.statut!=='rejetee');return {...l,fiche:f}})}
+function trMicroplan(p,niv){const F=trFiches(p),M=(S.microplans||[]).filter(m=>m.projet_id===p.id&&moisDe(m.mois)===TR.mois);
+ if(niv==='agent'){const mp=M.find(m=>m.agent_id===me.id),R=mp?trRealise(mp,F):[],ok=R.filter(r=>r.fiche).length;
+  return `<section class="card"><h3>Mon microplan de ${moisLib(TR.mois).toLowerCase()}</h3><p class="muted">Le microplan liste, avant le début du mois, les activités que vous prévoyez : date, localité, activité et nombre de personnes visées. Votre superviseur le valide. Chaque fiche envoyée à la même date et dans la même localité est comptée comme réalisée.</p>
+  ${mp?`<p>${tag(MP_ST[mp.statut])}${mp.motif&&mp.statut==='a_corriger'?` <span class="muted">${esc(mp.motif)}</span>`:''} · réalisé : <b>${ok} / ${R.length}</b> activité(s) (${pcS(ok,R.length)})</p>
+   ${svT(['Date','Localité','Activité','#Personnes visées','Réalisé','#Personnes touchées'],R.map(r=>[fmtD(r.date),esc(r.localite),esc(r.activite),num(r.cible),r.fiche?tag(['oui','ok']):(r.date<today()?tag(['non','bad']):'<span class="muted">à venir</span>'),r.fiche?num(r.fiche.nb_total):'']))}`:''}
+  ${!mp||mp.statut!=='valide'?`<form data-form="terMp" data-id="${mp?mp.id:''}" style="margin-top:.8rem"><label for="trMpL">Activités prévues : une par ligne, « jj/mm/aaaa ; localité ; activité ; personnes visées »</label>
+   <textarea id="trMpL" name="lignes" rows="6" placeholder="05/11/2026 ; Kong ; Causerie éducative IST/VIH ; 25&#10;07/11/2026 ; Nafana ; Porte-à-porte ; 40">${esc(mp?(mp.lignes||[]).map(l=>[l.date.split('-').reverse().join('/'),l.localite,l.activite,l.cible??''].join(' ; ')).join('\n'):'')}</textarea>
+   <button class="btn" type="submit" style="margin-top:.5rem">${mp?'Renvoyer au superviseur':'Envoyer au superviseur'}</button></form>`:''}</section>`}
+ const A=trAgents(p).filter(u=>niv==='projet'||trVerifie(p,u.id));
+ return `<section class="card"><h3>Microplans de ${moisLib(TR.mois).toLowerCase()}</h3><p class="muted">Un microplan validé par agent et par mois : c'est la base du suivi de la réalisation et de la complétude.</p>
+ ${svT(['Agent','Statut','#Activités prévues','Réalisées','#Personnes visées','#Touchées',''],A.map(u=>{const mp=M.find(m=>m.agent_id===u.id);if(!mp)return [esc(u.nom),tag(['Non reçu','bad']),'','','','',''];const R=trRealise(mp,F),ok=R.filter(r=>r.fiche).length;
+  return [esc(u.nom),tag(MP_ST[mp.statut]),R.length,`${ok} (${pcS(ok,R.length)})`,num(somme(R,r=>r.cible)),num(somme(R.filter(r=>r.fiche),r=>r.fiche.nb_total)),
+   `<div class="row"><details><summary class="lnk">Détail</summary>${svT(['Date','Localité','Activité','#Visées','Réalisé'],R.map(r=>[fmtD(r.date),esc(r.localite),esc(r.activite),num(r.cible),r.fiche?'oui':'non']))}</details>${mp.statut==='soumis'&&mp.agent_id!==me.id?`<button class="btn sm" data-act="terMpSt" data-v="valide" data-id="${mp.id}">Valider</button><button class="btn ghost sm" data-act="terMpSt" data-v="a_corriger" data-id="${mp.id}">À revoir</button>`:''}</div>`]}),'Aucun agent affecté au projet.')}</section>`}
+
+/* ---------- rapports mensuels ---------- */
+function trInstantane(p,F,R){const A=trAgreger(F),st=trRefStats(R);
+ return {fiches:A.n,total:A.total,f:A.f,h:A.h,handicap:A.hand,age:A.age,vuln:A.vuln,localites:Object.entries(A.loc).map(([k,v])=>({localite:k,...v})).sort((a,b)=>b.total-a.total),
+  outils:Object.entries(A.outil).map(([k,v])=>{const o=trOutil(k)||{titre:'Outil',champs:[]};return {titre:o.titre,...v,champs:o.champs.filter(c=>A.champs[k+'|'+c.id]!=null).map(c=>({label:c.label,type:c.type,v:A.champs[k+'|'+c.id]}))}}),
+  agents:Object.entries(A.agent).map(([k,v])=>({nom:who(k),...v})),references:st}}
+function trChiffresHTML(d){if(!d||d.fiches==null)return '<p class="muted">Aucune donnée.</p>';
+ const ag=d.age||{},t=b=>(ag[b]||{F:0,M:0});
+ return `<div class="kpis"><div class="kpi"><b>${num(d.fiches)}</b><span>fiches (activités)</span></div><div class="kpi"><b>${num(d.total)}</b><span>personnes touchées</span></div><div class="kpi"><b>${pcS(d.f,d.f+d.h)}</b><span>de femmes (${num(d.f)})</span></div><div class="kpi"><b>${num(d.handicap)}</b><span>personnes vivant avec un handicap</span></div>${d.references?`<div class="kpi"><b>${num(d.references.emises)}</b><span>références, dont ${num(d.references.arrivees)} confirmées</span></div>`:''}</div>
+ <h4>Désagrégation par sexe et par âge</h4>${svT(['Âge','#Femmes','#Hommes','#Total'],[...TR_BANDES,'nd'].filter(b=>b!=='nd'||t('nd').F+t('nd').M).map(b=>[b==='nd'?'Âge non renseigné':b+' ans',num(t(b).F),num(t(b).M),num(t(b).F+t(b).M)]).concat(Object.keys(ag).length?[['<b>Total</b>',`<b>${num(d.f)}</b>`,`<b>${num(d.h)}</b>`,`<b>${num(d.f+d.h)}</b>`]]:[]))}
+ ${d.localites&&d.localites.length?`<h4>Par localité</h4>${trBarres(d.localites.slice(0,12).map(l=>[l.localite,l.total,`${l.n} fiche(s) · ${l.f} F / ${l.h} H`]))}`:''}
+ ${d.outils&&d.outils.length?`<h4>Par outil</h4>${d.outils.map(o=>`<details class="trOd"><summary><b>${esc(o.titre)}</b> · ${num(o.n)} fiche(s), ${num(o.total)} personne(s)</summary>${o.champs.map(c=>typeof c.v==='number'?`<p>${esc(c.label)} : <b>${num(c.v)}</b></p>`:`<p class="muted" style="margin:.6rem 0 .2rem">${esc(c.label)}</p>${trBarres(Object.entries(c.v).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[c.type==='ouinon'?(k==='oui'?'Oui':'Non'):k,v]))}`).join('')}</details>`).join('')}`:''}`}
+function trBarres(L){if(!L.length)return '';const max=Math.max(...L.map(x=>x[1]),1);return `<ul class="tb-bars tb-cnt">${L.map(([l,v,t])=>`<li title="${esc(t||l)} : ${num(v)}"><span class="tb-l">${esc(l)}</span><span class="tb-track" style="width:${(v/max*100).toFixed(1)}%"><i style="width:100%"></i></span><span class="tb-v">${num(v)}</span></li>`).join('')}</ul>`}
+function trRapForm(p,niv,r,d){const enRetard=today()>trLimite(TR.mois,niv);const F=(k,l,ph)=>`<div class="trL"><label>${l}</label><textarea name="${k}" rows="3" placeholder="${ph||''}">${esc(r?r[k]||'':'')}</textarea></div>`;
+ return `<form data-form="terRap" data-niv="${niv}" data-id="${r?r.id:''}" class="grid">${F('faits','Faits marquants du mois','Ce qui a bien marché, les résultats obtenus, les témoignages')}${F('difficultes','Difficultés rencontrées','Accès, météo, réticences, manque de supports…')}
+ ${F('alertes','Alertes communautaires et rumeurs','Rumeurs, incidents, tensions, cas graves à signaler (sans nom)')}${F('besoins','Besoins','Supports, préservatifs, formation, moyens de déplacement…')}${niv!=='agent'?F('recommandations','Recommandations',''):''}
+ <div class="trL"><button class="btn" type="submit">${r?'Renvoyer le rapport':'Envoyer le rapport'}</button> <span class="muted">Date limite : ${fmtD(trLimite(TR.mois,niv))}${enRetard&&!r?' · <b class="txt-bad">délai dépassé</b>':''}</span></div></form>`}
+function trRapAff(r){return `<p>${tag(RT_ST[r.statut])}${r.a_temps?'':' '+tag(['envoyé en retard','warn'])} <span class="muted">envoyé le ${fmtD(r.premier_envoi)}${r.valide_par?' · validé par '+esc(who(r.valide_par)):''}</span>${r.motif&&r.statut==='a_corriger'?` <span class="muted">· ${esc(r.motif)}</span>`:''}</p>
+ ${['faits','difficultes','alertes','besoins','recommandations'].filter(k=>r[k]).map(k=>`<p><b>${{faits:'Faits marquants',difficultes:'Difficultés',alertes:'Alertes et rumeurs',besoins:'Besoins',recommandations:'Recommandations'}[k]} :</b> <span class="pre">${esc(r[k])}</span></p>`).join('')}`}
+function trRapport(p,niv){const RT=(S.rterrain||[]).filter(r=>r.projet_id===p.id&&moisDe(r.mois)===TR.mois),F=trFiches(p).filter(f=>moisDe(f.date_activite)===TR.mois),R=trRefs(p).filter(r=>moisDe(r.date_reference)===TR.mois);
+ const futur=TR.mois>today().slice(0,7);
+ if(niv==='agent'){const r=RT.find(x=>x.niveau==='agent'&&x.auteur_id===me.id),mf=F.filter(f=>f.agent_id===me.id&&f.statut!=='rejetee'),d=trInstantane(p,mf,R.filter(x=>x.agent_id===me.id));
+  return `<section class="card"><h3>Mon rapport de ${moisLib(TR.mois).toLowerCase()}</h3><p class="muted">Les chiffres sont calculés à partir de vos fiches du mois. À envoyer au plus tard le ${fmtD(trLimite(TR.mois,'agent'))}.</p>${trChiffresHTML(r&&r.statut==='valide'?r.donnees:d)}
+  ${r?trRapAff(r):''}${!futur&&(!r||r.statut!=='valide')?trRapForm(p,'agent',r,d):''}</section>`}
+ if(niv==='ca'){const L=(S.rterrain||[]).filter(r=>r.niveau==='projet'&&r.statut==='valide').sort((a,b)=>a.mois<b.mois?1:-1);
+  return `<section class="card"><h3>Rapports mensuels validés</h3>${svT(['Projet','Mois','#Fiches','#Personnes','Validé par',''],L.map(r=>[esc(libProj(projet(r.projet_id))),moisLib(moisDe(r.mois)),num(r.donnees.fiches),num(r.donnees.total),esc(who(r.valide_par)),`<button class="btn ghost sm" data-act="terImpRap" data-id="${r.id}">Imprimer</button>`]),'Aucun rapport validé.')}</section>`}
+ const ags=trAgents(p).filter(u=>niv==='projet'||trVerifie(p,u.id)),ra=RT.filter(x=>x.niveau==='agent');
+ const tabAg=svT(['Agent','Rapport','À temps','#Fiches du mois','#Personnes',''],ags.map(u=>{const r=ra.find(x=>x.auteur_id===u.id),mf=F.filter(f=>f.agent_id===u.id&&f.statut!=='rejetee');
+  return [esc(u.nom),r?tag(RT_ST[r.statut]):tag(['Non reçu','bad']),r?(r.a_temps?'oui':'<b class="txt-bad">non</b>'):'',num(mf.length),num(somme(mf,f=>f.nb_total)),
+   r?`<div class="row"><details><summary class="lnk">Lire</summary>${trRapAff(r)}</details>${r.statut==='soumis'&&trVerifie(p,u.id)&&u.id!==me.id?`<button class="btn sm" data-act="terRapSt" data-v="valide" data-id="${r.id}">Valider</button><button class="btn ghost sm" data-act="terRapSt" data-v="a_corriger" data-id="${r.id}">À revoir</button>`:''}</div>`:'']}),'Aucun agent affecté au projet.');
+ const recus=ags.filter(u=>ra.some(x=>x.auteur_id===u.id)).length,atemps=ags.filter(u=>ra.some(x=>x.auteur_id===u.id&&x.a_temps)).length;
+ const compl=`<div class="kpis"><div class="kpi"><b>${pcS(recus,ags.length)}</b><span>complétude : ${recus} rapport(s) reçu(s) sur ${ags.length}</span></div><div class="kpi"><b>${pcS(atemps,ags.length)}</b><span>promptitude : reçus dans les délais</span></div></div>`;
+ if(niv==='sup'){const r=RT.find(x=>x.niveau==='superviseur'&&x.auteur_id===me.id),mf=F.filter(f=>ags.some(u=>u.id===f.agent_id)&&['verifiee','validee'].includes(f.statut));
+  return `<section class="card"><h3>Rapports de mes agents · ${moisLib(TR.mois).toLowerCase()}</h3>${compl}${tabAg}</section>
+  <section class="card"><h3>Ma synthèse de supervision</h3><p class="muted">Chiffres consolidés à partir des fiches vérifiées ou validées de vos agents. À envoyer au plus tard le ${fmtD(trLimite(TR.mois,'superviseur'))}.</p>${trChiffresHTML(r&&r.statut==='valide'?r.donnees:trInstantane(p,mf,R.filter(x=>ags.some(u=>u.id===x.agent_id))))}
+  ${r?trRapAff(r):''}${!futur&&(!r||r.statut!=='valide')?trRapForm(p,'superviseur',r):''}</section>`}
+ const rp=RT.find(x=>x.niveau==='projet'),rs=RT.filter(x=>x.niveau==='superviseur'),FV=F.filter(f=>f.statut==='validee'),enAtt=F.filter(f=>['soumise','verifiee'].includes(f.statut)).length;
+ const d=rp&&rp.statut==='valide'?rp.donnees:{...trInstantane(p,FV,R),completude:{attendus:ags.length,recus,a_temps:atemps},en_attente:enAtt};
+ const peutDP=rp&&rp.statut==='soumis'&&['DP','DE'].includes(me.role)&&rp.auteur_id!==me.id;
+ const liens=trOutils(p).flatMap(o=>(o.liens||[]).filter(l=>l.indicateur_id).map(l=>({o,l})));
+ const alertesAg=RT.filter(x=>x.niveau!=='projet'&&(x.alertes||x.difficultes||x.besoins));
+ return `<section class="card"><h3>Rapport mensuel du projet · ${moisLib(TR.mois)}</h3><p class="muted">Seules les fiches <b>validées</b> sont comptées. Le chef de projet ou le suivi-évaluation l'envoie au plus tard le ${fmtD(trLimite(TR.mois,'projet'))} ; le Directeur des programmes le valide ; ses chiffres peuvent alors être versés dans les indicateurs du projet.</p>
+  ${enAtt&&(!rp||rp.statut!=='valide')?`<p class="note">${enAtt} fiche(s) du mois sont encore en attente de vérification ou de validation : elles ne sont pas comptées. <button class="lnk" data-act="terTab" data-v="verifier">Les traiter</button></p>`:''}
+  ${trChiffresHTML(d)}
+  ${rp?trRapAff(rp):''}
+  ${peutDP?`<div class="row"><button class="btn" data-act="terRapSt" data-v="valide" data-id="${rp.id}">Valider le rapport du projet</button><button class="btn ghost" data-act="terRapSt" data-v="a_corriger" data-id="${rp.id}">Renvoyer au chef de projet</button></div>`:''}
+  ${rp&&rp.statut==='valide'&&liens.length&&trValide(p)?(rp.verse_le?`<p class="note">Chiffres versés dans les indicateurs le ${fmtD(rp.verse_le)} : les mesures attendent la validation d'une autre personne dans « Performance ».</p>`:`<p class="note">${liens.length} indicateur(s) du projet sont alimentés par la collecte. <button class="btn sm" data-act="terVerser" data-id="${rp.id}">Verser les chiffres du mois dans les indicateurs</button></p>`):''}
+  ${rp&&rp.statut==='valide'?'':(!futur&&trValide(p)&&(!rp||rp.auteur_id===me.id)?trRapForm(p,'projet',rp):'')}
+  ${rp?`<p><button class="btn ghost sm" data-act="terImpRap" data-id="${rp.id}">Imprimer le rapport mensuel</button></p>`:''}</section>
+ <section class="card"><h3>Remontée des agents et des superviseurs</h3>${compl}${tabAg}
+  ${rs.length?`<h4>Synthèses de supervision</h4>${rs.map(r=>`<details class="trOd"><summary><b>${esc(who(r.auteur_id))}</b> ${tag(RT_ST[r.statut])}</summary>${trRapAff(r)}${r.statut==='soumis'&&r.auteur_id!==me.id?`<div class="row"><button class="btn sm" data-act="terRapSt" data-v="valide" data-id="${r.id}">Valider</button><button class="btn ghost sm" data-act="terRapSt" data-v="a_corriger" data-id="${r.id}">À revoir</button></div>`:''}</details>`).join('')}`:''}
+  ${alertesAg.length?`<h4>Alertes, difficultés et besoins remontés</h4><ul>${alertesAg.map(x=>['alertes','difficultes','besoins'].filter(k=>x[k]).map(k=>`<li><b>${esc(who(x.auteur_id))}</b> · ${{alertes:'alerte',difficultes:'difficulté',besoins:'besoin'}[k]} : ${esc(x[k])}</li>`).join('')).join('')}</ul>`:''}</section>`}
+
+/* ---------- suivi des agents ---------- */
+function trAgentsVue(p,niv){const ags=trAgents(p).filter(u=>niv==='projet'||trVerifie(p,u.id)),F=trFiches(p).filter(f=>moisDe(f.date_activite)===TR.mois),M=(S.microplans||[]).filter(m=>m.projet_id===p.id&&moisDe(m.mois)===TR.mois),RT=(S.rterrain||[]).filter(r=>r.projet_id===p.id&&moisDe(r.mois)===TR.mois&&r.niveau==='agent');
+ const der=id=>{const L=trFiches(p).filter(f=>f.agent_id===id).map(f=>f.date_activite).sort();return L[L.length-1]};
+ const rows=ags.map(u=>{const mf=F.filter(f=>f.agent_id===u.id&&f.statut!=='rejetee'),mp=M.find(m=>m.agent_id===u.id),R=mp?trRealise(mp,F):[],ok=R.filter(r=>r.fiche).length,r=RT.find(x=>x.auteur_id===u.id),d=der(u.id),inactif=!d||(Date.now()-new Date(d))/864e5>14;
+  return [`${esc(u.nom)}${u.supId?`<br><span class="muted">sup. ${esc(who(u.supId))}</span>`:''}`,num(mf.length),num(somme(mf,f=>f.nb_total)),mp?`${ok}/${R.length} (${pcS(ok,R.length)})`:'<span class="muted">pas de microplan</span>',num(mf.filter(f=>f.statut==='validee').length),num(somme(mf,f=>f.nb_retours)),r?tag(RT_ST[r.statut]):tag(['non reçu','bad']),d?(inactif?`<b class="txt-bad">${fmtD(d)}</b>`:fmtD(d)):'<span class="muted">jamais</span>']});
+ return `<section class="card"><h3>${niv==='projet'?'Agents du projet':'Mes agents'} · ${moisLib(TR.mois).toLowerCase()}</h3><p class="muted">Réalisation du microplan, fiches validées, retours pour correction et dernière activité. Une dernière activité de plus de 14 jours est signalée en rouge : appelez l'agent.</p>
+ ${svT(['Agent','#Fiches','#Personnes','Microplan réalisé','#Validées','#Retours','Rapport du mois','Dernière activité'],rows,'Aucun agent affecté au projet. Affectez les agents dans « Personnel des projets ».')}</section>`}
+
+/* ---------- tableau de bord du projet ---------- */
+function trTableau(p,niv){const FV=trFiches(p).filter(f=>f.statut==='validee'),Fm=FV.filter(f=>moisDe(f.date_activite)===TR.mois),Fall=trFiches(p).filter(f=>moisDe(f.date_activite)===TR.mois);
+ const d=trInstantane(p,Fm,trRefs(p).filter(r=>moisDe(r.date_reference)===TR.mois)),cum=trAgreger(FV),ags=trAgents(p);
+ const ms=[];{let [a,b]=TR.mois.split('-').map(Number);for(let i=0;i<6;i++){ms.unshift(`${a}-${String(b).padStart(2,'0')}`);b--;if(!b){b=12;a--}}}
+ const parM=ms.map(m=>{const x=cum.mois[m]||{n:0,total:0,f:0,h:0};return [m,x]}),maxM=Math.max(1,...parM.map(x=>x[1].total));
+ const actifs=new Set(Fall.map(f=>f.agent_id)).size,att=Fall.filter(f=>['soumise','verifiee'].includes(f.statut)).length;
+ const tous=['DE','DP'].includes(me.role)?trProjets().map(q=>{const F=trFiches(q).filter(f=>moisDe(f.date_activite)===TR.mois),V=F.filter(f=>f.statut==='validee'),r=(S.rterrain||[]).find(x=>x.projet_id===q.id&&x.niveau==='projet'&&moisDe(x.mois)===TR.mois);
+  return [`<button class="lnk" data-act="terProjet" data-id="${q.id}">${esc(libProj(q))}</button>`,num(V.length),num(somme(V,f=>f.nb_total)),num(F.length-V.length-F.filter(f=>f.statut==='rejetee').length),r?tag(RT_ST[r.statut]):tag(['non établi',''])]}):[];
+ return `<div class="kpis"><div class="kpi"><b>${num(cum.total)}</b><span>personnes touchées depuis le début (fiches validées)</span></div><div class="kpi"><b>${num(d.total)}</b><span>en ${moisLib(TR.mois).toLowerCase()}</span></div>
+  <div class="kpi"><b>${pcS(cum.f,cum.f+cum.h)}</b><span>de femmes depuis le début</span></div><div class="kpi"><b>${actifs} / ${ags.length}</b><span>agents actifs ce mois</span></div><div class="kpi"><b>${num(att)}</b><span>fiches du mois en attente de validation</span></div></div>
+ <div class="tb-grid"><section class="card tb"><div class="tb-h"><h3>Personnes touchées par mois</h3><span class="muted">fiches validées · 6 derniers mois</span></div>
+  <ul class="trMois">${parM.map(([m,x])=>`<li title="${moisLib(m)} : ${num(x.total)} personnes (${num(x.f)} femmes, ${num(x.h)} hommes)"><span class="trMb"><i class="f" style="height:${(x.f/maxM*100).toFixed(1)}%"></i><i class="h" style="height:${(x.h/maxM*100).toFixed(1)}%"></i></span><b>${num(x.total)}</b><span>${new Date(Number(m.slice(0,4)),Number(m.slice(5))-1,1).toLocaleDateString('fr-FR',{month:'short'})}</span></li>`).join('')}</ul>
+  <p class="tb-leg"><span class="k trKf"></span>Femmes<span class="k trKh"></span>Hommes</p></section>
+ <section class="card tb"><div class="tb-h"><h3>Pyramide des âges du mois</h3><span class="muted">${num(d.total)} personnes</span></div>${trPyramide(d.age)}</section>
+ <section class="card tb"><div class="tb-h"><h3>Par localité</h3><span class="muted">${moisLib(TR.mois).toLowerCase()}</span></div>${d.localites.length?trBarres(d.localites.slice(0,8).map(l=>[l.localite,l.total])):'<p class="empty">Aucune fiche validée ce mois.</p>'}</section>
+ <section class="card tb"><div class="tb-h"><h3>Références</h3><span class="muted">${moisLib(TR.mois).toLowerCase()}</span></div><p>${num(d.references.emises)} émise(s), ${num(d.references.arrivees)} prise(s) en charge confirmée(s) (${pcS(d.references.arrivees,d.references.emises)}), ${num(d.references.perdues)} perdue(s) de vue.</p>${trBarres(Object.entries(d.references.motifs).sort((a,b)=>b[1]-a[1]).slice(0,6))}</section></div>
+ ${Object.keys(d.vuln||{}).length?`<section class="card"><h3>Personnes en situation de vulnérabilité touchées</h3>${trBarres(Object.entries(d.vuln).sort((a,b)=>b[1]-a[1]))}<p class="muted">Calculé à partir des listes de présence nominatives. ${num(d.handicap)} personne(s) vivant avec un handicap.</p></section>`:''}
+ <section class="card"><h3>Détail du mois</h3>${trChiffresHTML(d)}</section>
+ ${tous.length>1?`<section class="card"><h3>Tous les projets · ${moisLib(TR.mois).toLowerCase()}</h3>${svT(['Projet','#Fiches validées','#Personnes','#En attente','Rapport du mois'],tous)}</section>`:''}`}
+function trPyramide(ag){if(!ag)return '';const B=[...TR_BANDES].reverse(),max=Math.max(1,...B.map(b=>Math.max(ag[b].F,ag[b].M)));
+ return `<div class="trPyr" role="img" aria-label="${B.map(b=>`${b} ans : ${ag[b].F} femmes, ${ag[b].M} hommes`).join(' ; ')}">${B.map(b=>`<div class="trPy"><span class="trPv">${num(ag[b].F)}</span><span class="trPf"><i style="width:${(ag[b].F/max*100).toFixed(1)}%"></i></span><span class="trPb">${b}</span><span class="trPh"><i style="width:${(ag[b].M/max*100).toFixed(1)}%"></i></span><span class="trPv">${num(ag[b].M)}</span></div>`).join('')}</div>
+ <p class="tb-leg"><span class="k trKf"></span>Femmes<span class="k trKh"></span>Hommes${ag.nd&&(ag.nd.F+ag.nd.M)?` · âge non renseigné : ${num(ag.nd.F+ag.nd.M)}`:''}</p>`}
+
+/* ---------- qualité des données ---------- */
+function trQualite(p){const F=trFiches(p).filter(f=>moisDe(f.date_activite)===TR.mois&&f.statut!=='rejetee'),n=F.length;
+ const cnt=re=>F.filter(f=>trSignaux(f).some(s=>re.test(s[0]))).length;
+ const chk=[['Saisies tardives (plus de 7 jours après l\'activité)',cnt(/tardive/),'Rappeler aux agents de saisir dans les 48 heures ; une saisie tardive est souvent une saisie de mémoire.'],
+  ['Listes nominatives sans photo de la liste signée',cnt(/photo/),'Sans la photo, la vérification par le superviseur est impossible.'],['Doublons possibles (même agent, même jour, même lieu, même outil)',cnt(/Doublon/),'Vérifier qu\'il ne s\'agit pas d\'une même séance saisie deux fois.'],
+  ['Fiches avec des âges manquants',cnt(/âge/),'Les âges manquants faussent la désagrégation demandée par les bailleurs.'],['Effectifs inhabituels',cnt(/inhabituel/),'Comparer avec la liste papier ; un effectif très supérieur à la médiane mérite une explication.'],['Fiches sans position GPS',cnt(/GPS/),'La position prouve la présence sur le terrain ; elle ne coûte rien à relever.']];
+ const ret=F.filter(f=>f.nb_retours>0).length,ech=F.filter(f=>f.statut==='validee').sort((a,b)=>(a.id<b.id?-1:1)).filter((f,i)=>i%10===(Number(TR.mois.slice(5))%10));
+ return `<section class="card"><h3>Contrôles automatiques · ${moisLib(TR.mois).toLowerCase()} (${n} fiches)</h3><p class="muted">La qualité des données se juge sur cinq critères : exactitude, fiabilité, précision, ponctualité et intégrité. Ces contrôles automatiques repèrent les fiches à regarder de près ; ils ne remplacent pas la vérification sur papier et sur le terrain.</p>
+ ${svT(['Contrôle','#Fiches','Part','Que faire'],chk.map(([l,v,a])=>[esc(l),num(v),v?`<b class="${v/n>.1?'txt-bad':''}">${pcS(v,n)}</b>`:'0 %',`<span class="muted">${esc(a)}</span>`]).concat([[esc('Fiches renvoyées au moins une fois pour correction'),num(ret),pcS(ret,n),'<span class="muted">Un taux élevé signale un besoin de recyclage de l\'agent sur l\'outil.</span>']]))}</section>
+ <section class="card"><h3>Échantillon de contrôle du mois (${ech.length})</h3><p class="muted">Bonne pratique : recompter chaque mois environ une fiche validée sur dix, à partir de la fiche papier et, si possible, en appelant deux participants. L'échantillon est tiré automatiquement.</p>
+ ${svT(['Date','Agent','Outil','Localité','#Personnes',''],ech.map(f=>[fmtD(f.date_activite),esc(who(f.agent_id)),esc((trOutil(f.outil_id)||{}).titre||''),esc(f.localite),num(f.nb_total),`<button class="btn ghost sm" data-act="terVoir" data-id="${f.id}">Voir</button>`]),'Aucune fiche validée ce mois.')}</section>`}
+
+/* ---------- outils de collecte ---------- */
+function trOutilsVue(p,niv){const O=trOutils(p),gere=niv==='projet',inst=new Set(O.map(o=>o.modele));
+ const F=trFiches(p);
+ return `<section class="card"><h3>${gere?'Outils du projet':'Fiches du projet'} (${O.length})</h3><p class="muted">${gere?'Chaque projet a ses propres outils. Installez ceux de la bibliothèque OSV, adaptez-les (questions, choix), ou créez-en un. Modifier un outil crée une nouvelle version ; les fiches déjà remplies ne sont pas touchées.':'Imprimez les fiches vierges pour le terrain : elles portent le papier à en-tête d\'OSV. Recopiez-les ensuite dans l\'application et joignez la photo.'}</p>
+ ${svT(['Outil','Type','Liste','#Questions','#Fiches','Indicateurs alimentés','Statut',''],O.map(o=>[`<b>${esc(o.titre)}</b>${o.theme?`<br><span class="muted">${esc(o.theme)}</span>`:''}`,esc(OUT_TYPES[o.type]||o.type),o.presence==='nominative'?'nominative':o.presence==='anonyme'?'décompte':'—',o.champs.filter(c=>c.type!=='section').length,num(F.filter(f=>f.outil_id===o.id).length),
+  (o.liens||[]).filter(l=>l.indicateur_id).map(l=>esc(((S.inds||[]).find(i=>i.id===l.indicateur_id)||{}).libelle||'')).join('<br>')||'<span class="muted">aucun</span>',o.actif?tag(['en service','ok']):tag(['retiré','']),
+  `<div class="row"><button class="btn ghost sm" data-act="terImpVierge" data-id="${o.id}">Fiche vierge</button>${gere?`<button class="btn ghost sm" data-act="terOutilEd" data-id="${o.id}">Modifier</button><button class="btn ghost sm" data-act="terOutilActif" data-id="${o.id}">${o.actif?'Retirer':'Remettre en service'}</button>`:o.actif?`<button class="btn sm" data-act="terRemplir" data-id="${o.id}">Remplir</button>`:''}</div>`]),'Aucun outil installé.')}
+ ${gere?`<p><button class="btn ghost sm" data-act="terOutilEd" data-id="new">Créer un outil</button></p>`:''}</section>
+ ${gere?`<section class="card"><h3>Bibliothèque OSV</h3><p class="muted">Outils conçus d'après les pratiques des programmes communautaires (santé, DSSR et VBG, sécurité routière et au travail, environnement, eau et assainissement, gestion des plaintes). Installez ceux dont le projet a besoin.</p>
+ <div class="trBib">${MOD_OUTILS.map(m=>`<article class="trB"><h4>${esc(m.titre)}</h4><p class="muted">${esc(m.desc)}</p><p class="trBt"><span class="tag">${esc(OUT_TYPES[m.type])}</span> <span class="tag">${m.presence==='nominative'?'liste nominative':m.presence==='anonyme'?'décompte anonyme':'sans liste'}</span></p>
+ <div class="row">${inst.has(m.code)?'<span class="tag ok">installé</span>':`<button class="btn sm" data-act="terInstaller" data-v="${m.code}">Installer</button>`}<button class="btn ghost sm" data-act="terImpModele" data-v="${m.code}">Aperçu</button></div></article>`).join('')}</div>
+ ${MOD_OUTILS.some(m=>!inst.has(m.code))?`<p><button class="btn ghost sm" data-act="terInstaller" data-v="*">Tout installer</button></p>`:''}</section>`:''}`}
+function trOutilEditeur(p,o){const lignes=(o?o.champs:[]).map(c=>[c.label,c.type,(c.options||[]).join(' | '),c.requis?'requis':''].filter((x,i)=>i<2||x).join(' ; ')).join('\n');
+ const M=o?trMetriques(o):[['participants','Personnes touchées'],['fiches','Nombre de fiches'],['handicap','Personnes vivant avec un handicap']],inds=(S.inds||[]).filter(i=>i.projet_id===p.id),L=o?o.liens||[]:[];
+ return `<p><button class="lnk" data-act="terFermer">← Outils de collecte</button></p><div class="head"><h1>${o?'Modifier l\'outil':'Créer un outil de collecte'}</h1><p>${esc(libProj(p))}${o?` · version ${o.version}`:''}</p></div>
+ <form data-form="terOutil" data-id="${o?o.id:''}" class="card grid">
+  <div style="grid-column:span 2"><label>Titre</label><input name="titre" required value="${esc(o?o.titre:'')}"></div><div><label>Type</label><select name="type">${opts(Object.entries(OUT_TYPES),o?o.type:'seance')}</select></div>
+  <div><label>Thème</label><input name="theme" value="${esc(o?o.theme||'':'')}"></div><div><label>Liste des participants</label><select name="presence">${opts([['nominative','Liste de présence nominative'],['anonyme','Décompte anonyme (sexe × âge)'],['non','Pas de liste']],o?o.presence:'nominative')}</select></div>
+  <div class="trL"><label>Consignes de remplissage pour l'agent</label><textarea name="consignes" rows="3">${esc(o?o.consignes||'':'')}</textarea></div>
+  <div class="trL"><label for="trCh">Questions : une par ligne, « libellé ; type ; choix séparés par | ; requis »</label><textarea id="trCh" name="champs" rows="14" class="mono">${esc(lignes)}</textarea>
+   <small class="muted">Types : ${Object.entries(CH_TYPES).map(([k,v])=>`<b>${k}</b> (${v.toLowerCase()})`).join(', ')}. Exemple : « Thèmes abordés ; multi ; VIH | Sécurité routière | VBG ; requis ». Garder le même libellé conserve l'historique d'une question.</small></div>
+  <fieldset class="trL"><legend>Indicateurs du projet alimentés par cet outil</legend>${inds.length?M.map(([k,l])=>`<div class="trLien"><span>${esc(l)}</span><select name="lien_${k}">${opts(inds.map(i=>[i.id,`${i.code?i.code+' · ':''}${i.libelle}`]),(L.find(x=>x.metrique===k)||{}).indicateur_id||'','— aucun —')}</select></div>`).join(''):'<p class="muted">Aucun indicateur pour ce projet. Créez-les dans le cadre logique du projet.</p>'}
+   <small class="muted">Les chiffres du rapport mensuel validé sont versés dans ces indicateurs, comme mesures à valider par une autre personne.</small></fieldset>
+  <div class="trL row"><button class="btn" type="submit">Enregistrer</button><button class="btn ghost" type="button" data-act="terFermer">Annuler</button></div></form>`}
+function trLireChamps(txt,anciens){const vus=new Set(),err=[];const champs=String(txt||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map((l,i)=>{const [label,type0,optsT,req]=l.split(';').map(x=>(x||'').trim());
+  const type=(type0||'texte').toLowerCase();if(!CH_TYPES[type])err.push(`ligne ${i+1} : type « ${type0} » inconnu`);
+  const ex=(anciens||[]).find(c=>c.label===label);let id=ex?ex.id:trSlug(label);while(vus.has(id))id+='_';vus.add(id);
+  const options=['choix','multi'].includes(type)?String(optsT||'').split('|').map(x=>x.trim()).filter(Boolean):undefined;if(options&&!options.length)err.push(`ligne ${i+1} : indiquez les choix séparés par |`);
+  return {id,label,type,...(options?{options}:{}),...(/requis|oui|obligatoire/i.test(req||'')||/requis/i.test(optsT||'')&&!options?{requis:true}:{}),...(ex&&ex.aide?{aide:ex.aide}:{})}});
+ if(!champs.length)err.push('au moins une question');return [champs,err]}
+
+/* ---------- documents imprimables (papier à en-tête, Word) ---------- */
+function trCorpsOutil(o,p,x){const v=x||{},d=v.donnees||{},vide='<span style="display:inline-block;min-width:160px;border-bottom:.6pt dotted #555">&nbsp;</span>';
+ const val=c=>{const y=d[c.id];if(x){if(y==null||y==='')return '';return Array.isArray(y)?y.map(esc).join(', '):c.type==='ouinon'?(y==='oui'?'Oui':'Non'):c.type==='date'?fmtD(y):esc(y)}
+  if(['choix','multi'].includes(c.type))return (c.options||[]).map(z=>`☐ ${esc(z)}`).join(' &nbsp; ');if(c.type==='ouinon')return '☐ Oui &nbsp; ☐ Non';if(c.type==='long')return '<div style="height:44px"></div>';return vide};
+ const P=v.participants||[],n=x?Math.max(P.length,1):24;
+ const pres=o.presence==='nominative'?`<h2>Liste de présence</h2><table><thead><tr><th style="width:5%">N°</th><th style="width:30%">Nom et prénoms</th><th style="width:7%">Sexe</th><th style="width:7%">Âge</th><th style="width:15%">Téléphone</th><th style="width:9%">Handicap</th><th>Signature ou empreinte</th></tr></thead><tbody>
+  ${Array.from({length:n},(_,i)=>{const q=P[i]||{};return `<tr><td>${i+1}</td><td>${esc(q.nom||(x&&v.confidentiel?'(confidentiel)':''))}</td><td>${q.sexe||''}</td><td>${q.age??''}</td><td>${esc(q.tel||'')}</td><td>${q.handicap?'Oui':''}</td><td style="height:${x?'auto':'22px'}">${x?(q.signe===false?'non signé':'signé'):''}</td></tr>`}).join('')}</tbody></table>`
+  :o.presence==='anonyme'?`<h2>Décompte des participants</h2><table><thead><tr><th>Tranche d'âge</th><th class="num">Femmes</th><th class="num">Hommes</th><th class="num">Total</th></tr></thead><tbody>${TR_BANDES.map(b=>{const f=x?(((v.decompte||{}).F||{})[b]||0):'',h=x?(((v.decompte||{}).M||{})[b]||0):'';return `<tr><td>${b} ans</td><td class="num">${f}</td><td class="num">${h}</td><td class="num">${x?f+h:''}</td></tr>`}).join('')}<tr class="th"><th>Total</th><th class="num">${x?v.nb_f:''}</th><th class="num">${x?v.nb_h:''}</th><th class="num">${x?v.nb_total:''}</th></tr></tbody></table><p>dont personnes vivant avec un handicap : ${x?num((v.decompte||{}).handicap||0):vide}</p>`:'';
+ const kv=rows=>`<table class="kv">${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('')}</table>`;
+ return `<h1 class="doc-t">${esc(o.titre.toUpperCase())}</h1><p class="doc-s">${esc(OUT_TYPES[o.type]||'')}${o.theme?' · '+esc(o.theme):''}</p>
+ ${kv([['Projet',esc(p?libProj(p):'')],['Agent',x?esc(who(v.agent_id)):vide],['Date',x?fmtD(v.date_activite):vide+' &nbsp; Heure de début : '+vide.replace('160','60')+' &nbsp; de fin : '+vide.replace('160','60')],['Localité',x?esc(v.localite)+(v.sous_prefecture?' (s/p '+esc(v.sous_prefecture)+')':''):vide+' &nbsp; Sous-préfecture : '+vide],['Lieu précis',x?esc(v.lieu||''):vide]].concat(x&&v.heure_debut?[['Horaire',esc(v.heure_debut)+(v.heure_fin?' – '+esc(v.heure_fin):'')]]:[]))}
+ ${o.consignes&&!x?`<p class="petit"><b>Consignes :</b> ${esc(o.consignes)}</p>`:''}
+ ${o.champs.length?`<h2>Contenu de l'activité</h2>`:''}${(()=>{let h='',rows=[];const flush=()=>{if(rows.length)h+=kv(rows);rows=[]};o.champs.forEach(c=>{if(c.type==='section'){flush();h+=`<h3>${esc(c.label)}</h3>`}else rows.push([esc(c.label),val(c)])});flush();return h})()}
+ ${pres}
+ <div class="bloc"><div class="sig"><div><b>L'agent</b>${x?esc(who(v.agent_id)):''}<br>Date et signature</div><div><b>Vérifié par le superviseur</b>${x&&v.verifie_par?esc(who(v.verifie_par))+'<br>le '+fmtD(v.verifie_le):'Nom, date et signature'}</div><div><b>Validé par</b>${x&&v.valide_par?esc(who(v.valide_par))+'<br>le '+fmtD(v.valide_le):'Chef de projet ou suivi-évaluation'}</div></div>
+ ${x?'':'<p class="petit">À recopier dans OSV Gestion dans les 48 heures, avec la photo de cette fiche. Fiche à conserver par le superviseur : elle est la pièce justificative de l\'activité et des frais.</p>'}</div>`}
+function trImpVierge(o,p){ouvrirPapier(o.titre,trCorpsOutil(o,p,null),{nom:`Fiche_vierge_${trSlug(o.titre)}`,ref:`Fiche n° ________<br>${esc(p?p.code||'':'')}`})}
+function trImpFiche(x){const o=trOutil(x.outil_id),p=projet(x.projet_id);if(!o)return;ouvrirPapier(o.titre,trCorpsOutil(o,p,x),{nom:`Fiche_${trSlug(o.titre)}_${x.date_activite}`,ref:`${esc(p.code||'')}<br>Fiche du <b>${fmtD(x.date_activite)}</b><br>${FT_ST[x.statut][0]}`,filigrane:x.statut==='validee'?null:x.statut==='rejetee'?'REJETÉE':'NON VALIDÉE'})}
+function trImpRef(r){const p=projet(r.projet_id),kv=rows=>`<table class="kv">${rows.map(x=>`<tr><th>${x[0]}</th><td>${x[1]}</td></tr>`).join('')}</table>`,v='<span style="display:inline-block;min-width:200px;border-bottom:.6pt dotted #555">&nbsp;</span>';
+ const corps=`<h1 class="doc-t">FICHE DE RÉFÉRENCE</h1><p class="doc-s">${esc(libProj(p))}${r.confidentiel?' · <b>CONFIDENTIEL</b>':''}${r.urgence?' · <b>URGENCE</b>':''}</p>
+ ${kv([['N° de référence',`<b>${esc(r.numero||'')}</b>`],['Date',fmtD(r.date_reference)],['Code de la personne',esc(r.code_beneficiaire)],...(r.nom?[['Nom',esc(r.nom)]]:[]),...(r.telephone?[['Téléphone',esc(r.telephone)]]:[]),['Sexe, âge',`${r.sexe==='F'?'Femme':r.sexe==='M'?'Homme':''}${r.age!=null?', '+r.age+' ans':''}${r.handicap?' · personne vivant avec un handicap':''}`],['Localité',esc(r.localite)],['Motif',esc(r.motif)+(r.motif_detail?'<br>'+esc(r.motif_detail):'')],['Orientée vers',`<b>${esc(r.structure)}</b>`],['Agent qui réfère',esc(who(r.agent_id))+(r.accompagne?' · accompagne la personne':'')]])}
+ <div class="sig" style="--n:2"><div><b>L'agent</b>Signature</div><div><b>La personne</b>(ou son représentant) Signature ou empreinte</div></div>
+ <div class="bloc" style="margin-top:22px;border-top:1.2pt dashed #0B3D2E;padding-top:10px"><h1 class="doc-t" style="font-size:12pt">CONTRE-RÉFÉRENCE</h1><p class="doc-s">À remplir par la structure de prise en charge, puis à remettre à la personne pour l'agent communautaire</p>
+ ${kv([['Référence n°',esc(r.numero||'')],['Code de la personne',esc(r.code_beneficiaire)],['Reçue le',v],['Service',v],['Prise en charge effectuée',v],['Suite à donner, rendez-vous',v]])}
+ <div class="sig" style="--n:2"><div><b>Le prestataire</b>Nom, signature</div><div><b>Cachet de la structure</b></div></div></div>
+ <p class="petit">Les informations de cette fiche sont confidentielles. Elles ne servent qu'à la prise en charge de la personne et au suivi de son orientation.</p>`;
+ ouvrirPapier('Fiche de référence '+(r.numero||''),corps,{nom:`Reference_${(r.numero||'').replace(/\//g,'-')}`,ref:`N° <b>${esc(r.numero||'')}</b><br>${fmtD(r.date_reference)}`})}
+function trImpRap(r){const p=projet(r.projet_id),d=r.donnees||{},ag=d.age||{},t=b=>ag[b]||{F:0,M:0},T=(h,rows)=>`<table><thead><tr>${h.map(x=>`<th${x.startsWith('#')?' class="num"':''}>${x.replace('#','')}</th>`).join('')}</tr></thead><tbody>${rows.map(r2=>`<tr>${r2.map((c,i)=>`<td${h[i].startsWith('#')?' class="num"':''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+ const txt=k=>r[k]?`<p class="pre">${esc(r[k])}</p>`:'<p>—</p>';const rf=d.references||{};let n=0;const h=x=>`<h2>${++n}. ${x}</h2>`;
+ const corps=`<h1 class="doc-t">RAPPORT MENSUEL DES ACTIVITÉS COMMUNAUTAIRES</h1><p class="doc-s">${esc(libProj(p))}<br>${moisLib(moisDe(r.mois))}</p>
+ ${h('Synthèse chiffrée')}${T(['Indicateur','#Valeur'],[['Activités menées (fiches validées)',num(d.fiches)],['Personnes touchées',num(d.total)],['dont femmes',`${num(d.f)} (${pcS(d.f,d.f+d.h)})`],['dont hommes',num(d.h)],['Personnes vivant avec un handicap',num(d.handicap)],['Références émises',num(rf.emises)],['Prises en charge confirmées (contre-référence)',`${num(rf.arrivees)} (${pcS(rf.arrivees,rf.emises)})`]].concat(d.completude?[['Complétude des rapports des agents',`${pcS(d.completude.recus,d.completude.attendus)} (${d.completude.recus}/${d.completude.attendus})`],['Promptitude',pcS(d.completude.a_temps,d.completude.attendus)]]:[]))}
+ ${h('Désagrégation par sexe et par âge')}${T(['Âge','#Femmes','#Hommes','#Total'],[...TR_BANDES,'nd'].filter(b=>b!=='nd'||t('nd').F+t('nd').M).map(b=>[b==='nd'?'Non renseigné':b+' ans',num(t(b).F),num(t(b).M),num(t(b).F+t(b).M)]))}
+ ${(d.localites||[]).length?h('Couverture géographique')+T(['Localité','#Activités','#Femmes','#Hommes','#Total'],d.localites.map(l=>[esc(l.localite),num(l.n),num(l.f),num(l.h),num(l.total)])):''}
+ ${(d.outils||[]).length?h('Activités par type')+d.outils.map(o=>`<h3>${esc(o.titre)} · ${num(o.n)} activité(s), ${num(o.total)} personne(s)</h3>${o.champs.map(c=>typeof c.v==='number'?`<p>${esc(c.label)} : <b>${num(c.v)}</b></p>`:`<p>${esc(c.label)} : ${Object.entries(c.v).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${esc(c.type==='ouinon'?(k==='oui'?'Oui':'Non'):k)} (${v})`).join(' ; ')}</p>`).join('')}`).join(''):''}
+ ${Object.keys(rf.motifs||{}).length?h('Références par motif')+T(['Motif','#Nombre'],Object.entries(rf.motifs).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[esc(k),num(v)])):''}
+ ${(d.agents||[]).length?h('Contribution des agents')+T(['Agent','#Activités','#Personnes'],d.agents.map(a=>[esc(a.nom),num(a.n),num(a.total)])):''}
+ ${h('Faits marquants')}${txt('faits')}${h('Difficultés rencontrées')}${txt('difficultes')}${h('Alertes communautaires et rumeurs')}${txt('alertes')}${h('Besoins')}${txt('besoins')}${h('Recommandations')}${txt('recommandations')}
+ <div class="bloc"><div class="sig" style="--n:2"><div><b>Établi par</b>${esc(who(r.auteur_id))}<br>le ${fmtD(r.premier_envoi)}</div><div><b>Validé par le Directeur des programmes</b>${r.valide_par?esc(who(r.valide_par))+'<br>le '+fmtD(r.valide_le):'<i>en attente de validation</i>'}</div></div>
+ <p class="petit">Données issues des fiches terrain validées dans OSV Gestion selon le circuit agent, superviseur, suivi-évaluation et chef de projet.</p></div>`;
+ ouvrirPapier('Rapport mensuel '+moisLib(moisDe(r.mois)),corps,{nom:`Rapport_mensuel_${(p.code||'projet')}_${moisDe(r.mois)}`,ref:`${esc(p.code||'')}<br><b>${moisLib(moisDe(r.mois))}</b>`,filigrane:r.statut==='valide'?null:'NON VALIDÉ'})}
+function trCsv(nom,rows){const s=rows.map(r=>r.map(c=>{const v=String(c??'');return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}).join(';')).join('\r\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+s],{type:'text/csv;charset=utf-8'}));a.download=nom+'.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+
+/* ---------- alertes « À faire » ---------- */
+function trAlertes(){if(!p12||!me)return [];const A=[],L=trProjets();let av=0,cor=0,rap=[],mpv=0,rpv=0;
+ const prec=(()=>{const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-1);return d.toISOString().slice(0,7)})();
+ L.forEach(p=>{av+=trAVerifier(p).length;cor+=trFiches(p).filter(f=>f.statut==='a_corriger'&&[f.agent_id,f.saisi_par].includes(me.id)).length;
+  const niv=trNiv(p),RT=(S.rterrain||[]).filter(r=>r.projet_id===p.id&&moisDe(r.mois)===prec);
+  if(niv==='agent'&&trAgents(p).some(u=>u.id===me.id)&&!RT.some(r=>r.niveau==='agent'&&r.auteur_id===me.id))rap.push(p);
+  if(niv==='projet'&&p.chefId===me.id&&!RT.some(r=>r.niveau==='projet')&&trFiches(p).some(f=>moisDe(f.date_activite)===prec))rap.push(p);
+  mpv+=(S.microplans||[]).filter(m=>m.projet_id===p.id&&m.statut==='soumis'&&m.agent_id!==me.id&&trVerifie(p,m.agent_id)).length;
+  rpv+=(S.rterrain||[]).filter(r=>r.projet_id===p.id&&r.statut==='soumis'&&r.auteur_id!==me.id&&(r.niveau==='projet'?['DP','DE'].includes(me.role):r.niveau==='superviseur'?trValide(p):trVerifie(p,r.auteur_id))).length});
+ if(cor)A.push(['bad',`${cor} fiche(s) terrain renvoyée(s) pour correction`,'go','terrain','saisir']);
+ if(av)A.push(['warn',`${av} fiche(s) terrain à ${['DE','DP','CP','SE'].includes(me.role)?'valider':'vérifier'}`,'go','terrain','verifier']);
+ if(rpv)A.push(['warn',`${rpv} rapport(s) mensuel(s) de collecte à valider`,'go','terrain','rapport']);
+ if(mpv)A.push(['warn',`${mpv} microplan(s) d'agent à valider`,'go','terrain','microplan']);
+ if(rap.length)A.push(['warn',`Rapport de collecte de ${moisLib(prec).toLowerCase()} à envoyer (${rap.map(p=>p.code||p.nom).join(', ')})`,'go','terrain','rapport']);
+ return A}
+
+/* ---------- formulaires ---------- */
+document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target,t=f.dataset&&f.dataset.form;if(!t||!t.startsWith('ter'))return;e.preventDefault();e.stopImmediatePropagation();srvMsg='';
+ const d=Object.fromEntries(new FormData(f).entries()),p=trP();
+ if(t==='terFiche'){trEnvoyerFiche(f);return}
+ if(t==='terPiece'){const file=f.elements.fichier.files[0];action(()=>trJoindre(f.dataset.id,file),'Photo jointe à la fiche.');return}
+ if(t==='terRef'){const r={id:uuid(),org_id:S.org.id,projet_id:p.id,agent_id:d.agent||me.id,date_reference:d.date_reference,code_beneficiaire:String(d.code_beneficiaire).trim().toUpperCase(),nom:(d.nom||'').trim()||null,telephone:(d.telephone||'').trim()||null,
+   sexe:d.sexe,age:d.age===''?null:Number(d.age),handicap:!!d.handicap,localite:String(d.localite).trim(),motif:d.motif,motif_detail:(d.motif_detail||'').trim()||null,urgence:!!d.urgence,structure:String(d.structure).trim(),accompagne:!!d.accompagne};r.client_uuid=r.id;
+  if(/VBG/i.test(r.motif)){r.nom=null;r.telephone=null;r.confidentiel=true}
+  action(async()=>{await ins('references_communautaires',r);TR.refForm=false},'Référence enregistrée. Imprimez sa fiche (bouton « Fiche ») et remettez-la à la personne : la structure remplit le talon de contre-référence.');return}
+ if(t==='terMp'){const L=[],err=[];lignesTexte(d.lignes).forEach((c,i)=>{const dt=omDate(c[0]);if(!dt){err.push(`ligne ${i+1} : date illisible`);return}if(moisDe(dt)!==TR.mois)err.push(`ligne ${i+1} : hors du mois`);if(!c[1])err.push(`ligne ${i+1} : localité`);L.push({date:dt,localite:c[1]||'',activite:c[2]||'',cible:nbr(c[3])||0})});
+  if(!L.length)err.push('au moins une activité');if(err.length){alert('À corriger :\n· '+err.join('\n· '));return}L.sort((a,b)=>a.date<b.date?-1:1);
+  const id=f.dataset.id;action(async()=>{if(id)await upd('microplans',`id=eq.${id}`,{lignes:L,statut:'soumis'});else await ins('microplans',{org_id:S.org.id,projet_id:p.id,agent_id:me.id,mois:moisD(TR.mois),lignes:L});
+   const u=S.staff.find(x=>x.id===me.id);if(u&&u.supId)await notifierSrv([u.supId],`Microplan de ${moisLib(TR.mois).toLowerCase()} de ${u.nom} à valider`,'terrain',null)},'Microplan envoyé au superviseur.');return}
+ if(t==='terRap'){const niv=f.dataset.niv,id=f.dataset.id,F=trFiches(p).filter(x=>moisDe(x.date_activite)===TR.mois),R=trRefs(p).filter(x=>moisDe(x.date_reference)===TR.mois);
+  const ags=trAgents(p).filter(u=>niv==='projet'||trVerifie(p,u.id)),ra=(S.rterrain||[]).filter(r=>r.projet_id===p.id&&moisDe(r.mois)===TR.mois&&r.niveau==='agent');
+  const donnees=niv==='agent'?trInstantane(p,F.filter(x=>x.agent_id===me.id&&x.statut!=='rejetee'),R.filter(x=>x.agent_id===me.id))
+   :niv==='superviseur'?trInstantane(p,F.filter(x=>ags.some(u=>u.id===x.agent_id)&&['verifiee','validee'].includes(x.statut)),R.filter(x=>ags.some(u=>u.id===x.agent_id)))
+   :{...trInstantane(p,F.filter(x=>x.statut==='validee'),R),completude:{attendus:ags.length,recus:ags.filter(u=>ra.some(x=>x.auteur_id===u.id)).length,a_temps:ags.filter(u=>ra.some(x=>x.auteur_id===u.id&&x.a_temps)).length},en_attente:F.filter(x=>['soumise','verifiee'].includes(x.statut)).length};
+  if(niv==='projet'&&donnees.en_attente&&!confirm(`${donnees.en_attente} fiche(s) du mois ne sont pas encore validées et ne seront pas comptées. Envoyer quand même ?`))return;
+  const txt=k=>(d[k]||'').trim()||null,rec={donnees,faits:txt('faits'),difficultes:txt('difficultes'),alertes:txt('alertes'),besoins:txt('besoins'),recommandations:txt('recommandations')};
+  const dest=niv==='agent'?[(S.staff.find(x=>x.id===me.id)||{}).supId||p.chefId]:niv==='superviseur'?[p.chefId]:S.staff.filter(u=>u.role==='DP'&&accesOK(u)).map(u=>u.id);
+  action(async()=>{if(id)await upd('rapports_terrain',`id=eq.${id}`,{...rec,statut:'soumis'});else await ins('rapports_terrain',{org_id:S.org.id,projet_id:p.id,mois:moisD(TR.mois),niveau:niv,auteur_id:me.id,...rec});
+   await notifierSrv(dest,`Rapport ${niv==='agent'?'de l\'agent '+who(me.id):niv==='superviseur'?'de supervision de '+who(me.id):'mensuel du projet '+(p.code||p.nom)} · ${moisLib(TR.mois).toLowerCase()} : à valider`,'terrain',null)},'Rapport envoyé.');return}
+ if(t==='terOutil'){const id=f.dataset.id,o=id&&trOutil(id);const [champs,err]=trLireChamps(d.champs,o?o.champs:[]);if(!String(d.titre||'').trim())err.push('titre');if(err.length){alert('À corriger :\n· '+err.join('\n· '));return}
+  const tmp={...(o||{}),id:id||'x',champs},liens=trMetriques(tmp).map(([k])=>({metrique:k,indicateur_id:d['lien_'+k]||null})).filter(l=>l.indicateur_id);
+  const rec={titre:String(d.titre).trim(),type:d.type,theme:(d.theme||'').trim()||null,presence:d.presence,consignes:(d.consignes||'').trim()||null,champs,liens};
+  action(async()=>{if(id)await upd('outils_collecte',`id=eq.${id}`,rec);else await ins('outils_collecte',{org_id:S.org.id,projet_id:p.id,...rec});TR.outil=null},'Outil enregistré.');return}
+},true);
+
+/* ---------- actions ---------- */
+document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.target.closest('[data-act="go"]');if(g&&g.dataset.v==='terrain'){TR.saisie=null;TR.fiche=null;TR.outil=null;if(g.dataset.tab)TR.tab=g.dataset.tab;return}
+ const b=e.target.closest('[data-act^="ter"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const a=b.dataset.act,id=b.dataset.id,p=trP();srvMsg='';
+ const fx=id&&S.fterrain.find(x=>x.id===id);
+ if(a==='terTab'){TR.tab=b.dataset.v;TR.fiche=null;if(b.dataset.ref)TR.refForm=true;render();return}
+ if(a==='terProjet'){TR.pid=id;render();return}
+ if(a==='terRemplir'){const br=trLS.get('Brouillon',null);if(br&&br.outil===id&&br.pid===TR.pid)TR.saisie={outil:id,v:br.v};else{if(br&&!confirm('Une autre fiche commencée est gardée sur ce téléphone. La remplacer par une nouvelle fiche ?'))return;trLS.del('Brouillon');TR.saisie={outil:id}}render();scrollTo(0,0);return}
+ if(a==='terReprendre'){const br=trLS.get('Brouillon',null);if(br){TR.pid=br.pid;TR.saisie={outil:br.outil,v:br.v}}render();scrollTo(0,0);return}
+ if(a==='terAbandon'){if(!confirm('Abandonner cette fiche ? Ce qui a été saisi sera effacé de ce téléphone.'))return;trLS.del('Brouillon');TR.saisie=null;render();return}
+ if(a==='terFermer'){const f=document.querySelector('form[data-form="terFiche"]');if(f)trBrouillon(f);if(f&&!f.dataset.id)srvMsg='Fiche gardée sur ce téléphone : reprenez-la depuis l\'onglet « Saisir ».';TR.saisie=null;TR.fiche=null;TR.outil=null;render();return}
+ if(a==='terCorriger'){TR.saisie={outil:fx.outil_id,id};TR.fiche=null;render();scrollTo(0,0);return}
+ if(a==='terVoir'){TR.fiche=id;render();scrollTo(0,0);return}
+ if(a==='terPAdd'){const tb=document.querySelector('.trPres tbody');const n=Number(b.dataset.n)||1;for(let i=0;i<n;i++)tb.insertAdjacentHTML('beforeend',trLigneP({},tb.children.length));trNumeroter();const l=tb.lastElementChild.querySelector('input');if(n===1&&l)l.focus();return}
+ if(a==='terPDel'){const tr=b.closest('tr');tr.remove();trNumeroter();trBrouillon(document.querySelector('form[data-form="terFiche"]'));return}
+ if(a==='terGps'){const f=b.closest('form'),out=f.querySelector('[data-gps]');if(!navigator.geolocation){out.textContent='position indisponible sur cet appareil';return}out.textContent='recherche de la position…';
+  navigator.geolocation.getCurrentPosition(pos=>{const c=pos.coords;f.elements.lat.value=c.latitude.toFixed(6);f.elements.lng.value=c.longitude.toFixed(6);f.elements.gps_precision.value=Math.round(c.accuracy);out.textContent=`${c.latitude.toFixed(5)}, ${c.longitude.toFixed(5)} (± ${Math.round(c.accuracy)} m)`;trBrouillon(f)},
+   err=>{out.textContent=err.code===1?'autorisation refusée : activez la localisation pour ce site':'position introuvable, réessayez à découvert'},{enableHighAccuracy:true,timeout:20000,maximumAge:60000});return}
+ if(a==='terSync'){trSync(true);return}
+ if(a==='terSt'){const v=b.dataset.v;let motif=null;if(['a_corriger','rejetee'].includes(v)){motif=prompt(v==='rejetee'?'Motif du rejet (ex. activité non réalisée, doublon) :':'Qu\'est-ce que l\'agent doit corriger ?');if(!motif||!motif.trim())return}
+  action(async()=>{await upd('fiches_terrain',`id=eq.${id}`,{statut:v,...(motif?{retour_motif:motif.trim()}:{})});
+   if(motif)await notifierSrv([fx.agent_id,fx.saisi_par],`Fiche du ${fmtD(fx.date_activite)} (${fx.localite}) ${v==='rejetee'?'rejetée':'à corriger'} : ${motif.trim()}`,'terrain',id)},
+   {verifiee:'Fiche marquée vérifiée : elle part à la validation.',validee:'Fiche validée : elle compte dans les résultats du projet.',a_corriger:'Fiche renvoyée à l\'agent.',rejetee:'Fiche rejetée.'}[v]);return}
+ if(a==='terLot'){const ids=[...document.querySelectorAll('.trSel:checked')].map(x=>x.value),v=b.dataset.v;if(!ids.length){alert('Cochez d\'abord les fiches conformes.');return}
+  if(!confirm(`${v==='validee'?'Valider':'Marquer vérifiées'} ${ids.length} fiche(s) ?`))return;
+  action(async()=>{const err=[];for(const x of ids){try{await upd('fiches_terrain',`id=eq.${x}`,{statut:v})}catch(e){err.push(e.message)}}if(err.length)throw new Error(`${ids.length-err.length} fiche(s) traitée(s). ${err.length} refusée(s) : ${[...new Set(err)].join(' ; ')}`)},`${ids.length} fiche(s) ${v==='validee'?'validée(s)':'vérifiée(s)'}.`);return}
+ if(a==='terSuppr'){if(!confirm('Retirer cette fiche ? Elle sera supprimée définitivement.'))return;action(async()=>{await del('fiches_terrain',`id=eq.${id}`);TR.fiche=null},'Fiche retirée.');return}
+ if(a==='terImpFiche'){trImpFiche(fx);return}
+ if(a==='terImpVierge'){trImpVierge(trOutil(id),p);return}
+ if(a==='terImpModele'){const m=MOD_OUTILS.find(x=>x.code===b.dataset.v);trImpVierge(m,p);return}
+ if(a==='terImpRef'){trImpRef(S.refs.find(x=>x.id===id));return}
+ if(a==='terImpRap'){trImpRap(S.rterrain.find(x=>x.id===id));return}
+ if(a==='terCref'){const r=S.refs.find(x=>x.id===id);const dt=prompt(`Contre-référence de ${r.code_beneficiaire} (${r.motif}).\nDate de prise en charge (jj/mm/aaaa) :`,fmtD(today()));if(!dt)return;const iso=omDate(dt);if(!iso){alert('Date illisible.');return}
+  const iss=prompt('Issue de la prise en charge (ex. dépistage fait, traitement débuté, rendez-vous fixé) :','')||'';action(()=>upd('references_communautaires',`id=eq.${id}`,{statut:'arrivee',contre_ref_le:iso,contre_ref_issue:iss.trim()||null}),'Contre-référence enregistrée.');return}
+ if(a==='terPerdue'){const ob=prompt('Relances effectuées et motif (ex. 3 appels sans réponse, personne partie) :');if(!ob||!ob.trim())return;action(()=>upd('references_communautaires',`id=eq.${id}`,{statut:'perdue',observations:ob.trim()}),'Référence déclarée perdue de vue.');return}
+ if(a==='terMpSt'){const v=b.dataset.v;let motif=null;if(v==='a_corriger'){motif=prompt('Qu\'est-ce que l\'agent doit revoir dans son microplan ?');if(!motif||!motif.trim())return}const mp=S.microplans.find(x=>x.id===id);
+  action(async()=>{await upd('microplans',`id=eq.${id}`,{statut:v,...(motif?{motif:motif.trim()}:{})});await notifierSrv([mp.agent_id],`Votre microplan de ${moisLib(moisDe(mp.mois)).toLowerCase()} : ${v==='valide'?'validé':'à revoir ('+motif.trim()+')'}`,'terrain',null)},v==='valide'?'Microplan validé.':'Microplan renvoyé à l\'agent.');return}
+ if(a==='terRapSt'){const v=b.dataset.v,r=S.rterrain.find(x=>x.id===id);let motif=null;if(v==='a_corriger'){motif=prompt('Qu\'est-ce qu\'il faut revoir dans ce rapport ?');if(!motif||!motif.trim())return}
+  action(async()=>{await upd('rapports_terrain',`id=eq.${id}`,{statut:v,...(motif?{motif:motif.trim()}:{})});await notifierSrv([r.auteur_id],`Votre rapport de ${moisLib(moisDe(r.mois)).toLowerCase()} : ${v==='valide'?'validé':'à revoir ('+motif.trim()+')'}`,'terrain',null)},v==='valide'?'Rapport validé.':'Rapport renvoyé à son auteur.');return}
+ if(a==='terVerser'){const r=S.rterrain.find(x=>x.id===id),m=moisDe(r.mois),F=trFiches(p).filter(f=>f.statut==='validee'&&moisDe(f.date_activite)===m),fin=finMois(m),src=`Collecte terrain – rapport mensuel ${m.slice(5)}/${m.slice(0,4)}`;
+  const M=[];trOutils(p).forEach(o=>(o.liens||[]).filter(l=>l.indicateur_id).forEach(l=>{const val=trValeurMetrique(o,F.filter(f=>f.outil_id===o.id),l.metrique);M.push({indicateur_id:l.indicateur_id,metrique:l.metrique,...val})}));
+  const parI={};M.forEach(x=>{const z=parI[x.indicateur_id]=parI[x.indicateur_id]||{v:0,f:null,h:null};z.v+=x.v;if(x.f!=null){z.f=(z.f||0)+x.f;z.h=(z.h||0)+x.h}});
+  const deja=(S.mesures||[]).filter(x=>x.source===src&&parI[x.indicateur_id]);if(deja.length){alert('Ces chiffres ont déjà été versés pour ce mois.');return}
+  const lib=Object.entries(parI).map(([i,z])=>`· ${((S.inds||[]).find(x=>x.id===i)||{}).libelle} : ${num(z.v)}`).join('\n');if(!confirm(`Verser dans les indicateurs (période close le ${fmtD(fin)}) :\n${lib}\n\nLes mesures devront être validées par une autre personne.`))return;
+  action(async()=>{await ins('mesures',Object.entries(parI).map(([i,z])=>({org_id:S.org.id,indicateur_id:i,periode_fin:fin,valeur:z.v,valeur_f:z.f,valeur_h:z.h,source:src,commentaire:'Fiches terrain validées du mois, rapport validé par '+who(r.valide_par)})));await upd('rapports_terrain',`id=eq.${id}`,{verse_le:new Date().toISOString()})},'Chiffres versés dans les indicateurs : validez les mesures dans « Performance ».');return}
+ if(a==='terCsv'){const F=trFiches(p).filter(f=>moisDe(f.date_activite)===TR.mois&&(!TR.agent||f.agent_id===TR.agent)&&(!TR.statut||f.statut===TR.statut)&&(!TR.outilF||f.outil_id===TR.outilF));
+  if(b.dataset.v==='fiches'){const ch=[...new Map(F.flatMap(f=>(trOutil(f.outil_id)||{champs:[]}).champs.filter(c=>c.type!=='section').map(c=>[f.outil_id+'|'+c.id,c]))).entries()];
+   trCsv(`Fiches_${p.code||'projet'}_${TR.mois}`,[['Date','Agent','Outil','Localité','Sous-préfecture','Lieu','Total','Femmes','Hommes','Handicap','Statut','Latitude','Longitude',...ch.map(([,c])=>c.label)],
+    ...F.map(f=>[f.date_activite,who(f.agent_id),(trOutil(f.outil_id)||{}).titre,f.localite,f.sous_prefecture,f.lieu,f.nb_total,f.nb_f,f.nb_h,f.nb_handicap,FT_ST[f.statut][0],f.lat,f.lng,...ch.map(([k,c])=>{if(!k.startsWith(f.outil_id))return '';const v=(f.donnees||{})[c.id];return Array.isArray(v)?v.join(', '):v??''})])])}
+  else trCsv(`Participants_${p.code||'projet'}_${TR.mois}`,[['Date','Localité','Outil','Agent','Nom','Sexe','Âge','Tranche','Téléphone','Handicap','Vulnérabilité','Émargement'],...F.filter(f=>!f.confidentiel).flatMap(f=>(f.participants||[]).map(q=>[f.date_activite,f.localite,(trOutil(f.outil_id)||{}).titre,who(f.agent_id),q.nom,q.sexe,q.age??'',trBande(q.age),q.tel,q.handicap?'oui':'non',q.vuln,q.signe===false?'non':'oui']))]);return}
+ if(a==='terInstaller'){const L=b.dataset.v==='*'?MOD_OUTILS.filter(m=>!trOutils(p).some(o=>o.modele===m.code)):[MOD_OUTILS.find(m=>m.code===b.dataset.v)];
+  action(()=>ins('outils_collecte',L.map(m=>({org_id:S.org.id,projet_id:p.id,modele:m.code,titre:m.titre,type:m.type,theme:m.theme,presence:m.presence,consignes:m.consignes,champs:m.champs}))),`${L.length} outil(s) installé(s). Adaptez-les si besoin, puis reliez-les aux indicateurs du projet.`);return}
+ if(a==='terOutilEd'){TR.outil=id;render();scrollTo(0,0);return}
+ if(a==='terOutilActif'){const o=trOutil(id);action(()=>upd('outils_collecte',`id=eq.${id}`,{actif:!o.actif}),o.actif?'Outil retiré : il n\'est plus proposé aux agents.':'Outil remis en service.');return}
+},true);
+function trNumeroter(){const rows=document.querySelectorAll('.trPres tbody tr');rows.forEach((r,i)=>{const n=r.querySelector('.trN');if(n)n.textContent=i+1});const t=document.querySelector('.trPresTot');if(t){const F=[...rows].filter(r=>r.querySelector('[data-k="sexe"]').value==='F').length,M=[...rows].filter(r=>r.querySelector('[data-k="sexe"]').value==='M').length;t.textContent=F+M?`${F+M} personne(s) : ${F} F · ${M} H`:''}}
+document.addEventListener('change',e=>{if(MODE!=='srv'||!me)return;const t=e.target,k=t.dataset&&t.dataset.ter;
+ if(k==='pid'){TR.pid=t.value;TR.agent='';TR.outilF='';render();return}
+ if(k==='mois'){if(t.value)TR.mois=t.value;render();return}
+ if(['agent','statut','outilF'].includes(k)){TR[k]=t.value;render();return}
+ if(k==='tout'){document.querySelectorAll('.trSel').forEach(x=>x.checked=t.checked);return}
+ if(k==='motif'){const vbg=/VBG/i.test(t.value);t.form.querySelectorAll('.trNom').forEach(x=>{x.hidden=vbg;x.querySelectorAll('input').forEach(i=>{if(vbg)i.value=''})});return}
+ const f=t.closest&&t.closest('form[data-form="terFiche"]');if(f){if(t.dataset.k==='sexe')trNumeroter();trBrouillon(f)}});
+let trTimer=null;document.addEventListener('input',e=>{const f=e.target.closest&&e.target.closest('form[data-form="terFiche"]');if(!f)return;clearTimeout(trTimer);trTimer=setTimeout(()=>trBrouillon(f),600)});
+
+/* ---------- carte d'accueil ---------- */
+function tbTerrain(){if(!p12||!me)return '';const L=trProjets();if(!L.length)return '';const m=today().slice(0,7);
+ const mes=L.flatMap(p=>trFiches(p)).filter(f=>(f.agent_id===me.id||f.saisi_par===me.id)&&moisDe(f.date_activite)===m&&f.statut!=='rejetee');
+ const cor=L.flatMap(p=>trFiches(p)).filter(f=>f.statut==='a_corriger'&&[f.agent_id,f.saisi_par].includes(me.id)).length,av=L.reduce((s,p)=>s+trAVerifier(p).length,0),file=trFile().length;
+ const lignes=[[num(mes.length),'fiche(s) envoyée(s) ce mois'],[num(somme(mes,f=>f.nb_total)),'personne(s) touchée(s) ce mois']].concat(cor?[[num(cor),'fiche(s) à corriger']]:[]).concat(av?[[num(av),'fiche(s) à vérifier ou valider']]:[]).concat(file?[[num(file),'envoi(s) en attente de réseau']]:[]);
+ return tbCarte('Collecte terrain',moisLib(m).toLowerCase(),`<ul class="tb-act">${lignes.map(([v,l])=>`<li><b style="font-size:1.1rem;color:var(--brand)">${v}</b> <span class="muted">${l}</span></li>`).join('')}</ul><p class="tb-plus"><button class="btn sm" data-act="go" data-v="terrain" data-tab="${av&&!['ASC'].includes(me.role)?'verifier':'saisir'}">${av&&me.role!=='ASC'?'Traiter les fiches':'Saisir une fiche'}</button></p>`)}
+
 /* ---------- démarrage ---------- */
 async function srvInit(){
  if(MODE!=='srv'){render();return}
  save=function(){};                                              // rien de réel n'est gardé dans le navigateur
  const _log=log;log=function(a){if(me&&S.org&&S.org.id)ins('audit',{org_id:S.org.id,user_id:me.id,action:String(a).slice(0,500)}).catch(()=>{})};
- loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{contrats:'Contrats et conventions',missions:'TDR et ordres de mission',adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
+ loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{terrain:'Collecte terrain',contrats:'Contrats et conventions',missions:'TDR et ordres de mission',adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
  render=srvRender;
- viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,missions:svMissions,contrats:svContrats,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
+ viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,missions:svMissions,contrats:svContrats,terrain:svTerrain,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
  S=srvVide();me=null;sess=sessLire();await omVerifCharger();
  const h=new URLSearchParams(location.hash.slice(1));                // retour d'un lien « mot de passe oublié »
  if(h.get('access_token')){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
