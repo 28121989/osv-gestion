@@ -5410,7 +5410,7 @@ const trFiches=p=>(S.fterrain||[]).filter(f=>f.projet_id===p.id);
 const trRefs=p=>(S.refs||[]).filter(r=>r.projet_id===p.id);
 
 /* ---------- consolidation : le cœur de la remontée ---------- */
-function trAgreger(F){const r={n:F.length,total:0,f:0,h:0,hand:0,age:{},loc:{},outil:{},agent:{},mois:{},champs:{},vuln:{}};
+function trAgreger(F){F=F.filter(x=>!trEstSup(x));const r={n:F.length,total:0,f:0,h:0,hand:0,age:{},loc:{},outil:{},agent:{},mois:{},champs:{},vuln:{}};
  [...TR_BANDES,'nd'].forEach(b=>r.age[b]={F:0,M:0});
  const add=(o,k,x)=>{o[k]=o[k]||{n:0,total:0,f:0,h:0};o[k].n++;o[k].total+=x.nb_total;o[k].f+=x.nb_f;o[k].h+=x.nb_h};
  F.forEach(x=>{r.total+=x.nb_total;r.f+=x.nb_f;r.h+=x.nb_h;r.hand+=x.nb_handicap;
@@ -5473,6 +5473,8 @@ const MOD_OUTILS=[
    C('supports','Supports utilisés','multi',{options:['Boîte à images','Affiches, dépliants','Vidéo','Démonstration (préservatif, casque…)','Aucun']}),
    C('preserv_m','Préservatifs masculins distribués','nombre'),C('preserv_f','Préservatifs féminins distribués','nombre'),C('depliants','Dépliants distribués','nombre'),
    C('orientes','Personnes orientées vers un service','nombre',{aide:'Une fiche de référence par personne orientée.'}),
+   C('public','Public principal','choix',{options:['Travailleurs du chantier','Riverains','Mixte']}),
+   C('ret_n','Participants interrogés à la fin (3 questions de rétention)','nombre',{aide:'Interroger 5 participants pris au hasard.'}),C('ret_ok','dont ayant cité au moins 2 messages clés sur 3','nombre'),
    C('questions','Questions posées, rumeurs et fausses croyances entendues','long'),C('obs','Observations','long')]},
  {code:'MASSE',titre:'Fiche de séance de masse (décompte anonyme)',type:'seance',presence:'anonyme',theme:'Toutes thématiques',
   desc:'Pour les marchés, gares, cérémonies : on compte les personnes par sexe et tranche d\'âge, sans liste nominative.',
@@ -5533,7 +5535,96 @@ const MOD_OUTILS=[
   champs:[C('phase','Phase de l\'enquête','choix',{requis:true,options:['Référence','Finale']}),C('consent','La personne a donné son consentement éclairé','ouinon',{requis:true}),
    C('sexe','Sexe de la personne interrogée','choix',{requis:true,options:['Femme','Homme']}),C('age','Âge','nombre',{requis:true}),C('instr','Niveau d\'instruction','choix',{options:['Aucun','Primaire','Secondaire','Supérieur']}),
    C('s1','Connaissances','section'),C('q1','Cite au moins deux moyens de prévention du VIH','ouinon'),C('q2','Sait où se faire dépister gratuitement','ouinon'),C('q3','Connaît au moins un service d\'aide aux victimes de violences','ouinon'),C('q4','Sait comment déposer une plainte liée au projet','ouinon'),
-   C('s2','Attitudes et pratiques','section'),C('q5','Accepterait de partager un repas avec une personne vivant avec le VIH','ouinon'),C('q6','Porte toujours un casque à moto (ou l\'exige du conducteur)','ouinon'),C('q7','A utilisé un préservatif lors du dernier rapport occasionnel','ouinon'),C('q8','Pense qu\'un homme a parfois le droit de frapper sa femme','ouinon',{aide:'Réponse « oui » = attitude défavorable.'})]}];
+   C('s2','Attitudes et pratiques','section'),C('q5','Accepterait de partager un repas avec une personne vivant avec le VIH','ouinon'),C('q6','Porte toujours un casque à moto (ou l\'exige du conducteur)','ouinon'),C('q7','A utilisé un préservatif lors du dernier rapport occasionnel','ouinon'),C('q8','Pense qu\'un homme a parfois le droit de frapper sa femme','ouinon',{aide:'Réponse « oui » = attitude défavorable.'})]},
+ {code:'PROFIL',titre:'Profil de la localité et croquis (A1)',type:'suivi',presence:'non',theme:'Consultation communautaire',pack:'chantier',
+  desc:'Une fiche par localité, avant toute activité : strates communautaires, langues, disponibilités, points sensibles. Le croquis dessiné à la main est photographié et joint.',
+  consignes:'Remplir avec le chef du village ou un notable. Relever la position GPS au centre du village. Dessiner le croquis (école, marché, centre de santé, lieux de culte, traversées dangereuses, accès du chantier, gares de motos), le photographier et le joindre comme pièce justificative.',
+  champs:[C('dist_chantier','Distance au chantier (km)','nombre'),C('population','Population estimée','nombre'),C('pop_source','Source de l\'estimation','choix',{options:['Chefferie','Centre de santé','Recensement','Estimation de l\'ASC']}),
+   C('strates','Strates communautaires présentes','multi',{requis:true,options:['Chefferie et notables','Leaders religieux','Association de femmes','Association de jeunes','Personnes handicapées','Commerçantes','Conducteurs de motos-taxis et transporteurs','Enseignants','Agents de santé','Travailleurs migrants liés au chantier','Orpailleurs','Éleveurs']}),
+   C('contacts','Représentants à contacter (strate, nom, téléphone)','long',{aide:'Une ligne par strate.'}),
+   C('langues','Langues parlées','multi',{options:['Français','Dioula','Sénoufo','Malinké','Koulango','Lobi','Baoulé','Autre']}),
+   C('marche','Jour de marché','choix',{options:['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche','Pas de marché']}),
+   C('dispo_f','Moment où les femmes sont disponibles','choix',{options:['Matin','Mi-journée','Après-midi','Soir']}),C('dispo_h','Moment où les hommes sont disponibles','choix',{options:['Matin','Mi-journée','Après-midi','Soir']}),
+   C('points','Points sensibles placés sur le croquis','multi',{options:['École','Marché','Centre de santé','Lieu de culte','Traversée dangereuse','Accès du chantier','Gare de motos','Maquis, lieux de rencontre','Point d\'eau']}),
+   C('reseau','Réseau téléphonique dans la localité','choix',{options:['Bon','Faible','Aucun']}),C('obs','Observations','long')]},
+ {code:'CONSULT',titre:'Fiche de consultation communautaire (A2)',type:'mobilisation',presence:'nominative',theme:'Consultation communautaire',pack:'chantier',
+  desc:'Une fiche par groupe consulté (strate) : préoccupations, attentes, canaux préférés, engagements pris par OSV.',
+  consignes:'Consulter chaque strate séparément ; les femmes et les jeunes à part, à l\'heure qui leur convient. Toute plainte exprimée doit aussi être enregistrée dans une fiche de plainte.',
+  champs:[C('strate','Strate consultée','choix',{requis:true,options:['Chefferie et notables','Leaders religieux','Femmes','Jeunes','Personnes handicapées','Commerçantes','Conducteurs de motos-taxis et transporteurs','Travailleurs du chantier','Agents de santé','Enseignants','Autre']}),
+   C('connait','Le groupe connaît le projet et le chantier','choix',{options:['Bien','Un peu','Pas du tout']}),
+   C('preoc','Préoccupations exprimées','multi',{options:['Circulation des camions','Poussière et bruit','Sécurité des enfants','Emploi local','Relations entre travailleurs et filles du village','IST et VIH','Conflits fonciers','Eau','Autre']}),
+   C('preoc_detail','Préoccupations en détail (sans nom)','long'),
+   C('canaux','Canaux d\'information préférés','multi',{options:['Crieur public','Radio','Église ou mosquée','Associations','WhatsApp','Réunion au village']}),
+   C('horaire','Horaire souhaité pour les séances','texte'),C('plaintes','Nombre de plaintes exprimées (une fiche de plainte chacune)','nombre'),
+   C('engagements','Engagements pris par OSV devant le groupe','long')]},
+ {code:'ENQCH',titre:'Questionnaire d\'enquête de base et finale – chantier (A3)',type:'enquete',presence:'non',theme:'Connaissances, attitudes et pratiques',pack:'chantier',
+  desc:'Même questionnaire avant et après la sensibilisation : VIH et IST, sécurité routière autour du chantier, code de conduite et plaintes. 15 minutes, sans nom, 18 ans et plus.',
+  consignes:'Lire le consentement : « Nous faisons une enquête pour améliorer les actions de sensibilisation autour du chantier. Vos réponses restent anonymes, vous pouvez refuser ou arrêter à tout moment. » Sans accord, ne pas poursuivre. Ne pas souffler les réponses ; pour les questions à citer, ne pas lire les choix. Aucune question sur les violences vécues : si une personne en révèle, l\'écouter et lui proposer une orientation confidentielle.',
+  champs:[C('phase','Phase de l\'enquête','choix',{requis:true,options:['Base (avant)','Finale (après)']}),C('consent','La personne a donné son accord','ouinon',{requis:true}),
+   C('public','Public','choix',{requis:true,options:['Travailleur du chantier','Riverain']}),C('sexe','Sexe','choix',{requis:true,options:['Femme','Homme']}),C('age','Âge (18 ans et plus)','nombre',{requis:true}),
+   C('instr','Niveau d\'instruction','choix',{options:['Aucun','Primaire','Secondaire','Supérieur']}),C('langue','Langue de l\'entretien','choix',{options:['Français','Dioula','Sénoufo','Malinké','Koulango','Autre']}),
+   C('hd','Handicap (questions courtes du Groupe de Washington)','section'),
+   C('wg','A beaucoup de difficultés ou ne peut pas du tout…','multi',{options:['voir, même avec des lunettes','entendre, même avec un appareil','marcher ou monter des marches','se souvenir ou se concentrer','prendre soin de soi (se laver, s\'habiller)','communiquer dans sa langue habituelle','aucune de ces difficultés']}),
+   C('s1','VIH et IST','section'),
+   C('v1','Le préservatif utilisé à chaque rapport réduit le risque de VIH','choix',{options:['Oui','Non','Ne sait pas']}),
+   C('v2','Un seul partenaire fidèle et non infecté réduit le risque','choix',{options:['Oui','Non','Ne sait pas']}),
+   C('v3','Une personne qui paraît en bonne santé peut avoir le VIH','choix',{options:['Oui','Non','Ne sait pas']}),
+   C('v4','On peut attraper le VIH par une piqûre de moustique','choix',{options:['Oui','Non','Ne sait pas']}),
+   C('v5','On peut attraper le VIH en partageant le repas d\'une personne séropositive','choix',{options:['Oui','Non','Ne sait pas']}),
+   C('v6','Cite un lieu proche de dépistage gratuit','ouinon'),
+   C('v7','Achèterait des légumes à un commerçant séropositif','choix',{options:['Oui','Non','Ne sait pas']}),
+   C('v8','A fait un test du VIH au cours des 12 derniers mois','ouinon'),C('v9','Sait où trouver des préservatifs ici','ouinon'),
+   C('s2','Sécurité routière autour du chantier','section'),
+   C('r1','Règles citées spontanément (ne pas lire)','multi',{options:['Réduire la vitesse','Traverser avec prudence face aux camions','Accompagner les enfants','Porter le casque','Pas d\'alcool au volant','Pas de téléphone en conduisant','Aucune']}),
+   C('r2','Casque porté sur les 5 derniers trajets en moto (0 à 5)','nombre',{aide:'Laisser vide si la personne ne circule pas à moto.'}),
+   C('r3','Témoin d\'un accident ou d\'une situation dangereuse liée au chantier ces 30 derniers jours','ouinon'),
+   C('s3','Code de conduite et mécanisme de plainte','section'),
+   C('c1','(Travailleurs) Le code de conduite interdit les relations sexuelles en échange d\'argent, de cadeaux ou d\'emploi','choix',{options:['Oui','Non','Ne sait pas','Sans objet (riverain)']}),
+   C('c2','(Travailleurs) Avec une personne de moins de 18 ans, c\'est interdit même si elle est d\'accord','choix',{options:['Oui','Non','Ne sait pas','Sans objet (riverain)']}),
+   C('c3','Sait comment déposer une plainte concernant le chantier','ouinon'),C('c3b','Moyen cité','texte'),
+   C('c4','Une femme harcelée par un travailleur pourrait s\'adresser à…','multi',{options:['Chef du village','ASC ou OSV','Centre de santé','Gendarmerie ou police','Responsable du chantier','Comité de plaintes','Ne sait pas']})]},
+ {code:'INCIDENT',titre:'Fiche d\'incident ou d\'alerte (A10)',type:'autre',presence:'non',theme:'Alerte',pack:'chantier',
+  desc:'Accident de la circulation, incident de sécurité, rumeur, tension avec la communauté. Envoyée tout de suite à la superviseure et au chef de projet.',
+  consignes:'Décrire les faits sans nom. En cas d\'urgence, appeler d\'abord les secours, puis remplir la fiche.',
+  champs:[C('type_i','Type d\'incident','choix',{requis:true,options:['Accident de la circulation','Presque-accident','Incident de sécurité sur le chantier','Rumeur','Tension avec la communauté','Comportement inapproprié d\'un travailleur','Autre']}),
+   C('gravite','Gravité','choix',{requis:true,options:['Faible','Moyenne','Grave','Très grave (blessé ou décès)']}),C('blesses','Personnes blessées','nombre'),
+   C('faits','Ce qui s\'est passé (sans nom)','long',{requis:true}),C('mesures','Mesures immédiates prises','long'),C('prevenu','Personnes déjà prévenues','texte')]},
+ {code:'COMPTAGE',titre:'Comptage routier observé : port du casque (A11)',type:'enquete',presence:'non',theme:'Sécurité routière',pack:'chantier',
+  desc:'Observation de 30 minutes à un point fixe : deux-roues, conducteurs et passagers casqués. Même point, même jour de la semaine et même heure à la base et à la fin.',
+  consignes:'Se placer sans gêner la circulation. Compter chaque deux-roues qui passe dans un sens comme dans l\'autre pendant exactement 30 minutes. Relever la position GPS du point.',
+  champs:[C('phase','Phase','choix',{requis:true,options:['Base (avant)','Finale (après)']}),C('point','Nom du point d\'observation','texte',{requis:true}),
+   C('motos','Deux-roues comptés','nombre',{requis:true}),C('cond_casque','Conducteurs portant un casque','nombre',{requis:true}),
+   C('passagers','Passagers comptés','nombre'),C('pass_casque','Passagers portant un casque','nombre'),C('surcharge','Deux-roues avec plus de 2 personnes','nombre'),C('obs','Observations (météo, contrôle de police…)','long')]},
+ {code:'SUPERV',titre:'Grille de supervision formative de l\'ASC (S1)',type:'suivi',presence:'non',theme:'Supervision',pack:'chantier',niveau:'sup',
+  desc:'Remplie par la superviseure en observant l\'ASC : kit, stock, qualité des données, séance avant, pendant et après, voix de la communauté. Score calculé automatiquement.',
+  consignes:'Une demi-journée par ASC, 2 ASC au plus par jour. Commencer par les recommandations de la supervision précédente. Observer sans interrompre la séance ; le coaching se fait après, en privé. « Sans objet » retire l\'item du score.',
+  champs:[C('prec','Recommandations de la supervision précédente','choix',{options:['Toutes levées','En partie levées','Non levées','Première supervision']}),
+   C('sb','B. Kit de l\'ASC','section'),C('b1','Badge','ouinon',{pts:true,so:true}),C('b2','Chasuble','ouinon',{pts:true,so:true}),C('b3','Boîte à images','ouinon',{pts:true,so:true}),C('b4','Dépliants','ouinon',{pts:true,so:true}),C('b5','Mégaphone','ouinon',{pts:true,so:true}),C('b6','Équipement de sécurité pour le chantier','ouinon',{pts:true,so:true}),C('b7','Téléphone chargé','ouinon',{pts:true,so:true}),
+   C('sc','C. Stock d\'intrants','section'),C('c1','Quantité comptée = quantité restante sur les fiches','ouinon',{pts:true,so:true}),C('c2','Aucun jour de rupture ce mois','ouinon',{pts:true,so:true}),
+   C('sd','D. Qualité des données (3 séances tirées au hasard)','section'),C('d1','Liste recomptée = effectif déclaré','ouinon',{pts:true,so:true}),C('d2','Fiches complètes','ouinon',{pts:true,so:true}),C('d3','Références suivies d\'une contre-référence','ouinon',{pts:true,so:true}),
+   C('d_recompte','Effectif recompté sur les 3 séances','nombre'),C('d_declare','Effectif déclaré sur les 3 séances','nombre'),
+   C('se1','E1. Avant la séance','section'),C('e11','Connaît le milieu de vie de son public','ouinon',{pts:true,so:true}),C('e12','Cible et thème choisis à partir des besoins','ouinon',{pts:true,so:true}),C('e13','3 messages clés préparés','ouinon',{pts:true,so:true}),C('e14','Support prêt','ouinon',{pts:true,so:true}),C('e15','Durée prévue','ouinon',{pts:true,so:true}),C('e16','Lieu, date et heure annoncés','ouinon',{pts:true,so:true}),
+   C('se2','E2. Pendant la séance','section'),C('e21','Salue et installe les participants','ouinon',{pts:true,so:true}),C('e22','Se présente et fait présenter','ouinon',{pts:true,so:true}),C('e23','Annonce l\'objet de la séance','ouinon',{pts:true,so:true}),C('e24','Lieu adapté et discret','ouinon',{pts:true,so:true}),C('e25','Langue adaptée','ouinon',{pts:true,so:true}),C('e26','Utilise correctement le support','ouinon',{pts:true,so:true}),C('e27','Fait participer, femmes comprises','ouinon',{pts:true,so:true}),C('e28','Reformule les questions','ouinon',{pts:true,so:true}),C('e29','Répond juste','ouinon',{pts:true,so:true}),C('e210','Corrige les rumeurs sans se moquer','ouinon',{pts:true,so:true}),C('e211','Démontre le préservatif si le thème le demande','ouinon',{pts:true,so:true}),C('e212','Fait la synthèse','ouinon',{pts:true,so:true}),
+   C('se3','E3. Après la séance','section'),C('e31','Pose les 3 questions de rétention','ouinon',{pts:true,so:true}),C('e32','Oriente qui en a besoin','ouinon',{pts:true,so:true}),C('e33','Remplit les fiches sur place','ouinon',{pts:true,so:true}),C('e34','Planifie la suite avec le groupe','ouinon',{pts:true,so:true}),C('e35','Remercie','ouinon',{pts:true,so:true}),
+   C('sf','F. Voix de la communauté (3 à 5 personnes)','section'),C('f1','Connaissent l\'ASC','ouinon',{pts:true,so:true}),C('f2','Le trouvent respectueux','ouinon',{pts:true,so:true}),C('f3','Citent 2 messages clés','ouinon',{pts:true,so:true}),C('f4','Savent comment déposer une plainte','ouinon',{pts:true,so:true}),
+   C('sg','G. Problèmes et plan d\'amélioration','section'),C('probleme','Problèmes constatés et causes','long'),C('solutions','Solutions et coaching apporté sur place','long'),C('recos','Recommandations (une par ligne : action ; responsable ; échéance)','long')]},
+ {code:'CQENQ',titre:'Contrôle qualité des enquêtes : réinterrogation (S2)',type:'enquete',presence:'non',theme:'Supervision',pack:'chantier',niveau:'sup',
+  desc:'La superviseure réinterroge 1 personne enquêtée sur 10, tirée au hasard, sur 5 questions-témoins, et compare avec le questionnaire de l\'ASC.',
+  consignes:'Retrouver la personne grâce au lieu et à l\'heure de l\'entretien, sans lui demander son nom. Poser les 5 questions sans montrer les réponses données la première fois.',
+  champs:[C('phase','Phase de l\'enquête contrôlée','choix',{requis:true,options:['Base (avant)','Finale (après)']}),C('ref','Repère du questionnaire contrôlé (heure, lieu)','texte',{requis:true}),
+   C('q_age','Âge concordant','ouinon',{pts:true}),C('q_public','Public concordant','ouinon',{pts:true}),C('q_v1','Réponse sur le préservatif concordante','ouinon',{pts:true}),C('q_v8','Réponse sur le test du VIH concordante','ouinon',{pts:true}),C('q_c3','Réponse sur le mécanisme de plainte concordante','ouinon',{pts:true}),
+   C('entretien','La personne confirme avoir été interrogée','ouinon',{requis:true}),C('obs','Observations','long')]}];
+/* outils remplis par l'encadrement (superviseure, suivi-évaluation), pas proposés aux ASC */
+const OUT_SUP=['SUPERV','CQENQ'];
+const trEstSupO=o=>!!o&&OUT_SUP.includes(o.modele);
+const trEstSup=x=>trEstSupO(trOutil(x.outil_id));
+/* score d'une grille : « oui » = 1 point, « non » = 0, « sans objet » retiré du total */
+function trScore(o,d){const P=(o&&o.champs||[]).filter(c=>c.pts);let ok=0,n=0;P.forEach(c=>{const v=(d||{})[c.id];if(v==='oui'){ok++;n++}else if(v==='non')n++});return {ok,n,pct:n?Math.round(100*ok/n):null}}
+const trScoreTag=sc=>sc.pct==null?'':tag([`${sc.pct} % (${sc.ok}/${sc.n})`,sc.pct>=80?'ok':sc.pct>=60?'warn':'bad']);
+function trScoreBlocs(o,d){const B=[];let cur=null;(o.champs||[]).forEach(c=>{if(c.type==='section'){cur={t:c.label,ok:0,n:0};B.push(cur);return}if(!c.pts||!cur)return;const v=(d||{})[c.id];if(v==='oui'){cur.ok++;cur.n++}else if(v==='non')cur.n++});
+ const L=B.filter(b=>b.n);return L.length?svT(['Bloc','#Oui','#Total','Taux'],L.map(b=>[esc(b.t),b.ok,b.n,`${Math.round(100*b.ok/b.n)} %`]),''):''}
+const trScoreLib=p=>p==null?'':p>=80?'Bon niveau : supervision mensuelle.':p>=60?'À renforcer : coaching ciblé sur les items manqués.':'Accompagnement rapproché : nouvelle supervision sous 10 jours.';
+const PACK_CHANTIER=['PROFIL','CONSULT','ENQCH','COMPTAGE','MOBIL','SEANCE','MASSE','VAD','SECU','ROUTE','DISTRIB','PLAINTE','INCIDENT','SUPERV','CQENQ'];
 
 /* ---------- vue principale ---------- */
 function svTerrain(){
@@ -5563,7 +5654,7 @@ function svTerrain(){
   ({saisir:trSaisir,fiches:trListeFiches,references:trReferences,microplan:trMicroplan,rapport:trRapport,outils:trOutilsVue,verifier:trVerifierVue,agents:trAgentsVue,tableau:trTableau,qualite:trQualite}[TR.tab]||trSaisir)(p,niv)}
 
 /* ---------- onglet Saisir ---------- */
-function trSaisir(p,niv){const O=trOutils(p).filter(o=>o.actif),cor=trFiches(p).filter(f=>f.statut==='a_corriger'&&[f.agent_id,f.saisi_par].includes(me.id)),br=trLS.get('Brouillon',null);
+function trSaisir(p,niv){const O=trOutils(p).filter(o=>o.actif&&(niv!=='agent'||!trEstSupO(o))),cor=trFiches(p).filter(f=>f.statut==='a_corriger'&&[f.agent_id,f.saisi_par].includes(me.id)),br=trLS.get('Brouillon',null);
  return (cor.length?`<section class="card notif"><h3>À corriger (${cor.length})</h3><p class="muted">Ces fiches vous ont été renvoyées. Corrigez-les : elles repartent automatiquement à la vérification.</p>
    ${cor.map(f=>`<div class="q-row"><div><b>${esc((trOutil(f.outil_id)||{}).titre||'Fiche')}</b> · ${fmtD(f.date_activite)} · ${esc(f.localite)}<br><span class="muted">Remarque de ${esc(who(f.retour_par))} : ${esc(f.retour_motif||'')}</span></div><button class="btn sm" data-act="terCorriger" data-id="${f.id}">Corriger</button></div>`).join('')}</section>`:'')+
   (br&&br.pid===p.id&&trOutil(br.outil)?`<section class="card"><h3>Fiche commencée</h3><div class="q-row"><div><b>${esc(trOutil(br.outil).titre)}</b><br><span class="muted">gardée sur ce téléphone le ${new Date(br.le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}</span></div><div class="row"><button class="btn sm" data-act="terReprendre">Reprendre</button><button class="btn ghost sm" data-act="terAbandon">Abandonner</button></div></div></section>`:'')+
@@ -5576,7 +5667,7 @@ function trChamp(c,v){const n='c_'+c.id,val=v==null?'':v,req=c.requis?' required
  const lab=`<label for="tf_${c.id}">${esc(c.label)}${c.requis?' <span class="req" aria-hidden="true">*</span>':''}</label>`;
  if(c.type==='section')return `<h4 class="trSec">${esc(c.label)}</h4>`;
  if(c.type==='long')return `<div class="trL">${lab}<textarea id="tf_${c.id}" name="${n}" rows="3"${req}>${esc(val)}</textarea>${dictBtn('tf_'+c.id)}${aide}</div>`;
- if(c.type==='choix'||c.type==='ouinon'){const O=c.type==='ouinon'?[['oui','Oui'],['non','Non']]:(c.options||[]).map(x=>[x,x]);return `<div${c.type==='choix'&&String(c.label).length>60?' class="trL"':''}>${lab}<select id="tf_${c.id}" name="${n}"${req}>${opts(O,val,'— choisir —')}</select>${aide}</div>`}
+ if(c.type==='choix'||c.type==='ouinon'){const O=c.type==='ouinon'?[['oui','Oui'],['non','Non'],...(c.so?[['so','Sans objet']]:[])]:(c.options||[]).map(x=>[x,x]);return `<div${c.type==='choix'&&String(c.label).length>60?' class="trL"':''}>${lab}<select id="tf_${c.id}" name="${n}"${req}>${opts(O,val,'— choisir —')}</select>${aide}</div>`}
  if(c.type==='multi'){const V=Array.isArray(v)?v:[];return `<fieldset class="trL trMulti"><legend>${esc(c.label)}${c.requis?' <span class="req" aria-hidden="true">*</span>':''}</legend>${(c.options||[]).map(x=>`<label><input type="checkbox" name="${n}" value="${esc(x)}"${V.includes(x)?' checked':''}> ${esc(x)}</label>`).join('')}${aide}</fieldset>`}
  const t={nombre:'number',date:'date',heure:'time'}[c.type]||'text';
  return `<div>${lab}<input id="tf_${c.id}" name="${n}" type="${t}"${t==='number'?' min="0" step="any" inputmode="decimal"':''}${t==='date'?` max="${today()}"`:''} value="${esc(val)}"${req}>${aide}</div>`}
@@ -5605,7 +5696,7 @@ function trSaisieVue(p){const s=TR.saisie,o=trOutil(s.outil);if(!o){TR.saisie=nu
  ${o.consignes?`<details class="card trCons"><summary><b>Consignes de remplissage</b></summary><p>${esc(o.consignes)}</p></details>`:''}
  <form data-form="terFiche" data-outil="${o.id}" data-id="${s.id||''}" class="card grid trForm" novalidate>
   <h4 class="trSec">Identification de l'activité</h4>${(v.donnees||{})._recit?`<input type="hidden" name="_recit" value="${esc(v.donnees._recit)}">`:''}
-  ${pourAutre&&!s.id?`<div><label for="tf_agent">Agent qui a mené l'activité</label><select id="tf_agent" name="agent">${opts(ags.map(u=>[u.id,`${u.nom} (${posteLib(u)})`]),v.agent_id||me.id)}</select></div>`:''}
+  ${trEstSupO(o)&&!s.id?`<div><label for="tf_agent">ASC supervisé(e) <span class="req" aria-hidden="true">*</span></label><select id="tf_agent" name="agent" required>${opts(trAgents(p).map(u=>[u.id,u.nom]),v.agent_id||'','— choisir —')}</select></div>`:pourAutre&&!s.id?`<div><label for="tf_agent">Agent qui a mené l'activité</label><select id="tf_agent" name="agent">${opts(ags.map(u=>[u.id,`${u.nom} (${posteLib(u)})`]),v.agent_id||me.id)}</select></div>`:''}
   <div><label for="tf_date">Date de l'activité <span class="req" aria-hidden="true">*</span></label><input id="tf_date" name="date_activite" type="date" max="${today()}" required value="${v.date_activite||today()}"></div>
   <div><label for="tf_hd">Heure de début</label><input id="tf_hd" name="heure_debut" type="time" value="${esc(v.heure_debut||'')}"></div>
   <div><label for="tf_hf">Heure de fin</label><input id="tf_hf" name="heure_fin" type="time" value="${esc(v.heure_fin||'')}"></div>
@@ -5666,11 +5757,12 @@ async function trJoindre(id,file){const x=S.fterrain.find(y=>y.id===id)||{id,pro
 /* ---------- détail d'une fiche ---------- */
 function trFicheVue(x){const p=projet(x.projet_id),o=trOutil(x.outil_id)||{titre:'Fiche',champs:[]},aut=[x.agent_id,x.saisi_par].includes(me.id);
  const peutV=x.statut==='soumise'&&!aut&&trVerifie(p,x.agent_id),peutVal=['soumise','verifiee'].includes(x.statut)&&!aut&&trValide(p)&&x.verifie_par!==me.id,peutR=['soumise','verifiee'].includes(x.statut)&&!aut&&trVerifie(p,x.agent_id);
- const val=(c,v)=>Array.isArray(v)?v.map(esc).join(', '):c.type==='ouinon'?(v==='oui'?'Oui':v==='non'?'Non':''):c.type==='date'?fmtD(v):esc(v);
- const P=x.participants||[],sig=trSignaux(x);
+ const val=(c,v)=>Array.isArray(v)?v.map(esc).join(', '):c.type==='ouinon'?(v==='oui'?'Oui':v==='non'?'Non':v==='so'?'Sans objet':''):c.type==='date'?fmtD(v):esc(v);
+ const P=x.participants||[],sig=trSignaux(x),sc=trScore(o,x.donnees);
  return `<p><button class="lnk" data-act="terFermer">← Collecte terrain</button></p>${srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:''}
  <div class="head"><h1>${esc(o.titre)}</h1><p>${fmtD(x.date_activite)}${x.heure_debut?' · '+esc(x.heure_debut)+(x.heure_fin?'–'+esc(x.heure_fin):''):''} · ${esc(x.localite)}${x.sous_prefecture?' ('+esc(x.sous_prefecture)+')':''} · ${esc(who(x.agent_id))}</p></div>
  <div class="row" style="margin-bottom:1rem">${tag(FT_ST[x.statut])}${x.confidentiel?tag(['Confidentiel','bad']):''}${sig.map(s=>tag(s)).join('')}</div>
+ ${sc.pct!=null?`<section class="card"><h3>${trEstSupO(o)&&o.modele==='CQENQ'?'Concordance':'Score de la supervision'} : ${trScoreTag(sc)}</h3><p class="muted">${o.modele==='CQENQ'?(sc.pct>=90?'Concordance suffisante.':'Concordance inférieure à 90 % : vérifier un par un les questionnaires du jour de cet ASC.'):trScoreLib(sc.pct)} « Sans objet » est retiré du total.</p>${trScoreBlocs(o,x.donnees)}</section>`:''}
  ${x.retour_motif&&['a_corriger','rejetee'].includes(x.statut)?`<p class="note"><b>${x.statut==='rejetee'?'Motif du rejet':'À corriger'} :</b> ${esc(x.retour_motif)} <span class="muted">(${esc(who(x.retour_par))}, ${fmtD(x.retour_le)})</span></p>`:''}
  ${peutV||peutVal||peutR?`<section class="card notif"><h3>${peutVal?'Validation':'Vérification'}</h3><p class="muted">${peutVal?'En validant, vous confirmez que la fiche est complète et cohérente : elle compte alors dans les résultats du projet.':'Comparez avec la fiche papier signée (photo jointe) : date, lieu, nombre de participants, émargements.'}</p>
   <div class="row">${peutV&&!peutVal?`<button class="btn" data-act="terSt" data-v="verifiee" data-id="${x.id}">Vérifiée, conforme</button>`:''}${peutVal?`<button class="btn" data-act="terSt" data-v="validee" data-id="${x.id}">Valider</button>`:''}${peutR?`<button class="btn ghost" data-act="terSt" data-v="a_corriger" data-id="${x.id}">Renvoyer pour correction</button>`:''}${peutVal?`<button class="btn danger sm" data-act="terSt" data-v="rejetee" data-id="${x.id}">Rejeter</button>`:''}</div></section>`:''}
@@ -5804,9 +5896,10 @@ function trRapport(p,niv){const RT=(S.rterrain||[]).filter(r=>r.projet_id===p.id
 function trAgentsVue(p,niv){const ags=trAgents(p).filter(u=>niv==='projet'||trVerifie(p,u.id)),F=trFiches(p).filter(f=>moisDe(f.date_activite)===TR.mois),M=(S.microplans||[]).filter(m=>m.projet_id===p.id&&moisDe(m.mois)===TR.mois),RT=(S.rterrain||[]).filter(r=>r.projet_id===p.id&&moisDe(r.mois)===TR.mois&&r.niveau==='agent');
  const der=id=>{const L=trFiches(p).filter(f=>f.agent_id===id).map(f=>f.date_activite).sort();return L[L.length-1]};
  const rows=ags.map(u=>{const mf=F.filter(f=>f.agent_id===u.id&&f.statut!=='rejetee'),mp=M.find(m=>m.agent_id===u.id),R=mp?trRealise(mp,F):[],ok=R.filter(r=>r.fiche).length,r=RT.find(x=>x.auteur_id===u.id),d=der(u.id),inactif=!d||(Date.now()-new Date(d))/864e5>14;
-  return [`${esc(u.nom)}${u.supId?`<br><span class="muted">sup. ${esc(who(u.supId))}</span>`:''}`,num(mf.length),num(somme(mf,f=>f.nb_total)),mp?`${ok}/${R.length} (${pcS(ok,R.length)})`:'<span class="muted">pas de microplan</span>',num(mf.filter(f=>f.statut==='validee').length),num(somme(mf,f=>f.nb_retours)),r?tag(RT_ST[r.statut]):tag(['non reçu','bad']),d?(inactif?`<b class="txt-bad">${fmtD(d)}</b>`:fmtD(d)):'<span class="muted">jamais</span>']});
+  const sv=trFiches(p).filter(f=>f.agent_id===u.id&&trEstSup(f)&&(trOutil(f.outil_id)||{}).modele==='SUPERV'&&f.statut!=='rejetee').sort((a,b)=>a.date_activite<b.date_activite?1:-1)[0],svs=sv?trScore(trOutil(sv.outil_id),sv.donnees):null;
+  return [`${esc(u.nom)}${u.supId?`<br><span class="muted">sup. ${esc(who(u.supId))}</span>`:''}`,sv?`${trScoreTag(svs)}<br><span class="muted">${fmtD(sv.date_activite)}</span>`:'<span class="muted">jamais</span>',num(mf.filter(f=>!trEstSup(f)).length),num(somme(mf,f=>f.nb_total)),mp?`${ok}/${R.length} (${pcS(ok,R.length)})`:'<span class="muted">pas de microplan</span>',num(mf.filter(f=>f.statut==='validee').length),num(somme(mf,f=>f.nb_retours)),r?tag(RT_ST[r.statut]):tag(['non reçu','bad']),d?(inactif?`<b class="txt-bad">${fmtD(d)}</b>`:fmtD(d)):'<span class="muted">jamais</span>']});
  return `<section class="card"><h3>${niv==='projet'?'Agents du projet':'Mes agents'} · ${moisLib(TR.mois).toLowerCase()}</h3><p class="muted">Réalisation du microplan, fiches validées, retours pour correction et dernière activité. Une dernière activité de plus de 14 jours est signalée en rouge : appelez l'agent.</p>
- ${svT(['Agent','#Fiches','#Personnes','Microplan réalisé','#Validées','#Retours','Rapport du mois','Dernière activité'],rows,'Aucun agent affecté au projet. Affectez les agents dans « Personnel des projets ».')}</section>`}
+ ${svT(['Agent','Dernière supervision','#Fiches','#Personnes','Microplan réalisé','#Validées','#Retours','Rapport du mois','Dernière activité'],rows,'Aucun agent affecté au projet. Affectez les agents dans « Personnel des projets ».')}</section>`}
 
 /* ---------- tableau de bord du projet ---------- */
 function trTableau(p,niv){const FV=trFiches(p).filter(f=>f.statut==='validee'),Fm=FV.filter(f=>moisDe(f.date_activite)===TR.mois),Fall=trFiches(p).filter(f=>moisDe(f.date_activite)===TR.mois);
@@ -5851,6 +5944,7 @@ function trOutilsVue(p,niv){const O=trOutils(p),gere=niv==='projet',inst=new Set
   (o.liens||[]).filter(l=>l.indicateur_id).map(l=>esc(((S.inds||[]).find(i=>i.id===l.indicateur_id)||{}).libelle||'')).join('<br>')||'<span class="muted">aucun</span>',o.actif?tag(['en service','ok']):tag(['retiré','']),
   `<div class="row"><button class="btn ghost sm" data-act="terImpVierge" data-id="${o.id}">Fiche vierge</button>${gere?`<button class="btn ghost sm" data-act="terOutilEd" data-id="${o.id}">Modifier</button><button class="btn ghost sm" data-act="terOutilActif" data-id="${o.id}">${o.actif?'Retirer':'Remettre en service'}</button>`:o.actif?`<button class="btn sm" data-act="terRemplir" data-id="${o.id}">Remplir</button>`:''}</div>`]),'Aucun outil installé.')}
  ${gere?`<p><button class="btn ghost sm" data-act="terOutilEd" data-id="new">Créer un outil</button></p>`:''}</section>
+ ${gere&&PACK_CHANTIER.some(k=>!inst.has(k))?`<section class="card iaRac"><h3>Dispositif « chantier » (aéroport, route, ouvrage)</h3><p class="muted">Les 15 outils du dispositif de collecte des projets de chantier : profil de la localité, consultation communautaire, enquête de base et finale, comptage des casques, séances, distribution, plaintes, incidents, et pour l'encadrement la grille de supervision notée et le contrôle qualité des enquêtes. Version 1, à améliorer avec les retours du terrain.</p><p><button class="btn" data-act="terInstaller" data-v="pack:chantier">Installer le dispositif chantier (${PACK_CHANTIER.filter(k=>!inst.has(k)).length} outils)</button></p></section>`:''}
  ${gere?`<section class="card"><h3>Bibliothèque OSV</h3><p class="muted">Outils conçus d'après les pratiques des programmes communautaires (santé, DSSR et VBG, sécurité routière et au travail, environnement, eau et assainissement, gestion des plaintes). Installez ceux dont le projet a besoin.</p>
  <div class="trBib">${MOD_OUTILS.map(m=>`<article class="trB"><h4>${esc(m.titre)}</h4><p class="muted">${esc(m.desc)}</p><p class="trBt"><span class="tag">${esc(OUT_TYPES[m.type])}</span> <span class="tag">${m.presence==='nominative'?'liste nominative':m.presence==='anonyme'?'décompte anonyme':'sans liste'}</span></p>
  <div class="row">${inst.has(m.code)?'<span class="tag ok">installé</span>':`<button class="btn sm" data-act="terInstaller" data-v="${m.code}">Installer</button>`}<button class="btn ghost sm" data-act="terImpModele" data-v="${m.code}">Aperçu</button></div></article>`).join('')}</div>
@@ -6011,7 +6105,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.targ
    trCsv(`Fiches_${p.code||'projet'}_${TR.mois}`,[['Date','Agent','Outil','Localité','Sous-préfecture','Lieu','Total','Femmes','Hommes','Handicap','Statut','Latitude','Longitude',...ch.map(([,c])=>c.label)],
     ...F.map(f=>[f.date_activite,who(f.agent_id),(trOutil(f.outil_id)||{}).titre,f.localite,f.sous_prefecture,f.lieu,f.nb_total,f.nb_f,f.nb_h,f.nb_handicap,FT_ST[f.statut][0],f.lat,f.lng,...ch.map(([k,c])=>{if(!k.startsWith(f.outil_id))return '';const v=(f.donnees||{})[c.id];return Array.isArray(v)?v.join(', '):v??''})])])}
   else trCsv(`Participants_${p.code||'projet'}_${TR.mois}`,[['Date','Localité','Outil','Agent','Nom','Sexe','Âge','Tranche','Téléphone','Handicap','Vulnérabilité','Émargement'],...F.filter(f=>!f.confidentiel).flatMap(f=>(f.participants||[]).map(q=>[f.date_activite,f.localite,(trOutil(f.outil_id)||{}).titre,who(f.agent_id),q.nom,q.sexe,q.age??'',trBande(q.age),q.tel,q.handicap?'oui':'non',q.vuln,q.signe===false?'non':'oui']))]);return}
- if(a==='terInstaller'){const L=b.dataset.v==='*'?MOD_OUTILS.filter(m=>!trOutils(p).some(o=>o.modele===m.code)):[MOD_OUTILS.find(m=>m.code===b.dataset.v)];
+ if(a==='terInstaller'){const L=b.dataset.v==='*'?MOD_OUTILS.filter(m=>!trOutils(p).some(o=>o.modele===m.code)):b.dataset.v==='pack:chantier'?PACK_CHANTIER.map(k=>MOD_OUTILS.find(m=>m.code===k)).filter(m=>m&&!trOutils(p).some(o=>o.modele===m.code)):[MOD_OUTILS.find(m=>m.code===b.dataset.v)];if(!L.length)return;
   action(()=>ins('outils_collecte',L.map(m=>({org_id:S.org.id,projet_id:p.id,modele:m.code,titre:m.titre,type:m.type,theme:m.theme,presence:m.presence,consignes:m.consignes,champs:m.champs}))),`${L.length} outil(s) installé(s). Adaptez-les si besoin, puis reliez-les aux indicateurs du projet.`);return}
  if(a==='terOutilEd'){TR.outil=id;render();scrollTo(0,0);return}
  if(a==='terOutilActif'){const o=trOutil(id);action(()=>upd('outils_collecte',`id=eq.${id}`,{actif:!o.actif}),o.actif?'Outil retiré : il n\'est plus proposé aux agents.':'Outil remis en service.');return}
@@ -6086,7 +6180,7 @@ async function dictStart(btn){const cible=document.getElementById(btn.dataset.ci
 
 document.addEventListener('visibilitychange',()=>{if(dict&&document.visibilityState==='visible'&&navigator.wakeLock){navigator.wakeLock.request('screen').then(w=>{if(dict)dict.wake=w}).catch(()=>{})}});
 /* ---------- l'agent raconte, l'assistant remplit la fiche ---------- */
-function iaRacontCarte(p){if(!iaOK())return '';const O=trOutils(p).filter(o=>o.actif&&o.type!=='plainte');if(!O.length)return '';
+function iaRacontCarte(p){if(!iaOK())return '';const O=trOutils(p).filter(o=>o.actif&&o.type!=='plainte'&&!trEstSupO(o));if(!O.length)return '';
  return `<section class="card iaRac"><h3>${ico('mic')} Raconter mon activité</h3><p class="muted">Parlez comme à votre superviseur : où et quand, ce que vous avez fait, combien de femmes et d'hommes, ce que les gens ont demandé. <b>Ne dites pas les noms des personnes.</b> L'application remplit la fiche ; vous vérifiez, vous recopiez la liste signée, puis vous envoyez.</p>
  <div class="grid" style="align-items:end"><div><label for="racOutil">Quelle activité ?</label><select id="racOutil">${opts(O.map(o=>[o.id,o.titre]),'')}</select></div></div>
  <label for="racTxt" style="margin-top:.6rem">Mon récit</label><textarea id="racTxt" rows="5" placeholder="Ex. : Ce matin à Nafana, sur la place du marché, j'ai fait une causerie sur le VIH et la sécurité routière. Il y avait 12 femmes et 8 hommes. J'ai donné 30 préservatifs. Une femme a demandé si le préservatif rend stérile.">${esc(trLS.get('Recit',''))}</textarea>
@@ -6143,7 +6237,7 @@ function omFormSimple(t){if(!p07)return '';const caches={type_mission:t.type_mis
   <div class="trL"><button class="btn" type="submit">Envoyer pour signature</button></div></form>`}
 const mpLigne=(l={},p)=>`<div class="mpL"><input type="date" data-m="date" value="${l.date||''}" min="${moisD(TR.mois)}" max="${finMois(TR.mois)}" aria-label="Date"><input data-m="localite" list="trMpLoc" value="${esc(l.localite||'')}" placeholder="Localité" aria-label="Localité"><input data-m="activite" list="trMpAct" value="${esc(l.activite||'')}" placeholder="Activité" aria-label="Activité"><input data-m="cible" type="number" min="0" inputmode="numeric" value="${l.cible??''}" placeholder="Personnes" aria-label="Personnes visées"><button type="button" class="btn ghost sm" data-act="iaMpDel" aria-label="Retirer">×</button></div>`;
 function mpSync(f){f.elements.lignes.value=[...f.querySelectorAll('.mpL')].map(r=>{const q=k=>r.querySelector(`[data-m="${k}"]`).value.trim();return q('date')?[q('date').split('-').reverse().join('/'),q('localite'),q('activite'),q('cible')||0].join(' ; '):''}).filter(Boolean).join('\n')}
-function mpEditeur(p,mp){const L=mp?(mp.lignes||[]):[{},{},{}],locs=[...new Set(trFiches(p).map(x=>x.localite).concat(L.map(l=>l.localite)).filter(Boolean))],acts=trOutils(p).filter(o=>o.actif).map(o=>o.titre);
+function mpEditeur(p,mp){const L=mp?(mp.lignes||[]):[{},{},{}],locs=[...new Set(trFiches(p).map(x=>x.localite).concat(L.map(l=>l.localite)).filter(Boolean))],acts=trOutils(p).filter(o=>o.actif&&!trEstSupO(o)).map(o=>o.titre);
  return `<form data-form="terMp" data-id="${mp?mp.id:''}" class="mpF" style="margin-top:.8rem"><p><b>Mes activités prévues</b> <span class="muted">(une ligne par activité)</span></p>
   ${iaOK()?`<div class="iaRac" style="margin-bottom:.8rem"><label for="mpRecit">Ou dites votre plan du mois, l'application remplit les lignes :</label><textarea id="mpRecit" rows="3" placeholder="Ex. : Le 5 novembre causerie à Nafana pour 25 personnes, le 12 porte-à-porte à Kong pour 40 personnes…"></textarea><div class="row iaRow">${dictBtn('mpRecit','Parler')}<button type="button" class="btn sm iaB" data-act="iaMicroplan">${ico('etoile')} Remplir automatiquement</button></div></div>`:''}
   <div class="mpEnt" aria-hidden="true"><span>Date</span><span>Localité</span><span>Activité</span><span>Personnes</span><span></span></div><div class="mpLs">${L.map(l=>mpLigne(l,p)).join('')}</div>
@@ -6552,7 +6646,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.targ
  if(a==='iaMpAdd'){const f=b.closest('form');f.querySelector('.mpLs').insertAdjacentHTML('beforeend',mpLigne({},trP()));return}
  if(a==='iaMpDel'){const f=b.closest('form');b.closest('.mpL').remove();mpSync(f);return}
  if(a==='iaMicroplan'){const f=b.closest('form'),recit=document.getElementById('mpRecit').value.trim(),p=trP();if(recit.length<15){alert('Dites d\'abord votre plan du mois.');return}
-  iaAvec(b,async()=>{const r=await iaAppel('microplan',{recit,mois:TR.mois,aujourd_hui:today(),activites_possibles:trOutils(p).filter(o=>o.actif).map(o=>o.titre),localites_connues:[...new Set(trFiches(p).map(x=>x.localite))].slice(0,40)});
+  iaAvec(b,async()=>{const r=await iaAppel('microplan',{recit,mois:TR.mois,aujourd_hui:today(),activites_possibles:trOutils(p).filter(o=>o.actif&&!trEstSupO(o)).map(o=>o.titre),localites_connues:[...new Set(trFiches(p).map(x=>x.localite))].slice(0,40)});
    const L=L2(r.lignes).filter(l=>/^\d{4}-\d{2}-\d{2}$/.test(l.date||'')&&moisDe(l.date)===TR.mois);if(!L.length){alert('Aucune activité datée n\'a été trouvée dans le mois : précisez les dates.');return}
    f.querySelector('.mpLs').innerHTML=L.map(l=>mpLigne(l,p)).join('');mpSync(f);if(L2(r.a_verifier).length)alert('À vérifier :\n· '+L2(r.a_verifier).join('\n· '))});return}
  if(a==='iaRapport'){const f=b.closest('form'),niv=f.dataset.niv,p=trP(),F=trFiches(p).filter(x=>moisDe(x.date_activite)===TR.mois),R=trRefs(p).filter(x=>moisDe(x.date_reference)===TR.mois);
