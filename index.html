@@ -1748,7 +1748,7 @@ async function srvLoad(){
  p03=T[0]!==null;[N.plans,N.axes,N.objectifs,N.programmes,N.jalons,N.cadre,N.inds,N.mesures,N.risques,N.docs,N.histo]=T.map(x=>x||[]);
  const T5=await Promise.all([sel('budget_lignes',f),sel('depenses',f),sel('financements',f),sel('seuils_approbation',f)].map(opt));p05=T5[0]!==null;[N.blignes,N.depenses,N.financements,N.seuils]=T5.map(x=>x||[]);
  const T6=await Promise.all(['comptes_tresorerie','mouvements','rapprochements','avances','fournisseurs','seuils_achat','achats','devis','baremes_mission','missions','biens','inventaires','plan_comptable','correspondances'].map(t=>sel(t,f)).concat([sel('inventaire_lignes')]).map(opt));p06=T6[3]!==null;
- const T7=await opt(sel('mission_membres',f+'&order=ordre'));p07=T7!==null;N.mmembres=T7||[];
+ const T7=await opt(sel('mission_membres',f+'&order=ordre'));p07=T7!==null;N.mmembres=T7||[];p11=p07&&(await opt(sel('missions','select=revision&limit=1')))!==null;N.mrev=p11?(await opt(sel('missions_revisions',f+'&order=le')))||[]:[];
  const T8=await Promise.all([sel('tdrs',f+'&order=cree_le.desc'),sel('tdr_avis',f+'&order=le'),sel('acces_budget',f)].map(opt));p08=T8[0]!==null;N.tdrs=T8[0]||[];N.tavis=T8[1]||[];N.accBud=T8[2]||[];
  const T10=await opt(sel('contrats',f+'&order=redige_le.desc'));p10=T10!==null;N.contrats=T10||[];p10f=p10&&(await opt(sel('contrats','select=fiche&limit=1')))!==null;
  [N.comptes,N.mouvements,N.rapprochements,N.avances,N.fournisseurs,N.seuilsAchat,N.achats,N.devis,N.baremes,N.missions,N.biens,N.inventaires,N.pcomptes,N.correspondances,N.invLignes]=T6.map(x=>x||[]);
@@ -4433,7 +4433,7 @@ return toUTF8Array(s);
 return qrcode})();
 
 /* ===== Ordres de mission authentifiés (script 07) ===== */
-let p07=false,omVerif=null;
+let p07=false,p11=false,omVerif=null,omEdit=null,omEditV=null;
 const OM_TYPES=['Activité de terrain','Supervision','Formation ou atelier','Collecte de données','Réunion ou plaidoyer','Mission avec le bailleur','Mission administrative'];
 const OM_TRANSP=['Véhicule OSV','Véhicule de location','Véhicule du partenaire','Transport en commun','Moto de service','Avion'];
 const OM_HEB=['Couvert par le per diem','Réservé et payé par OSV','Pris en charge par la structure d\'accueil','Sans nuitée'];
@@ -4444,59 +4444,82 @@ const omMissionnaires=m=>[m.agent_id,...omMembres(m).map(x=>x.user_id).filter(Bo
 const omDEPart=ids=>ids.some(id=>(S.staff.find(u=>u.id===id)||{}).role==='DE');
 const omPeutSigner=m=>m.statut==='demandee'&&(omDEPart(omMissionnaires(m))?me.role==='CA':['DE','DP'].includes(me.role))&&!omMissionnaires(m).includes(me.id);
 const omPeutAnnuler=m=>m.statut==='approuvee'&&(['DE','DP'].includes(me.role)||(me.role==='CA'&&m.signe_role==='CA'));
+const omPeutModifier=m=>p07&&m.statut==='demandee'&&(m.demande_par===me.id||m.agent_id===me.id||['DE','DP','RA','CPT'].includes(me.role)||auDessusC(m.agent_id));
+const omPeutReviser=m=>p11&&m.statut==='approuvee'&&(['DE','DP'].includes(me.role)||(me.role==='CA'&&m.signe_role==='CA')||m.agent_id===me.id||m.demande_par===me.id);
+const omRev=m=>Number(m.revision)>0?` · révision ${m.revision}`:'';
 const miTotal=m=>Math.round(Number(m.per_diem_jour)*Number(m.nb_jours))+Number(m.frais_transport)+Number(m.autres_frais)+somme(omMembres(m),x=>Math.round(Number(x.per_diem_jour)*Number(x.nb_jours)));
 const omLien=c=>{const u=new URL(location.origin+location.pathname);['mode','srv'].forEach(k=>{const v=QS.get(k);if(v)u.searchParams.set(k,v)});u.searchParams.set('om',c);return u.toString()};
 const omDate=t=>{t=String(t||'').trim();let m=t.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;return /^\d{4}-\d{2}-\d{2}$/.test(t)?t:null};
 
 function miLigne(m){const n=omMembres(m).length;
  return [`${m.numero?`<b>${esc(m.numero)}</b><br>`:''}${esc(who(m.agent_id))}${n?`<br><span class="muted">+ ${n} missionnaire(s)</span>`:''}`,`${esc(m.objet)}<br><span class="muted">${esc(m.destination)}${m.projet_id?' · '+esc(libProj(projet(m.projet_id))):''}</span>`,`${fmtD(m.date_depart)} → ${fmtD(m.date_retour)}`,`${num(m.nb_jours)} j × ${num(m.per_diem_jour)}${n?` <span class="muted">(par personne)</span>`:''}<br><span class="muted">transport ${num(m.frais_transport)}${Number(m.autres_frais)?' · autres '+num(m.autres_frais):''}</span>`,num(m.montant_liquide??miTotal(m)),
-  tag(MI_ST[m.statut])+(m.statut==='approuvee'&&m.signe_role?`<br><span class="muted">signé par ${esc(who(m.approuve_par))}${m.signe_role==='DP'?' (P/O)':''}</span>`:'')+(m.rapport_doc_id?`<br>${docLien(m.rapport_doc_id)}`:'')+(m.motif?`<br><span class="muted">${esc(m.motif)}</span>`:''),
-  `<div class="row">${miAppr(m)?`<button class="btn sm" data-act="miSt" data-v="approuvee" data-id="${m.id}">Signer</button><button class="btn ghost sm" data-act="miRej" data-id="${m.id}">Rejeter</button>`:''}${miLiq(m)?`<button class="btn sm" data-act="miSt" data-v="liquidee" data-id="${m.id}">Liquider</button>`:''}<button class="btn ghost sm" data-act="miOM" data-id="${m.id}">${m.numero?'Ordre de mission':'Aperçu de l\'ordre'}</button>${omPeutAnnuler(m)?`<button class="btn ghost sm" data-act="miAnn" data-id="${m.id}">Annuler l'ordre</button>`:''}</div>`]}
+  (m.statut==='demandee'&&m.numero?tag(['En révision, à signer','warn'])+`<br><span class="muted">révision ${m.revision} : ${esc(m.revision_motif||'')}</span>`:tag(MI_ST[m.statut])+(Number(m.revision)>0&&m.statut!=='demandee'?`<br><span class="muted">révision ${m.revision}</span>`:''))+(m.statut==='approuvee'&&m.signe_role?`<br><span class="muted">signé par ${esc(who(m.approuve_par))}${m.signe_role==='DP'?' (P/O)':''}</span>`:'')+(m.rapport_doc_id?`<br>${docLien(m.rapport_doc_id)}`:'')+(m.motif?`<br><span class="muted">${esc(m.motif)}</span>`:''),
+  `<div class="row">${miAppr(m)?`<button class="btn sm" data-act="miSt" data-v="approuvee" data-id="${m.id}">Signer</button><button class="btn ghost sm" data-act="miRej" data-id="${m.id}">Rejeter</button>`:''}${miLiq(m)?`<button class="btn sm" data-act="miSt" data-v="liquidee" data-id="${m.id}">Liquider</button>`:''}<button class="btn ghost sm" data-act="miOM" data-id="${m.id}">${m.numero&&m.statut!=='demandee'?'Ordre de mission':'Aperçu de l\'ordre'}</button>${omPeutModifier(m)?`<button class="btn ghost sm" data-act="miModif" data-id="${m.id}">Modifier</button>`:''}${omPeutReviser(m)?`<button class="btn ghost sm" data-act="miRev" data-id="${m.id}" title="Rouvrir l'ordre signé pour le corriger, puis le renvoyer à la signature">Réviser</button>`:''}${omPeutAnnuler(m)?`<button class="btn ghost sm" data-act="miAnn" data-id="${m.id}">Annuler l'ordre</button>`:''}</div>`]}
 
 /* ---------- formulaire : établir un ordre de mission ---------- */
-function omForm(t){if(!p07)return '';t=t||{};const tous=gAdm()||['DP','CP'].includes(me.role);
- const ag=S.staff.filter(u=>accesOK(u)&&u.role!=='EXT'&&(tous||u.id===me.id||auDessusC(u.id))).sort((a,b)=>a.nom.localeCompare(b.nom));
+function omForm(t,m){if(!p07)return '';t=t||{};const tous=gAdm()||['DP','CP'].includes(me.role);
+ const ag=S.staff.filter(u=>accesOK(u)&&u.role!=='EXT'&&(tous||u.id===me.id||auDessusC(u.id)||(m&&u.id===m.agent_id))).sort((a,b)=>a.nom.localeCompare(b.nom));
  const autres=S.staff.filter(u=>accesOK(u)&&u.role!=='EXT').sort((a,b)=>a.nom.localeCompare(b.nom));
- const acts=S.cadre.filter(c=>c.niveau==='act'),proj=S.projets.filter(p=>!['cloture','archive','rejete'].includes(p.statut));
+ const acts=S.cadre.filter(c=>c.niveau==='act'),proj=S.projets.filter(p=>!['cloture','archive','rejete'].includes(p.statut)||(m&&p.id===m.projet_id));
  const h=t=>`<h4 style="grid-column:1/-1;margin:.8rem 0 0;border-bottom:1px solid var(--line,#ddd);padding-bottom:.2rem">${t}</h4>`;
- return `<details style="margin-top:.6rem" ${t.id?'open':''}><summary><b>Établir un ordre de mission</b></summary>
- <p class="muted" style="margin-top:.5rem">Le responsable hiérarchique prépare l'ordre ; il est signé par le Directeur exécutif ou, à défaut, par le Directeur des programmes. Quand le Directeur exécutif part lui-même en mission, l'ordre est signé par le Président du Conseil d'administration. À la signature, l'ordre reçoit un numéro officiel et un QR code qui permet à toute autorité de vérifier son authenticité.</p>
- <form data-form="mdMission" class="grid" style="align-items:end">${t.id?`<input type="hidden" name="tdr_id" value="${t.id}"><p class="note" style="grid-column:1/-1">Prérempli depuis le TDR ${esc(t.numero||'')} « ${esc(t.titre)} ».</p>`:''}
+ const jj=d=>d?d.split('-').reverse().join('/'):'';const mb=m?omMembres(m):[],coches=new Set(mb.map(x=>x.user_id).filter(Boolean));
+ /* valeurs : ordre existant (modification), sinon TDR validé (préremplissage) */
+ const V=m?{type:m.type_mission,objet:m.objet,projet:m.projet_id,activite:m.activite_id,ligne:m.ligne_id,agent:m.agent_id,dest:m.destination,d1:m.date_depart,d2:m.date_retour,
+   ext:mb.filter(x=>!x.user_id).map(x=>[x.nom,x.fonction||'',x.structure||''].join(' ; ')).join('\n'),
+   it:(m.itineraire||[]).map(e=>[jj(e.date),e.heure,e.de,e.a,e.moyen].join(' ; ')).join('\n'),acc:(m.accueil||[]).map(a=>[a.structure,a.localite,a.contact].join(' ; ')).join('\n'),
+   transport:m.transport,vehicule:m.vehicule||'',chauffeur:m.chauffeur||'',heb:m.hebergement,tdr:m.tdr||'',res:m.resultats||'',pd:m.per_diem_jour,ft:m.frais_transport,af:m.autres_frais,urg:m.urgence||'',secu:m.securite??OM_SECU}
+  :{type:t.type_mission,objet:t.titre||'',projet:t.projet_id||'',activite:t.activite_id||'',ligne:t.ligne_id||'',agent:t.auteur_id||me.id,dest:t.destination||'',d1:t.date_debut||'',d2:t.date_fin||'',ext:'',it:'',acc:'',
+   transport:OM_TRANSP[0],vehicule:'',chauffeur:'',heb:OM_HEB[0],tdr:[t.objectif_general,t.objectifs_specifiques].filter(Boolean).join('\n'),res:[t.resultats,t.livrables].filter(Boolean).join('\n'),pd:'',ft:0,af:0,urg:'',secu:OM_SECU};
+ const plus=(L,v)=>v&&!L.includes(v)?[...L,v]:L;
+ const form=`<form data-form="mdMission" class="grid" style="align-items:end"${m?` data-mid="${m.id}"`:''}>${m?`<input type="hidden" name="mid" value="${m.id}">`:t.id?`<input type="hidden" name="tdr_id" value="${t.id}"><p class="note" style="grid-column:1/-1">Prérempli depuis le TDR ${esc(t.numero||'')} « ${esc(t.titre)} ».</p>`:''}
  ${h('1. Objet et cadre')}
- <div><label>Type de mission</label><select name="type_mission">${opts(OM_TYPES.map(x=>[x,x]),t.type_mission||OM_TYPES[0])}</select></div>
- <div style="grid-column:span 2"><label>Objet de la mission</label><input name="objet" required value="${esc(t.titre||'')}" placeholder="ex. Sensibilisation des riverains du chantier"></div>
- <div><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),t.projet_id||'','— hors projet —')}</select></div>
- <div style="grid-column:span 2"><label>Activité du cadre logique</label><select name="activite">${opts(acts.map(a=>[a.id,`${(projet(a.projet_id)||{}).code||''} · ${a.code?a.code+' ':''}${a.libelle}`.slice(0,140)]),t.activite_id||'','— aucune —')}</select></div>
- <div style="grid-column:span 2"><label>Ligne budgétaire imputée</label><select name="ligne">${opts(S.blignes.filter(l=>proj.some(p=>p.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''} · ${l.code?l.code+' ':''}${l.libelle}`.slice(0,140)]),t.ligne_id||'','— à préciser par la comptabilité —')}</select></div>
+ <div><label>Type de mission</label><select name="type_mission">${opts(plus(OM_TYPES,V.type).map(x=>[x,x]),V.type||OM_TYPES[0])}</select></div>
+ <div style="grid-column:span 2"><label>Objet de la mission</label><input name="objet" required value="${esc(V.objet)}" placeholder="ex. Sensibilisation des riverains du chantier"></div>
+ <div><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),V.projet||'','— hors projet —')}</select></div>
+ <div style="grid-column:span 2"><label>Activité du cadre logique</label><select name="activite">${opts(acts.map(a=>[a.id,`${(projet(a.projet_id)||{}).code||''} · ${a.code?a.code+' ':''}${a.libelle}`.slice(0,140)]),V.activite||'','— aucune —')}</select></div>
+ <div style="grid-column:span 2"><label>Ligne budgétaire imputée</label><select name="ligne">${opts(S.blignes.filter(l=>proj.some(p=>p.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''} · ${l.code?l.code+' ':''}${l.libelle}`.slice(0,140)]),V.ligne||'','— à préciser par la comptabilité —')}</select></div>
  ${h('2. Missionnaires')}
- <div><label>Chef de mission</label><select name="agent" required>${opts(ag.map(u=>[u.id,`${u.nom} (${posteLib(u)})`]),t.auteur_id||me.id)}</select></div>
- <div style="grid-column:span 2"><label>Autres membres d'OSV</label><div class="domChk" style="max-height:9rem;overflow:auto;border:1px solid var(--line,#ccc);padding:.3rem .5rem;border-radius:6px">${autres.map(u=>`<label style="display:block;font-weight:normal"><input type="checkbox" name="membres" value="${u.id}"> ${esc(u.nom)} <span class="muted">· ${esc(posteLib(u))}</span></label>`).join('')}</div></div>
- <div style="grid-column:1/-1"><label>Personnes sans compte (consultant, enquêteur, chauffeur, partenaire) : une par ligne, « nom ; fonction ; structure »</label><textarea name="externes" rows="2" placeholder="KOUASSI Aya ; Enquêtrice ; OSV"></textarea></div>
+ <div><label>Chef de mission</label><select name="agent" required>${opts(ag.map(u=>[u.id,`${u.nom} (${posteLib(u)})`]),V.agent)}</select></div>
+ <div style="grid-column:span 2"><label>Autres membres d'OSV</label><div class="domChk" style="max-height:9rem;overflow:auto;border:1px solid var(--line,#ccc);padding:.3rem .5rem;border-radius:6px">${autres.map(u=>`<label style="display:block;font-weight:normal"><input type="checkbox" name="membres" value="${u.id}"${coches.has(u.id)?' checked':''}> ${esc(u.nom)} <span class="muted">· ${esc(posteLib(u))}</span></label>`).join('')}</div></div>
+ <div style="grid-column:1/-1"><label>Personnes sans compte (consultant, enquêteur, chauffeur, partenaire) : une par ligne, « nom ; fonction ; structure »</label><textarea name="externes" rows="2" placeholder="KOUASSI Aya ; Enquêtrice ; OSV">${esc(V.ext)}</textarea></div>
  ${h('3. Itinéraire et calendrier')}
- <div><label>Destination principale</label><input name="destination" required value="${esc(t.destination||'')}" placeholder="ex. Kong"></div>
- <div><label>Départ</label><input name="date_depart" type="date" required value="${t.date_debut||''}"></div>
- <div><label>Retour</label><input name="date_retour" type="date" required value="${t.date_fin||''}"></div>
- <div style="grid-column:1/-1"><label>Étapes : une par ligne, « date ; heure ; de ; à ; moyen »</label><textarea name="itineraire" rows="3" placeholder="03/11/2026 ; 06:00 ; Yamoussoukro ; Kong ; Véhicule OSV&#10;06/11/2026 ; 14:00 ; Kong ; Yamoussoukro ; Véhicule OSV"></textarea></div>
- <div style="grid-column:1/-1"><label>Structures d'accueil et personnes à rencontrer : une par ligne, « structure ; localité ; contact »</label><textarea name="accueil" rows="3" placeholder="Préfecture de Kong ; Kong ; Secrétaire général&#10;Base vie EBOMAF ; Kong ; Responsable HSE"></textarea></div>
+ <div><label>Destination principale</label><input name="destination" required value="${esc(V.dest)}" placeholder="ex. Kong"></div>
+ <div><label>Départ</label><input name="date_depart" type="date" required value="${V.d1||''}"></div>
+ <div><label>Retour</label><input name="date_retour" type="date" required value="${V.d2||''}"></div>
+ <div style="grid-column:1/-1"><label>Étapes : une par ligne, « date ; heure ; de ; à ; moyen »</label><textarea name="itineraire" rows="3" placeholder="03/11/2026 ; 06:00 ; Yamoussoukro ; Kong ; Véhicule OSV&#10;06/11/2026 ; 14:00 ; Kong ; Yamoussoukro ; Véhicule OSV">${esc(V.it)}</textarea></div>
+ <div style="grid-column:1/-1"><label>Structures d'accueil et personnes à rencontrer : une par ligne, « structure ; localité ; contact »</label><textarea name="accueil" rows="3" placeholder="Préfecture de Kong ; Kong ; Secrétaire général&#10;Base vie EBOMAF ; Kong ; Responsable HSE">${esc(V.acc)}</textarea></div>
  ${h('4. Moyens logistiques')}
- <div><label>Moyen de transport</label><select name="transport">${opts(OM_TRANSP.map(x=>[x,x]),OM_TRANSP[0])}</select></div>
- <div><label>Véhicule (immatriculation)</label><input name="vehicule" placeholder="ex. 1234 AB 01"></div>
- <div><label>Chauffeur</label><input name="chauffeur"></div>
- <div><label>Hébergement</label><select name="hebergement">${opts(OM_HEB.map(x=>[x,x]),OM_HEB[0])}</select></div>
+ <div><label>Moyen de transport</label><select name="transport">${opts(plus(OM_TRANSP,V.transport).map(x=>[x,x]),V.transport||OM_TRANSP[0])}</select></div>
+ <div><label>Véhicule (immatriculation)</label><input name="vehicule" value="${esc(V.vehicule)}" placeholder="ex. 1234 AB 01"></div>
+ <div><label>Chauffeur</label><input name="chauffeur" value="${esc(V.chauffeur)}"></div>
+ <div><label>Hébergement</label><select name="hebergement">${opts(plus(OM_HEB,V.heb).map(x=>[x,x]),V.heb||OM_HEB[0])}</select></div>
  ${h('5. Termes de référence')}
- <div style="grid-column:1/-1"><label>Objectifs et tâches</label><textarea name="tdr" rows="3" required>${esc([t.objectif_general,t.objectifs_specifiques].filter(Boolean).join('\n'))}</textarea></div>
- <div style="grid-column:1/-1"><label>Résultats et livrables attendus</label><textarea name="resultats" rows="2" placeholder="ex. rapport de mission, listes de présence, photos">${esc([t.resultats,t.livrables].filter(Boolean).join('\n'))}</textarea></div>
+ <div style="grid-column:1/-1"><label>Objectifs et tâches</label><textarea name="tdr" rows="3" required>${esc(V.tdr)}</textarea></div>
+ <div style="grid-column:1/-1"><label>Résultats et livrables attendus</label><textarea name="resultats" rows="2" placeholder="ex. rapport de mission, listes de présence, photos">${esc(V.res)}</textarea></div>
  ${h('6. Prise en charge financière')}
  <div><label>Barème du per diem</label><select name="bareme">${opts(S.baremes.map(b=>[`${b.categorie}|${b.zone}`,`${b.categorie} · ${b.zone} · ${num(b.per_diem)}/jour`]),'',S.baremes.length?'— choisir —':'aucun barème fixé')}</select></div>
- <div><label>Per diem par jour et par personne (sans barème)</label><input name="per_diem" type="number" min="0"></div>
- <div><label>Frais de transport (FCFA)</label><input name="frais_transport" type="number" min="0" value="0"></div>
- <div><label>Autres frais (FCFA)</label><input name="autres_frais" type="number" min="0" value="0"></div>
+ <div><label>Per diem par jour et par personne (sans barème)</label><input name="per_diem" type="number" min="0" value="${V.pd??''}"></div>
+ <div><label>Frais de transport (FCFA)</label><input name="frais_transport" type="number" min="0" value="${V.ft??0}"></div>
+ <div><label>Autres frais (FCFA)</label><input name="autres_frais" type="number" min="0" value="${V.af??0}"></div>
  ${h('7. Sécurité')}
- <div style="grid-column:span 2"><label>Contact d'urgence pendant la mission (nom et téléphone)</label><input name="urgence" required></div>
- <div style="grid-column:1/-1"><label>Consignes de sécurité</label><textarea name="securite" rows="3">${esc(OM_SECU)}</textarea></div>
- <div style="grid-column:1/-1"><button class="btn" type="submit">Envoyer pour signature</button></div></form></details>`}
+ <div style="grid-column:span 2"><label>Contact d'urgence pendant la mission (nom et téléphone)</label><input name="urgence" required value="${esc(V.urg)}"></div>
+ <div style="grid-column:1/-1"><label>Consignes de sécurité</label><textarea name="securite" rows="3">${esc(V.secu)}</textarea></div>
+ <div class="row" style="grid-column:1/-1"><button class="btn" type="submit">${m?'Enregistrer et renvoyer à la signature':'Envoyer pour signature'}</button>${m?'<button class="btn ghost" type="button" data-act="omEditFermer">Fermer sans enregistrer</button>':''}</div></form>`;
+ if(m)return form;
+ return `<details style="margin-top:.6rem" ${t.id?'open':''}><summary><b>Établir un ordre de mission</b></summary>
+ <p class="muted" style="margin-top:.5rem">Le responsable hiérarchique prépare l'ordre ; il est signé par le Directeur exécutif ou, à défaut, par le Directeur des programmes. Quand le Directeur exécutif part lui-même en mission, l'ordre est signé par le Président du Conseil d'administration. À la signature, l'ordre reçoit un numéro officiel et un QR code qui permet à toute autorité de vérifier son authenticité.</p>${form}</details>`}
 
-async function omEtablir(f,d){const o=S.org.id;if(p08&&!d.tdr_id){alert('Un ordre de mission s\'établit à partir d\'un TDR validé : ouvrez « TDR et ordres de mission ».');return}
+/* ---------- page de modification d'un ordre « à signer » (nouveau ou en révision) ---------- */
+function omEditVue(){const m=S.missions.find(x=>x.id===omEdit);if(!m||!omPeutModifier(m)){omEdit=null;return viewHTML()}
+ const rv=(S.mrev||[]).filter(r=>r.mission_id===m.id).sort((a,b)=>a.revision-b.revision);
+ return `<p><button class="lnk" data-act="omEditFermer">← Retour</button></p>${srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:''}
+ <div class="head"><h1>Modifier l'ordre de mission${m.numero?' '+esc(m.numero):''}</h1><p>${esc(m.objet)} · ${esc(m.destination)} · du ${fmtD(m.date_depart)} au ${fmtD(m.date_retour)}</p></div>
+ ${m.numero?`<p class="note">Révision ${m.revision} en cours, ouverte par ${esc(who(m.revision_par))} le ${fmtD(m.revision_le)}. Motif : ${esc(m.revision_motif||'')}.<br>L'ordre garde son numéro ${esc(m.numero)}. À la nouvelle signature, il recevra un nouveau QR code ; l'ancien exemplaire imprimé n'est plus valable et la vérification l'indique comme « remplacé ».</p>`:'<p class="note">Cet ordre n\'est pas encore signé : corrigez-le, puis renvoyez-le au signataire.</p>'}
+ <section class="card">${omForm(null,m)}</section>
+ ${rv.length?`<section class="card"><h3>Historique des révisions</h3>${svT(['Révision remplacée','Signée le','Révision demandée le','Par','Motif'],rv.map(r=>[r.revision===0?'Version initiale':'Révision '+r.revision,r.signe_le?fmtD(r.signe_le):'—',fmtD(r.le),esc(who(r.par)),esc(r.motif)]))}</section>`:''}`}
+
+
+async function omEtablir(f,d){const o=S.org.id;if(p08&&!d.tdr_id&&!d.mid){alert('Un ordre de mission s\'établit à partir d\'un TDR validé : ouvrez « TDR et ordres de mission ».');return}
  if(d.date_retour<d.date_depart){alert('La date de retour doit suivre la date de départ.');return}
  const ac=d.activite&&S.cadre.find(x=>x.id===d.activite),li=d.ligne&&S.blignes.find(x=>x.id===d.ligne);
  if((ac||li)&&!d.projet){alert('Choisissez le projet auquel se rattachent l\'activité et la ligne budgétaire.');return}
@@ -4508,37 +4531,48 @@ async function omEtablir(f,d){const o=S.org.id;if(p08&&!d.tdr_id){alert('Un ordr
  const ext=lignesTexte(d.externes).map(c=>({nom:c[0]||'',fonction:c[1]||'',structure:c[2]||''})).filter(x=>x.nom);
  const mb=[...f.querySelectorAll('[name=membres]:checked')].map(x=>x.value).filter(id=>id!==d.agent);
  const ids=[d.agent,...mb],nb=jours(d.date_depart,d.date_retour);
- const conflit=S.missions.filter(m=>['demandee','approuvee'].includes(m.statut)&&m.date_depart<=d.date_retour&&m.date_retour>=d.date_depart&&omMissionnaires(m).some(x=>ids.includes(x)));
+ const conflit=S.missions.filter(m=>m.id!==d.mid&&['demandee','approuvee'].includes(m.statut)&&m.date_depart<=d.date_retour&&m.date_retour>=d.date_depart&&omMissionnaires(m).some(x=>ids.includes(x)));
  if(conflit.length&&!confirm(`Attention : ${[...new Set(conflit.flatMap(m=>omMissionnaires(m).filter(x=>ids.includes(x))))].map(who).join(', ')} a (ont) déjà une mission sur ces dates (${conflit.map(m=>m.numero||m.objet).join(', ')}). Continuer quand même ?`))return;
- const b=d.bareme&&S.baremes.find(x=>`${x.categorie}|${x.zone}`===d.bareme),pd=b?Number(b.per_diem):(nbr(d.per_diem)||0),mid=uuid();
+ const b=d.bareme&&S.baremes.find(x=>`${x.categorie}|${x.zone}`===d.bareme),pd=b?Number(b.per_diem):(nbr(d.per_diem)||0),mid=d.mid||uuid(),ancien=d.mid&&S.missions.find(x=>x.id===d.mid);
  const deP=omDEPart(ids),sign=S.staff.filter(u=>accesOK(u)&&(deP?u.role==='CA':u.role==='DE')).map(u=>u.id);
  action(async()=>{
-  await ins('missions',{id:mid,org_id:o,agent_id:d.agent,...(d.tdr_id?{tdr_id:d.tdr_id}:{}),projet_id:d.projet||null,activite_id:d.activite||null,ligne_id:d.ligne||null,type_mission:d.type_mission,objet:String(d.objet).trim(),destination:String(d.destination).trim(),date_depart:d.date_depart,date_retour:d.date_retour,
+  const champs={agent_id:d.agent,projet_id:d.projet||null,activite_id:d.activite||null,ligne_id:d.ligne||null,type_mission:d.type_mission,objet:String(d.objet).trim(),destination:String(d.destination).trim(),date_depart:d.date_depart,date_retour:d.date_retour,
    transport:d.transport||null,vehicule:(d.vehicule||'').trim()||null,chauffeur:(d.chauffeur||'').trim()||null,hebergement:d.hebergement||null,tdr:(d.tdr||'').trim()||null,resultats:(d.resultats||'').trim()||null,itineraire:it,accueil:acc,urgence:(d.urgence||'').trim()||null,securite:(d.securite||'').trim()||null,
-   per_diem_jour:pd,nb_jours:nb,frais_transport:nbr(d.frais_transport)||0,autres_frais:nbr(d.autres_frais)||0});
+   per_diem_jour:pd,nb_jours:nb,frais_transport:nbr(d.frais_transport)||0,autres_frais:nbr(d.autres_frais)||0};
+  if(ancien){await upd('missions',`id=eq.${mid}`,champs);await del('mission_membres',`mission_id=eq.${mid}`)}
+  else await ins('missions',{id:mid,org_id:o,...(d.tdr_id?{tdr_id:d.tdr_id}:{}),...champs});
   const rows=[...mb.map((id,i)=>{const u=S.staff.find(x=>x.id===id);return {org_id:o,mission_id:mid,user_id:id,nom:u.nom,fonction:posteLib(u),structure:S.org.nom,role_mission:'Membre',per_diem_jour:pd,nb_jours:nb,ordre:i+1}}),
    ...ext.map((x,i)=>({org_id:o,mission_id:mid,user_id:null,nom:x.nom,fonction:x.fonction||null,structure:x.structure||null,role_mission:'Membre',per_diem_jour:pd,nb_jours:nb,ordre:mb.length+i+1}))];
   if(rows.length)await ins('mission_membres',rows);
-  await notifierSrv(sign.length?sign:S.staff.filter(u=>u.role==='DP'&&accesOK(u)).map(u=>u.id),`Ordre de mission à signer : ${d.objet} (${d.destination}, ${fmtD(d.date_depart)})`,'mesdem',mid);
-  await notifierSrv(ids,`Vous êtes désigné(e) pour la mission « ${d.objet} » (${d.destination}, du ${fmtD(d.date_depart)} au ${fmtD(d.date_retour)}) : ordre en attente de signature`,'mesdem',mid)},
- deP?'Ordre de mission envoyé au Président du Conseil d\'administration pour signature.':'Ordre de mission envoyé au Directeur exécutif pour signature.')}
+  const quoi=ancien&&ancien.numero?`Ordre de mission ${ancien.numero} corrigé (révision ${ancien.revision}), à signer à nouveau`:ancien?'Ordre de mission modifié, à signer':'Ordre de mission à signer';
+  await notifierSrv((sign.length?sign:S.staff.filter(u=>u.role==='DP'&&accesOK(u)).map(u=>u.id)).filter(x=>!ids.includes(x)),`${quoi} : ${d.objet} (${d.destination}, ${fmtD(d.date_depart)})`,'mesdem',mid);
+  await notifierSrv(ids.filter(x=>x!==me.id),ancien?`L'ordre de mission « ${d.objet} » a été modifié (${d.destination}, du ${fmtD(d.date_depart)} au ${fmtD(d.date_retour)}) : en attente de signature`:`Vous êtes désigné(e) pour la mission « ${d.objet} » (${d.destination}, du ${fmtD(d.date_depart)} au ${fmtD(d.date_retour)}) : ordre en attente de signature`,'mesdem',mid);omEdit=null},
+ (ancien?'Modifications enregistrées. ':'')+(deP?'Ordre de mission envoyé au Président du Conseil d\'administration pour signature.':'Ordre de mission envoyé au Directeur exécutif pour signature.'))}
 
 /* ---------- le document : ordre de mission imprimable ---------- */
 /* ---------- vérification publique (QR code) ---------- */
 function omVerifHTML(){const r=omVerif.res,ok=r&&['approuvee','rapport','liquidee'].includes(r.statut),fini=ok&&r.retour<today();
  const etat=!r?['bad','Document non authentique','Aucun ordre de mission ne correspond à ce code. Le document présenté n\'a pas été émis par OSV Gestion, ou le code a été mal saisi.']
+  :r.statut==='remplace'?['bad','Exemplaire remplacé : plus valable',`Ce document correspond à ${r.revision?'la révision '+r.revision:'la version initiale'} de l'ordre ${r.numero}, remplacée le ${fmtD(r.remplace_le)}. ${r.en_vigueur?`La version en vigueur est la révision ${r.revision_actuelle} : demandez à voir cet exemplaire.`:'La version corrigée n\'est pas encore signée.'}`]
   :r.statut==='annulee'?['bad','Ordre de mission annulé',`Cet ordre a été annulé le ${fmtD(r.annule_le)} : il n'est plus valable.`]
   :ok?['ok',fini?'Ordre de mission authentique · mission terminée':'Ordre de mission authentique et valide',fini?`La mission s'est achevée le ${fmtD(r.retour)}.`:`Valable du ${fmtD(r.depart)} au ${fmtD(r.retour)}.`]:['bad','Ordre de mission non valable',''];
  return `<div class="login"><div class="card" style="max-width:620px;margin:2rem auto"><div style="display:flex;gap:.8rem;align-items:center"><img src="${LOGO}" alt="Logo ONG Sécurité Vie" style="height:56px"><div><b>OSV Gestion</b><br><span class="muted">Vérification d'un ordre de mission</span></div></div>
  ${omVerif.err?`<p class="err" role="alert">${esc(omVerif.err)}</p>`:`<p class="tag ${etat[0]}" style="display:block;font-size:1.1rem;padding:.7rem;margin:1rem 0 .4rem" role="status">${etat[1]}</p><p>${etat[2]}</p>
- ${r?`<div class="facts"><div><span>Organisation</span><b>${esc(r.organisation)}</b></div><div><span>Numéro</span><b>${esc(r.numero)}</b></div><div><span>Type</span><b>${esc(r.type||'Mission')}</b></div><div><span>Destination</span><b>${esc(r.destination)}</b></div><div><span>Période</span><b>${fmtD(r.depart)} → ${fmtD(r.retour)}</b></div><div><span>Signé par</span><b>${esc(r.signe_par||'—')}${r.signe_role==='CA'?' (Président du CA)':r.signe_role==='DP'?' (P/O le Directeur exécutif)':r.signe_role==='DE'?' (Directeur exécutif)':''}, le ${fmtD(r.signe_le)}</b></div></div>
+ ${r&&r.statut==='remplace'?`<div class="facts"><div><span>Organisation</span><b>${esc(r.organisation)}</b></div><div><span>Numéro</span><b>${esc(r.numero)}</b></div></div>`:''}${r&&r.statut!=='remplace'?`<div class="facts"><div><span>Organisation</span><b>${esc(r.organisation)}</b></div><div><span>Numéro</span><b>${esc(r.numero)}${Number(r.revision)>0?' · révision '+r.revision:''}</b></div><div><span>Type</span><b>${esc(r.type||'Mission')}</b></div><div><span>Destination</span><b>${esc(r.destination)}</b></div><div><span>Période</span><b>${fmtD(r.depart)} → ${fmtD(r.retour)}</b></div><div><span>Signé par</span><b>${esc(r.signe_par||'—')}${r.signe_role==='CA'?' (Président du CA)':r.signe_role==='DP'?' (P/O le Directeur exécutif)':r.signe_role==='DE'?' (Directeur exécutif)':''}, le ${fmtD(r.signe_le)}</b></div></div>
  <h3>Missionnaires</h3><ol>${(r.missionnaires||[]).map(x=>`<li>${esc(x.nom||'')} <span class="muted">· ${esc(x.role||'')}</span></li>`).join('')}</ol>
  <p class="muted">Comparez ces informations avec le document présenté et avec la pièce d'identité des personnes. En cas de doute, contactez l'${esc(r.organisation)}.</p>`:''}`}
  <p><button class="btn ghost" data-act="omFermer">Fermer</button></p></div></div>`}
 async function omVerifCharger(){const c=QS.get('om');if(!c)return;omVerif={code:c,res:null};
  if(!/^[0-9a-f]{20}$/.test(c)){return}
  try{omVerif.res=await api('/rest/v1/rpc/verifier_om',{method:'POST',body:{code:c},anon:true})}catch(e){omVerif.err='Vérification impossible pour le moment : '+e.message}}
-document.addEventListener('click',e=>{if(MODE!=='srv')return;const b=e.target.closest('[data-act="omFermer"],[data-act="miAnn"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
+document.addEventListener('click',e=>{if(MODE!=='srv')return;const b=e.target.closest('[data-act="omFermer"],[data-act="miAnn"],[data-act="miModif"],[data-act="miRev"],[data-act="omEditFermer"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
+ if(b.dataset.act==='omEditFermer'){omEdit=null;srvMsg='';render();return}
+ if(b.dataset.act==='miModif'){omEdit=b.dataset.id;omEditV=view;srvMsg='';render();scrollTo(0,0);return}
+ if(b.dataset.act==='miRev'){const x=S.missions.find(y=>y.id===b.dataset.id);if(!x||!me)return;
+  const m=prompt(`Révision de l'ordre ${x.numero||''} « ${x.objet} ».\n\nL'ordre redevient « à signer » : vous le corrigez, puis il est signé à nouveau. Il garde son numéro ; l'exemplaire déjà imprimé ne sera plus valable (son QR code indiquera « remplacé »).\n\nMotif de la révision :`);if(!m||!m.trim())return;
+  action(async()=>{await upd('missions',`id=eq.${x.id}`,{statut:'demandee',revision_motif:m.trim()});
+   await notifierSrv(omMissionnaires(x).filter(y=>y!==me.id),`Ordre de mission ${x.numero||''} « ${x.objet} » en révision (${m.trim()}). L'exemplaire imprimé n'est plus valable : attendez la nouvelle version signée.`,'mesdem',x.id);omEdit=x.id;omEditV=view},
+   'Ordre rouvert pour révision. Corrigez-le ci-dessous, puis renvoyez-le à la signature.');return}
  if(b.dataset.act==='omFermer'){omVerif=null;try{history.replaceState(null,'',location.pathname+location.search.replace(/([?&])om=[^&]*&?/,'$1').replace(/[?&]$/,''))}catch(_){}render();return}
  const x=S.missions.find(y=>y.id===b.dataset.id);if(!x||!me)return;const m=prompt(`Motif de l'annulation de l'ordre ${x.numero||''} :`);if(!m||!m.trim())return;
  action(async()=>{await upd('missions',`id=eq.${x.id}`,{statut:'annulee',motif:m.trim()});await notifierSrv(omMissionnaires(x),`Ordre de mission ${x.numero||''} « ${x.objet} » annulé. Motif : ${m.trim()}`,'mesdem',x.id)},'Ordre de mission annulé : il apparaît comme annulé à la vérification.')},true);
@@ -4565,7 +4599,7 @@ function srvRender(){const root=document.getElementById('root');
  <div class="stage"><header class="topbar"><p class="tb-titre">${view==='dossier'?'Portefeuille des projets › dossier':esc(titre)}</p>
   <div class="tb-moi"><span class="avatar" aria-hidden="true">${esc(initiales(me.nom))}</span><span class="tb-nom"><b>${esc(me.nom)}</b><small>${esc(posteLib(me))}</small></span></div>
   <button class="btn ghost sm" data-act="logout">${ico('logout')}<span>Se déconnecter</span></button></header>
- <main id="main" tabindex="-1">${view==='home'?home():viewHTML()}</main>${piedApp()}</div></div>`}
+ <main id="main" tabindex="-1">${omEdit&&view===omEditV?omEditVue():view==='home'?home():viewHTML()}</main>${piedApp()}</div></div>`}
 
 function srvLoginHTML(){const anim=dsAnim.login?' anim':'';
  const cote=`<section class="auth-side${anim}" aria-label="ONG Sécurité Vie"><span class="route" aria-hidden="true"></span>
@@ -4688,7 +4722,7 @@ function tdrDetail(t){const om=tdrOM(t),av=S.tavis.filter(a=>a.tdr_id===t.id).so
   <div class="row" style="margin-top:.6rem"><button class="btn" type="submit" value="ok">${TDR_BTN[t.statut]}</button><button class="btn ghost" type="submit" value="a_corriger">Renvoyer pour correction</button>${['de','ca'].includes(t.statut)?'<button class="btn danger" type="submit" value="rejete">Rejeter</button>':''}</div></form></section>`:''}
  ${auteur&&['brouillon','a_corriger'].includes(t.statut)?`<div class="row" style="margin-bottom:1rem"><button class="btn" data-act="tdrModif" data-id="${t.id}">Modifier</button><button class="btn ghost" data-act="tdrSoumettre" data-id="${t.id}">Soumettre</button><button class="btn danger sm" data-act="tdrRetirer" data-id="${t.id}">Retirer ce TDR</button></div>`:''}
  ${tdrPeutOM(t)?`<section class="card notif"><h3>Le TDR est validé : établissez l'ordre de mission</h3><p class="muted">Le formulaire est prérempli à partir du TDR. Complétez les missionnaires, l'itinéraire, les structures d'accueil et les moyens, puis envoyez-le à la signature.</p>${omForm(t)}</section>`:''}
- <div class="row" style="margin-bottom:1rem"><button class="btn ghost sm" data-act="tdrImprimer" data-id="${t.id}">Imprimer ou enregistrer en PDF</button>${om?`<button class="btn ghost sm" data-act="miOM" data-id="${om.id}">Voir l'ordre de mission</button>`:''}</div>
+ <div class="row" style="margin-bottom:1rem"><button class="btn ghost sm" data-act="tdrImprimer" data-id="${t.id}">Imprimer ou enregistrer en PDF</button>${om?`<button class="btn ghost sm" data-act="miOM" data-id="${om.id}">Voir l'ordre de mission</button>${omPeutModifier(om)?`<button class="btn ghost sm" data-act="miModif" data-id="${om.id}">Modifier l'ordre de mission</button>`:''}${omPeutReviser(om)?`<button class="btn ghost sm" data-act="miRev" data-id="${om.id}">Réviser l'ordre de mission</button>`:''}`:''}</div>
  <article class="card tdrDoc">${t.projet_id&&projet(t.projet_id)?`<p class="muted">Projet : ${esc(libProj(projet(t.projet_id)))}${t.activite_id&&S.cadre.find(x=>x.id===t.activite_id)?` · activité ${esc(S.cadre.find(x=>x.id===t.activite_id).code||'')} ${esc(S.cadre.find(x=>x.id===t.activite_id).libelle)}`:''}</p>`:''}
  ${TDR_SEC.map(([k,l],i)=>`<h3>${i+1}. ${l}</h3>${t[k]?`<p class="pre">${esc(t[k])}</p>`:'<p class="muted">Non renseigné.</p>'}`).join('')}
  <h3>${TDR_SEC.length+1}. Budget estimatif</h3>${(t.budget||[]).length?svT(['Poste','#Quantité','Unité','#Coût unitaire','#Montant (FCFA)'],[...t.budget.map(b=>[esc(b.libelle),num(b.quantite),esc(b.unite||''),num(b.cout),num(Math.round(b.quantite*b.cout))]),['<b>Total</b>','','','',`<b>${num(tot)}</b>`]]):'<p class="muted">Non renseigné.</p>'}</article>
@@ -4911,12 +4945,12 @@ function ordreMission(m){if(!m)return;
  <p class="petit">Au retour, le chef de mission remet le rapport de mission dans les cinq (5) jours ouvrables, avec les listes de présence et pièces justificatives. Toute modification de l'itinéraire ou des dates est soumise à l'accord préalable du signataire.</p>
  <div class="bloc"><div class="sig"><div><b>Établi par</b>${esc(who(m.demande_par))}<br>le ${fmtD(m.cree_le)}</div><div><b>Le chef de mission</b>« Lu et pris connaissance »<br>${esc(chef.nom||'')}</div>
   <div><b>${OM_SIGN[roleS]}</b>${valide?`${esc(who(m.approuve_par))}<br><span class="petit">Signé électroniquement dans OSV Gestion le ${new Date(m.approuve_le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}</span><br><span class="petit">Cachet :</span>`:'<i>en attente de signature</i>'}</div></div>
- ${valide&&qr?`<div class="auth">${qr}<div><b>Authenticité vérifiable</b><br>Scannez ce QR code, ou ouvrez <b>${esc(omLien(m.code_verif).replace(/^https?:\/\//,''))}</b><br>Code de vérification : <b style="font-family:monospace;font-size:10pt">${esc(m.code_verif)}</b><br>La page affiche les missionnaires, la destination, les dates et la validité de l'ordre. Un ordre annulé y apparaît comme annulé.</div></div>`:''}</div>
- <div class="saut"></div><h1 class="doc-t" style="font-size:12.5pt">VISAS DES STRUCTURES D'ACCUEIL</h1><p class="doc-s">Ordre de mission ${esc(m.numero||'non signé')} · ${esc(chef.nom||'')}${pers.length>1?` et ${pers.length-1} autre(s)`:''} · du ${fmtD(m.date_depart)} au ${fmtD(m.date_retour)}<br>Attestation de passage : à faire viser à l'arrivée et au départ de chaque structure. Pièce justificative du per diem.</p>
+ ${valide&&qr?`<div class="auth">${qr}<div><b>Authenticité vérifiable</b><br>Scannez ce QR code, ou ouvrez <b>${esc(omLien(m.code_verif).replace(/^https?:\/\//,''))}</b><br>Code de vérification : <b style="font-family:monospace;font-size:10pt">${esc(m.code_verif)}</b><br>La page affiche les missionnaires, la destination, les dates et la validité de l'ordre. Un ordre annulé y apparaît comme annulé ; après une révision, seul le dernier exemplaire signé est valable.</div></div>`:''}</div>
+ <div class="saut"></div><h1 class="doc-t" style="font-size:12.5pt">VISAS DES STRUCTURES D'ACCUEIL</h1><p class="doc-s">Ordre de mission ${esc(m.numero||'non signé')}${Number(m.revision)>0?' (révision '+m.revision+')':''} · ${esc(chef.nom||'')}${pers.length>1?` et ${pers.length-1} autre(s)`:''} · du ${fmtD(m.date_depart)} au ${fmtD(m.date_retour)}<br>Attestation de passage : à faire viser à l'arrivée et au départ de chaque structure. Pièce justificative du per diem.</p>
  <table><thead><tr><th style="width:24%">Structure et localité</th><th style="width:19%">Arrivée (date, heure)</th><th style="width:19%">Départ (date, heure)</th><th>Nom, qualité, signature et cachet</th></tr></thead><tbody>${visas.map(v=>`<tr><td style="height:88px">${esc(v.s)}${v.l?`<br><span class="petit">${esc(v.l)}</span>`:''}</td><td></td><td></td><td></td></tr>`).join('')}</tbody></table>
  <h2>Observations du chef de mission au retour</h2><div style="border:.6pt solid #8a9993;height:80px"></div>
  <div class="sig"><div><b>Le chef de mission</b>Date et signature</div><div><b>Visa de la comptabilité</b>Liquidation</div><div><b>${OM_SIGN[roleS]}</b>Vu au retour</div></div>`;
- ouvrirPapier(`Ordre de mission ${m.numero||'(projet)'}`,corps,{nom:`Ordre_de_mission_${(m.numero||'projet').replace(/\//g,'-')}`,ref:`N° <b>${esc(m.numero||'—')}</b><br>Établi le ${fmtD(m.cree_le)}<br>par ${esc(who(m.demande_par))}`,filigrane:valide?null:annule?'ANNULÉ':'NON SIGNÉ – SANS VALEUR',avis:valide?'':annule?'Ordre annulé : document sans valeur.':'Ordre non signé : document de travail sans valeur.'})}
+ ouvrirPapier(`Ordre de mission ${m.numero||'(projet)'}`,corps,{nom:`Ordre_de_mission_${(m.numero||'projet').replace(/\//g,'-')}`,ref:`N° <b>${esc(m.numero||'—')}</b>${Number(m.revision)>0?`<br>Révision <b>${m.revision}</b>${valide?' du '+fmtD(m.approuve_le):' (en cours)'}`:''}<br>Établi le ${fmtD(m.cree_le)}<br>par ${esc(who(m.demande_par))}`,filigrane:valide?null:annule?'ANNULÉ':'NON SIGNÉ – SANS VALEUR',avis:valide?'':annule?'Ordre annulé : document sans valeur.':m.numero?`Révision ${m.revision} en cours, pas encore signée : document de travail sans valeur. L'ordre signé précédent n'est plus valable.`:'Ordre non signé : document de travail sans valeur.'})}
 
 /* ---------- termes de référence ---------- */
 function tdrImprimer(t){if(!t)return;const av=S.tavis.filter(a=>a.tdr_id===t.id).sort((a,b)=>a.le<b.le?-1:1),ok=t.statut==='valide',tot=tdrTot(t),p=t.projet_id&&projet(t.projet_id);
@@ -5116,8 +5150,13 @@ function dxTable(ctx,t){const kv=t.classList.contains('kv'),rows=[...t.querySele
  return `<w:tbl><w:tblPr><w:tblW w:w="${DX_W}" w:type="dxa"/>${dxBrd()}<w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="90" w:type="dxa"/><w:right w:w="90" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${widths.map(w=>`<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>`+
   rows.map(r=>{const head=r.parentElement.tagName==='THEAD'||r.classList.contains('th'),cells=[...r.children],h=(r.querySelector('[style*="height"]')||{}).style;let ci=0;
    return `<w:tr><w:trPr><w:cantSplit/>${head&&r.parentElement.tagName==='THEAD'?'<w:tblHeader/>':''}${h&&h.height?`<w:trHeight w:val="${Math.round(parseFloat(h.height)*15)}" w:hRule="atLeast"/>`:''}</w:trPr>${cells.map(c=>{const sp=Number(c.getAttribute('colspan'))||1,w=widths.slice(ci,ci+sp).reduce((a,b)=>a+b,0);ci+=sp;return dxCell(ctx,c,head,kv&&c.tagName==='TH',w)}).join('')}</w:tr>`}).join('')+`</w:tbl>${dxP('',{ap:60})}`}
-function dxBoites(ctx,div,hRow){const cells=[...div.children],w=Math.floor(DX_W/cells.length);
- return `<w:tbl><w:tblPr><w:tblW w:w="${DX_W}" w:type="dxa"/>${dxBrd()}<w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid>${cells.map(()=>`<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid><w:tr><w:trPr><w:cantSplit/>${hRow?`<w:trHeight w:val="${hRow}" w:hRule="atLeast"/>`:''}</w:trPr>${cells.map(c=>`<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/></w:tcPr>${dxP(dxInline(ctx,c,{sz:18}),{ap:0,jc:'left'})}</w:tc>`).join('')}</w:tr></w:tbl>${dxP('',{ap:60})}`}
+/* case de signature : l'intitulé en gras sur sa propre ligne, comme à l'écran */
+function dxCase(ctx,c){const t=c.firstElementChild;if(t&&t.tagName==='B'&&c.firstChild===t){const k=c.cloneNode(true);k.removeChild(k.firstElementChild);while(k.firstChild&&k.firstChild.nodeType===3&&!k.firstChild.textContent.trim())k.removeChild(k.firstChild);if(k.firstChild&&k.firstChild.nodeName==='BR')k.removeChild(k.firstChild);return dxRun(t.textContent,{sz:18,b:true})+'<w:r><w:br/></w:r>'+dxInline(ctx,k,{sz:18})}return dxInline(ctx,c,{sz:18})}
+function dxBoites(ctx,div,hRow){const cells=[...div.children],isImg=c=>c.tagName==='IMG',dim=(c,a)=>Number(c.getAttribute(a))||90;
+ /* une case qui est elle-même une image (le QR code de l'ordre de mission) : image intégrée au .docx, case à sa mesure */
+ const fixe=cells.filter(isImg).map(c=>Math.round(dim(c,'width')*15)+260),reste=DX_W-fixe.reduce((a,b)=>a+b,0),nLib=cells.length-fixe.length;let k=0;
+ const W=cells.map(c=>isImg(c)?fixe[k++]:Math.floor(reste/Math.max(1,nLib)));
+ return `<w:tbl><w:tblPr><w:tblW w:w="${DX_W}" w:type="dxa"/>${dxBrd()}<w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid>${W.map(w=>`<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid><w:tr><w:trPr><w:cantSplit/>${hRow?`<w:trHeight w:val="${hRow}" w:hRule="atLeast"/>`:''}</w:trPr>${cells.map((c,i)=>`<w:tc><w:tcPr><w:tcW w:w="${W[i]}" w:type="dxa"/>${isImg(c)?'<w:vAlign w:val="center"/>':''}</w:tcPr>${isImg(c)?dxP(dxImg(ctx,c.getAttribute('src'),dim(c,'width'),dim(c,'height')),{ap:0,jc:'center'}):dxP(dxCase(ctx,c),{ap:0,jc:'left'})}</w:tc>`).join('')}</w:tr></w:tbl>${dxP('',{ap:60})}`}
 function dxBlocks(ctx,el,o={}){let x='';el.childNodes.forEach(n=>{
  if(n.nodeType===3){if(n.textContent.trim())x+=dxP(dxRun(n.textContent.trim(),{}),{});return}
  if(n.nodeType!==1)return;const tg=n.tagName.toLowerCase(),c=n.classList,al=(n.style&&n.style.textAlign)||'';
