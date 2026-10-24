@@ -1788,7 +1788,7 @@ const QS=new URLSearchParams(location.search);
 const MODE=(()=>{const q=QS.get('mode');if(q==='srv'||q==='demo')return q;try{const m=sessionStorage.getItem('osv-mode');if(m)return m}catch(e){}
  return /(^|\.)ongsecuritevie\.org$|github\.io$/.test(location.hostname)?'srv':'demo'})();
 const PSTAT={brouillon:['Brouillon',''],configuration:['Configuration',''],verification:['Vérification','warn'],validation:['Validation','warn'],active:['Activé','ok'],execution:['En exécution','ok'],suspendu:['Suspendu','bad'],rejete:['Rejeté','bad'],a_corriger:['À corriger','bad'],cloture:['Clôturé',''],archive:['Archivé','']};
-const ROLES_PROJET=['Chef de projet','Suivi-évaluation','Superviseur terrain','Relais communautaire','Assistant programme','Comptable projet','Logisticien','Chauffeur','Consultant','Autre'];
+const ROLES_PROJET=['Chef de projet','Suivi-évaluation','Superviseur terrain','Agent de santé communautaire (ASC)','Relais communautaire','Assistant programme','Comptable projet','Logisticien','Chauffeur','Consultant','Autre'];
 const SRV_MAX=20*1024*1024;
 let sess=null,srvAudit=[],srvMsg='',srvBusy=false,srvRecup=false;
 
