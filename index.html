@@ -528,6 +528,11 @@ body.iaBusy{cursor:progress}
 .pvDoc table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.3rem 0 .8rem}.pvDoc th,.pvDoc td{border:1px solid var(--line);padding:.4rem .55rem;text-align:left;vertical-align:top}.pvDoc th{background:var(--soft);font-weight:600}
 .pvDoc ol,.pvDoc ul{margin:.2rem 0 .7rem 1.2rem}
 .joCadre{display:grid;gap:.35rem}.iaB2 .ico{width:15px;height:15px;vertical-align:-2px;color:var(--brand)}
+.joCtl{gap:.5rem;margin-top:.5rem}.joCtl [aria-pressed="true"]{background:color-mix(in srgb,var(--or) 16%,var(--panel));border-color:var(--or)}
+.joEtat{font-size:.82rem;margin:.4rem 0 .3rem;color:var(--ok,#2c7a4b);font-weight:600}.joEtat:empty{display:none}.joEtat.pause{color:var(--or)}
+.joFic{cursor:pointer;position:relative}.joFic .ico{width:15px;height:15px;vertical-align:-2px;color:var(--brand)}
+.joG{display:flex;flex-wrap:wrap;gap:.5rem;margin:.3rem 0 .8rem}.joV{padding:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg);cursor:zoom-in;line-height:0}
+.joV img{width:132px;height:99px;object-fit:cover;display:block}.joH4{font-size:.86rem;margin:.6rem 0 .2rem}
 </style>
 </head>
 <body>
@@ -1858,7 +1863,7 @@ async function srvLoad(){
  const T7=await opt(sel('mission_membres',f+'&order=ordre'));p07=T7!==null;N.mmembres=T7||[];p11=p07&&(await opt(sel('missions','select=revision&limit=1')))!==null;N.mrev=p11?(await opt(sel('missions_revisions',f+'&order=le')))||[]:[];
  const T8=await Promise.all([sel('tdrs',f+'&order=cree_le.desc'),sel('tdr_avis',f+'&order=le'),sel('acces_budget',f)].map(opt));p08=T8[0]!==null;N.tdrs=T8[0]||[];N.tavis=T8[1]||[];N.accBud=T8[2]||[];
  const T10=await opt(sel('contrats',f+'&order=redige_le.desc'));p10=T10!==null;N.contrats=T10||[];p10f=p10&&(await opt(sel('contrats','select=fiche&limit=1')))!==null;
- const T13=await Promise.all([sel('journal',f+'&order=date_evt.desc&limit=3000'),sel('capitalisations',f+'&order=cree_le.desc'),sel('ia_reglages',f)].map(opt));p13=T13[0]!==null;N.journal=T13[0]||[];N.capis=T13[1]||[];N.iaReg=(T13[2]||[])[0]||null;p14=p13&&(await opt(sel('journal','select=cadre&limit=1')))!==null;
+ const T13=await Promise.all([sel('journal',f+'&order=date_evt.desc&limit=3000'),sel('capitalisations',f+'&order=cree_le.desc'),sel('ia_reglages',f)].map(opt));p13=T13[0]!==null;N.journal=T13[0]||[];N.capis=T13[1]||[];N.iaReg=(T13[2]||[])[0]||null;p14=p13&&(await opt(sel('journal','select=cadre&limit=1')))!==null;p16=p14&&(await opt(sel('journal','select=parent_id&limit=1')))!==null;
  const T15=await Promise.all([sel('veille_notes',f+'&order=date_evt.desc&limit=3000'),sel('opportunites',f+'&order=cree_le.desc')].map(opt));p15=T15[0]!==null;N.veille=T15[0]||[];N.opps=T15[1]||[];
  const T12=await Promise.all([sel('outils_collecte',f+'&order=cree_le'),sel('fiches_terrain',f+'&order=date_activite.desc,saisi_le.desc&limit=10000'),sel('references_communautaires',f+'&order=date_reference.desc&limit=10000'),sel('microplans',f),sel('rapports_terrain',f+'&order=mois.desc')].map(opt));p12=T12[0]!==null;[N.outils,N.fterrain,N.refs,N.microplans,N.rterrain]=T12.map(x=>x||[]);
  [N.comptes,N.mouvements,N.rapprochements,N.avances,N.fournisseurs,N.seuilsAchat,N.achats,N.devis,N.baremes,N.missions,N.biens,N.inventaires,N.pcomptes,N.correspondances,N.invLignes]=T6.map(x=>x||[]);
@@ -1998,6 +2003,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv')return;const b=e.target.cl
  if(a==='notifOuvrir'){const n=S.pol.notifs.find(x=>x.id===b.dataset.id);if(n){upd('notifications',`id=eq.${n.id}`,{lu:true}).catch(()=>{});if(n.lien==='adm'||n.lien==='mesdem'){stop();n.lus.push(me.id);view=n.lien==='adm'&&ROLES[me.role].nav.includes('adm')?'adm':'mesdem';render();return}
   if(n.lien==='finances'){stop();n.lus.push(me.id);finSel=n.ref||null;if(ROLES[me.role].nav.includes('finances'))view='finances';else{dosSel=n.ref;dosTab='fin';view='dossier'}render();return}
   if(n.lien==='contrats'){stop();n.lus.push(me.id);ctrSel=n.ref||null;ctrEdit=null;view=ROLES[me.role].nav.includes('contrats')?'contrats':'mesdem';render();return}
+  if(n.lien==='journal'){stop();n.lus.push(me.id);if(JR.user!==me.id){Object.assign(JR,{user:me.id,tab:'liste',capSel:null,capEdit:false,pvEdit:false,filtre:'moi'});joAnx={liste:[],photos:[]}}JR.sel=n.ref&&S.journal.some(x=>x.id===n.ref)?n.ref:null;JR.edit=null;JR.jour=null;JR.tab='liste';view=ROLES[me.role].nav.includes('journal')?'journal':'home';render();return}
   if(n.lien==='veille'){stop();n.lus.push(me.id);VE.sel=n.ref||null;view=ROLES[me.role].nav.includes('veille')?'veille':'home';render();return}
   if(n.lien==='terrain'){stop();n.lus.push(me.id);TR.saisie=null;TR.outil=null;TR.fiche=n.ref&&S.fterrain.some(x=>x.id===n.ref)?n.ref:null;view=ROLES[me.role].nav.includes('terrain')?'terrain':'home';render();return}
   if(n.lien==='missions'){stop();n.lus.push(me.id);tdrSel=n.ref||null;tdrEdit=null;view=ROLES[me.role].nav.includes('missions')?'missions':'home';render();return}
@@ -2031,7 +2037,7 @@ document.addEventListener('change',e=>{if(MODE!=='srv'||!me)return;const t=e.tar
 /* ===== Base du Directeur des programmes (mode serveur) : stratégie, programmes, portefeuille, dossier du projet, performance, archives ===== */
 const DEPTS={GOUVERNANCE:'Gouvernance (conseil d\'administration)',DIRECTION:'Direction exécutive',PROGRAMMES:'Programmes et projets',ADMIN_FIN:'Administration et finances',COMPTA:'Comptabilité',RH:'Ressources humaines',LOGISTIQUE:'Logistique'};
 const DEP_ROLE={DE:Object.keys(DEPTS),CA:['GOUVERNANCE'],RA:['ADMIN_FIN','COMPTA','LOGISTIQUE'],CPT:['COMPTA'],LOG:['LOGISTIQUE'],RH:['RH'],DP:['PROGRAMMES'],CP:['PROGRAMMES'],SE:['PROGRAMMES'],SUP:['PROGRAMMES'],ASC:['PROGRAMMES'],LECT:['PROGRAMMES']};
-const DOC_TYPES=['Convention de financement','Proposition de projet','Budget approuvé','Plan de travail','Termes de référence','Rapport d\'activité','Rapport narratif au bailleur','Rapport financier','Rapport de mission','Fiche de terrain (scan)','Liste de présence (scan)','Procès-verbal','Compte rendu de réunion','Contrat','Facture ou justificatif','Pièce comptable','Bon de commande','Correspondance','Évaluation','Photo ou vidéo','Autre'];
+const DOC_TYPES=['Convention de financement','Proposition de projet','Budget approuvé','Plan de travail','Termes de référence','Rapport d\'activité','Rapport narratif au bailleur','Rapport financier','Rapport de mission','Fiche de terrain (scan)','Liste de présence (scan)','Photo d\'activité','Procès-verbal','Compte rendu de réunion','Contrat','Facture ou justificatif','Pièce comptable','Bon de commande','Correspondance','Évaluation','Photo ou vidéo','Autre'];
 const DOC_ST={brouillon:['Brouillon',''],valide:['Validé','ok'],signe:['Signé et cacheté','ok'],obsolete:['Obsolète','warn']};
 const CL_NIV={og:'Objectif global',os:'Objectif spécifique',res:'Résultat attendu',act:'Activité'};
 const CHAINE={impact:'Impact',effet:'Effet',extrant:'Extrant',processus:'Processus'};
@@ -5238,7 +5244,7 @@ const DX_V='0B3D2E',DX_O='EB6A0F',DX_W=9978;
 const dxE=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const dxB64=u=>{const b=atob(u.split(',')[1]),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a};
 function dxRun(t,f){if(t==='')return '';return `<w:r><w:rPr>${f.font?`<w:rFonts w:ascii="${f.font}" w:hAnsi="${f.font}" w:cs="${f.font}"/>`:''}${f.b?'<w:b/><w:bCs/>':''}${f.i?'<w:i/>':''}${f.color?`<w:color w:val="${f.color}"/>`:''}${f.sz?`<w:sz w:val="${f.sz}"/><w:szCs w:val="${f.sz}"/>`:''}${f.sp?`<w:spacing w:val="${f.sp}"/>`:''}</w:rPr><w:t xml:space="preserve">${dxE(t)}</w:t></w:r>`}
-function dxImg(ctx,src,wPx,hPx){const id=ctx.imgs.length+1,rid='rIdI'+id,ext=src.startsWith('data:image/gif')?'gif':'png';ctx.imgs.push({rid,nom:`img${id}.${ext}`,data:dxB64(src)});
+function dxImg(ctx,src,wPx,hPx){const id=ctx.imgs.length+1,rid='rIdI'+id,ext=src.startsWith('data:image/gif')?'gif':src.startsWith('data:image/jpeg')?'jpeg':'png';ctx.imgs.push({rid,nom:`img${id}.${ext}`,data:dxB64(src)});
  const cx=Math.round(wPx*9525),cy=Math.round(hPx*9525);ctx.n++;
  return `<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:docPr id="${ctx.n}" name="Image${ctx.n}"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="${ctx.n}" name="Image${ctx.n}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="${rid}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>`}
 function dxInline(ctx,node,f){let o='';node.childNodes.forEach(n=>{
@@ -5303,7 +5309,7 @@ async function docxBlob(corps,o={}){const ctx={imgs:[],n:0},doc=new DOMParser().
  const NS='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"';
  const rels=L=>`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${L.join('')}</Relationships>`;
  const te=new TextEncoder(),F=(name,str)=>({name,data:te.encode(str)});
- const files=[F('[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="gif" ContentType="image/gif"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`),
+ const files=[F('[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="gif" ContentType="image/gif"/><Default Extension="jpeg" ContentType="image/jpeg"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`),
   F('_rels/.rels',rels(['<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>','<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>'])),
   F('docProps/core.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${dxE(o.titre||'')}</dc:title><dc:creator>${dxE(S.org.nom)}</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString().slice(0,19)}Z</dcterms:created></cp:coreProperties>`),
   F('word/styles.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial" w:eastAsia="Arial"/><w:color w:val="16211D"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:lang w:val="fr-FR"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="100" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style></w:styles>`),
@@ -6041,9 +6047,9 @@ ICO.etoile='<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-
 const iaOK=()=>p13&&!(S.iaReg&&S.iaReg.actif===false);
 const iaTel=s=>String(s).replace(/(\+?225[\s.]?)?\b0\d([\s.]?\d{2}){4}\b/g,'[téléphone]');
 const iaNettoyer=x=>typeof x==='string'?iaTel(x):Array.isArray(x)?x.map(iaNettoyer):x&&typeof x==='object'?Object.fromEntries(Object.entries(x).map(([k,v])=>[k,iaNettoyer(v)])):x;
-async function iaAppel(tache,donnees){if(!p13)throw new Error('Exécutez le script 13 dans Supabase pour activer l\'assistant.');
+async function iaAppel(tache,donnees,images){if(!p13)throw new Error('Exécutez le script 13 dans Supabase pour activer l\'assistant.');
  if(sess&&sess.expires_at&&sess.expires_at*1000-Date.now()<60000)await authRefresh();
- let r;try{r=await fetch(SUPA.url+'/functions/v1/claude',{method:'POST',headers:{apikey:SUPA.key,Authorization:'Bearer '+sess.access_token,'Content-Type':'application/json'},body:JSON.stringify({tache,donnees:iaNettoyer(donnees)})})}
+ let r;try{r=await fetch(SUPA.url+'/functions/v1/claude',{method:'POST',headers:{apikey:SUPA.key,Authorization:'Bearer '+sess.access_token,'Content-Type':'application/json'},body:JSON.stringify({tache,donnees:iaNettoyer(donnees),...(images?{images}:{})})})}
  catch(e){throw new Error('Assistant injoignable : il a besoin d\'Internet. Vérifiez la connexion et réessayez.')}
  const j=await r.json().catch(()=>null);
  if(r.status===404)throw new Error('L\'assistant de rédaction n\'est pas encore installé sur le serveur.');
@@ -6058,21 +6064,24 @@ let dict=null;
 const dictBtn=(cible,lib='Parler')=>SR?`<span class="dictW"><button type="button" class="btn ghost sm dictBtn" data-act="dicter" data-cible="${cible}" aria-pressed="false">${ico('mic')} <span>${lib}</span></button><span class="dictLive" data-live="${cible}" aria-live="polite"></span></span>`:'';
 const dictAide=()=>SR?'':'<p class="muted dictNon">Pour parler au lieu d\'écrire, ouvrez l\'application dans Google Chrome (téléphone ou ordinateur).</p>';
 function dictStop(){if(!dict)return;const d=dict;dict=null;d.actif=false;try{d.rec.stop()}catch(_){}clearInterval(d.timer);if(d.wake)d.wake.release().catch(()=>{});
+ if(d.long){try{if(document.contains(d.cible))localStorage.setItem(joBrouillonCle(),JSON.stringify({t:d.cible.value,le:new Date().toISOString()}))}catch(_){}const c=document.querySelector(`[data-ctl="${d.btn.dataset.cible}"]`);if(c)c.hidden=true;const et=document.querySelector(`[data-etat="${d.btn.dataset.cible}"]`);if(et){et.textContent='Enregistrement arrêté. Pensez à cliquer sur « Enregistrer ».';et.classList.remove('pause')}}
  if(document.contains(d.btn)){d.btn.setAttribute('aria-pressed','false');d.btn.classList.remove('rec');d.btn.querySelector('span').textContent=d.lib}const l=document.querySelector(`[data-live="${d.btn.dataset.cible}"]`);if(l)l.textContent=''}
 async function dictStart(btn){const cible=document.getElementById(btn.dataset.cible);if(!cible)return;dictStop();
  const rec=new SR();rec.lang='fr-FR';rec.continuous=true;rec.interimResults=true;
- const d=dict={rec,cible,btn,actif:true,debut:Date.now(),lib:btn.querySelector('span').textContent,wake:null};
+ const d=dict={rec,cible,btn,actif:true,debut:Date.now(),lib:btn.querySelector('span').textContent,wake:null,long:btn.dataset.long==='1',premier:true,dernier:Date.now(),stamp:Date.now(),sauve:Date.now(),parole:0,pauses:0,hors:false};
  const live=document.querySelector(`[data-live="${btn.dataset.cible}"]`);
- rec.onresult=e=>{if(!document.contains(cible)){dictStop();return}let fin='',inter='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t;else inter+=t}
-  if(fin.trim()){const v=cible.value;cible.value=(v&&!/\s$/.test(v)?v+' ':v)+fin.trim()+' ';cible.dispatchEvent(new Event('input',{bubbles:true}));cible.scrollTop=cible.scrollHeight}if(live)live.textContent=inter};
+ rec.onresult=e=>{if(!document.contains(cible)){dictStop();return}if(d.hors){if(live)live.textContent='';return}let fin='',inter='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t;else inter+=t}
+  if(fin.trim()){const v=cible.value,tx=d.long?dictLongEcrire(d,fin.trim()+' '):fin.trim()+' ';cible.value=(v&&!/\s$/.test(v)&&!/^\n/.test(tx)?v+' ':v)+tx;cible.dispatchEvent(new Event('input',{bubbles:true}));cible.scrollTop=cible.scrollHeight}if(live)live.textContent=inter};
  rec.onerror=e=>{if(['not-allowed','service-not-allowed'].includes(e.error)){alert('Le micro est refusé. Autorisez le micro pour ce site (icône à gauche de l\'adresse), puis réessayez.');dictStop()}
   else if(e.error==='network'&&live)live.textContent='Pas de réseau : la dictée a besoin d\'Internet. Écrivez, ou réessayez plus tard.';else if(e.error==='audio-capture'){alert('Aucun micro détecté sur cet appareil.');dictStop()}};
  rec.onend=()=>{if(dict===d&&d.actif){try{rec.start()}catch(_){}}};
  try{rec.start()}catch(e){alert('La dictée n\'a pas pu démarrer : '+e.message);dict=null;return}
  btn.setAttribute('aria-pressed','true');btn.classList.add('rec');
- const maj=()=>{const s=Math.floor((Date.now()-d.debut)/1000);btn.querySelector('span').textContent=`Arrêter · ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`};maj();d.timer=setInterval(maj,1000);
+ const maj=()=>{const s=Math.floor((Date.now()-d.debut)/1000);const hh=Math.floor(s/3600);btn.querySelector('span').textContent=`Arrêter · ${hh?hh+':':''}${String(Math.floor(s/60)%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;if(d.long)dictLongTick(d)};
+ if(d.long){const c=document.querySelector(`[data-ctl="${btn.dataset.cible}"]`);if(c)c.hidden=false}maj();d.timer=setInterval(maj,1000);
  try{if(navigator.wakeLock)d.wake=await navigator.wakeLock.request('screen')}catch(_){}}
 
+document.addEventListener('visibilitychange',()=>{if(dict&&document.visibilityState==='visible'&&navigator.wakeLock){navigator.wakeLock.request('screen').then(w=>{if(dict)dict.wake=w}).catch(()=>{})}});
 /* ---------- l'agent raconte, l'assistant remplit la fiche ---------- */
 function iaRacontCarte(p){if(!iaOK())return '';const O=trOutils(p).filter(o=>o.actif&&o.type!=='plainte');if(!O.length)return '';
  return `<section class="card iaRac"><h3>${ico('mic')} Raconter mon activité</h3><p class="muted">Parlez comme à votre superviseur : où et quand, ce que vous avez fait, combien de femmes et d'hommes, ce que les gens ont demandé. <b>Ne dites pas les noms des personnes.</b> L'application remplit la fiche ; vous vérifiez, vous recopiez la liste signée, puis vous envoyez.</p>
@@ -6153,28 +6162,48 @@ const JO_T_ANC=['reunion','atelier','visite','mission','formation','activite','a
 const JO_ROLE={organisateur:'OSV organise',invite:'OSV est invitée',participant:'OSV participe',intervenant:'OSV intervient (communication, facilitation)'};
 const JO_P={prive:'Moi seul(e)',direction:'Ma hiérarchie et la direction',projet:'L\'équipe du projet'};
 let p14=false;
-const joTitreDoc=j=>(j.pv&&j.pv.titre_document)||({reunion_externe:'COMPTE RENDU DE PARTICIPATION',formation:'RAPPORT DE PARTICIPATION À LA FORMATION',rencontre:'COMPTE RENDU DE RENCONTRE',seminaire:'RAPPORT DE PARTICIPATION',atelier:'COMPTE RENDU D\'ATELIER',mission:'RAPPORT DE MISSION',visite:'RAPPORT DE VISITE',audience:'COMPTE RENDU D\'AUDIENCE',plaidoyer:'COMPTE RENDU DE PLAIDOYER'}[j.type]||'COMPTE RENDU DE RÉUNION');
+const joTitreDoc=j=>(j.pv&&j.pv.titre_document)||(j.parent_id?'POINT DE LA JOURNÉE '+(j.jour||''):null)||({reunion_externe:'COMPTE RENDU DE PARTICIPATION',formation:'RAPPORT DE PARTICIPATION À LA FORMATION',rencontre:'COMPTE RENDU DE RENCONTRE',seminaire:'RAPPORT DE PARTICIPATION',atelier:'COMPTE RENDU D\'ATELIER',mission:'RAPPORT DE MISSION',visite:'RAPPORT DE VISITE',audience:'COMPTE RENDU D\'AUDIENCE',plaidoyer:'COMPTE RENDU DE PLAIDOYER'}[j.type]||'COMPTE RENDU DE RÉUNION');
 const joCadre=j=>j.cadre||(j.projet_id?'projet':'institutionnel');
 const CAP_T={capitalisation:'Document de capitalisation',redevabilite:'Rapport de redevabilité',durabilite:'Note de durabilité et de pérennité',apprentissage:'Document d\'apprentissage (leçons apprises)',bonnes_pratiques:'Fiche de bonnes pratiques'};
 const capPeut=()=>['DE','DP','CP','SE'].includes(me.role);
 function svJournal(){if(!p13)return head('Journal et comptes rendus','')+'<p class="note">Exécutez le script 13 dans Supabase pour activer le journal, les comptes rendus et l\'assistant de rédaction.</p>';
- if(JR.user!==me.id)Object.assign(JR,{user:me.id,tab:'liste',sel:null,edit:null,pvEdit:false,capSel:null,capEdit:false,filtre:'moi'});
- if(JR.edit)return joEditeur(JR.edit==='new'?null:S.journal.find(j=>j.id===JR.edit));
+ if(JR.user!==me.id){Object.assign(JR,{user:me.id,tab:'liste',sel:null,edit:null,jour:null,pvEdit:false,capSel:null,capEdit:false,filtre:'moi'});joAnx={liste:[],photos:[]}}
+ if(JR.edit)return joEditeur(JR.edit==='new'?(JR.jour?{parent_id:JR.jour.parent,jour:JR.jour.n}:null):S.journal.find(j=>j.id===JR.edit));
  if(JR.sel&&S.journal.some(j=>j.id===JR.sel))return joDetail(S.journal.find(j=>j.id===JR.sel));
  if(JR.capSel&&(S.capis||[]).some(c=>c.id===JR.capSel))return capDetail(S.capis.find(c=>c.id===JR.capSel));
  const tabs=[['liste','Journal'],...(capPeut()||me.role==='CA'?[['capi','Capitalisation et redevabilité']]:[]),...(me.role==='DE'?[['assistant','Assistant de rédaction']]:[])];
  if(!tabs.some(t=>t[0]===JR.tab))JR.tab='liste';
  return head('Journal et comptes rendus','Consignez chaque réunion, atelier, visite ou mission : dictez pendant l\'activité ou résumez après. L\'assistant rédige le compte rendu ; vous le relisez et le validez. Ce journal nourrit la capitalisation, la redevabilité et l\'apprentissage de l\'organisation.')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
  `<nav class="subnav">${tabs.map(([k,l])=>`<button data-act="joTab" data-v="${k}" ${JR.tab===k?'aria-current="page"':''}>${l}</button>`).join('')}</nav>`+({liste:joListe,capi:capListe,assistant:iaReglagesVue}[JR.tab])()}
-function joListe(){let L=S.journal.slice();if(JR.filtre==='moi')L=L.filter(j=>j.auteur_id===me.id);L.sort((a,b)=>a.date_evt<b.date_evt?1:-1);
+function joListe(){let L=S.journal.filter(j=>!j.parent_id);if(JR.filtre==='moi')L=L.filter(j=>j.auteur_id===me.id||(j.rapporteurs||[]).includes(me.id));
+ const AF=p16?S.journal.filter(j=>!j.parent_id&&j.statut!=='valide').flatMap(j=>Array.from({length:joJours(j)},(_,i)=>i+1).filter(N=>joRapp(j,N)===me.id&&!joEnfants(j).some(x=>x.jour===N)).map(N=>[j,N])):[];L.sort((a,b)=>a.date_evt<b.date_evt?1:-1);
  const tous=S.journal.some(j=>j.auteur_id!==me.id);
- return `<section class="card"><div class="row" style="justify-content:space-between;margin-bottom:.8rem"><button class="btn" data-act="joNouveau">${ico('mic')} Nouvelle réunion ou activité</button>${tous?`<div class="row"><label class="trChk"><input type="radio" name="joF" data-jo="moi" ${JR.filtre==='moi'?'checked':''}> Mon journal</label><label class="trChk"><input type="radio" name="joF" data-jo="tous" ${JR.filtre==='tous'?'checked':''}> Tout ce que je peux voir</label></div>`:''}</div>
- ${svT(['Date','Type','Objet','Lieu','Par','Compte rendu',''],L.map(j=>[fmtD(j.date_evt),esc(JO_T[j.type]||j.type),`<b>${esc(j.titre)}</b>${j.projet_id&&projet(j.projet_id)?`<br><span class="muted">${esc(libProj(projet(j.projet_id)))}</span>`:''}`,esc(j.lieu||''),esc(who(j.auteur_id)),
+ return (AF.length?`<section class="card iaRac"><h3>${ico('mic')} Journées dont vous êtes rapporteur</h3>${AF.map(([j,N])=>`<div class="q-row"><div><b>Journée ${N} – ${esc(j.titre)}</b><br><span class="muted">${fmtD(joDateJour(j,N))}${j.lieu?' · '+esc(j.lieu):''} · désigné(e) par ${esc(who(j.auteur_id))}</span></div><button class="btn sm" data-act="joJour" data-id="${j.id}" data-n="${N}">Rédiger le point du jour</button></div>`).join('')}</section>`:'')+`<section class="card"><div class="row" style="justify-content:space-between;margin-bottom:.8rem"><button class="btn" data-act="joNouveau">${ico('mic')} Nouvelle réunion ou activité</button>${tous?`<div class="row"><label class="trChk"><input type="radio" name="joF" data-jo="moi" ${JR.filtre==='moi'?'checked':''}> Mon journal</label><label class="trChk"><input type="radio" name="joF" data-jo="tous" ${JR.filtre==='tous'?'checked':''}> Tout ce que je peux voir</label></div>`:''}</div>
+ ${svT(['Date','Type','Objet','Lieu','Par','Compte rendu',''],L.map(j=>[fmtD(j.date_evt)+(joJours(j)>1?`<br><span class="muted">→ ${fmtD(j.date_fin)}</span>`:''),esc(JO_T[j.type]||j.type)+(joJours(j)>1?`<br>${tag([joJours(j)+' jours · '+joEnfants(j).filter(x=>x.pv).length+' point(s)',''])}`:''),`<b>${esc(j.titre)}</b>${j.projet_id&&projet(j.projet_id)?`<br><span class="muted">${esc(libProj(projet(j.projet_id)))}</span>`:''}`,esc(j.lieu||''),esc(who(j.auteur_id)),
   j.statut==='valide'?tag(['validé','ok']):j.pv?tag(['à relire','warn']):tag(['notes seulement','']),`<button class="btn ghost sm" data-act="joVoir" data-id="${j.id}">Ouvrir</button>`]),'Aucune entrée. Commencez par votre prochaine réunion : ouvrez une entrée et lancez l\'enregistrement.')}</section>`}
 function joEditeur(j){j=j||{};const proj=S.projets.filter(p=>!['archive','rejete'].includes(p.statut)&&(['DE','DP','CA'].includes(me.role)||trEmploye(p)));
+ const par=j.parent_id?S.journal.find(x=>x.id===j.parent_id):null;
  const cadre=j.id?joCadre(j):(['DE','CA','RA','RH','CPT','LOG'].includes(me.role)?'institutionnel':'projet');
  const types=p14?Object.entries(JO_T).filter(([k])=>k!=='reunion'||j.type==='reunion'):Object.entries(JO_T).filter(([k])=>JO_T_ANC.includes(k));
- return `<p><button class="lnk" data-act="joFermer">← Journal</button></p>`+head(j.id?'Modifier l\'entrée':'Nouvelle réunion ou activité','Réunion de projet, réunion à laquelle OSV est invitée, formation, atelier, mission… Pendant l\'activité, lancez l\'enregistrement : la parole s\'écrit au fil de l\'eau. À la fin, l\'assistant rédige le document ; vous le relisez et le validez.')+
+ let br=null;if(!j.transcription){try{br=JSON.parse(localStorage.getItem('osv_jo_tr_'+me.id+'_'+(j.id||'nouveau'+(par?par.id+'_'+j.jour:'')))||'null')}catch(_){}}
+ const mis=p16?(S.missions||[]).filter(m=>!['annulee','rejetee','refusee'].includes(m.statut)&&(m.agent_id===me.id||m.demande_par===me.id||(S.mmembres||[]).some(x=>x.mission_id===m.id&&x.user_id===me.id)||['DE','DP'].includes(me.role)||m.id===j.mission_id)):[];
+ const rec=`<div class="trL joRec"><label for="jo_tr">Enregistrement ${par?'de la journée':'de l\'activité'}</label><div class="row iaRow">${SR?`<button type="button" class="btn dictBtn joBig" data-act="dicter" data-cible="jo_tr" data-long="1" aria-pressed="false">${ico('mic')} <span>Démarrer l'enregistrement</span></button><span class="dictLive" data-live="jo_tr" aria-live="polite"></span>`:''}</div>${dictAide()}
+   ${SR?`<div class="row joCtl" data-ctl="jo_tr" hidden><button type="button" class="btn ghost sm" data-act="joDictPoint">▶ Nouveau point de l'ordre du jour</button><button type="button" class="btn ghost sm" data-act="joDictPause" aria-pressed="false">⏸ Pause : causerie, hors sujet</button></div><p class="joEtat" data-etat="jo_tr" aria-live="polite"></p>`:''}
+   ${br&&br.t?`<p class="note">Un enregistrement non enregistré du ${new Date(br.le).toLocaleString('fr-FR')} a été retrouvé et remis ci-dessous. Vérifiez-le, puis enregistrez.</p>`:''}
+   <textarea id="jo_tr" name="transcription" rows="10" placeholder="La parole s'écrit ici pendant l'activité. Vous pouvez aussi coller ou taper vos notes.">${esc(j.transcription||(br&&br.t)||'')}</textarea>
+   <small class="muted">Seul le texte est gardé, jamais le son : les silences ne pèsent rien. Après 2 minutes sans parole, l'écriture se met en pause et reprend dès qu'on parle. Pendant une causerie ou un échange hors sujet, appuyez sur « Pause ». Le texte est sauvegardé sur l'appareil toutes les 30 secondes. Pour une journée entière, branchez le téléphone au chargeur. Il faut Internet ; relisez les noms propres et les chiffres.</small></div>`;
+ const part=`<div class="trL"><label for="jo_part">Participants : une personne par ligne, « nom ; fonction ; structure ; F ou H »</label><textarea id="jo_part" name="participants" rows="4" placeholder="KONE Ali ; Directeur départemental ; DDS Kong ; H">${esc(j.participants||'')}</textarea>
+   <div class="row iaRow">${iaOK()?`<label class="btn ghost sm joFic">${ico('etoile')} Lire la liste de présence (photo)<input type="file" accept="image/*" multiple data-jo-liste hidden></label>`:''}<label class="btn ghost sm joFic">Joindre des photos de l'activité<input type="file" accept="image/*" multiple data-jo-photos hidden></label><span class="muted" id="joEff">${esc(joEffTxt(joEffectif(joPartsJ(j))))}</span></div>
+   <p class="muted" id="joAnxZ"></p><small class="muted">Prenez la liste signée en photo, bien à plat et éclairée : les noms s'ajoutent ci-dessus et la photo est jointe en annexe 1 ; les photos de l'activité vont en annexe 2. Pour une activité avec des bénéficiaires (causerie, dépistage, VBG), ne saisissez pas de noms : seul l'effectif compte.</small></div>`;
+ if(par)return `<p><button class="lnk" data-act="joFermer">← Retour</button></p>`+head(`Point de la journée ${j.jour}`,`${esc(par.titre)} · ${fmtD(joDateJour(par,j.jour))}. Enregistrez la journée, joignez la liste de présence et les photos, puis rédigez le point du jour : il sera compilé dans le rapport global par ${esc(who(par.auteur_id))}.`)+
+  `<form data-form="joForm" data-id="${j.id||''}" data-parent="${par.id}" data-jour="${j.jour}" class="card grid trForm">
+  <div><label>Date</label><input name="date_evt" type="date" required value="${j.date_evt||joDateJour(par,j.jour)}"></div>
+  <div><label>Début</label><input name="heure_debut" type="time" value="${esc(j.heure_debut||'')}"></div><div><label>Fin</label><input name="heure_fin" type="time" value="${esc(j.heure_fin||'')}"></div>
+  <div class="trL2"><label>Lieu</label><input name="lieu" value="${esc(j.lieu||par.lieu||'')}"></div>
+  ${part}${rec}
+  <div class="trL"><label for="jo_notes">Mes notes de la journée (décisions, chiffres, points à retenir)</label><textarea id="jo_notes" name="notes" rows="4">${esc(j.notes||'')}</textarea>${dictBtn('jo_notes')}</div>
+  <div class="trL row"><button class="btn ghost" type="submit" value="brouillon">Enregistrer</button>${iaOK()?`<button class="btn iaB" type="submit" value="pv">${ico('etoile')} Enregistrer et rédiger le point du jour</button>`:''}</div></form>`;
+ return `<p><button class="lnk" data-act="joFermer">← Journal</button></p>`+head(j.id?'Modifier l\'entrée':'Nouvelle réunion ou activité','Réunion de projet, réunion à laquelle OSV est invitée, formation, atelier, mission… Pendant l\'activité, lancez l\'enregistrement : la parole s\'écrit au fil de l\'eau. À la fin, l\'assistant rédige le document ; vous le relisez et le validez. Pour une activité de plusieurs jours, indiquez le dernier jour : chaque journée aura son rapporteur et son point, compilés ensuite en un rapport global.')+
  `<form data-form="joForm" data-id="${j.id||''}" class="card grid trForm">
   ${p14?`<fieldset class="trL joCadre"><legend>Cette activité relève</legend><label class="trChk"><input type="radio" name="cadre" value="projet" ${cadre==='projet'?'checked':''} data-jo-cadre> d'un projet d'OSV</label><label class="trChk"><input type="radio" name="cadre" value="institutionnel" ${cadre==='institutionnel'?'checked':''} data-jo-cadre> de la vie de l'organisation (hors projet : invitation, formation, partenariat, plaidoyer…)</label></fieldset>`:''}
   <div class="trL2"><label>Nature de l'activité</label><select name="type">${opts(types,j.type||(cadre==='projet'?(p14?'reunion_projet':'reunion'):(p14?'reunion_externe':'reunion')))}</select></div>
@@ -6182,31 +6211,33 @@ function joEditeur(j){j=j||{};const proj=S.projets.filter(p=>!['archive','rejete
   <div class="trL"><label>Objet <span class="req">*</span></label><input name="titre" required value="${esc(j.titre||'')}" placeholder="ex. Réunion de coordination à la Direction départementale de la santé de Kong"></div>
   ${p14?`<div class="trL2"><label>Structure organisatrice</label><input name="organisateur" value="${esc(j.organisateur||'')}" placeholder="ex. Direction régionale de la santé, PNUD, OSV"></div>
   <div><label>Rôle d'OSV</label><select name="role_osv">${opts(Object.entries(JO_ROLE),j.role_osv||(cadre==='projet'?'organisateur':'invite'))}</select></div>`:''}
-  <div><label>Date</label><input name="date_evt" type="date" required value="${j.date_evt||today()}"></div>
+  <div><label>${p16?'Date (premier jour)':'Date'}</label><input name="date_evt" type="date" required value="${j.date_evt||today()}"></div>
+  ${p16?`<div><label>Dernier jour <span class="muted">(si plusieurs jours)</span></label><input name="date_fin" type="date" value="${j.date_fin||''}"></div>`:''}
   ${p14?`<div><label>Début</label><input name="heure_debut" type="time" value="${esc(j.heure_debut||'')}"></div><div><label>Fin</label><input name="heure_fin" type="time" value="${esc(j.heure_fin||'')}"></div>`:''}
   <div class="trL2"><label>Lieu</label><input name="lieu" value="${esc(j.lieu||'')}"></div>
-  <div class="trL"><label for="jo_part">Participants : une personne par ligne, « nom ; fonction ; structure »</label><textarea id="jo_part" name="participants" rows="3" placeholder="KONE Ali ; Directeur départemental ; DDS Kong">${esc(j.participants||'')}</textarea></div>
-  <div class="trL joRec"><label for="jo_tr">Enregistrement de l'activité</label><div class="row iaRow">${SR?`<button type="button" class="btn dictBtn joBig" data-act="dicter" data-cible="jo_tr" aria-pressed="false">${ico('mic')} <span>Démarrer l'enregistrement</span></button><span class="dictLive" data-live="jo_tr" aria-live="polite"></span>`:''}</div>${dictAide()}
-   <textarea id="jo_tr" name="transcription" rows="10" placeholder="La parole s'écrit ici pendant l'activité. Vous pouvez aussi coller ou taper vos notes.">${esc(j.transcription||'')}</textarea>
-   <small class="muted">L'écran reste allumé pendant l'enregistrement. Il faut Internet ; relisez les noms propres et les chiffres.</small></div>
+  ${mis.length?`<div class="trL2"><label>Ordre de mission rattaché <span class="muted">(mission de supervision…)</span></label><select name="mission_id">${opts(mis.map(m=>[m.id,`${m.numero?'n° '+m.numero+' – ':''}${m.objet||m.destination||'Mission'} (${fmtD(m.date_depart)})`]),j.mission_id||'','— aucun —')}</select><small class="muted">Le rapport sera rédigé au regard des TDR de cette mission.</small></div>`:''}
+  ${part}${rec}
   <div class="trL"><label for="jo_notes">Mes notes (décisions, chiffres, points à retenir)</label><textarea id="jo_notes" name="notes" rows="4">${esc(j.notes||'')}</textarea>${dictBtn('jo_notes')}</div>
   <div><label>Qui peut lire ?</label><select name="partage">${opts(Object.entries(JO_P),j.partage||'direction')}</select></div>
   <div class="trL"><label class="trChk"><input type="checkbox" name="confidentiel" ${j.confidentiel?'checked':''}> Confidentiel : seul le Directeur exécutif pourra le lire, une fois validé</label></div>
   <div class="trL row"><button class="btn ghost" type="submit" value="brouillon">Enregistrer</button>${iaOK()?`<button class="btn iaB" type="submit" value="pv">${ico('etoile')} Enregistrer et rédiger le document</button>`:''}</div></form>`}
 const joMarques=pv=>(JSON.stringify(pv||{}).match(/\[à (compléter|préciser)[^\]]*\]/gi)||[]).length;
-function joDetail(j){const a=j.auteur_id===me.id,pv=j.pv,p=j.projet_id&&projet(j.projet_id),nm=joMarques(pv);
- return `<p><button class="lnk" data-act="joFermer">← Journal</button></p>${srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:''}<div class="head"><h1>${esc(j.titre)}</h1><p>${esc(JO_T[j.type]||j.type)} · ${fmtD(j.date_evt)}${j.heure_debut?' · '+esc(j.heure_debut)+(j.heure_fin?'–'+esc(j.heure_fin):''):''}${j.lieu?' · '+esc(j.lieu):''} · ${esc(who(j.auteur_id))}</p><p>${p?'Projet : '+esc(libProj(p)):'Activité institutionnelle (hors projet)'}${j.organisateur?' · organisée par '+esc(j.organisateur):''}${j.role_osv?' · '+esc(JO_ROLE[j.role_osv]||''):''}</p></div>
+function joDetail(j){const a=j.auteur_id===me.id,pv=j.pv,p=j.projet_id&&projet(j.projet_id),nm=joMarques(pv),par=joParent(j),multi=!par&&joJours(j)>1;
+ return `<p>${par?`<button class="lnk" data-act="joVoir" data-id="${par.id}">← ${esc(par.titre)}</button>`:'<button class="lnk" data-act="joFermer">← Journal</button>'}</p>${srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:''}<div class="head"><h1>${esc(j.titre)}</h1><p>${par?`Point de la journée ${j.jour} sur ${joJours(par)} · `:''}${esc(JO_T[j.type]||j.type)} · ${multi?`du ${fmtD(j.date_evt)} au ${fmtD(j.date_fin)} (${joJours(j)} jours)`:fmtD(j.date_evt)}${j.heure_debut?' · '+esc(j.heure_debut)+(j.heure_fin?'–'+esc(j.heure_fin):''):''}${j.lieu?' · '+esc(j.lieu):''} · ${esc(who(j.auteur_id))}</p><p>${p?'Projet : '+esc(libProj(p)):'Activité institutionnelle (hors projet)'}${j.organisateur?' · organisée par '+esc(j.organisateur):''}${j.role_osv?' · '+esc(JO_ROLE[j.role_osv]||''):''}</p></div>
  <div class="row" style="margin-bottom:1rem">${j.statut==='valide'?tag(['Document validé','ok']):tag(['Brouillon','warn'])}${j.confidentiel?tag(['Confidentiel','bad']):''}${nm&&j.statut!=='valide'?tag([nm+' passage(s) à compléter','bad']):''}<span class="muted">Lecture : ${esc(JO_P[j.partage])}</span></div>
  ${pv?`<div class="row" style="margin-bottom:1rem"><button class="btn" data-act="joWord" data-id="${j.id}">Télécharger en Word</button><button class="btn ghost sm" data-act="joImp" data-id="${j.id}">Aperçu, impression ou PDF</button></div>`:''}
- ${a?`<div class="row" style="margin-bottom:1rem"><button class="btn ghost sm" data-act="joModif" data-id="${j.id}">Modifier les informations et les notes</button>${pv&&!JR.pvEdit&&j.statut!=='valide'?`<button class="btn ghost sm" data-act="joPvEdit">Corriger le document</button>`:''}${iaOK()&&j.statut!=='valide'?`<button class="btn ghost sm iaB2" data-act="joPv" data-id="${j.id}">${ico('etoile')} ${pv?'Rédiger à nouveau':'Rédiger le document'}</button>`:''}${pv&&j.statut!=='valide'?`<button class="btn sm" data-act="joValider" data-id="${j.id}">Valider le document</button>`:''}${j.statut!=='valide'?`<button class="btn danger sm" data-act="joSuppr" data-id="${j.id}">Supprimer</button>`:''}</div>`:''}
+ ${a?`<div class="row" style="margin-bottom:1rem"><button class="btn ghost sm" data-act="joModif" data-id="${j.id}">Modifier les informations et les notes</button>${pv&&!JR.pvEdit&&j.statut!=='valide'?`<button class="btn ghost sm" data-act="joPvEdit">Corriger le document</button>`:''}${iaOK()&&j.statut!=='valide'&&!multi?`<button class="btn ghost sm iaB2" data-act="joPv" data-id="${j.id}">${ico('etoile')} ${pv?'Rédiger à nouveau':par?'Rédiger le point du jour':'Rédiger le document'}</button>`:''}${pv&&j.statut!=='valide'?`<button class="btn sm" data-act="joValider" data-id="${j.id}">Valider le document</button>`:''}${j.statut!=='valide'?`<button class="btn danger sm" data-act="joSuppr" data-id="${j.id}">Supprimer</button>`:''}</div>`:''}
  ${(S.veille||[]).some(v=>v.journal_id===j.id)?`<p class="note">Une note de veille stratégique a été tirée de cette activité. <button class="lnk" data-act="veVoir" data-id="${S.veille.find(v=>v.journal_id===j.id).id}">L'ouvrir</button></p>`:''}
+ ${joJourneesVue(j,a)}
+ ${a&&pv&&L2(pv.elements_ecartes).length?`<details class="card"><summary><b>Écarté à la rédaction</b> <span class="muted">(causeries, échanges hors sujet : ${L2(pv.elements_ecartes).length})</span></summary><ul style="margin-top:.6rem">${L2(pv.elements_ecartes).map(x=>`<li>${esc(x)}</li>`).join('')}</ul><p class="muted">Ces passages ne figurent pas dans le document. Si l'un d'eux compte, ajoutez-le dans vos notes, puis rédigez à nouveau.</p></details>`:''}
  ${nm&&a&&j.statut!=='valide'?`<p class="note">Les passages <mark>surlignés</mark> sont à compléter avant validation : cliquez sur « Corriger le document ».</p>`:''}
- ${pv?(JR.pvEdit&&a?pvEditeur(j):`<article class="card pvDoc">${pvHTML(pv,false,j)}</article>`):`<p class="note">Pas encore de document.${a&&iaOK()?' Cliquez sur « Rédiger le document ».':''}</p>`}
+ ${pv?(JR.pvEdit&&a?pvEditeur(j):`<article class="card pvDoc">${pvHTML(pv,false,j)}</article>`):`<p class="note">Pas encore de document.${a&&iaOK()?(multi?' Quand les points des journées sont rédigés, cliquez sur « Compiler le rapport global ».':' Cliquez sur « Rédiger le document ».'):''}</p>`}
+ ${joAnnexesVue(j,a&&j.statut!=='valide'||a&&me.role==='DE')}
  ${j.notes?`<details class="card"><summary><b>Notes</b></summary><p class="pre" style="margin-top:.6rem">${esc(j.notes)}</p></details>`:''}
  ${j.transcription?`<details class="card"><summary><b>Enregistrement</b> <span class="muted">(${num(j.transcription.split(/\s+/).length)} mots)</span></summary><p class="pre" style="margin-top:.6rem">${esc(j.transcription)}</p></details>`:''}`}
 const L2=v=>(Array.isArray(v)?v:[]).filter(x=>x&&(typeof x!=='string'||x.trim()));
 const joMark=(s,papier)=>papier?esc(s):esc(s).replace(/\[à (compléter|préciser)[^\]]*\]/gi,m=>`<mark>${m}</mark>`);
-function joPartsJ(j){const t=String(j&&j.participants||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean);return t.length&&t.some(l=>l.includes(';'))?t.map(l=>{const [nom,fonction,structure]=l.split(';').map(x=>x.trim());return {nom,fonction:fonction||'',structure:structure||''}}):[]}
+function joPartsJ(j){const t=String(j&&j.participants||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean);return t.length&&t.some(l=>l.includes(';'))?t.map(l=>{const [nom,fonction,structure,sx]=l.split(';').map(x=>x.trim());return {nom,fonction:fonction||'',structure:structure||'',sexe:/^f/i.test(sx||'')?'F':/^[hm]/i.test(sx||'')?'H':''}}):[]}
 function pvHTML(pv,papier,j){const M=s=>joMark(String(s??''),papier),ul=L=>L.length?`<ul>${L.map(x=>`<li>${M(x)}</li>`).join('')}</ul>`:'',ol=L=>L.length?`<ol>${L.map(x=>`<li>${M(x)}</li>`).join('')}</ol>`:'';
  let n=0;const T=t=>`<h2>${++n}. ${t}</h2>`,para=s=>String(s||'').split(/\n{2,}|\n/).filter(x=>x.trim()).map(x=>`<p>${M(x)}</p>`).join('');
  const part=L2(pv.participants).length?L2(pv.participants):joPartsJ(j);
@@ -6214,16 +6245,24 @@ function pvHTML(pv,papier,j){const M=s=>joMark(String(s??''),papier),ul=L=>L.len
  const pts=L2(pv.points);let h='';
  if(pv.resume)h+=`<p><b>Synthèse.</b> ${M(pv.resume)}</p>`;
  if(pv.contexte||L2(pv.objectifs).length)h+=T('Contexte et objectifs')+para(pv.contexte)+(L2(pv.objectifs).length?`<p>Objectifs :</p>${ul(L2(pv.objectifs))}`:'');
- if(part.length)h+=T('Participants')+tab(['N°','Nom et prénoms','Fonction','Structure'],'6,34,30,30',part.map((x,i)=>[i+1,M(x.nom),M(x.fonction),M(x.structure)]))+`<p class="petit">Effectif : ${part.length} participant(s).</p>`;
+ const jp=j?joPartsJ(j):[],eff=joEffectif(jp.length?jp:part.map(x=>({sexe:x.sexe||''}))),E=j&&!j.parent_id?joEnfants(j):[];
+ if(pv.methodologie)h+=T('Méthodologie et déroulement général')+para(pv.methodologie);
+ if(E.length)h+=T('Participation')+joEffJours(j);
+ else if(jp.length>12)h+=T('Participants')+`<p>${esc(joEffTxt(eff))}. La liste nominative figure en annexe.</p>`;
+ else if(part.length){const sx=part.some(x=>x.sexe);h+=T('Participants')+(sx?tab(['N°','Nom et prénoms','Fonction','Structure','Sexe'],'6,32,26,26,10',part.map((x,i)=>[i+1,M(x.nom),M(x.fonction),M(x.structure),M(x.sexe||'')])):tab(['N°','Nom et prénoms','Fonction','Structure'],'6,34,30,30',part.map((x,i)=>[i+1,M(x.nom),M(x.fonction),M(x.structure)])))+`<p class="petit">Effectif : ${esc(joEffTxt(eff)||part.length+' participant(s)')}.</p>`}
+ if(L2(pv.journees).length){h+=T('Déroulement par journée');const k=n;h+=L2(pv.journees).map(x=>`<h3>${k}.${x.jour||''}. Journée ${M(x.jour)}${x.date&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)?' – '+fmtD(x.date):''}${x.theme?' : '+M(x.theme):''}</h3>${para(x.synthese)}`).join('')}
  if(L2(pv.ordre_du_jour).length)h+=T('Ordre du jour')+ol(L2(pv.ordre_du_jour));
- if(pts.length){h+=T('Déroulement et principaux échanges');const k=n;h+=pts.map((x,i)=>`<h3>${k}.${i+1}. ${M(x.titre)}</h3>${para(x.synthese)}`).join('')}
+ if(pts.length){h+=T(L2(pv.journees).length?'Analyse par axe':'Déroulement et principaux échanges');const k=n;h+=pts.map((x,i)=>`<h3>${k}.${i+1}. ${M(x.titre)}</h3>${para(x.synthese)}`).join('')}
+ if(L2(pv.atteinte).length)h+=T('Atteinte des objectifs et des résultats attendus')+tab(['N°','Objectif ou résultat attendu','Réalisation','Niveau'],'6,34,42,18',L2(pv.atteinte).map((x,i)=>[i+1,M(x.objectif),M(x.realisation),M(x.niveau)]));
  if(L2(pv.constats).length)h+=T('Constats')+ul(L2(pv.constats));
  if(L2(pv.acquis).length)h+=T('Acquis et compétences renforcées')+ul(L2(pv.acquis));
+ if(L2(pv.difficultes).length)h+=T('Difficultés rencontrées')+ul(L2(pv.difficultes));
  if(L2(pv.position_osv).length)h+=T('Position et contributions d\'OSV')+ul(L2(pv.position_osv));
  if(L2(pv.decisions).length)h+=T('Décisions')+ol(L2(pv.decisions));
  if(L2(pv.recommandations).length)h+=T('Recommandations')+ol(L2(pv.recommandations));
  if(L2(pv.actions).length)h+=T('Plan d\'actions')+tab(['N°','Action','Responsable','Échéance'],'6,54,22,18',L2(pv.actions).map((x,i)=>[i+1,M(x.action),M(x.responsable),M(x.echeance)]));
  if(L2(pv.engagements_osv).length)h+=T('Engagements d\'OSV')+ul(L2(pv.engagements_osv));
+ if(pv.compile&&pv.conclusion)h+=T('Conclusion')+para(pv.conclusion);
  return h}
 function pvEditeur(j){const pv=j.pv||{},Lg=k=>L2(pv[k]).join('\n'),A=(k,l,v,r=3)=>`<div class="trL"><label for="pv_${k}">${l}</label><textarea id="pv_${k}" name="${k}" rows="${r}">${esc(v)}</textarea></div>`;
  return `<form data-form="joPvForm" data-id="${j.id}" class="card grid trForm"><p class="muted trL">Une ligne par élément. Dans les tableaux, séparez les colonnes par « ; ». Remplacez chaque « [à compléter : …] » par l'information exacte.</p>
@@ -6234,18 +6273,20 @@ function pvEditeur(j){const pv=j.pv||{},Lg=k=>L2(pv[k]).join('\n'),A=(k,l,v,r=3)
  ${A('decisions','Décisions',Lg('decisions'))}${A('recommandations','Recommandations',Lg('recommandations'))}
  ${A('actions','Plan d\'actions : « action ; responsable ; échéance »',L2(pv.actions).map(x=>[x.action,x.responsable,x.echeance].join(' ; ')).join('\n'))}
  ${A('engagements_osv','Engagements d\'OSV',Lg('engagements_osv'))}
+ ${pv.compile?`${A('methodologie','Méthodologie et déroulement général',pv.methodologie||'',4)}${A('journees','Déroulement par journée : « jour ; date AAAA-MM-JJ ; thème ; synthèse »',L2(pv.journees).map(x=>[x.jour,x.date,x.theme,x.synthese].join(' ; ')).join('\n'),8)}${A('atteinte','Atteinte des objectifs : « objectif ; réalisation ; niveau »',L2(pv.atteinte).map(x=>[x.objectif,x.realisation,x.niveau].join(' ; ')).join('\n'),6)}${A('difficultes','Difficultés rencontrées',Lg('difficultes'))}${A('conclusion','Conclusion',pv.conclusion||'',4)}`:''}
  <div class="trL row"><button class="btn" type="submit">Enregistrer les corrections</button><button class="btn ghost" type="button" data-act="joPvAnnul">Annuler</button></div></form>`}
 function joCorps(j){const pv=j.pv||{},p=j.projet_id&&projet(j.projet_id),u=S.staff.find(x=>x.id===j.auteur_id)||{},fonc=u.id?posteLib(u):'';
- const lig=[['Objet',esc(pv.titre||j.titre)],['Date',fmtD(j.date_evt)+(j.heure_debut?`, de ${esc(j.heure_debut)}${j.heure_fin?' à '+esc(j.heure_fin):''}`:'')],...(j.lieu?[['Lieu',esc(j.lieu)]]:[]),...(j.organisateur?[['Organisé par',esc(j.organisateur)]]:[]),
-  ...(j.role_osv?[['Participation d\'OSV',esc(JO_ROLE[j.role_osv]||'')]]:[]),['Cadre',p?'Projet « '+esc(p.nom)+' »'+(p.bailleur?' – '+esc(p.bailleur):''):'Activité institutionnelle'],['Rapporteur',esc(u.nom||who(j.auteur_id))+(fonc?', '+esc(fonc):'')]];
+ const par=joParent(j),nj=joJours(j),E=joEnfants(j),m=joMission(par||j);
+ const lig=[['Objet',esc(pv.titre||j.titre)],...(par?[['Activité',esc(par.titre)+` – journée ${j.jour} sur ${joJours(par)}`]]:[]),nj>1?['Période',`du ${fmtD(j.date_evt)} au ${fmtD(j.date_fin)} (${nj} jours)`]:['Date',fmtD(j.date_evt)+(j.heure_debut?`, de ${esc(j.heure_debut)}${j.heure_fin?' à '+esc(j.heure_fin):''}`:'')],...(m?[['Ordre de mission',esc((m.numero?'n° '+m.numero+' – ':'')+(m.objet||''))]]:[]),...(j.lieu?[['Lieu',esc(j.lieu)]]:[]),...(j.organisateur?[['Organisé par',esc(j.organisateur)]]:[]),
+  ...(j.role_osv?[['Participation d\'OSV',esc(JO_ROLE[j.role_osv]||'')]]:[]),['Cadre',p?'Projet « '+esc(p.nom)+' »'+(p.bailleur?' – '+esc(p.bailleur):''):'Activité institutionnelle'],...(E.length?[['Rapporteurs des journées',E.map(x=>`J${x.jour} : ${esc(who(x.auteur_id))}`).join(' · ')],['Compilation',esc(u.nom||who(j.auteur_id))+(fonc?', '+esc(fonc):'')]]:[['Rapporteur',esc(u.nom||who(j.auteur_id))+(fonc?', '+esc(fonc):'')]])];
  return `<h1 class="doc-t">${esc(String(joTitreDoc(j)).toUpperCase())}</h1><p class="doc-s">${esc(pv.titre||j.titre)}</p>
  <table class="kv">${lig.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('')}</table>
  ${pvHTML(pv,true,j)}
- <div class="bloc"><p style="text-align:right">Fait à ${esc((j.lieu||'Yamoussoukro').split(',')[0])}, le ${fmtD(j.valide_le||j.date_evt)}</p><div class="sig" style="--n:2"><div><b>Le rapporteur</b>${esc(u.nom||'')}<br>${esc(fonc)}</div><div><b>Visa de la direction</b>${j.statut==='valide'?'':'<br>'}</div></div></div>`}
+ <div class="bloc"><p style="text-align:right">Fait à ${esc((j.lieu||'Yamoussoukro').split(',')[0])}, le ${fmtD(j.valide_le||j.date_evt)}</p><div class="sig" style="--n:2"><div><b>${E.length?'Le rapporteur général':'Le rapporteur'}</b>${esc(u.nom||'')}<br>${esc(fonc)}</div><div><b>Visa de la direction</b>${j.statut==='valide'?'':'<br>'}</div></div></div>${joAnnexesPapier(j)}`}
 const joNom=j=>`${String(joTitreDoc(j)).replace(/[^A-Za-zÀ-ÿ0-9]+/g,'_').replace(/^_|_$/g,'')}_${j.date_evt}`;
 const joRef=j=>`<b>${fmtD(j.date_evt)}</b><br>${esc(JO_T[j.type]||'')}`;
-function joImprimer(j){ouvrirPapier(joTitreDoc(j)+' – '+j.titre,joCorps(j),{nom:joNom(j),ref:joRef(j),filigrane:j.statut==='valide'?null:'PROJET'})}
-function joWord(j){telechargerWord(joNom(j)+'.docx',joTitreDoc(j)+' – '+j.titre,joCorps(j),{ref:joRef(j)})}
+async function joImprimer(j){const D=joDocsTous(j);if(D.some(d=>!ANX[d.id]))await joCharger(D);ouvrirPapier(joTitreDoc(j)+' – '+j.titre,joCorps(j),{nom:joNom(j),ref:joRef(j),filigrane:j.statut==='valide'?null:'PROJET'})}
+async function joWord(j){await joCharger(joDocsTous(j));telechargerWord(joNom(j)+'.docx',joTitreDoc(j)+' – '+j.titre,joCorps(j),{ref:joRef(j)})}
 function joContexte(rec,id){const c={nature:JO_T[rec.type]||rec.type,cadre:rec.cadre==='institutionnel'||!rec.projet_id?'institutionnel (hors projet)':'projet',structure_organisatrice:rec.organisateur||'',role_osv:JO_ROLE[rec.role_osv]||'',horaire:[rec.heure_debut,rec.heure_fin].filter(Boolean).join(' – '),
   redacteur:{nom:who(me.id),fonction:posteLib(S.staff.find(u=>u.id===me.id)||{})}};
  const p=rec.projet_id&&projet(rec.projet_id);
@@ -6257,7 +6298,138 @@ function joContexte(rec,id){const c={nature:JO_T[rec.type]||rec.type,cadre:rec.c
  else c.organisation={nom:'ONG Sécurité Vie (OSV)',siege:'Yamoussoukro, Côte d\'Ivoire',domaines:OSV_DOMAINES,slogan:'Agir pour sauver des vies au quotidien',
   activites_institutionnelles_recentes:S.journal.filter(x=>!x.projet_id&&x.id!==id&&x.pv&&x.statut==='valide').sort((a,b)=>a.date_evt<b.date_evt?1:-1).slice(0,3).map(x=>({date:x.date_evt,objet:x.titre,synthese:x.pv.resume}))};
  return c}
-const joPayload=(rec,id)=>({type:JO_T[rec.type]||rec.type,titre:rec.titre,date:rec.date_evt,lieu:rec.lieu,participants:rec.participants,notes:rec.notes,transcription:rec.transcription,contexte:joContexte(rec,id)});
+const joPayload=(rec,id)=>{const par=rec.parent_id&&S.journal.find(x=>x.id===rec.parent_id),t=joTdr(par||rec);
+ return {type:JO_T[rec.type]||rec.type,titre:rec.titre,date:rec.date_evt,lieu:rec.lieu,participants:rec.participants,notes:rec.notes,transcription:rec.transcription,contexte:joContexte(par||rec,id),
+  ...(par?{journee:{numero:rec.jour,date:rec.date_evt,activite:par.titre,du:par.date_evt,au:par.date_fin,nombre_de_jours:joJours(par),notes_du_coordonnateur:par.notes||''}}:{}),
+  ...(t?{tdr:{titre:t.titre,objectif_general:t.objectif_general,objectifs_specifiques:t.objectifs_specifiques,resultats_attendus:t.resultats}}:{})}};
+/* ---------- activités de plusieurs jours, listes de présence photographiées, annexes ---------- */
+let p16=false;
+const JO_LISTE='Liste de présence (scan)',JO_PHOTO='Photo d\'activité';
+let joAnx={liste:[],photos:[]};                 // photos choisies dans le formulaire, archivées à l'enregistrement
+const ANX={};                                    // id du document → {url, data, w, h} (chargé à la demande)
+const joJours=j=>{if(!j||!j.date_fin||j.date_fin<=j.date_evt)return 1;return Math.min(31,Math.round((new Date(j.date_fin+'T12:00')-new Date(j.date_evt+'T12:00'))/864e5)+1)};
+const joDateJour=(j,n)=>{const d=new Date(j.date_evt+'T12:00');d.setDate(d.getDate()+n-1);return d.toISOString().slice(0,10)};
+const joEnfants=j=>S.journal.filter(x=>x.parent_id===j.id).sort((a,b)=>(a.jour||0)-(b.jour||0));
+const joParent=j=>j&&j.parent_id?S.journal.find(x=>x.id===j.parent_id):null;
+const joRapp=(j,n)=>(j.rapporteurs||[])[n-1]||null;
+const joDocs=j=>(S.docs||[]).filter(d=>d.objet==='journal'&&d.objet_id===j.id&&d.fichier_chemin);
+const joListes=j=>joDocs(j).filter(d=>d.type_doc===JO_LISTE),joPhotos=j=>joDocs(j).filter(d=>d.type_doc===JO_PHOTO);
+const joMission=j=>j&&j.mission_id?(S.missions||[]).find(m=>m.id===j.mission_id):null;
+const joTdr=j=>{const m=joMission(j);return m&&m.tdr_id?(S.tdrs||[]).find(t=>t.id===m.tdr_id):null};
+function joEffectif(L){const f=L.filter(x=>/^f/i.test(x.sexe||'')).length,h=L.filter(x=>/^[hm]/i.test(x.sexe||'')).length;return {n:L.length,f,h,nd:L.length-f-h}}
+const joEffTxt=e=>e.n?`${e.n} participant${e.n>1?'s':''}${e.f||e.h?`, dont ${e.f} femme${e.f>1?'s':''} et ${e.h} homme${e.h>1?'s':''}${e.nd?` (${e.nd} non précisé${e.nd>1?'s':''})`:''}`:''}`:'';
+const joNorm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase().replace(/[^A-Z]/g,'');
+
+/* une photo est réduite avant envoi (≈ 300 Ko) : plus rapide sur le réseau du terrain, et le texte reste lisible */
+async function imgReduire(src,max=1600,q=.82){const url=typeof src==='string'?src:URL.createObjectURL(src);
+ try{const im=await new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ko(new Error('Cette image ne peut pas être lue. Prenez la photo en JPEG (réglage « Le plus compatible » sur iPhone).'));i.src=url});
+  const k=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.naturalWidth*k));c.height=Math.max(1,Math.round(im.naturalHeight*k));
+  const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);
+  const blob=await new Promise(ok=>c.toBlob(ok,'image/jpeg',q));return {blob,w:c.width,h:c.height,data:c.toDataURL('image/jpeg',q)}}
+ finally{if(typeof src!=='string')URL.revokeObjectURL(url)}}
+const b64De=data=>data.split(',')[1];
+
+/* lecture des noms sur les photos de la liste de présence */
+async function joLirePresence(btn,files){const ta=document.getElementById('jo_part');if(!ta||!files.length)return;
+ if(files.length>8){alert('8 photos au maximum à la fois.');return}
+ await iaAvec(btn,async()=>{const R=[];for(const f of files)R.push(await imgReduire(f,2000,.85));
+  const r=await iaAppel('presence',{activite:(document.querySelector('form[data-form="joForm"] [name="titre"]')||{}).value||''},R.map(x=>({media_type:'image/jpeg',data:b64De(x.data)})));
+  joAnx.liste.push(...R.map((x,i)=>({blob:x.blob,nom:files[i].name})));
+  const deja=new Set(String(ta.value).split(/\r?\n/).map(l=>joNorm(l.split(';')[0])).filter(Boolean));
+  const L=L2(r.participants).filter(p=>p&&p.nom&&!deja.has(joNorm(p.nom)));
+  const lig=L.map(p=>[p.nom,p.fonction||'',p.structure||'',/^f/i.test(p.sexe||'')?'F':/^[hm]/i.test(p.sexe||'')?'H':''].join(' ; ').replace(/( ; )+$/,''));
+  if(lig.length)ta.value=(ta.value.trim()?ta.value.trim()+'\n':'')+lig.join('\n');ta.dispatchEvent(new Event('input',{bubbles:true}));joAnxApercu();
+  const av=L2(r.a_verifier);alert(`${L.length} participant(s) ajouté(s) à partir de ${files.length} photo(s)${r.effectif_lu&&Number(r.effectif_lu)!==L.length?` (la liste en compte ${r.effectif_lu} : vérifiez)`:''}.${r.lisibilite==='faible'?'\n\nLa photo est peu lisible : relisez attentivement les noms.':''}${av.length?'\n\nÀ vérifier :\n· '+av.join('\n· '):''}\n\nLes photos de la liste seront jointes en annexe à l'enregistrement.`)})}
+function joAnxApercu(){const z=document.getElementById('joAnxZ');if(!z)return;const n1=joAnx.liste.length,n2=joAnx.photos.length;
+ z.textContent=n1||n2?`Prêt à joindre en annexe : ${n1} photo(s) de liste de présence, ${n2} photo(s) de l'activité.`:''}
+function joPartMaj(){const ta=document.getElementById('jo_part'),o=document.getElementById('joEff');if(!ta||!o)return;o.textContent=joEffTxt(joEffectif(joPartsJ({participants:ta.value})))}
+
+/* archivage des annexes (dans les Archives, rattachées à l'entrée du journal) */
+async function joArchiverAnnexes(j){const dep=j.confidentiel||!j.projet_id?'DIRECTION':'PROGRAMMES',L=[...joAnx.liste.map(x=>[x,JO_LISTE]),...joAnx.photos.map(x=>[x,JO_PHOTO])];let n=0,err='';
+ for(const [x,t] of L){try{const red=x.w?x:await imgReduire(x.blob||x,t===JO_LISTE?2000:1600,t===JO_LISTE?.85:.8);
+   const nom=`${t===JO_LISTE?'liste_presence':'photo'}_${j.date_evt}${j.jour?'_J'+j.jour:''}_${++n}.jpg`;
+   await arDeposer({departement:dep,projet:j.projet_id||null,type_doc:t,titre:`${t===JO_LISTE?'Liste de présence':'Photo'} – ${j.titre}`,annee:Number(String(j.date_evt).slice(0,4)),date_doc:j.date_evt,statut:'valide'},new File([red.blob],nom,{type:'image/jpeg'}),{objet:'journal',objet_id:j.id})}
+  catch(e){err=e.message}}
+ joAnx={liste:[],photos:[]};if(err)throw new Error('Une partie des annexes n\'a pas pu être archivée : '+err);return L.length}
+
+/* chargement des annexes pour l'écran, l'impression et le Word */
+async function joCharger(D){await Promise.all(D.filter(d=>!ANX[d.id]).map(async d=>{try{const b=await stoGetA(d.fichier_chemin),r=await imgReduire(b,1400,.8);ANX[d.id]={url:URL.createObjectURL(r.blob),data:r.data,w:r.w,h:r.h}}catch(_){ANX[d.id]={err:true}}}))}
+function joVignettes(){const I=[...document.querySelectorAll('img[data-anx]:not([src])')];if(!I.length)return;
+ const D=I.map(i=>(S.docs||[]).find(d=>d.id===i.dataset.anx)).filter(Boolean);
+ joCharger(D).then(()=>I.forEach(i=>{const a=ANX[i.dataset.anx];if(a&&a.url&&document.contains(i))i.src=a.url;else if(a&&a.err)i.alt='Image non disponible'}))}
+const joVign=d=>`<button type="button" class="joV" data-act="joAnxVoir" data-id="${d.id}" title="Agrandir"><img data-anx="${d.id}" alt="${esc(d.titre)}" width="132" height="99"></button>`;
+function joAnnexesVue(j,peut){const L=joListes(j),P=joPhotos(j);if(!L.length&&!P.length&&!peut)return '';setTimeout(joVignettes,0);
+ return `<section class="card"><h3>Annexes</h3>
+ <h4 class="joH4">Annexe 1 · Listes de présence <span class="muted">(${L.length})</span></h4>${L.length?`<div class="joG">${L.map(joVign).join('')}</div>`:'<p class="muted">Aucune photo de liste de présence.</p>'}
+ <h4 class="joH4">Annexe 2 · Photos de l'activité <span class="muted">(${P.length})</span></h4>${P.length?`<div class="joG">${P.map(joVign).join('')}</div>`:'<p class="muted">Aucune photo.</p>'}
+ ${peut?`<form data-form="joAnxForm" data-id="${j.id}" class="grid" style="align-items:end;margin-top:.8rem"><div><label>Ajouter des photos de la liste de présence</label><input type="file" name="liste" accept="image/*" multiple></div><div><label>Ajouter des photos de l'activité</label><input type="file" name="photos" accept="image/*" multiple></div><div><button class="btn sm" type="submit">Joindre aux annexes</button></div></form>
+ <p class="muted" style="margin-top:.4rem">Les photos sont réduites puis rangées dans les Archives, rattachées à cette activité. Elles figurent en annexe du document Word et de l'impression.</p>`:''}</section>`}
+
+/* annexes du document (Word et impression) */
+function joAnnexesPapier(j){const E=joEnfants(j),multi=E.length>0,src=multi?[j,...E]:[j];let h='',k=0;
+ const lab=x=>!multi?'':x===j?'Ensemble de l\'activité':`journée ${x.jour}`;
+ const tabPart=L=>`<table data-w="6,32,26,26,10"><thead><tr><th>N°</th><th>Nom et prénoms</th><th>Fonction</th><th>Structure</th><th>Sexe</th></tr></thead><tbody>${L.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.nom)}</td><td>${esc(x.fonction)}</td><td>${esc(x.structure)}</td><td>${esc(x.sexe||'')}</td></tr>`).join('')}</tbody></table>`;
+ const img=(d,wmax,hmax)=>{const a=ANX[d.id];if(!a||!a.data)return '';let w=wmax,hh=Math.round(wmax*a.h/a.w);if(hh>hmax){hh=hmax;w=Math.round(hmax*a.w/a.h)}return `<img src="${a.data}" width="${w}" height="${hh}" alt="" style="max-width:100%;height:auto">`};
+ const blocs1=src.map(x=>{const P=j.confidentiel?[]:joPartsJ(x),L=joListes(x),t=multi?(x===j?`<h3>Ensemble de l'activité</h3>`:`<h3>Journée ${x.jour} – ${fmtD(x.date_evt)}</h3>`):'';
+  if(!P.length&&!L.length)return '';
+  return t+(P.length>(multi?0:12)?tabPart(P)+`<p class="petit">${esc(joEffTxt(joEffectif(P)))}.</p>`:P.length?`<p class="petit">${esc(joEffTxt(joEffectif(P)))} (liste dans le corps du document).</p>`:'')+
+   L.map((d,i)=>`<p class="petit" style="text-align:center">Liste de présence signée${L.length>1?`, page ${i+1}/${L.length}`:''}${multi?' – '+lab(x):''}</p><p style="text-align:center">${img(d,600,760)}</p>`).join('')}).filter(Boolean);
+ if(blocs1.length){h+=`<div class="saut"></div><h2>Annexe ${++k} : Liste${src.length>1?'s':''} de présence</h2>`+blocs1.join('')}
+ const P=src.flatMap(x=>joPhotos(x).map(d=>[x,d])).filter(([,d])=>ANX[d.id]&&ANX[d.id].data);
+ if(P.length){h+=`<div class="saut"></div><h2>Annexe ${++k} : Photos de l'activité</h2><table data-w="50,50"><tbody>`;
+  for(let i=0;i<P.length;i+=2)h+=`<tr>${[P[i],P[i+1]].map((c,m)=>c?`<td style="text-align:center">${img(c[1],290,230)}<br><small>Photo ${i+m+1}${multi&&c[0]!==j?' – '+lab(c[0]):''} · ${fmtD(c[0].date_evt)}${c[0].lieu?' · '+esc(c[0].lieu):''}</small></td>`:'<td></td>').join('')}</tr>`;
+  h+='</tbody></table>'}
+ return h}
+const joDocsTous=j=>[...joDocs(j),...joEnfants(j).flatMap(joDocs)];
+
+/* journées : rapporteurs désignés et état des points journaliers */
+function joJourneesVue(j,a){const n=joJours(j);if(n<2||j.parent_id)return '';const E=joEnfants(j),staff=S.staff.filter(u=>u.actif&&u.role!=='EXT'&&accesOK(u)).sort((x,y)=>x.nom<y.nom?-1:1);
+ const recu=E.filter(x=>x.pv).length,val=E.filter(x=>x.statut==='valide').length;
+ const rows=Array.from({length:n},(_,i)=>{const N=i+1,c=E.find(x=>x.jour===N),r=joRapp(j,N),moi=r===me.id||(!r&&a);
+  const et=c?(c.statut==='valide'?tag(['point validé','ok']):c.pv?tag(['point rédigé, à valider','warn']):tag(['en cours','warn'])):tag(['à rédiger','']);
+  const eff=c?joEffectif(joPartsJ(c)):null,nb=c?joDocs(c).length:0;
+  return [`<b>Journée ${N}</b><br><span class="muted">${fmtD(joDateJour(j,N))}</span>`,
+   a&&j.statut!=='valide'?`<select name="r_${N}" aria-label="Rapporteur de la journée ${N}">${opts(staff.map(u=>[u.id,u.nom+' – '+posteLib(u)]),r||'','— moi-même —')}</select>`:esc(r?who(r):who(j.auteur_id)),
+   et+(eff&&eff.n?`<br><span class="muted">${esc(joEffTxt(eff))}</span>`:'')+(nb?`<br><span class="muted">${nb} annexe(s)</span>`:''),
+   c?`<button type="button" class="btn ghost sm" data-act="joVoir" data-id="${c.id}">Ouvrir</button>`:moi?`<button type="button" class="btn sm" data-act="joJour" data-id="${j.id}" data-n="${N}">Rédiger le point du jour ${N}</button>`:'']});
+ return `<section class="card"><h3>Journées et rapporteurs</h3><p class="muted">Activité de ${n} jours. Chaque journée a son rapporteur : il enregistre la journée, joint sa liste de présence et ses photos, rédige et valide son point. ${a?'Vous compilez ensuite tous les points en un rapport global.':`La compilation est faite par ${esc(who(j.auteur_id))}.`}</p>
+ <form data-form="joRapForm" data-id="${j.id}">${svT(['Journée','Rapporteur','Point du jour',''],rows,'')}${a&&j.statut!=='valide'?`<div class="row" style="margin-top:.6rem"><button class="btn ghost sm" type="submit">Enregistrer les rapporteurs et les prévenir</button></div>`:''}</form>
+ <div class="kpis" style="margin-top:.8rem"><div class="kpi"><b>${recu}/${n}</b><span>points rédigés</span></div><div class="kpi"><b>${val}/${n}</b><span>points validés</span></div><div class="kpi"><b>${num(somme(E,x=>joEffectif(joPartsJ(x)).n))}</b><span>présences cumulées</span></div></div>
+ ${a&&iaOK()&&j.statut!=='valide'?`<div class="row" style="margin-top:.8rem"><button class="btn iaB" data-act="joCompiler" data-id="${j.id}" ${recu?'':'disabled'}>${ico('etoile')} ${j.pv?'Compiler à nouveau':'Compiler le rapport global'} (${recu}/${n} points)</button>${joTdr(j)?`<span class="muted">Le rapport sera confronté aux TDR « ${esc(joTdr(j).titre)} ».</span>`:''}</div>`:''}</section>`}
+
+/* tableau des effectifs par journée (rapport global) */
+function joEffJours(j){const E=joEnfants(j);if(!E.length)return '';const R=E.map(x=>[x,joEffectif(joPartsJ(x))]),T=R.reduce((s,[,e])=>({n:s.n+e.n,f:s.f+e.f,h:s.h+e.h}),{n:0,f:0,h:0});
+ return `<table data-w="14,18,14,12,12,30"><thead><tr><th>Journée</th><th>Date</th><th>Présents</th><th>Femmes</th><th>Hommes</th><th>Rapporteur</th></tr></thead><tbody>${R.map(([x,e])=>`<tr><td>Jour ${x.jour}</td><td>${fmtD(x.date_evt)}</td><td>${e.n||'–'}</td><td>${e.f||'–'}</td><td>${e.h||'–'}</td><td>${esc(who(x.auteur_id))}</td></tr>`).join('')}<tr><td><b>Total</b></td><td></td><td><b>${T.n}</b></td><td><b>${T.f}</b></td><td><b>${T.h}</b></td><td></td></tr></tbody></table>${T.n?`<p class="petit">Présences cumulées sur ${E.length} journée(s) ; ${T.f+T.h?`part des femmes : ${Math.round(100*T.f/Math.max(1,T.f+T.h))} %`:'sexe non renseigné'}.</p>`:''}`}
+
+function joCompilPayload(j){const E=joEnfants(j),n=joJours(j),t=joTdr(j),m=joMission(j);
+ return {activite:{nature:JO_T[j.type]||j.type,titre:j.titre,du:j.date_evt,au:j.date_fin,lieu:j.lieu,organisateur:j.organisateur,role_osv:JO_ROLE[j.role_osv]||'',nombre_de_jours:n},
+  contexte:joContexte(j,j.id),notes_du_coordonnateur:j.notes||'',
+  tdr:t?{titre:t.titre,contexte:t.contexte,objectif_general:t.objectif_general,objectifs_specifiques:t.objectifs_specifiques,resultats_attendus:t.resultats,methodologie:t.methodologie,cibles:t.cibles,chronogramme:t.chronogramme,indicateurs:t.indicateurs,livrables:t.livrables}:null,
+  ordre_de_mission:m?{numero:m.numero,objet:m.objet,destination:m.destination,du:m.date_depart,au:m.date_retour}:null,
+  journees:Array.from({length:n},(_,i)=>{const N=i+1,c=E.find(x=>x.jour===N);if(!c||!c.pv)return {jour:N,date:joDateJour(j,N),point:null};const {elements_ecartes,...pv}=c.pv;
+   return {jour:N,date:c.date_evt,rapporteur:who(c.auteur_id),effectif:joEffectif(joPartsJ(c)),point_valide:c.statut==='valide',point:pv}})}}
+
+/* dictée longue : horodatage, pause automatique au silence, pause manuelle pour les causeries, sauvegarde */
+const DICT_SILENCE=120000;
+const hm=()=>new Date().toTimeString().slice(0,5);
+const joBrouillonCle=(f=document.querySelector('form[data-form="joForm"]'))=>{const d=(f||{dataset:{}}).dataset;return 'osv_jo_tr_'+(me&&me.id)+'_'+(d.id||'nouveau'+(d.parent?d.parent+'_'+d.jour:''))};
+function dictLongTick(d){const c=d.cible,etat=document.querySelector(`[data-etat="${c.id}"]`),now=Date.now(),sil=now-d.dernier;
+ if(etat){const mots=c.value.trim()?c.value.trim().split(/\s+/).length:0;
+  etat.textContent=(d.hors?`⏸ En pause depuis ${d.horsDe} : la parole n'est pas écrite. Appuyez sur « Reprendre ».`:sil>=DICT_SILENCE?`En pause automatique (silence depuis ${Math.floor(sil/60000)} min) : l'écriture reprend dès qu'on parle.`:'● En écoute')+` · ${num(mots)} mots · ${Math.round(d.parole/60000)} min de parole · ${d.pauses} pause(s)`;
+  etat.classList.toggle('pause',!!d.hors||sil>=DICT_SILENCE)}
+ if(now-d.sauve>30000){d.sauve=now;try{localStorage.setItem(joBrouillonCle(),JSON.stringify({t:c.value,le:new Date().toISOString()}))}catch(_){}}}
+function dictLongEcrire(d,txt){const now=Date.now(),sil=now-d.dernier;let pre='';
+ if(d.premier){pre=(d.cible.value.trim()?'\n\n':'')+`[${hm()}] `;d.premier=false;d.stamp=now}
+ else if(sil>=DICT_SILENCE){pre=`\n— pause de ${Math.round(sil/60000)} min —\n[${hm()}] `;d.pauses++;d.stamp=now}
+ else if(now-d.stamp>=5*60000){pre=`\n[${hm()}] `;d.stamp=now}
+ else d.parole+=Math.min(sil,20000);
+ d.dernier=now;return pre+txt}
+function dictPoint(){const d=dict;if(!d||!d.long)return;const t=(prompt('Intitulé du nouveau point (facultatif) :','')||'').trim();
+ d.cible.value=d.cible.value.replace(/\s*$/,'')+`\n\n▶ Point : ${t||'point suivant'} [${hm()}]\n`;d.stamp=Date.now();d.cible.dispatchEvent(new Event('input',{bubbles:true}));d.cible.scrollTop=d.cible.scrollHeight}
+function dictPause(b){const d=dict;if(!d||!d.long)return;d.hors=!d.hors;
+ if(d.hors){d.horsDe=hm();d.pauses++}else{d.cible.value=d.cible.value.replace(/\s*$/,'')+`\n— pause (causerie, hors sujet) de ${d.horsDe} à ${hm()} —\n[${hm()}] `;d.stamp=d.dernier=Date.now();d.cible.dispatchEvent(new Event('input',{bubbles:true}))}
+ b.setAttribute('aria-pressed',String(d.hors));b.innerHTML=d.hors?'▶ Reprendre l\'enregistrement':'⏸ Pause : causerie, hors sujet';dictLongTick(d)}
+
 
 /* ---------- capitalisation, redevabilité, durabilité, apprentissage ---------- */
 function capListe(){const L=(S.capis||[]).slice(),proj=S.projets.filter(p=>!['rejete'].includes(p.statut)&&(['DE','DP'].includes(me.role)||trEmploye(p)));
@@ -6296,27 +6468,51 @@ function iaReglagesVue(){const g=S.iaReg||{actif:true,quota_jour:40,quota_org_jo
  return `<section class="card"><h3>Réglages de l'assistant de rédaction</h3><p class="muted">La clé de l'API est rangée sur le serveur (secrets Supabase), jamais dans l'application. Vous pouvez suspendre l'assistant à tout moment et limiter le nombre de demandes, pour maîtriser la facture.</p>
  <form data-form="iaReg" class="grid" style="align-items:end"><div><label class="trChk"><input type="checkbox" name="actif" ${g.actif!==false?'checked':''}> Assistant activé</label></div><div><label>Demandes par personne et par jour</label><input name="quota_jour" type="number" min="0" max="1000" value="${g.quota_jour}"></div><div><label>Demandes par jour pour toute l'organisation</label><input name="quota_org_jour" type="number" min="0" max="20000" value="${g.quota_org_jour}"></div><div><button class="btn" type="submit">Enregistrer</button></div></form></section>
  <div class="kpis"><div class="kpi"><b>${num(uj.length)}</b><span>demandes aujourd'hui</span></div><div class="kpi"><b>${num(um.length)}</b><span>demandes ce mois</span></div><div class="kpi"><b>${num(Math.round(tk(um)/1000))} k</b><span>jetons ce mois (entrée + sortie)</span></div><div class="kpi"><b>${num(um.filter(u=>u.statut==='erreur').length)}</b><span>échecs ce mois</span></div></div>
- <section class="card"><h3>Utilisation du mois</h3>${trBarres(Object.entries(parT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[{fiche:'Fiches remplies à partir d\'un récit',tdr:'TDR rédigés',microplan:'Microplans',rapport:'Rapports mensuels',pv:'Comptes rendus',capitalisation:'Capitalisation et redevabilité',veille:'Notes de veille',bulletin:'Bulletins de veille',ameliorer:'Améliorations de texte'}[k]||k,v]))||'<p class="empty">Aucune demande ce mois.</p>'}
+ <section class="card"><h3>Utilisation du mois</h3>${trBarres(Object.entries(parT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[{fiche:'Fiches remplies à partir d\'un récit',tdr:'TDR rédigés',microplan:'Microplans',rapport:'Rapports mensuels',pv:'Comptes rendus',capitalisation:'Capitalisation et redevabilité',veille:'Notes de veille',bulletin:'Bulletins de veille',ameliorer:'Améliorations de texte',presence:'Listes de présence lues sur photo',compilation:'Rapports globaux compilés'}[k]||k,v]))||'<p class="empty">Aucune demande ce mois.</p>'}
  ${Object.keys(parU).length?`<h4>Par personne</h4>${trBarres(Object.entries(parU).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>[who(k),v]))}`:''}
  <p class="muted">Le coût dépend du nombre de jetons et du modèle choisi ; consultez la console de votre fournisseur (Anthropic) pour la facture réelle.</p></section>`}
 
 /* ---------- formulaires ---------- */
-document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target,t=f.dataset&&f.dataset.form;if(!['joForm','joPvForm','capForm','capEditForm','iaReg'].includes(t))return;e.preventDefault();e.stopImmediatePropagation();srvMsg='';dictStop();
+document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target,t=f.dataset&&f.dataset.form;if(!['joForm','joPvForm','capForm','capEditForm','iaReg','joAnxForm','joRapForm'].includes(t))return;e.preventDefault();e.stopImmediatePropagation();srvMsg='';dictStop();
  const d=Object.fromEntries(new FormData(f).entries()),sub=e.submitter&&e.submitter.value;
- if(t==='joForm'){const id=f.dataset.id||uuid(),inst=p14&&d.cadre==='institutionnel';
+ if(t==='joForm'&&f.dataset.parent){const id=f.dataset.id||uuid(),par=S.journal.find(x=>x.id===f.dataset.parent),N=Number(f.dataset.jour),cle=joBrouillonCle(f);
+  const rec={date_evt:d.date_evt,heure_debut:d.heure_debut||null,heure_fin:d.heure_fin||null,lieu:(d.lieu||'').trim()||null,participants:(d.participants||'').trim()||null,transcription:(d.transcription||'').trim()||null,notes:(d.notes||'').trim()||null};
+  if(sub==='pv'&&!rec.transcription&&!rec.notes){alert('Il n\'y a encore ni enregistrement ni notes pour cette journée.');return}
+  const nouveau=!f.dataset.id,full={...rec,parent_id:par.id,jour:N,type:par.type,titre:`${par.titre} – Journée ${N}`,projet_id:par.projet_id,cadre:par.cadre,partage:par.partage,confidentiel:par.confidentiel};
+  iaAvec(e.submitter,async()=>{if(nouveau)await ins('journal',{id,org_id:S.org.id,...full});else await upd('journal',`id=eq.${id}`,rec);
+   let am='';if(joAnx.liste.length||joAnx.photos.length){try{am=` ${await joArchiverAnnexes({...full,id})} annexe(s) jointe(s).`}catch(x){am=' '+x.message}}
+   try{localStorage.removeItem(cle)}catch(_){}
+   if(sub==='pv'){const pv=await iaAppel('pv',joPayload({...full,id},id));await upd('journal',`id=eq.${id}`,{pv})}
+   if(nouveau&&par.auteur_id!==me.id)await notifierSrv([par.auteur_id],`${who(me.id)} a enregistré le point de la journée ${N} : ${par.titre}`,'journal',par.id).catch(()=>{});
+   await srvLoad();JR.edit=null;JR.jour=null;JR.sel=id;JR.pvEdit=false;srvMsg=(sub==='pv'?'Point du jour rédigé : relisez-le, complétez les passages surlignés, puis validez-le.':'Journée enregistrée.')+am;render();scrollTo(0,0)});return}
+ if(t==='joForm'){const id=f.dataset.id||uuid(),inst=p14&&d.cadre==='institutionnel',cle=joBrouillonCle(f);
   const rec={type:d.type,titre:String(d.titre||'').trim(),date_evt:d.date_evt,lieu:(d.lieu||'').trim()||null,projet_id:inst?null:(d.projet||null),participants:(d.participants||'').trim()||null,transcription:(d.transcription||'').trim()||null,notes:(d.notes||'').trim()||null,partage:d.partage,confidentiel:!!d.confidentiel,
-   ...(p14?{cadre:inst?'institutionnel':'projet',organisateur:(d.organisateur||'').trim()||null,role_osv:d.role_osv||null,heure_debut:d.heure_debut||null,heure_fin:d.heure_fin||null}:{})};
+   ...(p14?{cadre:inst?'institutionnel':'projet',organisateur:(d.organisateur||'').trim()||null,role_osv:d.role_osv||null,heure_debut:d.heure_debut||null,heure_fin:d.heure_fin||null}:{}),
+   ...(p16?{date_fin:d.date_fin&&d.date_fin>d.date_evt?d.date_fin:null,...('mission_id' in d?{mission_id:d.mission_id||null}:{})}:{})};
+  if(p16&&d.date_fin&&d.date_fin<d.date_evt){alert('Le dernier jour précède le premier jour.');return}
+  if(rec.date_fin&&joJours(rec)>31){alert('Une activité ne peut pas dépasser 31 jours.');return}
   if(!rec.titre){alert('Indiquez l\'objet.');return}
   if(p14&&!inst&&!rec.projet_id){alert('Choisissez le projet, ou cochez « vie de l\'organisation (hors projet) ».');return}
   if(rec.partage==='projet'&&!rec.projet_id)rec.partage='direction';
   if(sub==='pv'&&!rec.transcription&&!rec.notes){alert('Il n\'y a encore ni enregistrement ni notes : enregistrez l\'activité ou écrivez vos notes.');return}
   const nouveau=!f.dataset.id;
+  const multi=joJours(rec)>1;
   iaAvec(e.submitter,async()=>{if(nouveau)await ins('journal',{id,org_id:S.org.id,...rec});else await upd('journal',`id=eq.${id}`,rec);
-   if(sub==='pv'){const pv=await iaAppel('pv',joPayload(rec,id));await upd('journal',`id=eq.${id}`,{pv})}
-   await srvLoad();JR.edit=null;JR.sel=id;JR.pvEdit=false;srvMsg=sub==='pv'?'Document rédigé : relisez-le, complétez les passages surlignés, puis validez-le.':'Entrée enregistrée.';render();scrollTo(0,0)});return}
+   let am='';if(joAnx.liste.length||joAnx.photos.length){try{am=` ${await joArchiverAnnexes({...rec,id})} annexe(s) jointe(s).`}catch(x){am=' '+x.message}}
+   try{localStorage.removeItem(cle)}catch(_){}
+   if(sub==='pv'&&!multi){const pv=await iaAppel('pv',joPayload(rec,id));await upd('journal',`id=eq.${id}`,{pv})}
+   await srvLoad();JR.edit=null;JR.sel=id;JR.pvEdit=false;srvMsg=(multi?'Activité enregistrée. Désignez maintenant le rapporteur de chaque journée.':sub==='pv'?'Document rédigé : relisez-le, complétez les passages surlignés, puis validez-le.':'Entrée enregistrée.')+am;render();scrollTo(0,0)});return}
+ if(t==='joAnxForm'){const j=S.journal.find(x=>x.id===f.dataset.id),L=[...f.elements.liste.files],Ph=[...f.elements.photos.files];if(!L.length&&!Ph.length){alert('Choisissez au moins une photo.');return}
+  joAnx={liste:L.map(x=>({blob:x})),photos:Ph.map(x=>({blob:x}))};iaAvec(e.submitter,async()=>{const n=await joArchiverAnnexes(j);await srvLoad();srvMsg=`${n} photo(s) jointe(s) aux annexes.`;render()});return}
+ if(t==='joRapForm'){const j=S.journal.find(x=>x.id===f.dataset.id),n=joJours(j),R=Array.from({length:n},(_,i)=>d['r_'+(i+1)]||null),av=j.rapporteurs||[];
+  const nv=R.map((u,i)=>u&&u!==av[i]&&u!==me.id?[u,i+1]:null).filter(Boolean);
+  action(async()=>{await upd('journal',`id=eq.${j.id}`,{rapporteurs:R.map(u=>u||me.id)});
+   for(const [u,N] of nv)await notifierSrv([u],`Vous êtes rapporteur de la journée ${N} (${fmtD(joDateJour(j,N))}) : ${j.titre}. Enregistrez la journée et rédigez son point dans le Journal.`,'journal',j.id).catch(()=>{})},
+   `Rapporteurs enregistrés${nv.length?` ; ${nv.length} personne(s) prévenue(s)`:''}.`);return}
  if(t==='joPvForm'){const Lg=k=>String(d[k]||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean),C=k=>Lg(k).map(l=>l.split(';').map(x=>x.trim()));
   const pv={...(S.journal.find(x=>x.id===f.dataset.id)||{}).pv,titre_document:(d.titre_document||'').trim(),resume:(d.resume||'').trim(),contexte:(d.contexte||'').trim(),objectifs:Lg('objectifs'),constats:Lg('constats'),acquis:Lg('acquis'),position_osv:Lg('position_osv'),recommandations:Lg('recommandations'),opportunites:Lg('opportunites'),conclusion:(d.conclusion||'').trim(),participants:C('participants').map(([nom,fonction,structure])=>({nom,fonction:fonction||'',structure:structure||''})),ordre_du_jour:Lg('ordre_du_jour'),points:C('points').map(([titre,...r])=>({titre,synthese:r.join(' ; ')})),decisions:Lg('decisions'),
    actions:C('actions').map(([action,responsable,echeance])=>({action,responsable:responsable||'',echeance:echeance||''})),engagements_osv:Lg('engagements_osv'),redevabilite:Lg('redevabilite'),lecons:Lg('lecons'),bonnes_pratiques:Lg('bonnes_pratiques'),suite:(d.suite||'').trim()};
+  if(pv.compile){pv.methodologie=(d.methodologie||'').trim();pv.journees=C('journees').map(([jour,date,theme,...r])=>({jour:Number(jour)||jour,date,theme:theme||'',synthese:r.join(' ; ')}));pv.atteinte=C('atteinte').map(([objectif,realisation,niveau])=>({objectif,realisation:realisation||'',niveau:niveau||''}));pv.difficultes=Lg('difficultes');pv.conclusion=(d.conclusion||'').trim()}
   action(async()=>{await upd('journal',`id=eq.${f.dataset.id}`,{pv});JR.pvEdit=false},'Compte rendu corrigé.');return}
  if(t==='capForm'){if(d.fin<d.debut){alert('La fin de la période précède son début.');return}const src=capSources(d.projet||null,d.debut,d.fin);
   const n=src.journal_valide.length+src.rapports_mensuels_valides.length+src.activites_terrain_validees.fiches+src.missions_tdr_valides.length;
@@ -6335,6 +6531,9 @@ document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.tar
 document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.target.closest('[data-act="go"]');if(g){dictStop();if(g.dataset.v==='journal'){JR.sel=null;JR.edit=null;JR.capSel=null;JR.tab='liste'}if(g.dataset.v==='veille'){VE.sel=null}if(g.dataset.v==='missions')tdrPre=null}
  const b=e.target.closest('[data-act="dicter"],[data-act^="ia"],[data-act^="jo"],[data-act^="cap"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const a=b.dataset.act,id=b.dataset.id;
  if(a==='dicter'){if(dict&&dict.btn===b)dictStop();else dictStart(b);return}
+ if(a==='joDictPoint'){dictPoint();return}
+ if(a==='joDictPause'){dictPause(b);return}
+ if(a==='joAnxVoir'){const x=ANX[id];if(x&&x.url)window.open(x.url,'_blank');return}
  dictStop();srvMsg='';
  if(a==='iaFiche'){const p=trP(),o=trOutil(document.getElementById('racOutil').value),recit=document.getElementById('racTxt').value.trim();if(!o)return;if(recit.length<20){alert('Racontez un peu plus votre activité (au moins une phrase).');return}
   trLS.set('Recit',recit);iaAvec(b,async()=>{const res=await iaAppel('fiche',{outil:{titre:o.titre,type:o.type,presence:o.presence,champs:o.champs.filter(c=>c.type!=='section').map(({id,label,type,options})=>({id,label,type,options}))},recit,aujourd_hui:today()});
@@ -6361,18 +6560,24 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.targ
    ['faits','difficultes','alertes','besoins','recommandations'].forEach(k=>{if(f.elements[k]&&r[k]!=null&&String(r[k]).trim())f.elements[k].value=String(r[k])});
    const n=f.querySelector('.iaNote');if(n)n.hidden=false});return}
  if(a==='joTab'){JR.tab=b.dataset.v;render();return}
- if(a==='joNouveau'){JR.edit='new';render();scrollTo(0,0);return}
- if(a==='joModif'){JR.edit=id;render();scrollTo(0,0);return}
+ if(a==='joNouveau'){JR.edit='new';JR.jour=null;joAnx={liste:[],photos:[]};render();scrollTo(0,0);return}
+ if(a==='joModif'){JR.edit=id;JR.jour=null;joAnx={liste:[],photos:[]};render();scrollTo(0,0);return}
+ if(a==='joJour'){const j=S.journal.find(x=>x.id===id),N=Number(b.dataset.n),c=j&&joEnfants(j).find(x=>x.jour===N);if(!j)return;if(c){JR.sel=c.id;render();return}JR.edit='new';JR.jour={parent:id,n:N};JR.sel=null;joAnx={liste:[],photos:[]};render();scrollTo(0,0);return}
+ if(a==='joCompiler'){const j=S.journal.find(x=>x.id===id),n=joJours(j),E=joEnfants(j).filter(x=>x.pv),nv=E.filter(x=>x.statut!=='valide').length;
+  if(E.length<n&&!confirm(`${n-E.length} journée(s) sans point rédigé. Compiler quand même ? Les journées manquantes seront signalées « à compléter ».`))return;
+  if(nv&&!confirm(`${nv} point(s) du jour ne sont pas encore validés par leur rapporteur. Compiler quand même ?`))return;
+  if(j.pv&&!confirm('Remplacer le rapport global actuel ?'))return;
+  iaAvec(b,async()=>{const r=await iaAppel('compilation',joCompilPayload(j));await upd('journal',`id=eq.${id}`,{pv:{...r,compile:true},statut:'brouillon'});await srvLoad();srvMsg='Rapport global compilé à partir des points journaliers : relisez-le, complétez les passages surlignés, puis validez-le.';render();scrollTo(0,0)});return}
  if(a==='joVoir'){JR.sel=id;JR.pvEdit=false;render();scrollTo(0,0);return}
- if(a==='joFermer'){if(JR.edit&&!confirm('Quitter sans enregistrer ? Ce qui n\'est pas enregistré sera perdu.'))return;JR.edit=null;JR.sel=null;JR.pvEdit=false;render();return}
+ if(a==='joFermer'){if(JR.edit&&!confirm('Quitter sans enregistrer ? Ce qui n\'est pas enregistré sera perdu.'))return;const pj=JR.jour&&JR.jour.parent;JR.edit=null;JR.sel=pj||null;JR.jour=null;JR.pvEdit=false;joAnx={liste:[],photos:[]};render();return}
  if(a==='joPvEdit'){JR.pvEdit=true;render();return}
  if(a==='joPvAnnul'){JR.pvEdit=false;render();return}
- if(a==='joPv'){const j=S.journal.find(x=>x.id===id);if(!j.transcription&&!j.notes){alert('Il n\'y a ni transcription ni notes à résumer.');return}if(j.pv&&!confirm('Remplacer le compte rendu actuel par une nouvelle rédaction ?'))return;
+ if(a==='joPv'){const j=S.journal.find(x=>x.id===id);if(j.parent_id&&j.pv&&(joParent(j)||{}).pv&&!confirm('Le rapport global a déjà été compilé : pensez à le compiler à nouveau ensuite. Continuer ?'))return;if(!j.transcription&&!j.notes){alert('Il n\'y a ni transcription ni notes à résumer.');return}if(j.pv&&!confirm('Remplacer le compte rendu actuel par une nouvelle rédaction ?'))return;
   iaAvec(b,async()=>{const pv=await iaAppel('pv',joPayload(j,j.id));await upd('journal',`id=eq.${id}`,{pv,statut:'brouillon'});await srvLoad();srvMsg='Document rédigé : relisez-le, complétez les passages surlignés, puis validez-le.';render()});return}
- if(a==='joWord'){joWord(S.journal.find(x=>x.id===id));return}
- if(a==='joValider'){const nm=joMarques((S.journal.find(x=>x.id===id)||{}).pv);if(nm&&!confirm(`Il reste ${nm} passage(s) « à compléter » dans le document. Valider quand même ?`))return;if(!nm&&!confirm('Valider ce compte rendu ? Il pourra servir aux documents de capitalisation et de redevabilité.'))return;const jv=S.journal.find(x=>x.id===id);let vm='',okv=false;action(async()=>{await upd('journal',`id=eq.${id}`,{statut:'valide'});okv=true;if(p15&&iaOK()&&!jv.confidentiel||p15&&iaOK()&&me.role==='DE'){try{await veProduire({...jv,statut:'valide'});vm=' Une note de veille stratégique a été transmise à la direction.'}catch(e){vm=' (La note de veille n\'a pas pu être produite : '+e.message+')'}}},null).then(()=>{if(okv){srvMsg='Document validé.'+vm;render()}});return}
+ if(a==='joWord'){const j=S.journal.find(x=>x.id===id),l=b.textContent;b.disabled=true;b.textContent='Préparation du fichier…';joWord(j).catch(x=>alert(x.message)).finally(()=>{b.disabled=false;b.textContent=l});return}
+ if(a==='joValider'){const nm=joMarques((S.journal.find(x=>x.id===id)||{}).pv);if(nm&&!confirm(`Il reste ${nm} passage(s) « à compléter » dans le document. Valider quand même ?`))return;if(!nm&&!confirm((S.journal.find(x=>x.id===id)||{}).parent_id?'Valider le point de cette journée ? Il sera compilé dans le rapport global.':'Valider ce compte rendu ? Il pourra servir aux documents de capitalisation et de redevabilité.'))return;const jv=S.journal.find(x=>x.id===id);let vm='',okv=false;action(async()=>{await upd('journal',`id=eq.${id}`,{statut:'valide'});okv=true;if(!jv.parent_id&&(p15&&iaOK()&&!jv.confidentiel||p15&&iaOK()&&me.role==='DE')){try{await veProduire({...jv,statut:'valide'});vm=' Une note de veille stratégique a été transmise à la direction.'}catch(e){vm=' (La note de veille n\'a pas pu être produite : '+e.message+')'}}},null).then(()=>{if(okv){srvMsg='Document validé.'+vm;render()}});return}
  if(a==='joSuppr'){if(!confirm('Supprimer cette entrée du journal ?'))return;action(async()=>{await del('journal',`id=eq.${id}`);JR.sel=null},'Entrée supprimée.');return}
- if(a==='joImp'){joImprimer(S.journal.find(x=>x.id===id));return}
+ if(a==='joImp'){joImprimer(S.journal.find(x=>x.id===id)).catch(x=>alert(x.message));return}
  if(a==='capVoir'){JR.capSel=id;JR.capEdit=false;render();scrollTo(0,0);return}
  if(a==='capFermer'){JR.capSel=null;JR.capEdit=false;JR.tab='capi';render();return}
  if(a==='capEdit'){JR.capEdit=true;render();return}
@@ -6381,8 +6586,10 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.targ
  if(a==='capSuppr'){if(!confirm('Supprimer ce brouillon ?'))return;action(async()=>{await del('capitalisations',`id=eq.${id}`);JR.capSel=null},'Document supprimé.');return}
  if(a==='capImp'){capImprimer(S.capis.find(x=>x.id===id));return}
 },true);
-document.addEventListener('input',e=>{const f=e.target.closest&&e.target.closest('form');if(!f)return;if(e.target.closest('.tdrsL'))tdrsSync(f);if(e.target.closest('.mpL'))mpSync(f)});
+document.addEventListener('input',e=>{if(e.target.id==='jo_part')joPartMaj();const f=e.target.closest&&e.target.closest('form');if(!f)return;if(e.target.closest('.tdrsL'))tdrsSync(f);if(e.target.closest('.mpL'))mpSync(f)});
 document.addEventListener('change',e=>{const r=e.target;if(r.dataset&&r.dataset.jo){JR.filtre=r.dataset.jo;render()}
+ if(r.hasAttribute&&r.hasAttribute('data-jo-liste')){const F=[...r.files];r.value='';if(F.length)joLirePresence(r.closest('label'),F);return}
+ if(r.hasAttribute&&r.hasAttribute('data-jo-photos')){const F=[...r.files];r.value='';joAnx.photos.push(...F.map(x=>({blob:x})));joAnxApercu();return}
  if(r.hasAttribute&&r.hasAttribute('data-jo-cadre')){const f=r.form,pj=r.value==='projet';f.querySelector('.joProj').hidden=!pj;const ty=f.elements.type;if(pj&&['reunion_externe'].includes(ty.value))ty.value='reunion_projet';if(!pj&&ty.value==='reunion_projet')ty.value='reunion_externe';if(f.elements.role_osv)f.elements.role_osv.value=pj?'organisateur':'invite';if(!pj&&f.elements.partage.value==='projet')f.elements.partage.value='direction'}});
 
 
