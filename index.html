@@ -381,6 +381,46 @@ details>summary{font-size:.9rem}
 .q-row .btn,.notif .q-row .btn{background:transparent;color:var(--brand);border:1px solid color-mix(in srgb,var(--brand) 35%,transparent)}.q-row .btn:hover{background:var(--brand-tint)}
 .svAl li{background:transparent;border-left-width:3px;border-bottom:1px solid var(--line);border-radius:0;padding:.55rem .85rem}.svAl li:last-child{border-bottom:0}
 @media (max-width:860px){.shell .srvNav button[aria-current="page"]::before{display:none}.rail{border-right:0;border-bottom:1px solid var(--line);padding:.4rem .6rem}.hero{padding:1.2rem 1.1rem 1.4rem}.stage main{padding:1.4rem 1rem 2.5rem}}
+/* tableau de bord d'accueil */
+.tb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:1.2rem;margin-top:.4rem}
+.tb-grid .card{margin:0}.tb-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:.2rem 1rem;margin-bottom:1rem}.tb-h h3{white-space:nowrap}.tb-h h3{margin:0}.tb-h .muted{font-size:.76rem}
+.tb-bars{list-style:none;margin:0;padding:0;display:grid;gap:.7rem}
+.tb-bars li{display:grid;grid-template-columns:minmax(110px,38%) 1fr auto;align-items:center;gap:.7rem;font-size:.8rem}
+.tb-bars .tb-l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;color:var(--ink);text-decoration:none;font-size:.8rem}
+.tb-track{display:block;height:10px;border-radius:4px;background:var(--brand-tint);min-width:6px;overflow:hidden}.tb-track i{display:block;height:100%;background:var(--brand);border-radius:4px}
+.tb-cnt .tb-track{background:transparent}.tb-cnt .tb-track i{background:color-mix(in srgb,var(--brand) 70%,var(--panel))}
+.tb-v{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.76rem;min-width:2.5em;text-align:right}
+.tb-leg{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem .9rem;margin:1rem 0 0;font-size:.74rem;color:var(--muted)}
+.k{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:.35rem;vertical-align:-1px}.k-fill{background:var(--brand)}.k-track{background:var(--brand-tint);border:1px solid color-mix(in srgb,var(--brand) 25%,transparent)}
+.tb-stack{display:flex;gap:2px;height:14px;border-radius:5px;overflow:hidden;margin:.2rem 0 1rem}.tb-stack i{display:block;height:100%}
+.tb-stack i.ok,.k.ok{background:var(--ok)}.tb-stack i.warn,.k.warn{background:var(--or)}.tb-stack i.bad,.k.bad{background:var(--bad)}.tb-stack i.nd,.k.nd{background:color-mix(in srgb,var(--muted) 35%,var(--panel))}
+.tb-legende{list-style:none;margin:0;padding:0;display:grid;gap:.45rem;font-size:.82rem}.tb-legende li{display:grid;grid-template-columns:auto 1fr auto 3.2em;align-items:center;gap:.4rem}.tb-legende b{font-variant-numeric:tabular-nums}.tb-legende .muted{text-align:right;font-size:.74rem}
+.tb-ech,.tb-act{list-style:none;margin:0;padding:0}.tb-ech li{display:flex;gap:.9rem;align-items:center;padding:.55rem 0;border-top:1px solid var(--line)}.tb-ech li:first-child,.tb-act li:first-child{border-top:0;padding-top:0}
+.tb-date{flex:none;width:2.9rem;text-align:center;border:1px solid var(--line);border-radius:7px;padding:.2rem 0;font-size:.68rem;color:var(--muted);line-height:1.2;text-transform:lowercase}.tb-date b{display:block;font-size:1rem;color:var(--brand)}
+.tb-t{display:flex;flex-direction:column;min-width:0;font-size:.84rem}.tb-t .muted{font-size:.72rem}.tb-t .lnk{text-align:left;text-decoration:none;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.tb-t .lnk:hover{color:var(--brand);text-decoration:underline}
+.tb-act li{display:flex;flex-direction:column;gap:.1rem;padding:.55rem 0;border-top:1px solid var(--line);font-size:.83rem}.tb-act .muted{font-size:.72rem}.tb-act .lnk{text-align:left;text-decoration:none;color:var(--ink)}
+.tb-plus{margin:.8rem 0 0;font-size:.78rem}
+/* pied de page de l'application */
+.pied-app{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(3,minmax(150px,1fr));gap:1.4rem 2rem;align-items:start;margin:3rem clamp(1.2rem,3.5vw,3.2rem) 0;padding:1.6rem 0 1.4rem;border-top:1px solid var(--line);font-size:.76rem;color:var(--muted);max-width:1200px}
+.pa-id{display:flex;gap:.7rem;align-items:center}.pa-id img{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:#fff}.pa-id b{display:block;color:var(--brand);font-size:.86rem}.pa-id span{font-style:italic}
+.pa-col{display:flex;flex-direction:column;gap:.15rem}.pa-col b{color:var(--ink);font-size:.78rem;margin-bottom:.15rem}
+.pa-bas{grid-column:1/-1;margin:.4rem 0 0;padding-top:.9rem;border-top:1px dashed var(--line);font-size:.72rem}
+@media (max-width:860px){.pied-app{grid-template-columns:1fr 1fr;margin:2rem 1rem 0}.pa-id{grid-column:1/-1}.tb-grid{grid-template-columns:1fr}}
+@media print{.pied-app{display:none}}
+/* menu latéral : le menu défile, la devise reste en bas sans chevauchement */
+@media (min-width:861px){.shell .srvNav{flex:none}.rail-foot{margin-top:auto;flex:none}}
+
+/* bande d'accueil compacte, messages qui défilent */
+.bande{position:relative;display:flex;align-items:center;gap:1.4rem;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.7rem 1.1rem .8rem;margin-bottom:1.6rem;overflow:hidden}
+.bande-id{display:flex;flex-direction:column;flex:none;line-height:1.25;padding-right:1.4rem;border-right:1px solid var(--line)}.bande-id b{font-size:.95rem;font-weight:620}
+.bande-date{display:flex;align-items:center;gap:.35rem;font-size:.72rem;color:var(--muted)}.bande-date .ico{width:13px;height:13px}
+.bande-defile{flex:1;min-width:0;position:relative;height:1.5rem}.bande-defile ul{list-style:none;margin:0;padding:0}
+.bande-defile li{position:absolute;inset:0;font-size:.88rem;color:var(--brand);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(8px);transition:opacity .45s ease,transform .45s ease;pointer-events:none}
+.bande-defile li.on{opacity:1;transform:none;pointer-events:auto}.bande-defile b{font-weight:650}
+.bande-pts{display:flex;gap:5px;flex:none}.bande-pts button{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:var(--line);cursor:pointer}.bande-pts button.on{background:var(--brand);width:16px;border-radius:4px}
+.bande .route{position:absolute;left:0;right:0;bottom:0;height:2px;background:repeating-linear-gradient(to right,var(--accent) 0 18px,transparent 18px 32px);opacity:.6}
+@media (prefers-reduced-motion:reduce){.bande-defile li{transition:none}}
+@media (max-width:860px){.kpis{grid-template-columns:1fr 1fr;gap:.7rem}.bande-id{padding-right:4.5rem!important}.bande{flex-wrap:wrap;gap:.5rem 1rem}.bande-id{border-right:0;padding-right:0;flex-direction:row;align-items:baseline;gap:.6rem}.bande-defile{flex-basis:100%;height:2.8rem}.bande-defile li{white-space:normal}.bande-pts{position:absolute;right:1rem;top:.9rem}}
 </style>
 </head>
 <body>
@@ -1733,11 +1773,11 @@ function srvHome(){const n=ROLES[me.role].nav,pa=polEnAttente().length;
  const D={adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
  return accHero()+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+notifBox()+
  (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:'')+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
- `<h2 class="sec-t">Vos espaces de travail</h2><div class="tiles">${n.map(v=>`<button class="tile" data-act="go" data-v="${v}">${ico(v,'tico')}<h2>${VIEWS[v]} ${v==='politiques'&&pa?`<span class="badge">${pa}</span>`:''}</h2><p>${D[v]||''}</p></button>`).join('')}</div>
+ `${['DE','DP','CA'].includes(me.role)&&p03?'':accTableauBord()}
  ${srvRecup?'<p class="note" role="alert">Lien de réinitialisation accepté : choisissez maintenant votre nouveau mot de passe ci-dessous.</p>':''}<details class="card" style="margin-top:1.5rem" ${srvRecup?'open':''}><summary><b>Mon compte</b> <span class="muted">· ${esc(sess.user.email)}</span></summary>
   <form data-form="srvPwd" class="grid" style="margin-top:.8rem;align-items:end"><div><label for="np1">Nouveau mot de passe (12 caractères au moins)</label><input id="np1" name="p1" type="password" minlength="12" autocomplete="new-password" required></div>
   <div><label for="np2">Confirmer</label><input id="np2" name="p2" type="password" minlength="12" autocomplete="new-password" required></div><div><button class="btn sm" type="submit">Changer mon mot de passe</button></div></form></details>
- <p class="legend" style="margin-top:1.5rem">Données enregistrées sur le serveur sécurisé de l'organisation. Les autres modules (collecte terrain, activités, feuilles de route, rapports automatiques) arrivent sur le serveur au fil des prochaines phases ; ils peuvent être essayés dans la démonstration.</p>`}
+ `}
 function srvPersonnel(){const rh=me.role==='RH',postesOk=S.postes.filter(p=>!(rh&&['DE','CA'].includes(p.niveau))),actifs=S.staff.filter(u=>u.actif);
  const niv=Object.entries(ROLES).filter(([r])=>!(rh&&['DE','CA'].includes(r)));
  return head('Personnel et accès','Chaque personne se connecte avec sa propre adresse e-mail et son mot de passe. Son poste détermine ce qu\'elle voit et peut faire.')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
@@ -2004,8 +2044,8 @@ function pilotageHTML(){const pl=planCourant(),pp=perfPlan(pl),ps=S.projets,acti
   ${k(pp&&pp.score!=null?tx(pp.score):'—','Réalisation du plan stratégique'+(pp&&pp.att!=null?` (rythme attendu ${tx(pp.att)})`:''),'go','performance')}
   ${k(`${s.ok} · ${s.warn} · ${s.bad}`,'Indicateurs dans les temps · à surveiller · en retard','go','performance')}${k(s.nd,'Indicateurs sans données suffisantes','go','performance')}
   ${k(aValider().length,'Mesures à valider','go','projets')}${k(S.risques.filter(r=>r.statut!=='clos'&&r.probabilite*r.impact>=15).length,'Risques élevés ouverts','go','programmes')}
-  ${k(S.docs.length,'Documents archivés visibles','go','archives')}</div>
- <section class="card"><h3>Alertes et décisions à prendre (${A.length})</h3>${alerteHTML(A)}</section>`}
+  ${k(S.docs.length,'Documents archivés visibles','go','archives')}</div>${accTableauBord()}
+ <section class="card" style="margin-top:1.4rem"><h3>Alertes et décisions à prendre (${A.length})</h3>${alerteHTML(A)}</section>`}
 
 /* ---------- plan stratégique ---------- */
 function svStrategie(){const de=me.role==='DE',pl=planCourant();
@@ -4525,7 +4565,7 @@ function srvRender(){const root=document.getElementById('root');
  <div class="stage"><header class="topbar"><p class="tb-titre">${view==='dossier'?'Portefeuille des projets › dossier':esc(titre)}</p>
   <div class="tb-moi"><span class="avatar" aria-hidden="true">${esc(initiales(me.nom))}</span><span class="tb-nom"><b>${esc(me.nom)}</b><small>${esc(posteLib(me))}</small></span></div>
   <button class="btn ghost sm" data-act="logout">${ico('logout')}<span>Se déconnecter</span></button></header>
- <main id="main" tabindex="-1">${view==='home'?home():viewHTML()}</main></div></div>`}
+ <main id="main" tabindex="-1">${view==='home'?home():viewHTML()}</main>${piedApp()}</div></div>`}
 
 function srvLoginHTML(){const anim=dsAnim.login?' anim':'';
  const cote=`<section class="auth-side${anim}" aria-label="ONG Sécurité Vie"><span class="route" aria-hidden="true"></span>
@@ -4543,12 +4583,21 @@ function srvLoginHTML(){const anim=dsAnim.login?' anim':'';
   <div class="auth-liens"><button type="button" class="lnk" data-act="srvOubli">Mot de passe oublié ?</button><button type="button" class="lnk" data-act="srvPublic">Documents publics de l'organisation</button></div>
  <p class="auth-demo">Découvrir l'application sans compte : <button type="button" class="lnk" data-act="srvDemo" data-v="demo">ouvrir la démonstration</button> (données fictives).</p></div></section></div>`}
 
-function accHero(){const n=mesNotifs().length,a=p03?alertes().length:0,anim=dsAnim.hero?' anim':'';dsAnim.hero=false;
- const prenom=me.nom;let msg;
- if(!n&&!a)msg='Tout est à jour : rien ne vous attend.';
- else msg=[a?`${a} point${a>1?'s':''} à décider ou à surveiller`:'',n?`${n} notification${n>1?'s':''} non lue${n>1?'s':''}`:''].filter(Boolean).join(' et ')+'.';
- return `<section class="hero${anim}"><p class="hero-date">${ico('cal')}${dateLongue()}</p><h1>Bonjour, ${esc(prenom)}.</h1><p class="hero-msg">${msg}</p>
- <p class="hero-meta">${esc(posteLib(me))}${me.bureau?' · '+esc(bur(me.bureau)):''} · ${esc(S.org.nom)}</p><span class="route" aria-hidden="true"></span></section>`}
+let bandePause=false,bandeT=null;
+function accHero(){const n=mesNotifs().length,a=p03?alertes().length:0,t=today(),T=(S.tdrs||[]).filter(x=>typeof tdrActeur==='function'&&tdrActeur(x)).length;
+ const prochaine=[...(S.missions||[]).filter(m=>['approuvee','demandee'].includes(m.statut)&&m.date_depart>=t).map(m=>[m.date_depart,`Mission « ${m.objet} »`]),...S.projets.filter(p=>!['cloture','archive','rejete'].includes(p.statut)&&p.debut>=t).map(p=>[p.debut,`Démarrage du projet ${p.code||p.nom}`])].sort((x,y)=>x[0]<y[0]?-1:1)[0];
+ const M=[a||n?[a?`<b>${a}</b> point${a>1?'s':''} à décider ou à surveiller`:'',n?`<b>${n}</b> notification${n>1?'s':''} non lue${n>1?'s':''}`:''].filter(Boolean).join(' · '):'Tout est à jour : rien ne vous attend.',
+  T?`<b>${T}</b> TDR attend${T>1?'ent':''} votre décision`:'',
+  prochaine?`Prochaine échéance : ${esc(prochaine[1])}, le ${new Date(prochaine[0]).toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}`:'',
+  `${esc(posteLib(me))}${me.bureau?' · '+esc(bur(me.bureau)):''} · ${esc(S.org.nom)}`,
+  'Agir pour sauver des vies au quotidien'].filter(Boolean);
+ if(!bandeT)bandeT=setInterval(()=>{if(bandePause||matchMedia('(prefers-reduced-motion: reduce)').matches)return;const L=[...document.querySelectorAll('.bande-defile li')];if(L.length<2)return;bandeAller(L.findIndex(x=>x.classList.contains('on'))+1)},5500);
+ const d=new Date().toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+ return `<section class="bande" aria-label="Bienvenue" onmouseenter="bandePause=true" onmouseleave="bandePause=false"><div class="bande-id"><span class="bande-date">${ico('cal')}${d}</span><b>Bonjour, ${esc(me.nom)}</b></div>
+ <div class="bande-defile"><ul>${M.map((m,i)=>`<li class="${i?'':'on'}">${m}</li>`).join('')}</ul></div>
+ ${M.length>1?`<div class="bande-pts" role="group" aria-label="Messages">${M.map((m,i)=>`<button type="button" class="${i?'':'on'}" aria-label="Message ${i+1}" onclick="bandeAller(${i})"></button>`).join('')}</div>`:''}<span class="route" aria-hidden="true"></span></section>`}
+function bandeAller(i){const L=[...document.querySelectorAll('.bande-defile li')],P=[...document.querySelectorAll('.bande-pts button')];if(!L.length)return;i=(i+L.length)%L.length;L.forEach((x,k)=>x.classList.toggle('on',k===i));P.forEach((x,k)=>x.classList.toggle('on',k===i))}
+window.bandeAller=bandeAller;
 
 
 /* ===== Accès au budget (script 09) ===== */
@@ -4592,7 +4641,7 @@ function tdrActeur(t){if(!t||t.auteur_id===me.id)return false;const a=S.staff.fi
 const tdrOM=t=>S.missions.find(m=>m.tdr_id===t.id&&!['rejetee','annulee'].includes(m.statut));
 const tdrPeutOM=t=>t.statut==='valide'&&!tdrOM(t)&&(t.auteur_id===me.id||gAdm()||['DP','CP'].includes(me.role)||auDessusC(t.auteur_id));
 function tdrAlertes(){if(!p08)return [];const A=[],m=S.tdrs.filter(tdrActeur);
- if(m.length)A.push(['warn',`${m.length} TDR à traiter (${m.map(t=>TDR_ST[t.statut][0].toLowerCase()).filter((x,i,a)=>a.indexOf(x)===i).join(', ')})`,'go','missions']);
+ if(m.length)A.push(['warn',`${m.length} TDR à traiter (${m.map(t=>TDR_ST[t.statut][0].replace(/^./,c=>c.toLowerCase())).filter((x,i,a)=>a.indexOf(x)===i).join(', ')})`,'go','missions']);
  const c=S.tdrs.filter(t=>t.auteur_id===me.id&&t.statut==='a_corriger').length;if(c)A.push(['bad',`${c} de vos TDR renvoyé(s) pour correction`,'go','missions']);
  const o=S.tdrs.filter(t=>t.auteur_id===me.id&&tdrPeutOM(t)).length;if(o)A.push(['warn',`${o} TDR validé(s) : établissez l'ordre de mission`,'go','missions']);return A}
 const TDR_COLS=['TDR','Mission','Dates','Rédigé par','Statut','Ordre de mission',''];
@@ -4650,7 +4699,7 @@ const tdrPatch=d=>{const budget=lignesTexte(d.budget).map(c=>({libelle:c[0]||'',
  TDR_SEC.forEach(([k])=>r[k]=(d[k]||'').trim()||null);return r};
 async function tdrNotifier(id){const r=(await sel('tdrs',`select=id,statut,titre,auteur_id&id=eq.${id}`))[0];if(!r)return;const a=S.staff.find(u=>u.id===r.auteur_id)||{},R=x=>S.staff.filter(u=>u.role===x&&accesOK(u)).map(u=>u.id);
  const dest={sup:[a.supId],dp:R('DP'),de:R('DE'),ca:R('CA')}[r.statut];
- if(dest)await notifierSrv(dest,`TDR à traiter (${TDR_ST[r.statut][0].toLowerCase()}) : ${r.titre}`,'missions',id);
+ if(dest)await notifierSrv(dest,`TDR à traiter (${TDR_ST[r.statut][0].replace(/^./,c=>c.toLowerCase())}) : ${r.titre}`,'missions',id);
  if(['valide','a_corriger','rejete'].includes(r.statut))await notifierSrv([r.auteur_id],r.statut==='valide'?`Votre TDR « ${r.titre} » est validé : établissez l'ordre de mission`:r.statut==='a_corriger'?`Votre TDR « ${r.titre} » est renvoyé pour correction`:`Votre TDR « ${r.titre} » est rejeté`,'missions',id)}
 document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target,t=f.dataset&&f.dataset.form;if(!['tdrForm','tdrDecision'].includes(t))return;e.preventDefault();e.stopImmediatePropagation();
  const d=Object.fromEntries(new FormData(f)),go=e.submitter&&e.submitter.value;srvMsg='';
@@ -5115,6 +5164,47 @@ async function docxBlob(corps,o={}){const ctx={imgs:[],n:0},doc=new DOMParser().
 async function telechargerWord(nom,titre,corps,o={}){try{const b=await docxBlob(corps,{...o,titre}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=nom.replace(/\.doc$/,'.docx');document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800)}catch(e){alert('Le fichier Word n\'a pas pu être créé : '+e.message)}}
 /* bouton « Word » dans chaque aperçu imprimable */
 const OSV_DOCS={};window.osvWord=k=>{const d=OSV_DOCS[k];if(d)telechargerWord(d.nom,d.titre,d.corps,d.o)};
+
+
+/* ===== Accueil : tableau de bord (remplace les tuiles qui doublaient le menu) et pied de page ===== */
+const tbM=v=>v>=1e6?(Math.round(v/1e5)/10).toLocaleString('fr-FR')+' M':num(v);
+function tbCarte(t,sous,corps,cl=''){return `<section class="card tb ${cl}"><div class="tb-h"><h3>${t}</h3>${sous?`<span class="muted">${sous}</span>`:''}</div>${corps}</section>`}
+function tbBudget(){const L=S.projets.filter(p=>!['rejete','archive'].includes(p.statut)&&voitFin(p)).map(p=>[p,finStats(p)]).filter(x=>x[1].budget>0).sort((a,b)=>b[1].budget-a[1].budget).slice(0,6);
+ if(!L.length)return tbCarte('Budget et exécution','par projet','<p class="empty">Aucun budget saisi pour le moment. Le graphique apparaîtra dès qu\'un projet aura ses lignes budgétaires.</p>');
+ const max=Math.max(...L.map(x=>x[1].budget)),tot=somme(L,x=>x[1].budget),re=somme(L,x=>x[1].real);
+ return tbCarte('Budget et exécution',`${tbM(re)} réalisés sur ${tbM(tot)} FCFA`,`<ul class="tb-bars">${L.map(([p,s])=>{const w=s.budget/max*100,t=s.budget?Math.min(1,s.real/s.budget):0;
+  return `<li title="${esc(p.nom)} : ${num(s.real)} FCFA réalisés sur ${num(s.budget)} FCFA (${tx(t)})"><button class="lnk tb-l" data-act="svDos" data-id="${p.id}">${esc(p.code||p.nom)}</button><span class="tb-track" style="width:${w.toFixed(1)}%"><i style="width:${(t*100).toFixed(1)}%"></i></span><span class="tb-v">${tx(t)}</span></li>`}).join('')}</ul>
+  <p class="tb-leg"><span class="k k-fill"></span>Réalisé (dépenses approuvées ou payées)<span class="k k-track"></span>Budget du projet</p>`)}
+function tbIndicateurs(){const s=synth(S.inds),n=s.ok+s.warn+s.bad+s.nd;if(!n)return tbCarte('Santé des indicateurs','','<p class="empty">Aucun indicateur suivi pour le moment.</p>');
+ const seg=[['ok','Dans les temps',s.ok],['warn','À surveiller',s.warn],['bad','En retard',s.bad],['nd','Sans données suffisantes',s.nd]].filter(x=>x[2]);
+ return tbCarte('Santé des indicateurs',`${n} indicateur(s) suivi(s)`,`<div class="tb-stack" role="img" aria-label="${seg.map(x=>`${x[1]} : ${x[2]}`).join(', ')}">${seg.map(x=>`<i class="${x[0]}" style="flex:${x[2]}" title="${x[1]} : ${x[2]}"></i>`).join('')}</div>
+  <ul class="tb-legende">${seg.map(x=>`<li><span class="k ${x[0]}"></span>${x[1]}<b>${x[2]}</b><span class="muted">${Math.round(x[2]/n*100)} %</span></li>`).join('')}</ul>`)}
+function tbStatuts(){const L=S.projets.filter(p=>p.statut!=='archive');if(!L.length)return '';const c={};L.forEach(p=>c[p.statut]=(c[p.statut]||0)+1);
+ const E=Object.entries(c).sort((a,b)=>b[1]-a[1]),max=Math.max(...E.map(x=>x[1]));
+ return tbCarte('Projets par étape',`${L.length} projet(s)`,`<ul class="tb-bars tb-cnt">${E.map(([k,v])=>`<li title="${(PSTAT[k]||[k])[0]} : ${v}"><span class="tb-l">${(PSTAT[k]||[k])[0]}</span><span class="tb-track" style="width:${(v/max*100).toFixed(1)}%"><i style="width:100%"></i></span><span class="tb-v">${v}</span></li>`).join('')}</ul>`)}
+function tbEcheances(){const t=today(),lim=new Date(Date.now()+45*864e5).toISOString().slice(0,10),E=[],dans=d=>d&&d>=t&&d<=lim;
+ (S.missions||[]).filter(m=>['approuvee','demandee'].includes(m.statut)&&dans(m.date_depart)&&(m.agent_id===me.id||(S.mmembres||[]).some(x=>x.mission_id===m.id&&x.user_id===me.id)||['DE','DP','RA','CA'].includes(me.role))).forEach(m=>E.push([m.date_depart,'Mission',`${m.objet} (${m.destination})`,'missions']));
+ (S.jalons||[]).filter(j=>dans(j.echeance)&&!['fait','abandonne'].includes(j.statut)).forEach(j=>E.push([j.echeance,'Jalon',j.libelle,'programmes']));
+ (S.contrats||[]).filter(c=>c.statut==='signe'&&dans(c.fin)).forEach(c=>E.push([c.fin,'Fin de contrat',c.nom,'contrats']));
+ S.projets.filter(p=>!['cloture','archive','rejete'].includes(p.statut)&&dans(p.fin)).forEach(p=>E.push([p.fin,'Fin de projet',p.nom,'projets']));
+ S.projets.filter(p=>['brouillon','configuration','validation','active'].includes(p.statut)&&dans(p.debut)).forEach(p=>E.push([p.debut,'Démarrage',p.nom,'projets']));
+ (S.tdrs||[]).filter(x=>x.statut==='valide'&&dans(x.date_debut)&&!tdrOM(x)&&x.auteur_id===me.id).forEach(x=>E.push([x.date_debut,'Ordre de mission à établir',x.titre,'missions']));
+ E.sort((a,b)=>a[0]<b[0]?-1:1);const nav=ROLES[me.role].nav;
+ return tbCarte('Prochaines échéances','45 prochains jours',E.length?`<ul class="tb-ech">${E.slice(0,8).map(([d,k,l,v])=>{const j=Math.round((new Date(d)-new Date(t))/864e5);
+  return `<li><span class="tb-date"><b>${new Date(d).toLocaleDateString('fr-FR',{day:'2-digit'})}</b>${new Date(d).toLocaleDateString('fr-FR',{month:'short'})}</span><span class="tb-t"><span class="muted">${k} · ${j===0?'aujourd\'hui':j===1?'demain':'dans '+j+' jours'}</span>${nav.includes(v)?`<button class="lnk" data-act="go" data-v="${v}">${esc(l)}</button>`:esc(l)}</span></li>`}).join('')}</ul>${E.length>8?`<p class="muted tb-plus">et ${E.length-8} autre(s)</p>`:''}`:'<p class="empty">Aucune échéance dans les 45 prochains jours.</p>')}
+function tbActivite(){if(me.role!=='DE'||!srvAudit.length)return '';const L=srvAudit.filter(a=>!/^(Connexion|Déconnexion)/.test(String(a.action))).slice(0,6);if(!L.length)return '';
+ const il=d=>{const m=Math.round((Date.now()-new Date(d))/6e4);return m<60?`il y a ${Math.max(1,m)} min`:m<1440?`il y a ${Math.round(m/60)} h`:`il y a ${Math.round(m/1440)} j`};
+ return tbCarte('Activité récente','journal d\'audit',`<ul class="tb-act">${L.map(a=>`<li><span class="muted">${il(a.le)} · ${esc(a.user_id?who(a.user_id):'Système')}</span>${esc(String(a.action).slice(0,140))}</li>`).join('')}</ul><p class="tb-plus"><button class="lnk" data-act="go" data-v="audit">Tout le journal</button></p>`)}
+function tbMesProjets(){const L=projetsVisibles?S.projets.filter(p=>p.chefId===me.id||(p.membres||[]).some(m=>m.staffId===me.id)):[];if(!L.length)return '';
+ return tbCarte('Mes projets',`${L.length}`,`<ul class="tb-act">${L.map(p=>{const s=synth(indsProjet(p));return `<li><span class="muted">${(PSTAT[p.statut]||[p.statut])[0]} · ${fmtD(p.debut)} → ${fmtD(p.fin)}${s.score!=null?' · indicateurs '+tx(s.score):''}</span><button class="lnk" data-act="svDos" data-id="${p.id}">${esc(libProj(p))}</button></li>`}).join('')}</ul>`)}
+function accTableauBord(){const pil=['DE','DP','CA'].includes(me.role)&&p03;
+ const B=pil?[S.projets.some(voitFin)?tbBudget():'',tbIndicateurs(),tbStatuts(),tbEcheances(),tbActivite()]:[tbEcheances(),p03?tbMesProjets():''];
+ return `<div class="tb-grid">${B.filter(Boolean).join('')}</div>`}
+function piedApp(){return `<footer class="pied-app"><div class="pa-id"><img src="${LOGO}" alt=""><div><b>${esc(S.org.nom||'ONG Sécurité Vie')}</b><span>Agir pour sauver des vies au quotidien</span></div></div>
+ <div class="pa-col"><b>Siège</b><span>Yamoussoukro, 220 Zouessi · BP 1605</span><span>${OSV_COORD.telSiege}</span></div>
+ <div class="pa-col"><b>Bureaux du Nord</b><span>Dabakala, district sanitaire</span><span>${OSV_COORD.telNord}</span></div>
+ <div class="pa-col"><b>Contact</b><span>contact@ongsecuritevie.org</span><span>${OSV_COORD.site}</span></div>
+ <p class="pa-bas">OSV Gestion · données hébergées sur le serveur sécurisé de l'organisation · accès réservé au personnel</p></footer>`}
 
 /* ---------- démarrage ---------- */
 async function srvInit(){
