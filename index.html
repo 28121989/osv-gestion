@@ -436,6 +436,9 @@ details>summary{font-size:.9rem}
 .trO b{font-size:.9rem;font-weight:600;line-height:1.3}.trO span{font-size:.76rem;color:var(--muted)}
 .trCat{min-height:5.4rem;border-color:color-mix(in srgb,var(--brand) 25%,var(--line))}.trCat b{font-size:1rem;color:var(--brand)}.trCat .trNb{margin-top:auto;font-weight:600}
 .trProj{margin:.35rem 0 0;line-height:1.35}
+.coDs{display:grid;gap:.6rem;margin:.3rem 0 .6rem}.coD{display:grid;grid-template-columns:minmax(0,1.6fr) 7.5rem minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) 2.4rem;gap:.5rem;align-items:end;padding:.6rem;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.coD .coT{grid-column:1/-1}.coD label{font-size:.75rem}@media (max-width:760px){.coD{grid-template-columns:1fr 1fr}.coD .coDx{grid-column:2;justify-self:end}}
+.coL p{max-width:72ch}
 .trGen{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-top:.6rem}.trGenB{display:grid;gap:.45rem;align-content:start;border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;background:var(--panel)}.trGenB h4{margin:0}.trGenB .btn{justify-self:start;margin-top:.3rem}
 .trPropQ{margin:.4rem 0 .6rem 1.2rem;font-size:.86rem}.trPropQ li{margin:.15rem 0}.trPropQ li.sec{display:block;margin-left:-1.2rem;margin-top:.5rem}.trProp summary{display:list-item;cursor:pointer;padding:.3rem 0}.trProp summary .trChk{display:inline-flex;gap:.4rem;align-items:center;margin-right:.3rem}
 .trO:hover,.trO:focus-visible{border-color:var(--brand);background:var(--brand-tint)}
@@ -1839,7 +1842,7 @@ async function authRefresh(){const s=sess;if(!s)return;sess=null;
 async function authLogout(){try{if(sess)await api('/auth/v1/logout',{method:'POST'})}catch(e){}sessEcrire(null)}
 
 /* ---------- chargement des données autorisées ---------- */
-function srvVide(){return {org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],veille:[],opps:[],journal:[],capis:[],iaUsage:[],outils:[],fterrain:[],refs:[],microplans:[],rterrain:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
+function srvVide(){return {courriers:[],org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],veille:[],opps:[],journal:[],capis:[],iaUsage:[],outils:[],fterrain:[],refs:[],microplans:[],rterrain:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
 async function srvLoad(){
  const uid=sess.user.id,mine=await sel('membres',`select=*&user_id=eq.${uid}&actif=is.true`);
  const m=(mine||[]).find(x=>!x.fin_acces||x.fin_acces>=today());
@@ -1871,6 +1874,7 @@ async function srvLoad(){
  const T8=await Promise.all([sel('tdrs',f+'&order=cree_le.desc'),sel('tdr_avis',f+'&order=le'),sel('acces_budget',f)].map(opt));p08=T8[0]!==null;N.tdrs=T8[0]||[];N.tavis=T8[1]||[];N.accBud=T8[2]||[];
  const T10=await opt(sel('contrats',f+'&order=redige_le.desc'));p10=T10!==null;N.contrats=T10||[];p10f=p10&&(await opt(sel('contrats','select=fiche&limit=1')))!==null;
  const T13=await Promise.all([sel('journal',f+'&order=date_evt.desc&limit=3000'),sel('capitalisations',f+'&order=cree_le.desc'),sel('ia_reglages',f)].map(opt));p13=T13[0]!==null;N.journal=T13[0]||[];N.capis=T13[1]||[];N.iaReg=(T13[2]||[])[0]||null;p14=p13&&(await opt(sel('journal','select=cadre&limit=1')))!==null;p16=p14&&(await opt(sel('journal','select=parent_id&limit=1')))!==null;
+ const T18=await opt(sel('courriers',f+'&order=cree_le.desc&limit=3000'));p18=T18!==null;N.courriers=T18||[];
  const T15=await Promise.all([sel('veille_notes',f+'&order=date_evt.desc&limit=3000'),sel('opportunites',f+'&order=cree_le.desc')].map(opt));p15=T15[0]!==null;N.veille=T15[0]||[];N.opps=T15[1]||[];
  const T12=await Promise.all([sel('outils_collecte',f+'&order=cree_le'),sel('fiches_terrain',f+'&order=date_activite.desc,saisi_le.desc&limit=10000'),sel('references_communautaires',f+'&order=date_reference.desc&limit=10000'),sel('microplans',f),sel('rapports_terrain',f+'&order=mois.desc')].map(opt));p12=T12[0]!==null;[N.outils,N.fterrain,N.refs,N.microplans,N.rterrain]=T12.map(x=>x||[]);
  [N.comptes,N.mouvements,N.rapprochements,N.avances,N.fournisseurs,N.seuilsAchat,N.achats,N.devis,N.baremes,N.missions,N.biens,N.inventaires,N.pcomptes,N.correspondances,N.invLignes]=T6.map(x=>x||[]);
@@ -1883,7 +1887,7 @@ const APPUI=['RH','RA','CPT','LOG'];
 function srvNav(r){if(r==='EXT')return ['politiques'];const appui=APPUI.includes(r),n=[];
  if(p03&&['DE','DP','CA'].includes(r))n.push('strategie','programmes');
  if(!appui)n.push('projets');if(p12&&['ASC','SUP','SE','CP','DP','DE','CA'].includes(r)){if(['ASC','SUP'].includes(r))n.splice(n.indexOf('projets'),0,'terrain');else n.push('terrain')}if(p03&&['DE','DP','CA',...APPUI].includes(r))n.push('equipes');if(p05&&['DE','DP','CA','RA','CPT'].includes(r))n.push('finances');if(p06&&['DE','DP','CA','RA','CPT','LOG'].includes(r))n.push('adm');
- if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');if(p08)n.push('missions');if(p06)n.push('mesdem');if(p13)n.push('journal');if(p15&&['DE','DP','RA','CA','CP'].includes(r))n.push('veille');
+ if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');if(p08)n.push('missions');if(p06)n.push('mesdem');if(p13)n.push('journal');if(p18&&!['EXT','CA'].includes(r))n.push('courriers');if(p15&&['DE','DP','RA','CA','CP'].includes(r))n.push('veille');
  if(p10&&['DE','DP','RH','RA'].includes(r))n.push('contrats');if(['DE','RH'].includes(r))n.push('personnel');if(r==='DE')n.push('audit');return n}
 async function notifierSrv(dest,texte,lien,ref){const ids=[...new Set(dest.filter(Boolean))].filter(id=>id!==me.id&&S.staff.some(u=>u.id===id));
  if(!ids.length)return 0;await ins('notifications',ids.map(id=>({org_id:S.org.id,user_id:id,texte,lien,ref,envoye_par:me.id})));return ids.length}
@@ -1893,7 +1897,7 @@ async function action(fn,msg){if(srvBusy)return;srvBusy=true;document.body.class
 
 /* ---------- écrans du mode serveur ---------- */
 function srvHome(){const n=ROLES[me.role].nav,pa=polEnAttente().length;
- const D={veille:'Alertes, opportunités, besoins des communautés et leçons tirés des activités : réservé à la direction',journal:'Réunions, visites et missions : dictées, comptes rendus rédigés automatiquement, capitalisation',terrain:'Fiches d\'activité, listes de présence, références, microplans et rapports des agents communautaires',adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
+ const D={courriers:'Lettres aux autorités et aux communautés : rédigées automatiquement, signées et numérotées',veille:'Alertes, opportunités, besoins des communautés et leçons tirés des activités : réservé à la direction',journal:'Réunions, visites et missions : dictées, comptes rendus rédigés automatiquement, capitalisation',terrain:'Fiches d\'activité, listes de présence, références, microplans et rapports des agents communautaires',adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
  return accHero()+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+notifBox()+
  (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:'')+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
  `${['DE','DP','CA'].includes(me.role)&&p03?'':accTableauBord()}
@@ -2010,6 +2014,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv')return;const b=e.target.cl
  if(a==='notifOuvrir'){const n=S.pol.notifs.find(x=>x.id===b.dataset.id);if(n){upd('notifications',`id=eq.${n.id}`,{lu:true}).catch(()=>{});if(n.lien==='adm'||n.lien==='mesdem'){stop();n.lus.push(me.id);view=n.lien==='adm'&&ROLES[me.role].nav.includes('adm')?'adm':'mesdem';render();return}
   if(n.lien==='finances'){stop();n.lus.push(me.id);finSel=n.ref||null;if(ROLES[me.role].nav.includes('finances'))view='finances';else{dosSel=n.ref;dosTab='fin';view='dossier'}render();return}
   if(n.lien==='contrats'){stop();n.lus.push(me.id);ctrSel=n.ref||null;ctrEdit=null;view=ROLES[me.role].nav.includes('contrats')?'contrats':'mesdem';render();return}
+  if(n.lien==='courriers'){stop();n.lus.push(me.id);if(CO.user!==me.id)Object.assign(CO,{user:me.id,tab:'miens',brouillon:null});CO.sel=n.ref&&(S.courriers||[]).some(x=>x.id===n.ref)?n.ref:null;CO.edit=null;view=ROLES[me.role].nav.includes('courriers')?'courriers':'home';render();return}
   if(n.lien==='journal'){stop();n.lus.push(me.id);if(JR.user!==me.id){Object.assign(JR,{user:me.id,tab:'liste',capSel:null,capEdit:false,pvEdit:false,filtre:'moi'});joAnx={liste:[],photos:[]}}JR.sel=n.ref&&S.journal.some(x=>x.id===n.ref)?n.ref:null;JR.edit=null;JR.jour=null;JR.tab='liste';view=ROLES[me.role].nav.includes('journal')?'journal':'home';render();return}
   if(n.lien==='veille'){stop();n.lus.push(me.id);VE.sel=n.ref||null;view=ROLES[me.role].nav.includes('veille')?'veille':'home';render();return}
   if(n.lien==='terrain'){stop();n.lus.push(me.id);TR.saisie=null;TR.outil=null;TR.fiche=n.ref&&S.fterrain.some(x=>x.id===n.ref)?n.ref:null;view=ROLES[me.role].nav.includes('terrain')?'terrain':'home';render();return}
@@ -6665,7 +6670,7 @@ function iaReglagesVue(){const g=S.iaReg||{actif:true,quota_jour:40,quota_org_jo
  return `<section class="card"><h3>Réglages de l'assistant de rédaction</h3><p class="muted">La clé de l'API est rangée sur le serveur (secrets Supabase), jamais dans l'application. Vous pouvez suspendre l'assistant à tout moment et limiter le nombre de demandes, pour maîtriser la facture.</p>
  <form data-form="iaReg" class="grid" style="align-items:end"><div><label class="trChk"><input type="checkbox" name="actif" ${g.actif!==false?'checked':''}> Assistant activé</label></div><div><label>Demandes par personne et par jour</label><input name="quota_jour" type="number" min="0" max="1000" value="${g.quota_jour}"></div><div><label>Demandes par jour pour toute l'organisation</label><input name="quota_org_jour" type="number" min="0" max="20000" value="${g.quota_org_jour}"></div><div><button class="btn" type="submit">Enregistrer</button></div></form></section>
  <div class="kpis"><div class="kpi"><b>${num(uj.length)}</b><span>demandes aujourd'hui</span></div><div class="kpi"><b>${num(um.length)}</b><span>demandes ce mois</span></div><div class="kpi"><b>${num(Math.round(tk(um)/1000))} k</b><span>jetons ce mois (entrée + sortie)</span></div><div class="kpi"><b>${num(um.filter(u=>u.statut==='erreur').length)}</b><span>échecs ce mois</span></div></div>
- <section class="card"><h3>Utilisation du mois</h3>${trBarres(Object.entries(parT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[{fiche:'Fiches remplies à partir d\'un récit',tdr:'TDR rédigés',microplan:'Microplans',rapport:'Rapports mensuels',pv:'Comptes rendus',capitalisation:'Capitalisation et redevabilité',veille:'Notes de veille',bulletin:'Bulletins de veille',ameliorer:'Améliorations de texte',presence:'Listes de présence lues sur photo',compilation:'Rapports globaux compilés',outils:'Outils de collecte conçus',outil_import:'Outils de bailleurs convertis'}[k]||k,v]))||'<p class="empty">Aucune demande ce mois.</p>'}
+ <section class="card"><h3>Utilisation du mois</h3>${trBarres(Object.entries(parT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[{fiche:'Fiches remplies à partir d\'un récit',tdr:'TDR rédigés',microplan:'Microplans',rapport:'Rapports mensuels',pv:'Comptes rendus',capitalisation:'Capitalisation et redevabilité',veille:'Notes de veille',bulletin:'Bulletins de veille',ameliorer:'Améliorations de texte',presence:'Listes de présence lues sur photo',compilation:'Rapports globaux compilés',outils:'Outils de collecte conçus',courrier:'Courriers rédigés',outil_import:'Outils de bailleurs convertis'}[k]||k,v]))||'<p class="empty">Aucune demande ce mois.</p>'}
  ${Object.keys(parU).length?`<h4>Par personne</h4>${trBarres(Object.entries(parU).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>[who(k),v]))}`:''}
  <p class="muted">Le coût dépend du nombre de jetons et du modèle choisi ; consultez la console de votre fournisseur (Anthropic) pour la facture réelle.</p></section>`}
 
@@ -6924,14 +6929,195 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 /* le mot de passe est remasqué avant l'envoi : il n'est jamais mémorisé en clair par le navigateur */
 document.addEventListener('submit',e=>{e.target.querySelectorAll&&e.target.querySelectorAll('input[data-oeil][type="text"]').forEach(i=>{i.type='password';const b=i.parentNode.querySelector('.pwOeil');if(b){b.innerHTML=OEIL;b.setAttribute('aria-pressed','false')}})},true);
 new MutationObserver(pwOeils).observe(document.documentElement,{childList:true,subtree:true});
+
+/* =====================================================================
+   COURRIERS OFFICIELS · modèles prêts à l'emploi, adaptés à chaque destinataire
+   Le rédacteur choisit les destinataires et décrit l'activité ; l'appel, l'adresse
+   et la formule de politesse s'adaptent seuls ; l'assistant rédige le corps.
+   ===================================================================== */
+let p18=false;
+const CO={sel:null,edit:null,tab:'miens',user:null,brouillon:null};
+ICO.courriers='<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>';
+const CO_TYPES={information:'Information',invitation:'Invitation à une rencontre',demande_appui:'Information et demande d\'appui',demande_autorisation:'Demande d\'autorisation',remerciement:'Remerciements',convocation:'Convocation',compte_rendu:'Transmission d\'un compte rendu',autre:'Autre'};
+const CO_ST={brouillon:['Brouillon',''],a_signer:['À signer','warn'],signe:['Signé','ok'],depose:['Déposé','ok'],annule:['Annulé','bad']};
+/* destinataires : [libellé, catégorie, titre au masculin, titre au féminin, préposition devant le lieu] */
+const CO_DEST={prefet:['Préfet','admin','le Préfet','la Préfète','de'],sous_prefet:['Sous-préfet','admin','le Sous-préfet','la Sous-préfète','de'],maire:['Maire','admin','le Maire','la Maire','de'],
+ dr_sante:['Directeur régional de la Santé','technique','le Directeur régional de la Santé et de l\'Hygiène publique','la Directrice régionale de la Santé et de l\'Hygiène publique','de'],
+ dd_sante:['Directeur départemental de la Santé','technique','le Directeur départemental de la Santé et de l\'Hygiène publique','la Directrice départementale de la Santé et de l\'Hygiène publique','de'],
+ district:['Directeur du district sanitaire','technique','le Directeur du district sanitaire','la Directrice du district sanitaire','de'],
+ dd_service:['Directeur départemental (autre service)','technique','le Directeur départemental','la Directrice départementale','de'],
+ gendarmerie:['Commandant de brigade de gendarmerie','admin','le Commandant de brigade de gendarmerie','la Commandante de brigade de gendarmerie','de'],
+ police:['Commissaire de police','admin','le Commissaire de police','la Commissaire de police','de'],
+ chef_canton:['Chef de canton','coutume','le Chef de canton','la Cheffe de canton','de'],chef_village:['Chef du village','coutume','le Chef du village','la Cheffe du village','de'],chef_terre:['Chef de terre','coutume','le Chef de terre','la Cheffe de terre','de'],
+ notables:['Notabilité','coutume','le Porte-parole de la notabilité','la Porte-parole de la notabilité','de'],
+ imam:['Imam','religion','l\'Imam','l\'Imam','de'],pasteur:['Pasteur','religion','le Pasteur','la Pasteure','de'],cure:['Curé','religion','le Curé de la paroisse','le Curé de la paroisse','de'],
+ pres_jeunes:['Président des jeunes','groupe','le Président des jeunes','la Présidente des jeunes','de'],pres_femmes:['Présidente des femmes','groupe','le Président de l\'association des femmes','la Présidente des femmes','de'],
+ pres_asso:['Président d\'association','groupe','le Président de l\'association','la Présidente de l\'association',''],
+ ecole:['Directeur d\'école','technique','le Directeur de l\'école','la Directrice de l\'école','de'],iep:['Inspecteur de l\'enseignement primaire','technique','l\'Inspecteur de l\'enseignement primaire','l\'Inspectrice de l\'enseignement primaire','de'],
+ entreprise:['Entreprise (direction des travaux)','entreprise','le Directeur des travaux','la Directrice des travaux',''],
+ autre:['Autre (titre à saisir)','autre','','','']};
+const CO_FORMULE={admin:'Nous vous prions d\'agréer, {A}, l\'expression de notre haute considération.',technique:'Nous vous prions d\'agréer, {A}, l\'expression de notre haute considération.',
+ coutume:'Nous vous prions de croire, {A}, à l\'assurance de notre profond respect.',religion:'Nous vous prions de croire, {A}, à l\'assurance de notre profond respect.',
+ groupe:'Nous vous prions d\'agréer, {A}, l\'expression de nos salutations distinguées.',entreprise:'Nous vous prions d\'agréer, {A}, l\'expression de nos salutations distinguées.',autre:'Nous vous prions d\'agréer, {A}, l\'expression de nos salutations distinguées.'};
+const CO_DEMANDE={admin:'Nous sollicitons respectueusement votre appui institutionnel pour faciliter la mobilisation des acteurs locaux et le bon déroulement de ces interventions.',
+ technique:'Nous sollicitons votre collaboration technique pour la bonne coordination de ces interventions avec vos services.',
+ coutume:'Nous sollicitons respectueusement votre bénédiction et votre appui pour informer et mobiliser la communauté autour de ces activités.',
+ religion:'Nous sollicitons votre bienveillant concours pour relayer cette information auprès des fidèles et encourager leur participation.',
+ groupe:'Nous sollicitons votre appui pour informer et mobiliser les membres de votre organisation, afin qu\'ils prennent une part active à ces activités.',
+ entreprise:'Nous sollicitons votre appui pour faciliter la participation de vos travailleurs à ces séances.',autre:'Nous sollicitons votre appui pour le bon déroulement de ces activités.'};
+const OSV_PRES='L\'ONG Sécurité Vie (OSV), créée le 15 juin 2023 et basée à Yamoussoukro, intervient dans la santé sexuelle et reproductive, la lutte contre les violences basées sur le genre, la sécurité routière, la sécurité au travail, l\'eau et l\'assainissement, l\'environnement et la gestion des plaintes.';
+const coCap=s=>s?s.charAt(0).toUpperCase()+s.slice(1):s;
+const dLong=d=>{if(!d)return '';const x=new Date(String(d).slice(0,10)+'T12:00'),j=x.getDate();return `${j===1?'1er':j} ${x.toLocaleDateString('fr-FR',{month:'long'})} ${x.getFullYear()}`};
+/* appel, adresse et formule : jamais laissés à la main, donc jamais d'erreur de genre ou de titre */
+function coDest(x){const D=CO_DEST[x.type]||CO_DEST.autre,f=x.civ==='Mme',civ=f?'Madame':'Monsieur';
+ const titre=x.type==='autre'?String(x.titre||'').trim():(f?D[3]:D[2]),compl=String(x.compl||'').trim(),lieu=String(x.lieu||'').trim();
+ const appel=`${civ} ${titre}`.trim(),apC=coCap(appel);
+ const adr=[`${civ} ${titre}${compl?' '+compl:''}${lieu?(D[4]?` ${D[4]} ${lieu}`.replace(/ de ([AEIOUYÉÈaeiouyéè])/,' d\'$1'):` ${lieu}`):''}`,String(x.nom||'').trim()?`(${String(x.nom).trim()})`:''].filter(Boolean);
+ return {cat:D[1],appel:apC,adresse:adr,formule:CO_FORMULE[D[1]].replace('{A}',appel)}}
+function coModele(c){const x=c.contexte||{},p=c.projet_id&&projet(c.projet_id),act=x.activite||'[à compléter : activité]',lieux=x.lieux||'[à compléter : lieux]',per=x.du?(x.au&&x.au!==x.du?`du ${dLong(x.du)} au ${dLong(x.au)}`:`le ${dLong(x.du)}`):'[à compléter : dates]';
+ const cadre=p?`Dans le cadre du projet « ${p.nom} »${x.partenaire?`, mis en œuvre avec ${x.partenaire}`:p.bailleur?`, financé par ${p.bailleur}`:''}`:`Dans le cadre de ses activités${x.partenaire?` menées avec ${x.partenaire}`:''}`;
+ const P1=`${cadre}, l'ONG Sécurité Vie prévoit ${act.charAt(0).toLowerCase()+act.slice(1)}${x.publics?`, à l'intention ${/^(des|de la|du|de l')/.test(x.publics)?'':'de '}${x.publics}`:''}.`;
+ const P3={invitation:`À ce titre, nous avons l'honneur de vous inviter à la rencontre qui se tiendra ${per}${x.heure?` à ${x.heure}`:''}, à ${lieux}.`,remerciement:`Nous tenons à vous exprimer nos sincères remerciements pour votre accompagnement lors de ${act.charAt(0).toLowerCase()+act.slice(1)}, ${per}, à ${lieux}.`,
+  convocation:`Vous êtes prié(e) de prendre part à la séance prévue ${per}${x.heure?` à ${x.heure}`:''}, à ${lieux}.`}[c.type]||`À ce titre, nous avons l'honneur de porter à votre connaissance l'organisation de cette activité ${per}, à ${lieux}.`;
+ return (c.contexte.destinataires||[]).map(d=>{const k=coDest(d);return {dest:d,appel:k.appel,adresse:k.adresse,formule:k.formule,paras:[P1,OSV_PRES,P3,...(c.type==='remerciement'?[]:[CO_DEMANDE[k.cat]]),'Nous demeurons à votre disposition pour toute information complémentaire et pour les dispositions de coordination que vous jugerez utiles.']}})}
+const coObjetDefaut=c=>{const a=(c.contexte||{}).activite||'activité';return ({invitation:'Invitation à ',information:'Information sur ',demande_appui:'Information et sollicitation d\'appui pour ',remerciement:'Remerciements pour ',convocation:'Convocation à ',demande_autorisation:'Demande d\'autorisation pour '}[c.type]||'')+a.charAt(0).toLowerCase()+a.slice(1)};
+const coSignataires=()=>S.staff.filter(u=>u.actif&&['DE','DP','CP'].includes(u.role)&&accesOK(u)).sort((a,b)=>['DE','DP','CP'].indexOf(a.role)-['DE','DP','CP'].indexOf(b.role)||a.nom.localeCompare(b.nom));
+const coPeutEditer=c=>['brouillon','a_signer'].includes(c.statut)&&[c.auteur_id,c.signataire_id].includes(me.id);
+
+/* ---------- vues ---------- */
+function svCourriers(){if(!p18)return head('Courriers','')+'<p class="note">Exécutez le script 18 dans Supabase pour activer les courriers.</p>';
+ if(CO.user!==me.id)Object.assign(CO,{user:me.id,sel:null,edit:null,tab:'miens',brouillon:null});
+ if(CO.edit)return coEditeur(CO.edit==='new'?null:S.courriers.find(c=>c.id===CO.edit));
+ const c=CO.sel&&S.courriers.find(x=>x.id===CO.sel);if(c)return coDetail(c);
+ const aSigner=S.courriers.filter(c=>c.statut==='a_signer'&&c.signataire_id===me.id);
+ const tabs=[['miens','Mes courriers'],...(aSigner.length||['DE','DP','CP'].includes(me.role)?[['signer',`À signer${aSigner.length?' ('+aSigner.length+')':''}`]]:[]),...(['DE','DP'].includes(me.role)?[['tous','Registre du courrier']]:[])];
+ if(!tabs.some(t=>t[0]===CO.tab))CO.tab='miens';
+ const L=(CO.tab==='signer'?aSigner:CO.tab==='tous'?S.courriers:S.courriers.filter(c=>c.auteur_id===me.id)).slice().sort((a,b)=>a.cree_le<b.cree_le?1:-1);
+ return head('Courriers','Lettres d\'information, d\'invitation, de demande d\'appui ou de remerciement aux autorités et aux communautés. Choisissez les destinataires : l\'appel, l\'adresse et la formule de politesse s\'adaptent à chacun. L\'assistant rédige ; vous relisez ; le signataire signe ; le courrier reçoit son numéro.')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
+ `<nav class="subnav">${tabs.map(([k,l])=>`<button data-act="coTab" data-v="${k}" ${CO.tab===k?'aria-current="page"':''}>${l}</button>`).join('')}</nav>
+ <section class="card"><p><button class="btn" data-act="coNouveau">${ico('courriers')} Nouveau courrier</button></p>
+ ${svT(['N°','Date','Objet','Destinataires','Rédacteur','Signataire','Statut',''],L.map(c=>[c.numero?`<b>${esc(c.numero)}</b>`:'<span class="muted">—</span>',fmtD(c.signe_le||c.cree_le),`<b>${esc(c.objet)}</b>${c.projet_id&&projet(c.projet_id)?`<br><span class="muted">${esc(libProj(projet(c.projet_id)))}</span>`:''}`,
+  esc((c.lettres||[]).map(l=>l.appel).slice(0,3).join(' ; ')+((c.lettres||[]).length>3?` et ${(c.lettres||[]).length-3} autre(s)`:'')),esc(who(c.auteur_id)),esc(c.signataire_id?who(c.signataire_id):'—'),tag(CO_ST[c.statut])+(c.depose_le?`<br><span class="muted">déposé le ${fmtD(c.depose_le)}</span>`:''),`<button class="btn ghost sm" data-act="coVoir" data-id="${c.id}">Ouvrir</button>`]),CO.tab==='signer'?'Aucun courrier à signer.':'Aucun courrier pour le moment.')}</section>`}
+
+const coLigneDest=(d={},i=0)=>`<div class="coD" data-d>
+ <div><label>Destinataire</label><select data-k="type">${opts(Object.entries(CO_DEST).map(([k,v])=>[k,v[0]]),d.type||'chef_village')}</select></div>
+ <div><label>Civilité</label><select data-k="civ">${opts([['M.','Monsieur'],['Mme','Madame']],d.civ||(d.type==='pres_femmes'?'Mme':'M.'))}</select></div>
+ <div><label>Localité ou circonscription</label><input data-k="lieu" value="${esc(d.lieu||'')}" placeholder="ex. Satama-Sokoro"></div>
+ <div class="coT" ${d.type==='autre'?'':'hidden'}><label>Titre (sans Monsieur ni Madame)</label><input data-k="titre" value="${esc(d.titre||'')}" placeholder="ex. le Chef du service de l'environnement"></div>
+ <div><label>Précision <span class="muted">(service, association…)</span></label><input data-k="compl" value="${esc(d.compl||'')}" placeholder="facultatif"></div>
+ <div><label>Nom <span class="muted">(facultatif)</span></label><input data-k="nom" value="${esc(d.nom||'')}"></div>
+ <div class="coDx"><button type="button" class="btn ghost sm" data-act="coDestSuppr" aria-label="Retirer ce destinataire">×</button></div></div>`;
+function coEditeur(c){c=c||CO.brouillon||{type:'demande_appui',contexte:{destinataires:[{type:'sous_prefet'},{type:'chef_village'}]}};const x=c.contexte||{},sig=coSignataires(),proj=S.projets.filter(p=>!['archive','rejete'].includes(p.statut));
+ const villes=[...new Set(['Yamoussoukro',...S.bureaux.map(b=>b.ville).filter(Boolean)])];
+ return `<p><button class="lnk" data-act="coFermer">← Courriers</button></p>`+head(c.id?'Modifier le courrier':'Nouveau courrier','Décrivez l\'activité et choisissez les destinataires. Une lettre est préparée pour chacun, avec le bon titre, la bonne adresse et la bonne formule de politesse.')+
+ `<form data-form="coForm" data-id="${c.id||''}" class="card grid trForm">
+  <div class="trL2"><label>Type de courrier</label><select name="type">${opts(Object.entries(CO_TYPES),c.type)}</select></div>
+  <div class="trL2"><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),c.projet_id||'','— hors projet —')}</select></div>
+  <div class="trL"><label>Activité concernée <span class="req">*</span></label><input name="activite" required value="${esc(x.activite||'')}" placeholder="ex. une campagne de sensibilisation sur les IST, le VIH et la sécurité routière"></div>
+  <div><label>Du</label><input name="du" type="date" value="${esc(x.du||'')}"></div><div><label>Au</label><input name="au" type="date" value="${esc(x.au||'')}"></div><div><label>Heure</label><input name="heure" type="time" value="${esc(x.heure||'')}"></div>
+  <div class="trL2"><label>Lieux</label><input name="lieux" value="${esc(x.lieux||'')}" placeholder="ex. Dabakala et Satama-Sokoro"></div>
+  <div class="trL2"><label>Publics visés</label><input name="publics" value="${esc(x.publics||'')}" placeholder="ex. des populations riveraines et des travailleurs du chantier"></div>
+  <div class="trL2"><label>Pour le compte de, ou avec <span class="muted">(entreprise, ONG partenaire)</span></label><input name="partenaire" value="${esc(x.partenaire||'')}" placeholder="ex. l'entreprise EBOMAF"></div>
+  <div class="trL"><label for="co_prec">Ce que vous voulez dire en plus (facultatif)</label><textarea id="co_prec" name="precisions" rows="2" placeholder="ex. Prévoir une salle pour 50 personnes ; la rencontre sera suivie d'une visite du chantier.">${esc(x.precisions||'')}</textarea>${dictBtn('co_prec')}</div>
+  <fieldset class="trL coDests"><legend>Destinataires (${(x.destinataires||[]).length||1})</legend><div class="coDs">${(x.destinataires&&x.destinataires.length?x.destinataires:[{}]).map(coLigneDest).join('')}</div>
+   <div class="row"><button type="button" class="btn ghost sm" data-act="coDestAjout">+ Un destinataire</button><button type="button" class="btn ghost sm" data-act="coKit">+ Autorités et leaders d'une localité</button></div>
+   <small class="muted">« Autorités et leaders d'une localité » ajoute en une fois le chef du village, le président des jeunes, la présidente des femmes et l'imam de la localité indiquée sur la dernière ligne.</small></fieldset>
+  <div class="trL2"><label>Signataire</label><select name="signataire" required>${opts(sig.map(u=>[u.id,`${u.nom} – ${posteLib(u)}`]),c.signataire_id||(sig[0]||{}).id||'')}</select></div>
+  <div><label>Lieu d'émission</label><select name="lieu_emission">${opts(villes.map(v=>[v,v]),c.lieu_emission||'Yamoussoukro')}</select></div>
+  <div class="trL"><label>Ampliations <span class="muted">(une par ligne, facultatif)</span></label><textarea name="ampliations" rows="2" placeholder="ex. Monsieur le Préfet de Dabakala">${esc(c.ampliations||'')}</textarea></div>
+  <div class="trL row">${iaOK()?`<button class="btn iaB" type="submit" value="ia">${ico('etoile')} Rédiger les lettres</button>`:''}<button class="btn ${iaOK()?'ghost':''}" type="submit" value="modele">Préparer avec le modèle standard</button></div></form>`}
+
+function coLettreHTML(c,l,papier){const u=S.staff.find(s=>s.id===c.signataire_id)||{},M=s=>papier?esc(s):esc(s).replace(/\[à (compléter|préciser)[^\]]*\]/gi,m=>`<mark>${m}</mark>`);
+ const num=c.numero||`______/OSV/${({DE:'DE',DP:'DP'})[u.role]||'CP'}/${new Date().getFullYear()}`;
+ return `${c.statut==='signe'||c.statut==='depose'?'':'<p class="petit" style="text-align:center"><b>PROJET DE COURRIER – NON SIGNÉ</b></p>'}
+ <p style="text-align:right">${esc(c.lieu_emission||'Yamoussoukro')}, le ${dLong(c.signe_le||today())}</p>
+ <p><b>N° ${esc(num)}</b></p>
+ <p>&nbsp;</p><p style="text-align:right">À<br>${l.adresse.map(M).join('<br>')}</p><p>&nbsp;</p>
+ <p><b>Objet :</b> ${M(c.objet)}</p><p>&nbsp;</p>
+ <p>${M(l.appel)},</p>
+ ${l.paras.filter(x=>String(x).trim()).map(x=>`<p>${M(x)}</p>`).join('')}
+ <p>${M(l.formule)}</p><p>&nbsp;</p>
+ <p style="text-align:right">Pour l'ONG Sécurité Vie,<br><b>${esc(posteLib(u))}</b><br><br><br><br><b>${esc(u.nom||'')}</b></p>
+ ${String(c.ampliations||'').trim()?`<p class="petit"><b>Ampliations :</b><br>${String(c.ampliations).split(/\r?\n/).filter(x=>x.trim()).map(x=>'– '+esc(x.trim())).join('<br>')}</p>`:''}`}
+const coCorps=c=>(c.lettres||[]).map((l,i)=>(i?'<div class="saut"></div>':'')+coLettreHTML(c,l,true)).join('');
+const coNom=c=>`Courrier_${(c.numero||'projet').replace(/[^A-Za-z0-9]+/g,'-')}_${trSlug(c.objet).slice(0,40)}`;
+function coDetail(c){const ed=coPeutEditer(c),sig=c.signataire_id===me.id,a=c.auteur_id===me.id,n=(c.lettres||[]).length,nm=(JSON.stringify(c.lettres||[]).match(/\[à (compléter|préciser)[^\]]*\]/gi)||[]).length;
+ return `<p><button class="lnk" data-act="coFermer">← Courriers</button></p>${srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:''}<div class="head"><h1>${esc(c.objet)}</h1><p>${esc(CO_TYPES[c.type]||'')} · ${n} lettre${n>1?'s':''} · rédigé par ${esc(who(c.auteur_id))} · signataire : ${esc(c.signataire_id?who(c.signataire_id):'—')}${c.projet_id&&projet(c.projet_id)?' · '+esc(libProj(projet(c.projet_id))):''}</p></div>
+ <div class="row" style="margin-bottom:1rem">${tag(CO_ST[c.statut])}${c.numero?tag(['N° '+c.numero,'']):''}${nm&&ed?tag([nm+' passage(s) à compléter','bad']):''}</div>
+ ${c.motif_retour&&c.statut==='brouillon'?`<p class="note"><b>Renvoyé pour correction :</b> ${esc(c.motif_retour)}</p>`:''}
+ <div class="row" style="margin-bottom:1rem"><button class="btn" data-act="coWord" data-id="${c.id}">Télécharger en Word</button><button class="btn ghost sm" data-act="coImp" data-id="${c.id}">Aperçu, impression ou PDF</button>
+  ${ed?`<button class="btn ghost sm" data-act="coModif" data-id="${c.id}">Modifier l'activité ou les destinataires</button>`:''}
+  ${a&&c.statut==='brouillon'&&c.signataire_id!==me.id?`<button class="btn sm" data-act="coSoumettre" data-id="${c.id}">Soumettre à la signature</button>`:''}
+  ${sig&&['brouillon','a_signer'].includes(c.statut)?`<button class="btn sm" data-act="coSigner" data-id="${c.id}">Signer et numéroter</button>`:''}
+  ${sig&&c.statut==='a_signer'?`<button class="btn ghost sm" data-act="coRenvoyer" data-id="${c.id}">Renvoyer pour correction</button>`:''}
+  ${c.statut==='signe'&&(a||sig)?`<button class="btn sm" data-act="coDepose" data-id="${c.id}">Noter le dépôt</button>`:''}
+  ${a&&c.statut==='brouillon'?`<button class="btn danger sm" data-act="coSuppr" data-id="${c.id}">Supprimer</button>`:''}
+  ${(a||['DE','DP'].includes(me.role))&&['signe','depose'].includes(c.statut)?`<button class="btn ghost sm" data-act="coAnnuler" data-id="${c.id}">Annuler</button>`:''}</div>
+ ${ed?`<p class="muted">Relisez chaque lettre ; corrigez directement dans les cadres, puis enregistrez. Les passages <mark>surlignés</mark> sont à compléter.</p><form data-form="coLettres" data-id="${c.id}">`:''}
+ ${(c.lettres||[]).map((l,i)=>`<article class="card pvDoc coL"><h3 class="muted" style="margin-top:0">Lettre ${i+1} sur ${n} · ${esc(l.adresse[0]||'')}</h3>
+  ${ed?`<div class="grid trForm"><div class="trL"><label>Paragraphes (séparés par une ligne vide)</label><textarea name="p_${i}" rows="${Math.min(22,6+l.paras.length*3)}">${esc(l.paras.join('\n\n'))}</textarea></div></div><details><summary class="muted">Aperçu de la lettre</summary>${coLettreHTML(c,l,false)}</details>`:coLettreHTML(c,l,false)}</article>`).join('')}
+ ${ed?`<div class="row"><button class="btn" type="submit">Enregistrer les corrections</button></div></form>`:''}`}
+
+/* ---------- lecture du formulaire ---------- */
+function coLireDests(f){return [...f.querySelectorAll('[data-d]')].map(r=>{const q=k=>r.querySelector(`[data-k="${k}"]`).value.trim();return {type:q('type'),civ:q('civ'),lieu:q('lieu'),titre:q('titre'),compl:q('compl'),nom:q('nom')}}).filter(d=>d.type&&(d.type!=='autre'||d.titre))}
+function coPayload(c){const p=c.projet_id&&projet(c.projet_id),x=c.contexte;
+ return {type:CO_TYPES[c.type],activite:{intitule:x.activite,du:x.du,au:x.au,heure:x.heure,lieux:x.lieux,publics:x.publics},precisions:x.precisions,partenaire:x.partenaire,
+  projet:p?{nom:p.nom,bailleur:p.bailleur,zone:p.zone,debut:p.debut,fin:p.fin,objectifs:(S.cadre||[]).filter(k=>k.projet_id===p.id&&['og','os'].includes(k.niveau)).map(k=>k.libelle).slice(0,5)}:null,
+  organisation:{nom:'ONG Sécurité Vie (OSV)',presentation:OSV_PRES,slogan:'Agir pour sauver des vies au quotidien'},
+  destinataires:x.destinataires.map((d,i)=>({cle:'d'+i,categorie:CO_DEST[d.type]?CO_DEST[d.type][1]:'autre',fonction:coDest(d).adresse[0]}))}}
+function coDepuisIA(c,r){const L=coModele(c),dem={};L2(r.demande_par_destinataire).forEach(x=>{if(x&&x.cle)dem[x.cle]=String(x.paragraphe||'').trim()});
+ const com=L2(r.paragraphes_communs).map(s=>String(s).trim()).filter(Boolean),clo=String(r.cloture||'').trim();
+ return L.map((l,i)=>({...l,paras:[...(com.length?com:l.paras.slice(0,3)),...(dem['d'+i]?[dem['d'+i]]:l.paras.slice(3,-1)),clo||l.paras[l.paras.length-1]]}))}
+
+document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target,t=f.dataset&&f.dataset.form;if(!['coForm','coLettres'].includes(t))return;e.preventDefault();e.stopImmediatePropagation();srvMsg='';dictStop();
+ const d=Object.fromEntries(new FormData(f).entries());
+ if(t==='coForm'){const id=f.dataset.id||uuid(),nouveau=!f.dataset.id,dest=coLireDests(f),sub=e.submitter&&e.submitter.value;
+  if(!String(d.activite||'').trim()){alert('Décrivez l\'activité concernée.');return}if(!dest.length){alert('Ajoutez au moins un destinataire.');return}if(dest.length>30){alert('30 destinataires au plus par courrier.');return}
+  if(d.du&&d.au&&d.au<d.du){alert('La date de fin précède la date de début.');return}if(!d.signataire){alert('Choisissez le signataire.');return}
+  const c={id,type:d.type,projet_id:d.projet||null,signataire_id:d.signataire,lieu_emission:d.lieu_emission||'Yamoussoukro',ampliations:String(d.ampliations||'').trim()||null,
+   contexte:{activite:String(d.activite).trim(),du:d.du||null,au:d.au||null,heure:d.heure||null,lieux:String(d.lieux||'').trim(),publics:String(d.publics||'').trim(),partenaire:String(d.partenaire||'').trim(),precisions:String(d.precisions||'').trim(),destinataires:dest}};
+  CO.brouillon={...c};
+  iaAvec(e.submitter,async()=>{let objet=coObjetDefaut(c),lettres=coModele(c);
+   if(sub==='ia'){const r=await iaAppel('courrier',coPayload(c));if(String(r.objet||'').trim())objet=String(r.objet).trim().replace(/^objet\s*:\s*/i,'');lettres=coDepuisIA(c,r)}
+   const rec={type:c.type,projet_id:c.projet_id,signataire_id:c.signataire_id,lieu_emission:c.lieu_emission,ampliations:c.ampliations,contexte:c.contexte,objet:objet.slice(0,300),lettres};
+   if(nouveau)await ins('courriers',{id,org_id:S.org.id,...rec});else await upd('courriers',`id=eq.${id}`,rec);
+   await srvLoad();CO.brouillon=null;CO.edit=null;CO.sel=id;srvMsg=`${lettres.length} lettre(s) préparée(s). Relisez-les, complétez les passages surlignés, puis ${c.signataire_id===me.id?'signez':'soumettez à la signature'}.`;render();scrollTo(0,0)});return}
+ if(t==='coLettres'){const c=S.courriers.find(x=>x.id===f.dataset.id),lettres=(c.lettres||[]).map((l,i)=>({...l,paras:String(d['p_'+i]??l.paras.join('\n\n')).split(/\n\s*\n/).map(s=>s.replace(/\s*\n\s*/g,' ').trim()).filter(Boolean)}));
+  action(()=>upd('courriers',`id=eq.${c.id}`,{lettres}),'Corrections enregistrées.');return}
+},true);
+
+document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.target.closest('[data-act="go"]');if(g&&g.dataset.v==='courriers'){CO.sel=null;CO.edit=null}
+ const b=e.target.closest('[data-act^="co"]');if(!b||!/^co[A-Z]/.test(b.dataset.act))return;e.preventDefault();e.stopImmediatePropagation();const a=b.dataset.act,id=b.dataset.id,c=id&&S.courriers.find(x=>x.id===id);dictStop();
+ if(a==='coDestAjout'){const L=b.closest('form').querySelectorAll('[data-d]'),last=L[L.length-1];b.closest('fieldset').querySelector('.coDs').insertAdjacentHTML('beforeend',coLigneDest({lieu:last?last.querySelector('[data-k=lieu]').value:''}));return}
+ if(a==='coKit'){const L=b.closest('form').querySelectorAll('[data-d]'),lieu=L.length?L[L.length-1].querySelector('[data-k=lieu]').value.trim():'';if(!lieu){alert('Indiquez d\'abord la localité sur la dernière ligne des destinataires.');return}
+  b.closest('fieldset').querySelector('.coDs').insertAdjacentHTML('beforeend',[{type:'chef_village',lieu},{type:'pres_jeunes',lieu},{type:'pres_femmes',civ:'Mme',lieu},{type:'imam',lieu}].map(coLigneDest).join(''));return}
+ if(a==='coDestSuppr'){const box=b.closest('.coDs');if(box.querySelectorAll('[data-d]').length>1)b.closest('[data-d]').remove();return}
+ srvMsg='';
+ if(a==='coTab'){CO.tab=b.dataset.v;render();return}
+ if(a==='coNouveau'){CO.edit='new';CO.sel=null;CO.brouillon=null;render();scrollTo(0,0);return}
+ if(a==='coVoir'){CO.sel=id;render();scrollTo(0,0);return}
+ if(a==='coModif'){CO.edit=id;CO.brouillon=null;render();scrollTo(0,0);return}
+ if(a==='coFermer'){if(CO.edit&&!confirm('Quitter sans préparer le courrier ?'))return;CO.edit=null;CO.sel=null;CO.brouillon=null;render();return}
+ if(a==='coWord'){telechargerWord(coNom(c)+'.docx',c.objet,coCorps(c),{ref:c.numero?'':'<b>Projet de courrier</b>'});return}
+ if(a==='coImp'){ouvrirPapier(c.objet,coCorps(c),{nom:coNom(c),ref:c.numero?'':'<b>Projet de courrier</b>',filigrane:['signe','depose'].includes(c.statut)?null:'PROJET'});return}
+ const nm=c?(JSON.stringify(c.lettres||[]).match(/\[à (compléter|préciser)[^\]]*\]/gi)||[]).length:0;
+ if(a==='coSoumettre'){if(nm&&!confirm(`Il reste ${nm} passage(s) « à compléter ». Soumettre quand même ?`))return;action(()=>upd('courriers',`id=eq.${id}`,{statut:'a_signer'}),`Courrier soumis à ${who(c.signataire_id)} pour signature.`);return}
+ if(a==='coSigner'){if(nm&&!confirm(`Il reste ${nm} passage(s) « à compléter ». Signer quand même ?`))return;if(!confirm('Signer ce courrier ? Il recevra son numéro et ne pourra plus être modifié.'))return;action(()=>upd('courriers',`id=eq.${id}`,{statut:'signe'}),'Courrier signé et numéroté. Téléchargez-le en Word ou imprimez-le pour le déposer.');return}
+ if(a==='coRenvoyer'){const m=prompt('Ce qu\'il faut corriger :');if(!m||!m.trim())return;action(()=>upd('courriers',`id=eq.${id}`,{statut:'brouillon',motif_retour:m.trim()}),'Courrier renvoyé au rédacteur.');return}
+ if(a==='coDepose'){const dt=prompt('Date du dépôt (AAAA-MM-JJ) :',today());if(!dt)return;if(!/^\d{4}-\d{2}-\d{2}$/.test(dt)){alert('Date au format AAAA-MM-JJ.');return}action(()=>upd('courriers',`id=eq.${id}`,{statut:'depose',depose_le:dt}),'Dépôt enregistré.');return}
+ if(a==='coSuppr'){if(!confirm('Supprimer ce brouillon ?'))return;action(async()=>{await del('courriers',`id=eq.${id}`);CO.sel=null},'Brouillon supprimé.');return}
+ if(a==='coAnnuler'){if(!confirm('Annuler ce courrier ? Il restera dans le registre, marqué annulé.'))return;action(()=>upd('courriers',`id=eq.${id}`,{statut:'annule'}),'Courrier annulé.');return}
+},true);
+document.addEventListener('change',e=>{const s=e.target;if(s.matches&&s.matches('.coD [data-k="type"]')){const r=s.closest('[data-d]');r.querySelector('.coT').hidden=s.value!=='autre';if(s.value==='pres_femmes')r.querySelector('[data-k="civ"]').value='Mme'}});
+
 /* ---------- démarrage ---------- */
 async function srvInit(){
  if(MODE!=='srv'){render();return}
  save=function(){};                                              // rien de réel n'est gardé dans le navigateur
  const _log=log;log=function(a){if(me&&S.org&&S.org.id)ins('audit',{org_id:S.org.id,user_id:me.id,action:String(a).slice(0,500)}).catch(()=>{})};
- loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{veille:'Veille stratégique',journal:'Journal et comptes rendus',terrain:'Collecte terrain',contrats:'Contrats et conventions',missions:'TDR et ordres de mission',adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
+ loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{courriers:'Courriers',veille:'Veille stratégique',journal:'Journal et comptes rendus',terrain:'Collecte terrain',contrats:'Contrats et conventions',missions:'TDR et ordres de mission',adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
  render=srvRender;
- viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,missions:svMissions,contrats:svContrats,terrain:svTerrain,journal:svJournal,veille:svVeille,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
+ viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,missions:svMissions,contrats:svContrats,terrain:svTerrain,journal:svJournal,veille:svVeille,courriers:svCourriers,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
  S=srvVide();me=null;sess=sessLire();await omVerifCharger();
  const h=new URLSearchParams(location.hash.slice(1));                // retour d'un lien « mot de passe oublié »
  if(h.get('access_token')){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
