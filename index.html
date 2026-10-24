@@ -574,6 +574,11 @@ td{padding:.6rem .7rem}
 .lnk{font-size:.92rem}
 label{color:color-mix(in srgb,var(--ink) 82%,var(--muted))}
 .note{border-radius:10px}
+.trQ{min-width:0}.trQ label,.trQ legend{display:block}.trQn{display:inline-block;min-width:2.4rem;font-weight:700;color:var(--c-violet)}.trQt{font-weight:600;font-size:1.02rem;line-height:1.45}.trQl{display:block;font-size:.78rem;color:var(--muted);font-weight:400;margin:.15rem 0 .35rem 2.4rem}
+.trConsigne{display:block;font-style:italic;color:var(--c-bord);font-size:.84rem;margin-top:.3rem}.trLire{font-weight:600;font-style:italic;border-left:3px solid var(--c-violet);padding:.3rem .7rem;background:var(--c-violet-t);border-radius:6px}
+.trRadio,.trMulti{border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem;margin:0}.trRadio legend,.trQ .trMulti legend{float:left;width:100%;padding:0;margin:0 0 .3rem}.trRadio legend+*,.trQ .trMulti legend+*{clear:both}.trRadL{display:flex;flex-wrap:wrap;gap:.35rem 1.2rem;margin:.2rem 0 0 2.4rem}.trRadL label{display:flex;align-items:center;gap:.4rem;font-weight:400;min-height:2.2rem;white-space:nowrap}
+.trMulti label{font-weight:400}.trQ[hidden]{display:none!important}
+
 .tdrApercu .tdr{max-width:860px}.tdrApercu .saut{border-top:1px dashed var(--line);margin:1.6rem 0}.tdrApercu .tg{min-height:0;display:block;padding:0}
 .tdrApercu .tg-proj{text-align:center;font-weight:700;letter-spacing:.03em;color:var(--c-vert);margin:.4rem 0}.tdrApercu .tg-sp{text-align:center;font-style:italic;font-weight:700;color:var(--c-bord);margin:0 0 1rem}
 .tdrApercu .tg-tdr{text-align:center;font-weight:700;letter-spacing:.18em;color:var(--c-vert);margin:.6rem 0}.tdrApercu .tg-boite{border:1px solid var(--c-violet);background:var(--c-violet-t);border-radius:10px;padding:1.4rem 1rem;margin:0 auto 1.2rem;max-width:640px;text-align:center}
@@ -5634,7 +5639,7 @@ function piedApp(){return `<footer class="pied-app"><div class="pa-id"><img src=
    Pyramide : agent, puis superviseur, puis chef de projet / S&E, puis DP / DE
    ===================================================================== */
 let p12=false;
-const TR={tab:null,pid:null,mois:new Date().toISOString().slice(0,7),fiche:null,saisie:null,outil:null,agent:'',statut:'',outilF:'',refForm:false};
+const TR={enq:null,tab:null,pid:null,mois:new Date().toISOString().slice(0,7),fiche:null,saisie:null,outil:null,agent:'',statut:'',outilF:'',refForm:false};
 const TR_BANDES=['0-9','10-14','15-19','20-24','25-49','50+'];
 const trBande=a=>{if(a===''||a==null)return 'nd';a=Number(a);if(!(a>=0))return 'nd';return a<10?'0-9':a<15?'10-14':a<20?'15-19':a<25?'20-24':a<50?'25-49':'50+'};
 const FT_ST={soumise:['À vérifier','warn'],verifiee:['Vérifiée, à valider','warn'],validee:['Validée','ok'],a_corriger:['À corriger','bad'],rejetee:['Rejetée','bad']};
@@ -5722,6 +5727,184 @@ window.addEventListener('online',()=>{if(MODE==='srv'&&me)trSync(false)});
 /* ---------- bibliothèque d'outils OSV (modèles prêts à l'emploi) ---------- */
 const C=(id,label,type,o={})=>({id,label,type,...o});
 const ON=['oui','non'];
+/* ===== Banque de questions d'enquête : la question exacte à poser, la consigne à l'enquêteur, la bonne réponse attendue ===== */
+const ONS=['Oui','Non','Ne sait pas'],NL='Ne pas lire les réponses. Cocher tout ce qui est cité.',WGO=['Non, aucune difficulté','Oui, un peu de difficulté','Oui, beaucoup de difficulté','Ne peut pas du tout'];
+const Qf=(id,label,type,q,o={})=>({id,label,type,...(q?{q}:{}),...o});
+const ENQ_MODS={
+ profil:{titre:"Identification de la personne interrogée",oblig:true,champs:[
+  Qf('phase',"Phase de l'enquête",'choix','',{requis:true,options:['Base (avant)','Finale (après)'],aide:"À cocher par l'enquêteur, sans poser de question."}),
+  Qf('consent',"Consentement",'ouinon',"Bonjour. Je travaille avec l'ONG Sécurité Vie. Nous faisons une enquête pour améliorer les actions de sensibilisation dans votre localité. L'entretien dure environ 20 minutes. Nous ne notons pas votre nom et vos réponses restent confidentielles. Vous pouvez refuser de répondre à une question ou arrêter à tout moment. Acceptez-vous de participer ?",{requis:true,aide:"Si la personne refuse, la remercier et arrêter : la suite du questionnaire se ferme."}),
+  Qf('public',"Public",'choix',"Travaillez-vous sur le chantier, ou habitez-vous la localité ?",{requis:true,options:['Travailleur du chantier','Riverain','Autre'],chantier:true}),
+  Qf('occup',"Occupation principale",'choix',"Quelle est votre occupation principale ?",{options:['Agriculture ou élevage','Commerce ou artisanat','Élève ou étudiant','Ménagère','Conducteur de moto ou de véhicule','Salarié','Sans emploi','Autre'],general:true}),
+  Qf('sexe',"Sexe",'choix','',{requis:true,options:['Femme','Homme'],aide:"Observer. Ne demander qu'en cas de doute."}),
+  Qf('age',"Âge",'nombre',"Quel âge avez-vous ?",{requis:true,aide:"En années révolues. En dessous de l'âge prévu par l'enquête, remercier la personne et arrêter."}),
+  Qf('instr',"Niveau d'instruction",'choix',"Quel est le plus haut niveau d'études que vous avez atteint ?",{options:['Aucun','Primaire','Secondaire','Supérieur','Alphabétisation ou école coranique']}),
+  Qf('matri',"Situation matrimoniale",'choix',"Êtes-vous actuellement marié(e) ou vivez-vous en couple ?",{options:['Marié(e) ou en union','Célibataire','Divorcé(e) ou séparé(e)','Veuf ou veuve']}),
+  Qf('langue',"Langue de l'entretien",'choix','',{options:['Français','Dioula','Sénoufo','Malinké','Koulango','Lobi','Baoulé','Autre'],aide:"À cocher par l'enquêteur."})]},
+ handicap:{titre:"Handicap (questions courtes du Groupe de Washington)",oblig:true,champs:[
+  Qf('s_wg',"Les questions suivantes portent sur des difficultés que vous pourriez avoir à faire certaines activités, à cause d'un problème de santé.",'section'),
+  Qf('wg1',"Difficulté à voir",'choix',"Avez-vous des difficultés à voir, même si vous portez des lunettes ?",{options:WGO,lire:true}),
+  Qf('wg2',"Difficulté à entendre",'choix',"Avez-vous des difficultés à entendre, même avec un appareil auditif ?",{options:WGO,lire:true}),
+  Qf('wg3',"Difficulté à marcher",'choix',"Avez-vous des difficultés à marcher ou à monter des marches ?",{options:WGO,lire:true}),
+  Qf('wg4',"Difficulté à se souvenir",'choix',"Avez-vous des difficultés à vous souvenir ou à vous concentrer ?",{options:WGO,lire:true}),
+  Qf('wg5',"Difficulté à prendre soin de soi",'choix',"Avez-vous des difficultés à prendre soin de vous, comme vous laver ou vous habiller ?",{options:WGO,lire:true}),
+  Qf('wg6',"Difficulté à communiquer",'choix',"Dans votre langue habituelle, avez-vous des difficultés à communiquer, c'est-à-dire à comprendre les autres ou à vous faire comprendre ?",{options:WGO,lire:true})]},
+ vih:{titre:"VIH et infections sexuellement transmissibles",champs:[
+  Qf('s_vih',"VIH et IST",'section'),
+  Qf('v1',"Le préservatif réduit le risque de VIH",'choix',"Peut-on réduire le risque d'attraper le VIH en utilisant correctement un préservatif à chaque rapport sexuel ?",{options:ONS,bonne:'Oui'}),
+  Qf('v2',"Un partenaire unique et fidèle réduit le risque",'choix',"Peut-on réduire le risque d'attraper le VIH en ayant un seul partenaire sexuel, qui n'est pas infecté et qui n'a pas d'autre partenaire ?",{options:ONS,bonne:'Oui'}),
+  Qf('v3',"Une personne en bonne santé apparente peut avoir le VIH",'choix',"Une personne qui paraît en bonne santé peut-elle avoir le VIH ?",{options:ONS,bonne:'Oui'}),
+  Qf('v4',"Pas de VIH par piqûre de moustique",'choix',"Peut-on attraper le VIH par une piqûre de moustique ?",{options:ONS,bonne:'Non'}),
+  Qf('v5',"Pas de VIH en partageant un repas",'choix',"Peut-on attraper le VIH en partageant le repas d'une personne qui a le VIH ?",{options:ONS,bonne:'Non'}),
+  Qf('v5b',"Pas de VIH par la sorcellerie",'choix',"Peut-on attraper le VIH par la sorcellerie ou par des moyens surnaturels ?",{options:ONS,bonne:'Non'}),
+  Qf('vt',"Transmission de la mère à l'enfant",'multi',"Comment une femme qui a le VIH peut-elle le transmettre à son enfant ?",{options:['Pendant la grossesse',"Pendant l'accouchement","Par l'allaitement",'Ne sait pas'],aide:NL}),
+  Qf('ist',"Signes d'IST cités",'multi',"Quels signes peuvent faire penser qu'une femme ou un homme a une infection sexuellement transmissible ?",{options:['Écoulement anormal','Plaie ou bouton sur le sexe','Douleur ou brûlure en urinant','Démangeaisons','Douleur au bas-ventre','Ne sait pas'],aide:NL}),
+  Qf('v6',"Connaît un lieu de dépistage gratuit",'ouinon',"Connaissez-vous un endroit près d'ici où l'on peut faire le test du VIH gratuitement ?"),
+  Qf('v6b',"Lieu de dépistage cité",'texte',"Lequel ?",{si:['v6','oui'],aide:"Noter le nom du lieu cité."}),
+  Qf('v8',"Test du VIH dans les 12 derniers mois",'choix',"Au cours des 12 derniers mois, avez-vous fait le test du VIH et reçu votre résultat ?",{options:['Oui','Non','Ne veut pas répondre'],aide:"Ne jamais demander le résultat."}),
+  Qf('v9',"Sait où trouver des préservatifs",'ouinon',"Savez-vous où trouver des préservatifs dans cette localité ?"),
+  Qf('v7',"Achèterait à un commerçant vivant avec le VIH",'choix',"Achèteriez-vous des légumes frais à un commerçant ou une commerçante dont vous savez qu'il a le VIH ?",{options:ONS,bonne:'Oui'}),
+  Qf('v10',"Un enfant vivant avec le VIH peut aller à l'école",'choix',"Pensez-vous qu'un enfant qui a le VIH peut aller à l'école avec les autres enfants ?",{options:ONS,bonne:'Oui'}),
+  Qf('vo',"Freins au préservatif et au dépistage",'long',"Selon vous, qu'est-ce qui empêche les gens d'ici d'utiliser le préservatif ou de faire le test du VIH ?",{aide:"Question ouverte : noter la réponse avec les mots de la personne."})]},
+ route:{titre:"Sécurité routière",champs:[
+  Qf('s_route',"Sécurité routière",'section'),
+  Qf('r1',"Précautions citées spontanément",'multi',"Quelles précautions faut-il prendre pour éviter les accidents sur la route, surtout près du chantier ?",{options:['Réduire la vitesse','Traverser avec prudence face aux camions','Accompagner les enfants','Porter le casque','Attacher la ceinture',"Pas d'alcool au volant",'Pas de téléphone en conduisant','Ne sait pas'],aide:NL}),
+  Qf('rm',"Se déplace à moto",'ouinon',"Vous déplacez-vous à moto, comme conducteur ou comme passager ?"),
+  Qf('r2',"Casque porté sur les 5 derniers trajets (0 à 5)",'nombre',"Lors de vos 5 derniers trajets à moto, combien de fois avez-vous porté un casque ?",{si:['rm','oui'],aide:"Un nombre de 0 à 5."}),
+  Qf('rc',"Casque attaché",'choix',"Quand vous portez le casque, la sangle est-elle attachée sous le menton ?",{si:['rm','oui'],options:['Toujours','Parfois','Jamais']}),
+  Qf('rv',"Vitesse maximale dans un village",'choix',"À quelle vitesse maximale un véhicule doit-il rouler quand il traverse un village ?",{options:['50 km/h ou moins','Plus de 50 km/h','Ne sait pas'],aide:'Ne pas lire les réponses.',bonne:'50 km/h ou moins'}),
+  Qf('ra',"L'alcool augmente le risque d'accident",'choix',"Conduire après avoir bu de l'alcool augmente-t-il le risque d'accident ?",{options:ONS,bonne:'Oui'}),
+  Qf('re',"Enfants de moins de 10 ans traversant seuls",'choix',"Les enfants de moins de 10 ans de votre ménage traversent-ils seuls la route principale ?",{options:['Oui','Non',"Pas d'enfant de cet âge"],bonne:'Non'}),
+  Qf('r3',"Témoin d'une situation dangereuse liée au chantier",'ouinon',"Au cours des 30 derniers jours, avez-vous vu un accident ou une situation dangereuse causée par les engins ou les camions du chantier ?"),
+  Qf('r3b',"Situation dangereuse décrite",'long',"Pouvez-vous décrire ce que vous avez vu, et où ?",{si:['r3','oui'],aide:"Ne noter aucun nom."}),
+  Qf('ro',"Endroits dangereux cités",'long',"Selon vous, quels sont les endroits les plus dangereux de la route dans votre localité, et pourquoi ?",{aide:"Question ouverte : noter la réponse avec les mots de la personne."})]},
+ vbg:{titre:"Violences basées sur le genre, exploitation et harcèlement",champs:[
+  Qf('s_vbg',"Violences basées sur le genre",'section',"",{aide:"Aucune question sur les violences vécues. Si une personne révèle une violence, l'écouter sans juger, ne rien noter de son récit et lui proposer une orientation confidentielle."}),
+  Qf('g0',"Opinions sur la violence conjugale",'section',"Parfois, un mari se fâche à cause de ce que fait sa femme. Selon vous, un mari a-t-il raison de frapper sa femme dans les situations suivantes ?"),
+  Qf('g1',"Frapper si elle sort sans le dire",'choix',"Si elle sort sans le lui dire ?",{options:ONS,bonne:'Non'}),
+  Qf('g2',"Frapper si elle néglige les enfants",'choix',"Si elle néglige les enfants ?",{options:ONS,bonne:'Non'}),
+  Qf('g3',"Frapper si elle n'est pas d'accord avec lui",'choix',"Si elle n'est pas d'accord avec lui ?",{options:ONS,bonne:'Non'}),
+  Qf('g4',"Frapper si elle refuse les rapports sexuels",'choix',"Si elle refuse d'avoir des rapports sexuels avec lui ?",{options:ONS,bonne:'Non'}),
+  Qf('g5',"Frapper si elle brûle la nourriture",'choix',"Si elle brûle la nourriture ?",{options:ONS,bonne:'Non'}),
+  Qf('g6',"Sexe contre argent ou emploi inacceptable",'choix',"Si un travailleur du chantier propose de l'argent, un cadeau ou un emploi à une femme ou à une jeune fille en échange de relations sexuelles, est-ce acceptable ?",{options:ONS,bonne:'Non'}),
+  Qf('g7',"Services d'aide cités",'multi',"Si une femme ou une jeune fille subit des violences ou du harcèlement, où peut-elle trouver de l'aide ici ?",{options:['Centre de santé','Chef du village ou notables','Agent communautaire ou ONG','Gendarmerie ou police','Centre social','Comité de plaintes du projet','Ne sait pas'],aide:NL}),
+  Qf('g8',"Délai de prise en charge après un viol",'choix',"Après un viol, dans quel délai faut-il aller au centre de santé pour recevoir un traitement qui protège du VIH et d'une grossesse ?",{options:['Dans les 72 heures (3 jours)','Plus tard','Ne sait pas'],aide:'Ne pas lire les réponses.',bonne:'Dans les 72 heures (3 jours)'}),
+  Qf('go',"Freins à la demande d'aide",'long',"Selon vous, qu'est-ce qui empêche les victimes de violences de demander de l'aide ?",{aide:"Question ouverte : noter la réponse avec les mots de la personne."})]},
+ plaintes:{titre:"Code de conduite et mécanisme de plainte",champs:[
+  Qf('s_mgp',"Code de conduite et plaintes",'section'),
+  Qf('c1',"Connaît l'interdiction du sexe contre argent, cadeau ou emploi",'choix',"Le code de conduite du chantier interdit-il aux travailleurs d'avoir des relations sexuelles en échange d'argent, de cadeaux ou d'un emploi ?",{options:['Oui','Non','Ne sait pas','Sans objet (riverain)'],bonne:'Oui',si:['public','Travailleur du chantier']}),
+  Qf('c2',"Connaît l'interdiction avec un mineur",'choix',"Une relation sexuelle avec une personne de moins de 18 ans est-elle interdite, même si cette personne est d'accord ?",{options:['Oui','Non','Ne sait pas'],bonne:'Oui'}),
+  Qf('c3',"Sait comment déposer une plainte",'ouinon',"Savez-vous comment déposer une plainte ou signaler un problème lié au chantier ?"),
+  Qf('c3b',"Moyen de plainte cité",'multi',"Comment feriez-vous ?",{si:['c3','oui'],options:['Boîte à plaintes','Comité de plaintes du village','Agent communautaire ou OSV','Chef du village','Numéro de téléphone','Responsable du chantier','Autre'],aide:NL}),
+  Qf('c4',"Recours cités pour une femme harcelée",'multi',"Si une femme était harcelée par un travailleur du chantier, à qui pourrait-elle s'adresser ?",{options:['Chef du village','Agent communautaire ou OSV','Centre de santé','Gendarmerie ou police','Responsable du chantier','Comité de plaintes','Ne sait pas'],aide:NL}),
+  Qf('c5',"Porterait plainte en cas de problème",'choix',"Si vous aviez un problème causé par le chantier, porteriez-vous plainte ?",{options:ONS}),
+  Qf('c5b',"Raison de ne pas porter plainte",'long',"Pourquoi ?",{si:['c5','Non'],aide:"Noter la réponse avec les mots de la personne."}),
+  Qf('c6',"A déjà déposé une plainte",'ouinon',"Avez-vous déjà déposé une plainte concernant le chantier ?"),
+  Qf('c6b',"Réponse reçue",'choix',"Avez-vous reçu une réponse ?",{si:['c6','oui'],options:['Oui, satisfaisante','Oui, mais pas satisfaisante','Pas encore']})]},
+ palu:{titre:"Paludisme",champs:[
+  Qf('s_palu',"Paludisme",'section'),
+  Qf('p1',"A dormi sous moustiquaire la nuit dernière",'choix',"La nuit dernière, avez-vous dormi sous une moustiquaire ?",{options:ONS}),
+  Qf('p1b',"Enfants de moins de 5 ans sous moustiquaire",'choix',"Les enfants de moins de 5 ans de votre ménage ont-ils dormi sous une moustiquaire la nuit dernière ?",{options:['Tous','Certains','Aucun',"Pas d'enfant de moins de 5 ans"]}),
+  Qf('p2',"Mode de transmission cité",'multi',"Comment attrape-t-on le paludisme ?",{options:['Piqûre de moustique','Eau sale','Soleil ou chaleur','Fatigue','Ne sait pas'],aide:NL}),
+  Qf('p3',"Signes du paludisme cités",'multi',"Quels sont les signes du paludisme ?",{options:['Fièvre','Frissons','Maux de tête','Vomissements','Courbatures','Ne sait pas'],aide:NL}),
+  Qf('p4',"Délai de recours en cas de fièvre",'choix',"Quand un enfant a de la fièvre, dans quel délai faut-il l'amener au centre de santé ?",{options:['Le jour même ou le lendemain','Après 2 jours ou plus','Ne sait pas'],aide:'Ne pas lire les réponses.',bonne:'Le jour même ou le lendemain'}),
+  Qf('p5',"Traitement préventif de la femme enceinte",'choix',"Une femme enceinte doit-elle recevoir un traitement préventif contre le paludisme lors des consultations prénatales ?",{options:ONS,bonne:'Oui'}),
+  Qf('po',"Freins à l'usage de la moustiquaire",'long',"Qu'est-ce qui empêche certaines familles de dormir sous la moustiquaire chaque nuit ?",{aide:"Question ouverte : noter la réponse avec les mots de la personne."})]},
+ eha:{titre:"Eau, hygiène et assainissement",champs:[
+  Qf('s_eha',"Eau, hygiène et assainissement",'section'),
+  Qf('e1',"Source principale d'eau de boisson",'choix',"D'où vient principalement l'eau que boivent les membres de votre ménage ?",{options:['Robinet ou borne-fontaine','Forage ou pompe','Puits protégé','Puits non protégé','Rivière, marigot ou mare','Eau en sachet ou en bouteille','Autre']}),
+  Qf('e2',"Traitement de l'eau",'multi',"Faites-vous quelque chose pour rendre l'eau plus sûre à boire ?",{options:['Rien','Bouillir','Javel ou chlore','Filtre','Filtrer avec un tissu','Laisser reposer','Autre']}),
+  Qf('e3',"Moments clés du lavage des mains cités",'multi',"À quels moments faut-il se laver les mains au savon ?",{options:['Avant de manger','Avant de préparer le repas','Après les toilettes','Après avoir nettoyé un enfant',"Avant d'allaiter ou de nourrir un enfant",'Ne sait pas'],aide:NL}),
+  Qf('e4',"Dispositif de lavage des mains observé",'choix',"Pouvez-vous me montrer l'endroit où les membres du ménage se lavent les mains ?",{options:['Eau et savon présents','Eau seulement','Ni eau ni savon',"Pas d'endroit prévu",'Refus de montrer'],aide:"Observer et cocher."}),
+  Qf('e5',"Type de toilettes",'choix',"Quel type de toilettes les membres du ménage utilisent-ils habituellement ?",{options:['Latrine avec dalle','Latrine sans dalle','Toilettes avec chasse','Pas de toilettes, dans la nature','Autre']}),
+  Qf('eo',"Problèmes d'eau et d'hygiène cités",'long',"Selon vous, quels sont les problèmes d'eau ou d'hygiène de la localité ?",{aide:"Question ouverte : noter la réponse avec les mots de la personne."})]},
+ dssr:{titre:"Santé sexuelle et reproductive, planification familiale",champs:[
+  Qf('s_dssr',"Santé sexuelle et reproductive",'section'),
+  Qf('f1',"Méthodes de planification familiale citées",'multi',"Quelles méthodes connaissez-vous pour éviter ou espacer les grossesses ?",{options:['Pilule','Injection','Implant','DIU (stérilet)','Préservatif masculin','Préservatif féminin','Méthode des jours','Allaitement maternel exclusif','Aucune'],aide:NL}),
+  Qf('f2',"Lieux d'accès cités",'multi',"Où peut-on obtenir ces méthodes ici ?",{options:['Centre de santé','Pharmacie','Agent communautaire','ONG','Ne sait pas'],aide:NL}),
+  Qf('f3',"Les adolescents peuvent être conseillés au centre de santé",'choix',"Un adolescent ou une adolescente peut-il recevoir des conseils sur la santé sexuelle au centre de santé ?",{options:ONS,bonne:'Oui'}),
+  Qf('f4',"Nombre minimal de consultations prénatales",'choix',"Combien de consultations prénatales une femme enceinte doit-elle faire au minimum ?",{options:['Une','Deux ou trois','Quatre ou plus','Ne sait pas'],aide:'Ne pas lire les réponses.',bonne:'Quatre ou plus'}),
+  Qf('f5',"Lieu d'accouchement recommandé",'choix',"Où une femme doit-elle accoucher ?",{options:['Au centre de santé','À la maison','Ne sait pas'],aide:'Ne pas lire les réponses.',bonne:'Au centre de santé'}),
+  Qf('fo',"Freins à la planification familiale",'long',"Selon vous, qu'est-ce qui empêche les femmes d'ici d'utiliser la planification familiale ?",{aide:"Question ouverte : noter la réponse avec les mots de la personne."})]},
+ env:{titre:"Environnement et résilience climatique",champs:[
+  Qf('s_env',"Environnement",'section'),
+  Qf('n1',"A planté un arbre dans les 12 derniers mois",'ouinon',"Au cours des 12 derniers mois, avez-vous planté un arbre ?"),
+  Qf('n2',"Gestion des ordures ménagères",'choix',"Que faites-vous de vos ordures ménagères ?",{options:['Bac ou ramassage','Trou à ordures','Brûlées','Jetées dans la nature','Autre']}),
+  Qf('n3',"Les feux de brousse nuisent à la localité",'choix',"Les feux de brousse ont-ils des conséquences néfastes pour la localité ?",{options:ONS,bonne:'Oui'}),
+  Qf('n4',"Changements du climat observés",'multi',"Avez-vous remarqué des changements du climat ces dernières années ?",{options:['Pluies moins abondantes','Pluies irrégulières','Plus de chaleur','Inondations','Sécheresse','Aucun changement']}),
+  Qf('no',"Actions proposées pour l'environnement",'long',"Que pourrait faire la communauté pour protéger son environnement ?",{aide:"Question ouverte : noter la réponse avec les mots de la personne."})]},
+ travail:{titre:"Santé et sécurité au travail (travailleurs)",champs:[
+  Qf('s_sst',"Santé et sécurité au travail",'section',"",{aide:"Seulement pour les travailleurs."}),
+  Qf('t1',"Équipements de protection cités",'multi',"Quels équipements de protection devez-vous porter à votre poste ?",{options:['Casque','Chaussures de sécurité','Gilet à haute visibilité','Gants','Lunettes','Masque','Protection auditive','Harnais','Ne sait pas'],aide:NL}),
+  Qf('t2',"Port des équipements observé",'choix',"Aujourd'hui, portez-vous tous ces équipements ?",{options:['Oui, tous','Une partie','Aucun'],aide:"Observer et confirmer."}),
+  Qf('t3',"Causerie sécurité dans le mois",'ouinon',"Avez-vous participé à une causerie ou à une formation sécurité au cours du dernier mois ?"),
+  Qf('t4',"Blessure au travail dans les 3 derniers mois",'choix',"Au cours des 3 derniers mois, avez-vous été blessé au travail ?",{options:['Non',"Oui, sans arrêt de travail","Oui, avec arrêt de travail"]}),
+  Qf('t5',"Sait à qui signaler un danger",'ouinon',"Savez-vous à qui signaler une situation dangereuse sur le chantier ?"),
+  Qf('to',"Propositions pour plus de sécurité",'long',"Qu'est-ce qui rendrait votre travail plus sûr ?",{aide:"Question ouverte : noter la réponse avec les mots de la personne."})]},
+ retour:{titre:"Exposition aux messages et appréciation (enquête finale)",champs:[
+  Qf('s_ret',"Exposition aux messages",'section',"",{aide:"À poser surtout en enquête finale."}),
+  Qf('x0',"A participé à une activité d'OSV",'choix',"Au cours des derniers mois, avez-vous participé à une activité de sensibilisation de l'ONG Sécurité Vie ?",{options:['Oui','Non','Ne se souvient pas']}),
+  Qf('x1',"Canaux par lesquels les messages sont arrivés",'multi',"Par quels moyens avez-vous reçu des messages de sensibilisation ?",{options:['Causerie','Visite à domicile','Séance de masse','Radio','Affiche ou panneau','Crieur public','Leader communautaire','Aucun']}),
+  Qf('x2',"Message retenu",'long',"Qu'avez-vous retenu de plus important ?",{si:['x0','Oui'],aide:"Noter la réponse avec les mots de la personne."}),
+  Qf('x3',"Changement de pratique déclaré",'ouinon',"Avez-vous changé quelque chose dans vos habitudes depuis ?",{si:['x0','Oui']}),
+  Qf('x3b',"Changement décrit",'long',"Qu'avez-vous changé ?",{si:['x3','oui']}),
+  Qf('x4',"Satisfaction",'choix',"Êtes-vous satisfait des activités de sensibilisation menées dans votre localité ?",{options:['Très satisfait','Satisfait','Peu satisfait','Pas satisfait','Sans avis']}),
+  Qf('x5',"Suggestions",'long',"Comment pourrions-nous améliorer nos activités ?",{aide:"Noter la réponse avec les mots de la personne."})]}};
+/* indicateurs composites calculés automatiquement quand les questions sont présentes */
+const ENQ_COMPOSITES=[
+ {lib:"Connaissance complète du VIH (5 bonnes réponses sur 5)",ids:['v1','v2','v3','v4','v5']},
+ {lib:"Attitude d'acceptation envers les personnes vivant avec le VIH",ids:['v7','v10']},
+ {lib:"Rejet de toutes les justifications de la violence conjugale",ids:['g1','g2','g3','g4','g5']},
+ {lib:"Connaissance des règles du code de conduite",ids:['c1','c2']}];
+/* compose un questionnaire à partir des modules choisis */
+function enqComposer(mods,chantier){const L=['profil','handicap',...mods.filter(m=>!['profil','handicap'].includes(m))];
+ return L.flatMap(k=>(ENQ_MODS[k]||{champs:[]}).champs).filter(c=>chantier?!c.general:!c.chantier).map(c=>{const x={...c};delete x.general;delete x.chantier;if(!chantier&&x.si&&x.si[0]==='public')delete x.si;return x})}
+const ENQ_CONSIGNES="Lire la question telle qu'elle est écrite, sans la changer ni souffler la réponse. Quand la consigne dit « ne pas lire les réponses », laisser la personne répondre puis cocher ce qu'elle cite. Une fiche par personne, sans nom. Si la personne refuse de participer, la remercier et arrêter. Les questions qui ne concernent pas la personne s'ouvrent ou se ferment toutes seules.";
+
+/* ---------- conditions d'affichage : consentement et questions filtres ---------- */
+function trSiMaj(f){if(!f)return;const val=id=>{const el=f.querySelectorAll(`[name="c_${id}"]`);if(!el.length)return null;if(el[0].type==='checkbox')return [...el].filter(x=>x.checked).map(x=>x.value);if(el[0].type==='radio'){const r=[...el].find(x=>x.checked);return r?r.value:''}return el[0].value};
+ const cons=val('consent'),stop=cons==='non';let apres=false;
+ f.querySelectorAll('[data-qid]').forEach(w=>{const id=w.dataset.qid;let cache=false;if(apres&&stop)cache=true;
+  if(!cache&&w.dataset.si){const [k,v]=w.dataset.si.split('|'),x=val(k);cache=Array.isArray(x)?!x.includes(v):x!==v}
+  w.hidden=cache;w.querySelectorAll('input,select,textarea').forEach(i=>i.disabled=cache);if(id==='consent')apres=true});
+ const m=f.querySelector('.trStop');if(m)m.hidden=!stop}
+document.addEventListener('change',e=>{const f=e.target.closest&&e.target.closest('form');if(f&&f.querySelector('[data-qid]'))trSiMaj(f)});
+new MutationObserver(()=>{if(trSiMaj._t)return;trSiMaj._t=requestAnimationFrame(()=>{trSiMaj._t=0;document.querySelectorAll('form').forEach(f=>{if(f.querySelector('[data-qid]')&&!f.dataset.siOk){f.dataset.siOk='1';trSiMaj(f)}})})}).observe(document.documentElement,{childList:true,subtree:true});
+
+const trMajDispo=o=>{const m=MOD_OUTILS.find(x=>x.code===o.modele);return !!(m&&m.champs.some(c=>c.q)&&!o.champs.some(c=>c.q))};
+function trEnqCompoCarte(p){const M=Object.entries(ENQ_MODS).filter(([,m])=>!m.oblig);
+ return `<section class="card iaRac"><h3>Composer un questionnaire d'enquête</h3><p class="muted">Choisissez les thèmes : l'application assemble un questionnaire prêt à poser, avec pour chaque question le texte à lire, la consigne à l'enquêteur, les questions ouvertes et les filtres. Les mêmes questions servent avant et après la sensibilisation, et les résultats se comparent automatiquement. L'identification, le consentement et les questions sur le handicap sont toujours inclus.</p>
+ <form class="grid" onsubmit="return false"><div style="grid-column:span 2"><label>Titre</label><input name="titre" value="Enquête de connaissances, attitudes et pratiques"></div><div><label>Publics</label><select name="public"><option value="chantier">Chantier : travailleurs et riverains</option><option value="general">Communauté</option></select></div><div><label>Âge minimum</label><input name="age" type="number" min="10" max="25" value="15"></div>
+ <fieldset class="trL trMulti"><legend>Thèmes</legend>${M.map(([k,m])=>`<label><input type="checkbox" name="em" value="${k}"${['vih','retour'].includes(k)?' checked':''}> ${esc(m.titre)} <span class="muted">(${m.champs.filter(c=>c.type!=='section').length} questions)</span></label>`).join('')}</fieldset>
+ <div class="trL"><button type="button" class="btn" data-act="terEnqCompo">Créer le questionnaire</button></div></form></section>`}
+/* ---------- résultats des enquêtes : avant, après, écart ---------- */
+function trEnqVue(p){const O=trOutils(p).filter(o=>o.type==='enquete'&&o.champs.some(c=>c.id==='phase'));
+ if(!O.length)return `<section class="card"><p class="empty">Aucun questionnaire d'enquête avant et après n'est installé pour ce projet. Composez-en un dans l'onglet « Outils de collecte ».</p></section>`;
+ const o=O.find(x=>x.id===TR.enq)||O[0],F=trFiches(p).filter(f=>f.outil_id===o.id&&['verifiee','validee'].includes(f.statut)&&(f.donnees||{}).consent!=='non');
+ const ph=v=>/^Base/i.test(v||'')?'b':/^Finale/i.test(v||'')?'f':null,G={b:F.filter(f=>ph((f.donnees||{}).phase)==='b'),f:F.filter(f=>ph((f.donnees||{}).phase)==='f')};
+ const pc=(n,d)=>d?Math.round(n*1000/d)/10:null,fx=x=>x==null?'-':String(x).replace('.',',')+' %',ec=(a,b)=>a==null||b==null?'-':`${b-a>0?'+':''}${String(Math.round((b-a)*10)/10).replace('.',',')} pts`;
+ const rep=(L,id)=>L.map(f=>(f.donnees||{})[id]).filter(v=>v!=null&&v!==''&&!(Array.isArray(v)&&!v.length));
+ const okv=(c,v)=>c.type==='ouinon'?v===String(c.bonne).toLowerCase():v===c.bonne;
+ const lignes=[],horsRes=new Set([...ENQ_MODS.profil.champs,...ENQ_MODS.handicap.champs].map(x=>x.id));o.champs.forEach(c=>{if(c.type==='section'){if(horsRes.has(c.id))return;lignes.push(`<tr class="th"><th colspan="4">${esc(c.label)}</th></tr>`);return}
+  if(['phase','consent'].includes(c.id)||[...ENQ_MODS.profil.champs,...ENQ_MODS.handicap.champs].some(x=>x.id===c.id))return;
+  const rb=rep(G.b,c.id),rf=rep(G.f,c.id);
+  if(c.bonne!=null){const a=pc(rb.filter(v=>okv(c,v)).length,rb.length),b=pc(rf.filter(v=>okv(c,v)).length,rf.length);lignes.push(`<tr><td>${esc(c.label)}<br><span class="muted">bonne réponse : ${esc(c.bonne)}</span></td><td class="num">${fx(a)}</td><td class="num">${fx(b)}</td><td class="num"><b class="${b!=null&&a!=null?(b>=a?'txt-ok':'txt-bad'):''}">${ec(a,b)}</b></td></tr>`);return}
+  if(c.type==='ouinon'){const a=pc(rb.filter(v=>v==='oui').length,rb.length),b=pc(rf.filter(v=>v==='oui').length,rf.length);lignes.push(`<tr><td>${esc(c.label)} <span class="muted">(oui)</span></td><td class="num">${fx(a)}</td><td class="num">${fx(b)}</td><td class="num">${ec(a,b)}</td></tr>`);return}
+  if(c.type==='choix'||c.type==='multi'){lignes.push(`<tr><td colspan="4"><b>${esc(c.label)}</b>${c.type==='multi'?' <span class="muted">(plusieurs réponses possibles)</span>':''}</td></tr>`);
+   (c.options||[]).forEach(x=>{const has=v=>Array.isArray(v)?v.includes(x):v===x,a=pc(rb.filter(has).length,rb.length),b=pc(rf.filter(has).length,rf.length);lignes.push(`<tr><td style="padding-left:1.6rem">${esc(x)}</td><td class="num">${fx(a)}</td><td class="num">${fx(b)}</td><td class="num">${ec(a,b)}</td></tr>`)});return}
+  if(c.type==='nombre'){const m=L=>{const n=L.map(Number).filter(x=>!isNaN(x));return n.length?Math.round(n.reduce((s,x)=>s+x,0)/n.length*10)/10:null},a=m(rb),b=m(rf);lignes.push(`<tr><td>${esc(c.label)} <span class="muted">(moyenne)</span></td><td class="num">${a??'-'}</td><td class="num">${b??'-'}</td><td class="num">${a!=null&&b!=null?(b-a>0?'+':'')+Math.round((b-a)*10)/10:'-'}</td></tr>`)}});
+ const comp=ENQ_COMPOSITES.filter(k=>k.ids.every(id=>o.champs.some(c=>c.id===id&&c.bonne!=null))).map(k=>{const cs=k.ids.map(id=>o.champs.find(c=>c.id===id)),t=L=>{const R=L.filter(f=>cs.every(c=>(f.donnees||{})[c.id]!=null&&(f.donnees||{})[c.id]!==''));return pc(R.filter(f=>cs.every(c=>okv(c,(f.donnees||{})[c.id]))).length,R.length)},a=t(G.b),b=t(G.f);return [esc(k.lib),fx(a),fx(b),`<b class="${a!=null&&b!=null?(b>=a?'txt-ok':'txt-bad'):''}">${ec(a,b)}</b>`]});
+ const wg=o.champs.filter(c=>/^wg\d/.test(c.id));if(wg.length){const t=L0=>{const L=L0.filter(f=>wg.some(c=>(f.donnees||{})[c.id]));return pc(L.filter(f=>wg.some(c=>/beaucoup|pas du tout/i.test((f.donnees||{})[c.id]||''))).length,L.length)};comp.push(['Personnes vivant avec un handicap (au moins une difficulté sévère)',fx(t(G.b)),fx(t(G.f)),'-'])}
+ const sexe=(L,s)=>L.filter(f=>(f.donnees||{}).sexe===s).length;
+ const ouv=o.champs.filter(c=>c.type==='long'),txt=c=>{const L=F.map(f=>[(f.donnees||{})[c.id],ph((f.donnees||{}).phase)]).filter(x=>String(x[0]||'').trim()).slice(-12);return L.length?`<h4>${esc(c.label)}</h4><ul>${L.map(([v,k])=>`<li>${esc(v)} <span class="muted">(${k==='f'?'finale':'base'})</span></li>`).join('')}</ul>`:''};
+ return `<div id="trEnqRes"><section class="card"><div class="row" style="justify-content:space-between;align-items:end"><div><label for="trEnqSel">Questionnaire</label><select id="trEnqSel" data-ter="enq">${opts(O.map(x=>[x.id,x.titre]),o.id)}</select></div><button class="btn ghost sm" data-act="terEnqImp">Imprimer les résultats</button></div>
+ <p class="muted" style="margin-top:.6rem">Fiches vérifiées ou validées, tous mois confondus, personnes ayant donné leur accord. Pour chaque question à bonne réponse, la part de bonnes réponses avant et après la sensibilisation, et l'écart en points.</p>
+ <div class="kpis"><div class="kpi"><span>Enquête de base</span><b>${G.b.length}</b><span>${sexe(G.b,'Femme')} femmes, ${sexe(G.b,'Homme')} hommes</span></div><div class="kpi"><span>Enquête finale</span><b>${G.f.length}</b><span>${sexe(G.f,'Femme')} femmes, ${sexe(G.f,'Homme')} hommes</span></div></div>
+ ${G.b.length&&G.b.length<30||G.f.length&&G.f.length<30?'<p class="note">Moins de 30 personnes interrogées dans une phase : les pourcentages sont indicatifs.</p>':''}</section>
+ ${comp.length?`<section class="card"><h3>Indicateurs clés</h3>${svT(['Indicateur','#Base','#Finale','#Écart'],comp)}</section>`:''}
+ <section class="card trEnqT"><h3>Résultats question par question</h3><div class="tbl"><table><thead><tr><th>Question</th><th class="num">Base</th><th class="num">Finale</th><th class="num">Écart</th></tr></thead><tbody>${lignes.join('')}</tbody></table></div></section>
+ ${ouv.some(c=>F.some(f=>String((f.donnees||{})[c.id]||'').trim()))?`<section class="card"><h3>Ce que disent les personnes (questions ouvertes)</h3><p class="muted">Les 12 dernières réponses par question, sans nom.</p>${ouv.map(txt).join('')}</section>`:''}</div>`}
+
 const MOD_OUTILS=[
  {code:'SEANCE',titre:'Fiche de séance de sensibilisation et liste de présence',type:'seance',presence:'nominative',theme:'Toutes thématiques',
   desc:'Causerie éducative, séance de masse, porte-à-porte, projection-débat. Liste de présence nominative, désagrégée par sexe, âge et handicap.',
@@ -5789,13 +5972,10 @@ const MOD_OUTILS=[
   consignes:'Une fiche par ouvrage et par visite. Photographier l\'ouvrage si possible.',
   champs:[C('ouvrage','Type d\'ouvrage','choix',{requis:true,options:['Forage équipé d\'une pompe','Puits','Borne-fontaine','Latrine communautaire','Dispositif de lavage des mains']}),C('code','Code ou nom de l\'ouvrage','texte'),
    C('etat','État','choix',{requis:true,options:['Fonctionnel','Fonctionnel avec réserves','En panne']}),C('menages','Ménages desservis','nombre'),C('comite','Comité de gestion fonctionnel','ouinon'),C('probleme','Problèmes constatés','long'),C('action','Action engagée','long')]},
- {code:'CAP',titre:'Enquête CAP (questionnaire individuel)',type:'enquete',presence:'non',theme:'Connaissances, attitudes et pratiques',
-  desc:'Questionnaire individuel, de référence et final, pour mesurer l\'évolution des connaissances et des pratiques.',
-  consignes:'Lire le texte de consentement ; sans accord, ne pas poursuivre. Ne pas souffler les réponses. Une fiche par personne interrogée, sans nom.',
-  champs:[C('phase','Phase de l\'enquête','choix',{requis:true,options:['Référence','Finale']}),C('consent','La personne a donné son consentement éclairé','ouinon',{requis:true}),
-   C('sexe','Sexe de la personne interrogée','choix',{requis:true,options:['Femme','Homme']}),C('age','Âge','nombre',{requis:true}),C('instr','Niveau d\'instruction','choix',{options:['Aucun','Primaire','Secondaire','Supérieur']}),
-   C('s1','Connaissances','section'),C('q1','Cite au moins deux moyens de prévention du VIH','ouinon'),C('q2','Sait où se faire dépister gratuitement','ouinon'),C('q3','Connaît au moins un service d\'aide aux victimes de violences','ouinon'),C('q4','Sait comment déposer une plainte liée au projet','ouinon'),
-   C('s2','Attitudes et pratiques','section'),C('q5','Accepterait de partager un repas avec une personne vivant avec le VIH','ouinon'),C('q6','Porte toujours un casque à moto (ou l\'exige du conducteur)','ouinon'),C('q7','A utilisé un préservatif lors du dernier rapport occasionnel','ouinon'),C('q8','Pense qu\'un homme a parfois le droit de frapper sa femme','ouinon',{aide:'Réponse « oui » = attitude défavorable.'})]},
+ {code:'CAP',titre:'Enquête CAP communautaire (questionnaire individuel)',type:'enquete',presence:'non',theme:'Connaissances, attitudes et pratiques',
+  desc:'Questionnaire individuel, identique avant et après la sensibilisation : VIH et IST, paludisme, santé de la reproduction, violences basées sur le genre, eau et hygiène, exposition aux messages. Questions à lire telles quelles, questions ouvertes et filtres automatiques.',
+  consignes:ENQ_CONSIGNES+' Personnes de 15 ans et plus.',
+  champs:enqComposer(['vih','palu','dssr','vbg','eha','retour'],false)},
  {code:'PROFIL',titre:'Profil de la localité et croquis (A1)',type:'suivi',presence:'non',theme:'Consultation communautaire',pack:'chantier',
   desc:'Une fiche par localité, avant toute activité : strates communautaires, langues, disponibilités, points sensibles. Le croquis dessiné à la main est photographié et joint.',
   consignes:'Remplir avec le chef du village ou un notable. Relever la position GPS au centre du village. Dessiner le croquis (école, marché, centre de santé, lieux de culte, traversées dangereuses, accès du chantier, gares de motos), le photographier et le joindre comme pièce justificative.',
@@ -5818,31 +5998,9 @@ const MOD_OUTILS=[
    C('horaire','Horaire souhaité pour les séances','texte'),C('plaintes','Nombre de plaintes exprimées (une fiche de plainte chacune)','nombre'),
    C('engagements','Engagements pris par OSV devant le groupe','long')]},
  {code:'ENQCH',titre:'Questionnaire d\'enquête de base et finale, chantier (A3)',type:'enquete',presence:'non',theme:'Connaissances, attitudes et pratiques',pack:'chantier',
-  desc:'Même questionnaire avant et après la sensibilisation : VIH et IST, sécurité routière autour du chantier, code de conduite et plaintes. 15 minutes, sans nom, 18 ans et plus.',
-  consignes:'Lire le consentement : « Nous faisons une enquête pour améliorer les actions de sensibilisation autour du chantier. Vos réponses restent anonymes, vous pouvez refuser ou arrêter à tout moment. » Sans accord, ne pas poursuivre. Ne pas souffler les réponses ; pour les questions à citer, ne pas lire les choix. Aucune question sur les violences vécues : si une personne en révèle, l\'écouter et lui proposer une orientation confidentielle.',
-  champs:[C('phase','Phase de l\'enquête','choix',{requis:true,options:['Base (avant)','Finale (après)']}),C('consent','La personne a donné son accord','ouinon',{requis:true}),
-   C('public','Public','choix',{requis:true,options:['Travailleur du chantier','Riverain']}),C('sexe','Sexe','choix',{requis:true,options:['Femme','Homme']}),C('age','Âge (18 ans et plus)','nombre',{requis:true}),
-   C('instr','Niveau d\'instruction','choix',{options:['Aucun','Primaire','Secondaire','Supérieur']}),C('langue','Langue de l\'entretien','choix',{options:['Français','Dioula','Sénoufo','Malinké','Koulango','Autre']}),
-   C('hd','Handicap (questions courtes du Groupe de Washington)','section'),
-   C('wg','A beaucoup de difficultés ou ne peut pas du tout…','multi',{options:['voir, même avec des lunettes','entendre, même avec un appareil','marcher ou monter des marches','se souvenir ou se concentrer','prendre soin de soi (se laver, s\'habiller)','communiquer dans sa langue habituelle','aucune de ces difficultés']}),
-   C('s1','VIH et IST','section'),
-   C('v1','Le préservatif utilisé à chaque rapport réduit le risque de VIH','choix',{options:['Oui','Non','Ne sait pas']}),
-   C('v2','Un seul partenaire fidèle et non infecté réduit le risque','choix',{options:['Oui','Non','Ne sait pas']}),
-   C('v3','Une personne qui paraît en bonne santé peut avoir le VIH','choix',{options:['Oui','Non','Ne sait pas']}),
-   C('v4','On peut attraper le VIH par une piqûre de moustique','choix',{options:['Oui','Non','Ne sait pas']}),
-   C('v5','On peut attraper le VIH en partageant le repas d\'une personne séropositive','choix',{options:['Oui','Non','Ne sait pas']}),
-   C('v6','Cite un lieu proche de dépistage gratuit','ouinon'),
-   C('v7','Achèterait des légumes à un commerçant séropositif','choix',{options:['Oui','Non','Ne sait pas']}),
-   C('v8','A fait un test du VIH au cours des 12 derniers mois','ouinon'),C('v9','Sait où trouver des préservatifs ici','ouinon'),
-   C('s2','Sécurité routière autour du chantier','section'),
-   C('r1','Règles citées spontanément (ne pas lire)','multi',{options:['Réduire la vitesse','Traverser avec prudence face aux camions','Accompagner les enfants','Porter le casque','Pas d\'alcool au volant','Pas de téléphone en conduisant','Aucune']}),
-   C('r2','Casque porté sur les 5 derniers trajets en moto (0 à 5)','nombre',{aide:'Laisser vide si la personne ne circule pas à moto.'}),
-   C('r3','Témoin d\'un accident ou d\'une situation dangereuse liée au chantier ces 30 derniers jours','ouinon'),
-   C('s3','Code de conduite et mécanisme de plainte','section'),
-   C('c1','(Travailleurs) Le code de conduite interdit les relations sexuelles en échange d\'argent, de cadeaux ou d\'emploi','choix',{options:['Oui','Non','Ne sait pas','Sans objet (riverain)']}),
-   C('c2','(Travailleurs) Avec une personne de moins de 18 ans, c\'est interdit même si elle est d\'accord','choix',{options:['Oui','Non','Ne sait pas','Sans objet (riverain)']}),
-   C('c3','Sait comment déposer une plainte concernant le chantier','ouinon'),C('c3b','Moyen cité','texte'),
-   C('c4','Une femme harcelée par un travailleur pourrait s\'adresser à…','multi',{options:['Chef du village','ASC ou OSV','Centre de santé','Gendarmerie ou police','Responsable du chantier','Comité de plaintes','Ne sait pas']})]},
+  desc:'Même questionnaire avant et après la sensibilisation, travailleurs et riverains : VIH et IST, sécurité routière autour du chantier, violences et exploitation, code de conduite et plaintes, exposition aux messages. Chaque question est rédigée telle qu\'elle se pose. Environ 20 minutes, sans nom, 18 ans et plus.',
+  consignes:ENQ_CONSIGNES+' Personnes de 18 ans et plus.',
+  champs:enqComposer(['vih','route','vbg','plaintes','retour'],true)},
  {code:'INCIDENT',titre:'Fiche d\'incident ou d\'alerte (A10)',type:'autre',presence:'non',theme:'Alerte',pack:'chantier',
   desc:'Accident de la circulation, incident de sécurité, rumeur, tension avec la communauté. Envoyée tout de suite à la superviseure et au chef de projet.',
   consignes:'Décrire les faits sans nom. En cas d\'urgence, appeler d\'abord les secours, puis remplir la fiche.',
@@ -5883,7 +6041,7 @@ const trSlugId=(s,vus)=>{let b=String(s||'q').normalize('NFD').replace(/[̀-ͯ]/
 function trPropNettoyer(r){const T=s=>String(s??'').trim();
  const O=L2(r&&r.outils).slice(0,15).map(o=>{const vus=new Set(['phase_x']);const champs=L2(o.champs).slice(0,80).map(c=>{let type=CH_TYPES_OK.includes(c.type)?c.type:'texte';const options=L2(c.options).map(T).filter(Boolean).slice(0,40);
    if(['choix','multi'].includes(type)&&options.length<2)type=options.length?'texte':'texte';
-   return {id:trSlugId(c.id||c.label,vus),label:T(c.label).slice(0,300)||'Question',type,...(['choix','multi'].includes(type)?{options:[...new Set(options)]}:{}),...(c.requis===true?{requis:true}:{}),...(T(c.aide)?{aide:T(c.aide).slice(0,300)}:{})}}).filter(c=>c.label);
+   return {id:trSlugId(c.id||c.label,vus),label:T(c.label).slice(0,300)||'Question',type,...(['choix','multi'].includes(type)?{options:[...new Set(options)]}:{}),...(c.requis===true?{requis:true}:{}),...(T(c.aide)?{aide:T(c.aide).slice(0,300)}:{}),...(T(c.q)?{q:T(c.q).slice(0,700)}:{}),...(T(c.bonne)&&(type==='ouinon'?/^(oui|non)$/i.test(T(c.bonne)):options.includes(T(c.bonne)))?{bonne:type==='ouinon'?T(c.bonne).replace(/^./,x=>x.toUpperCase()).replace(/^(.)(.*)$/,(m,x,y)=>x+y.toLowerCase()):T(c.bonne)}:{}),...(Array.isArray(c.si)&&c.si.length===2?{si:[T(c.si[0]),T(c.si[1])]}:{})}}).filter(c=>c.label);champs.forEach(c=>{if(c.si&&!champs.some(x=>x.id===c.si[0]))delete c.si});
   const role=OUT_ROLE[o.role]?o.role:'agent';
   return {titre:T(o.titre).slice(0,150)||'Outil',role,type:OUT_TYPES_OK.includes(o.type)?o.type:'autre',presence:['nominative','anonyme','non'].includes(o.presence)?o.presence:'non',theme:T(o.theme).slice(0,150),consignes:T(o.consignes).slice(0,2000),indicateurs:L2(o.indicateurs).map(T).filter(Boolean).slice(0,10),champs,choisi:true}}).filter(o=>o.champs.length||o.presence!=='non');
  return {outils:O,remarques:L2(r&&r.remarques).map(T).filter(Boolean).slice(0,15)}}
@@ -5989,7 +6147,7 @@ function svTerrain(){
  const tabs=niv==='agent'?[['saisir','Saisir'],['fiches','Mes fiches'],['references','Références'],['microplan','Mon microplan'],['rapport','Mon rapport du mois'],['outils','Fiches vierges']]
   :niv==='sup'?[['verifier','À vérifier'],['agents','Mes agents'],['saisir','Saisir'],['fiches','Fiches'],['references','Références'],['microplan','Microplans'],['rapport','Rapports'],['outils','Fiches vierges']]
   :niv==='ca'?[['rapport','Rapports validés']]
-  :[['tableau','Tableau de bord'],['verifier','À valider'],['fiches','Fiches'],['references','Références'],['agents','Agents'],['microplan','Microplans'],['rapport','Rapport mensuel'],['qualite','Qualité des données'],['outils','Outils de collecte'],['saisir','Saisir une fiche papier']];
+  :[['tableau','Tableau de bord'],['verifier','À valider'],['fiches','Fiches'],['references','Références'],['agents','Agents'],['microplan','Microplans'],['rapport','Rapport mensuel'],['qualite','Qualité des données'],['enquetes','Résultats des enquêtes'],['outils','Outils de collecte'],['saisir','Saisir une fiche papier']];
  if(!tabs.some(t=>t[0]===TR.tab))TR.tab=tabs[0][0];
  const nb={verifier:trAVerifier(p).length,saisir:trFiches(p).filter(f=>f.statut==='a_corriger'&&[f.agent_id,f.saisi_par].includes(me.id)).length+trFile().length};
  const file=trFile();
@@ -6001,7 +6159,7 @@ function svTerrain(){
   `<div class="trBarre">${L.length>1?`<div><label for="trPid">Projet</label><select id="trPid" data-ter="pid">${opts(L.map(x=>[x.id,libProj(x)]),p.id)}</select></div>`:`<div><span class="lbl">Projet</span><p class="trProj"><b>${esc(p.code||p.nom)}</b> <span class="muted">${esc(p.code?p.nom:'')}</span></p></div>`}
    <div><label for="trMois">Mois</label><input id="trMois" type="month" data-ter="mois" value="${TR.mois}" max="${today().slice(0,7)}"></div></div>
   <nav class="subnav trTabs" aria-label="Collecte terrain">${tabs.map(([k,l])=>`<button data-act="terTab" data-v="${k}" ${TR.tab===k?'aria-current="page"':''}>${l}${nb[k]?` <span class="badge">${nb[k]}</span>`:''}</button>`).join('')}</nav>`+
-  ({saisir:trSaisir,fiches:trListeFiches,references:trReferences,microplan:trMicroplan,rapport:trRapport,outils:trOutilsVue,verifier:trVerifierVue,agents:trAgentsVue,tableau:trTableau,qualite:trQualite}[TR.tab]||trSaisir)(p,niv)}
+  ({saisir:trSaisir,fiches:trListeFiches,references:trReferences,microplan:trMicroplan,rapport:trRapport,outils:trOutilsVue,verifier:trVerifierVue,agents:trAgentsVue,tableau:trTableau,qualite:trQualite,enquetes:trEnqVue}[TR.tab]||trSaisir)(p,niv)}
 
 /* ---------- onglet Saisir ---------- */
 function trSaisir(p,niv){const O=trOutils(p).filter(o=>o.actif&&(niv!=='agent'||!trEstSupO(o))),cor=trFiches(p).filter(f=>f.statut==='a_corriger'&&[f.agent_id,f.saisi_par].includes(me.id)),br=trLS.get('Brouillon',null);
@@ -6013,14 +6171,20 @@ function trSaisir(p,niv){const O=trOutils(p).filter(o=>o.actif&&(niv!=='agent'||
   `<section class="card"><h3>Orienter une personne vers un service</h3><p class="muted">Dépistage, planification familiale, consultation prénatale, prise en charge d'une violence… Chaque orientation a sa fiche de référence, avec un talon de contre-référence à faire remplir par la structure.</p><button class="btn ghost sm" data-act="terTab" data-v="references" data-ref="1">Nouvelle référence</button></section>`}
 
 /* ---------- formulaire d'une fiche ---------- */
-function trChamp(c,v){const n='c_'+c.id,val=v==null?'':v,req=c.requis?' required':'',aide=c.aide?`<small class="muted">${esc(c.aide)}</small>`:'';
- const lab=`<label for="tf_${c.id}">${esc(c.label)}${c.requis?' <span class="req" aria-hidden="true">*</span>':''}</label>`;
- if(c.type==='section')return `<h4 class="trSec">${esc(c.label)}</h4>`;
- if(c.type==='long')return `<div class="trL">${lab}<textarea id="tf_${c.id}" name="${n}" rows="3"${req}>${esc(val)}</textarea>${dictBtn('tf_'+c.id)}${aide}</div>`;
- if(c.type==='choix'||c.type==='ouinon'){const O=c.type==='ouinon'?[['oui','Oui'],['non','Non'],...(c.so?[['so','Sans objet']]:[])]:(c.options||[]).map(x=>[x,x]);return `<div${c.type==='choix'&&String(c.label).length>60?' class="trL"':''}>${lab}<select id="tf_${c.id}" name="${n}"${req}>${opts(O,val,'Choisir')}</select>${aide}</div>`}
- if(c.type==='multi'){const V=Array.isArray(v)?v:[];return `<fieldset class="trL trMulti"><legend>${esc(c.label)}${c.requis?' <span class="req" aria-hidden="true">*</span>':''}</legend>${(c.options||[]).map(x=>`<label><input type="checkbox" name="${n}" value="${esc(x)}"${V.includes(x)?' checked':''}> ${esc(x)}</label>`).join('')}${aide}</fieldset>`}
+function trChamp(c,v,num,D){const n='c_'+c.id,val=v==null?'':v,req=c.requis?' required':'',aide=c.aide?`<small class="${c.q?'trConsigne':'muted'}">${esc(c.aide)}</small>`:'';
+ const si=c.si&&Array.isArray(c.si)?c.si:null,dv=k=>D?D[k]:undefined,cache=si?(()=>{const x=dv(si[0]);return Array.isArray(x)?!x.includes(si[1]):x!==si[1]})():false;
+ const W=(inner,large)=>`<div class="trQ${large||c.q?' trL':''}" data-qid="${esc(c.id)}"${si?` data-si="${esc(si[0])}|${esc(si[1])}"`:''}${cache?' hidden':''}>${inner}</div>`;
+ const tq=c.q?`<span class="trQn">${num||''}</span><span class="trQt">${esc(c.q)}</span><span class="trQl">${esc(c.label)}${c.lire?', lire les réponses':''}</span>`:esc(c.label);
+ const lab=`<label for="tf_${c.id}">${tq}${c.requis?' <span class="req" aria-hidden="true">*</span>':''}</label>`;
+ if(c.type==='section')return W(`<h4 class="trSec">${esc(c.label)}</h4>${c.q?`<p class="trLire">${esc(c.q)}</p>`:''}${aide}`,true);
+ if(c.type==='long')return W(`${lab}<textarea id="tf_${c.id}" name="${n}" rows="3"${req}>${esc(val)}</textarea>${dictBtn('tf_'+c.id)}${aide}`,true);
+ if(c.type==='choix'||c.type==='ouinon'){const O=c.type==='ouinon'?[['oui','Oui'],['non','Non'],...(c.so?[['so','Sans objet']]:[])]:(c.options||[]).map(x=>[x,x]);
+  if(c.q&&O.length<=7)return W(`<fieldset class="trRadio"><legend>${tq}${c.requis?' <span class="req" aria-hidden="true">*</span>':''}</legend><div class="trRadL">${O.map(([k,l])=>`<label><input type="radio" name="${n}" value="${esc(k)}"${String(val)===k?' checked':''}${req}> ${esc(l)}</label>`).join('')}</div>${aide}</fieldset>`,true);
+  return W(`${lab}<select id="tf_${c.id}" name="${n}"${req}>${opts(O,val,'Choisir')}</select>${aide}`,c.type==='choix'&&String(c.label).length>60)}
+ if(c.type==='multi'){const V=Array.isArray(v)?v:[];return W(`<fieldset class="trMulti"><legend>${tq}${c.requis?' <span class="req" aria-hidden="true">*</span>':''}</legend>${(c.options||[]).map(x=>`<label><input type="checkbox" name="${n}" value="${esc(x)}"${V.includes(x)?' checked':''}> ${esc(x)}</label>`).join('')}${aide}</fieldset>`,true)}
  const t={nombre:'number',date:'date',heure:'time'}[c.type]||'text';
- return `<div>${lab}<input id="tf_${c.id}" name="${n}" type="${t}"${t==='number'?' min="0" step="any" inputmode="decimal"':''}${t==='date'?` max="${today()}"`:''} value="${esc(val)}"${req}>${aide}</div>`}
+ return W(`${lab}<input id="tf_${c.id}" name="${n}" type="${t}"${t==='number'?' min="0" step="any" inputmode="decimal"':''}${t==='date'?` max="${today()}"`:''} value="${esc(val)}"${req}>${aide}`)}
+const trNumeros=champs=>{let k=0;const m={};champs.forEach(c=>{if(c.q&&c.type!=='section')m[c.id]='Q'+(++k)});return m};
 const trLigneP=(x={},i=0)=>`<tr data-p><td class="trN">${i+1}</td><td><input data-k="nom" value="${esc(x.nom||'')}" aria-label="Nom et prénoms" placeholder="Nom et prénoms"></td>
  <td><select data-k="sexe" aria-label="Sexe"><option value="">Sexe</option><option value="F"${x.sexe==='F'?' selected':''}>F</option><option value="M"${x.sexe==='M'?' selected':''}>M</option></select></td>
  <td><input data-k="age" type="number" min="0" max="120" inputmode="numeric" value="${x.age??''}" aria-label="Âge" placeholder="Âge"></td>
@@ -6055,7 +6219,7 @@ function trSaisieVue(p){const s=TR.saisie,o=trOutil(s.outil);if(!o){TR.saisie=nu
   <div><label for="tf_lieu">Lieu précis</label><input id="tf_lieu" name="lieu" value="${esc(v.lieu||'')}" placeholder="ex. place publique, église, base vie"></div>
   <div class="trGps"><span class="lbl">Position GPS</span><button type="button" class="btn ghost sm" data-act="terGps">Relever ma position</button><span class="muted" data-gps>${v.lat!=null?`${Number(v.lat).toFixed(5)}, ${Number(v.lng).toFixed(5)} (± ${Math.round(v.gps_precision||0)} m)`:'non relevée'}</span>
    <input type="hidden" name="lat" value="${v.lat??''}"><input type="hidden" name="lng" value="${v.lng??''}"><input type="hidden" name="gps_precision" value="${v.gps_precision??''}"></div>
-  ${o.champs.length?`<h4 class="trSec">Contenu de l'activité</h4>`:''}${o.champs.map(c=>trChamp(c,(v.donnees||{})[c.id])).join('')}
+  ${o.champs.length?`<h4 class="trSec">${o.champs.some(c=>c.q)?'Questionnaire':'Contenu de l\'activité'}</h4>`:''}${o.champs.some(c=>c.id==='consent')?'<p class="note trStop trL" hidden>La personne n\'a pas donné son accord : le questionnaire s\'arrête ici. Remerciez-la ; vous pouvez envoyer la fiche pour compter le refus.</p>':''}${(()=>{const N=trNumeros(o.champs);return o.champs.map(c=>trChamp(c,(v.donnees||{})[c.id],N[c.id],v.donnees||{})).join('')})()}
   ${trPresence(o,v)}
   <h4 class="trSec">Pièce justificative et confidentialité</h4>
   <div class="trL"><label for="tf_piece">${o.presence==='nominative'?'Photo de la liste de présence signée':'Photo ou scan de la fiche papier'}</label><input id="tf_piece" name="piece" type="file" accept="image/*,.pdf" capture="environment"><small class="muted">Sans réseau, la photo ne peut pas partir avec la fiche : vous la joindrez ensuite depuis « Mes fiches ».</small></div>
@@ -6063,7 +6227,7 @@ function trSaisieVue(p){const s=TR.saisie,o=trOutil(s.outil);if(!o){TR.saisie=nu
   <div class="trL row trActs"><button class="btn" type="submit">${s.id?'Renvoyer la fiche corrigée':'Envoyer la fiche'}</button><button class="btn ghost" type="button" data-act="terFermer">${s.id?'Annuler':'Garder pour plus tard'}</button>${s.id?'':'<button class="btn ghost" type="button" data-act="terAbandon">Abandonner cette fiche</button>'}</div>
  </form>`}
 function trLire(f){const o=trOutil(f.dataset.outil),g=n=>String((f.elements[n]||{}).value??'').trim(),err=[];
- const donnees={};o.champs.forEach(c=>{if(c.type==='section')return;let v;
+ const donnees={};o.champs.forEach(c=>{if(c.type==='section')return;const w=f.querySelector(`[data-qid="${c.id}"]`);if(w&&w.hidden)return;let v;
   if(c.type==='multi')v=[...f.querySelectorAll(`[name="c_${c.id}"]:checked`)].map(x=>x.value);else{v=g('c_'+c.id);if(c.type==='nombre'&&v!=='')v=Number(String(v).replace(',','.'))}
   if(c.requis&&(v===''||(Array.isArray(v)&&!v.length)))err.push(c.label);
   if(c.type==='nombre'&&v!==''&&!(v>=0))err.push(c.label+' (nombre positif)');
@@ -6292,30 +6456,30 @@ function trOutilsVue(p,niv){const O=trOutils(p),gere=niv==='projet',inst=new Set
  return (gere?trPropVue(p)+(TR.prop?'':trGenCarte(p)):'')+`<section class="card"><h3>${gere?'Outils du projet':'Fiches du projet'} (${O.length})</h3><p class="muted">${gere?'Chaque projet a ses propres outils. Installez ceux de la bibliothèque OSV, adaptez-les (questions, choix), ou créez-en un. Modifier un outil crée une nouvelle version ; les fiches déjà remplies ne sont pas touchées.':'Imprimez les fiches vierges pour le terrain : elles portent le papier à en-tête d\'OSV. Recopiez-les ensuite dans l\'application et joignez la photo.'}</p>
  ${svT(['Outil','Type','Liste','#Questions','#Fiches','Indicateurs alimentés','Statut',''],O.map(o=>[`<b>${esc(o.titre)}</b>${o.theme?`<br><span class="muted">${esc(o.theme)}</span>`:''}`,esc(OUT_TYPES[o.type]||o.type),o.presence==='nominative'?'nominative':o.presence==='anonyme'?'décompte':'-',o.champs.filter(c=>c.type!=='section').length,num(F.filter(f=>f.outil_id===o.id).length),
   (o.liens||[]).filter(l=>l.indicateur_id).map(l=>esc(((S.inds||[]).find(i=>i.id===l.indicateur_id)||{}).libelle||'')).join('<br>')||'<span class="muted">aucun</span>',o.actif?tag(['en service','ok']):tag(['retiré','']),
-  `<div class="row"><button class="btn ghost sm" data-act="terImpVierge" data-id="${o.id}">Fiche vierge</button>${gere?`<button class="btn ghost sm" data-act="terOutilEd" data-id="${o.id}">Modifier</button><button class="btn ghost sm" data-act="terOutilActif" data-id="${o.id}">${o.actif?'Retirer':'Remettre en service'}</button>`:o.actif?`<button class="btn sm" data-act="terRemplir" data-id="${o.id}">Remplir</button>`:''}</div>`]),'Aucun outil installé.')}
- ${gere?`<p><button class="btn ghost sm" data-act="terOutilEd" data-id="new">Créer un outil</button></p>`:''}</section>
+  `<div class="row"><button class="btn ghost sm" data-act="terImpVierge" data-id="${o.id}">Fiche vierge</button>${gere&&trMajDispo(o)?`<button class="btn sm" data-act="terOutilMaj" data-id="${o.id}">Mettre à jour les questions</button>`:''}${gere?`<button class="btn ghost sm" data-act="terOutilEd" data-id="${o.id}">Modifier</button><button class="btn ghost sm" data-act="terOutilActif" data-id="${o.id}">${o.actif?'Retirer':'Remettre en service'}</button>`:o.actif?`<button class="btn sm" data-act="terRemplir" data-id="${o.id}">Remplir</button>`:''}</div>`]),'Aucun outil installé.')}
+ ${gere?`<p><button class="btn ghost sm" data-act="terOutilEd" data-id="new">Créer un outil</button></p>`:''}</section>${gere?trEnqCompoCarte(p):''}
  ${gere&&PACK_CHANTIER.some(k=>!inst.has(k))?`<section class="card iaRac"><h3>Dispositif « chantier » (aéroport, route, ouvrage)</h3><p class="muted">Les 15 outils du dispositif de collecte des projets de chantier : profil de la localité, consultation communautaire, enquête de base et finale, comptage des casques, séances, distribution, plaintes, incidents, et pour l'encadrement la grille de supervision notée et le contrôle qualité des enquêtes. Version 1, à améliorer avec les retours du terrain.</p><p><button class="btn" data-act="terInstaller" data-v="pack:chantier">Installer le dispositif chantier (${PACK_CHANTIER.filter(k=>!inst.has(k)).length} outils)</button></p></section>`:''}
  ${gere?`<section class="card"><h3>Bibliothèque OSV</h3><p class="muted">Outils conçus d'après les pratiques des programmes communautaires (santé, DSSR et VBG, sécurité routière et au travail, environnement, eau et assainissement, gestion des plaintes). Installez ceux dont le projet a besoin.</p>
  <div class="trBib">${MOD_OUTILS.map(m=>`<article class="trB"><h4>${esc(m.titre)}</h4><p class="muted">${esc(m.desc)}</p><p class="trBt"><span class="tag">${esc(OUT_TYPES[m.type])}</span> <span class="tag">${m.presence==='nominative'?'liste nominative':m.presence==='anonyme'?'décompte anonyme':'sans liste'}</span></p>
  <div class="row">${inst.has(m.code)?'<span class="tag ok">installé</span>':`<button class="btn sm" data-act="terInstaller" data-v="${m.code}">Installer</button>`}<button class="btn ghost sm" data-act="terImpModele" data-v="${m.code}">Aperçu</button></div></article>`).join('')}</div>
  ${MOD_OUTILS.some(m=>!inst.has(m.code))?`<p><button class="btn ghost sm" data-act="terInstaller" data-v="*">Tout installer</button></p>`:''}</section>`:''}`}
-function trOutilEditeur(p,o){const lignes=(o?o.champs:[]).map(c=>[c.label,c.type,(c.options||[]).join(' | '),c.requis?'requis':''].filter((x,i)=>i<2||x).join(' ; ')).join('\n');
+function trOutilEditeur(p,o){const lignes=(o?o.champs:[]).map(c=>{const L=[c.label,c.type,(c.options||[]).join(' | '),c.requis?'requis':'',c.q||''];while(L.length>2&&!L[L.length-1])L.pop();return L.join(' ; ')}).join('\n');
  const M=o?trMetriques(o):[['participants','Personnes touchées'],['fiches','Nombre de fiches'],['handicap','Personnes vivant avec un handicap']],inds=(S.inds||[]).filter(i=>i.projet_id===p.id),L=o?o.liens||[]:[];
  return `<p><button class="lnk" data-act="terFermer">Retour aux outils de collecte</button></p><div class="head"><h1>${o?'Modifier l\'outil':'Créer un outil de collecte'}</h1><p>${esc(libProj(p))}${o?`, version ${o.version}`:''}</p></div>
  <form data-form="terOutil" data-id="${o?o.id:''}" class="card grid">
   <div style="grid-column:span 2"><label>Titre</label><input name="titre" required value="${esc(o?o.titre:'')}"></div><div><label>Type</label><select name="type">${opts(Object.entries(OUT_TYPES),o?o.type:'seance')}</select></div>
   <div><label>Thème</label><input name="theme" value="${esc(o?o.theme||'':'')}"></div><div><label>Liste des participants</label><select name="presence">${opts([['nominative','Liste de présence nominative'],['anonyme','Décompte anonyme (sexe × âge)'],['non','Pas de liste']],o?o.presence:'nominative')}</select></div>
   <div class="trL"><label>Consignes de remplissage pour l'agent</label><textarea name="consignes" rows="3">${esc(o?o.consignes||'':'')}</textarea></div>
-  <div class="trL"><label for="trCh">Questions : une par ligne, « libellé ; type ; choix séparés par | ; requis »</label><textarea id="trCh" name="champs" rows="14" class="mono">${esc(lignes)}</textarea>
+  <div class="trL"><label for="trCh">Questions : une par ligne, « libellé ; type ; choix séparés par | ; requis ; question à poser telle qu'elle se lit »</label><textarea id="trCh" name="champs" rows="14" class="mono">${esc(lignes)}</textarea>
    <small class="muted">Types : ${Object.entries(CH_TYPES).map(([k,v])=>`<b>${k}</b> (${v.toLowerCase()})`).join(', ')}. Exemple : « Thèmes abordés ; multi ; VIH | Sécurité routière | VBG ; requis ». Garder le même libellé conserve l'historique d'une question.</small></div>
   <fieldset class="trL"><legend>Indicateurs du projet alimentés par cet outil</legend>${inds.length?M.map(([k,l])=>`<div class="trLien"><span>${esc(l)}</span><select name="lien_${k}">${opts(inds.map(i=>[i.id,`${i.code?i.code+', ':''}${i.libelle}`]),(L.find(x=>x.metrique===k)||{}).indicateur_id||'','Aucun')}</select></div>`).join(''):'<p class="muted">Aucun indicateur pour ce projet. Créez-les dans le cadre logique du projet.</p>'}
    <small class="muted">Les chiffres du rapport mensuel validé sont versés dans ces indicateurs, comme mesures à valider par une autre personne.</small></fieldset>
   <div class="trL row"><button class="btn" type="submit">Enregistrer</button><button class="btn ghost" type="button" data-act="terFermer">Annuler</button></div></form>`}
-function trLireChamps(txt,anciens){const vus=new Set(),err=[];const champs=String(txt||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map((l,i)=>{const [label,type0,optsT,req]=l.split(';').map(x=>(x||'').trim());
+function trLireChamps(txt,anciens){const vus=new Set(),err=[];const champs=String(txt||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map((l,i)=>{const [label,type0,optsT,req,...qq]=l.split(';').map(x=>(x||'').trim());const q=qq.join(' ; ').trim();
   const type=(type0||'texte').toLowerCase();if(!CH_TYPES[type])err.push(`ligne ${i+1} : type « ${type0} » inconnu`);
   const ex=(anciens||[]).find(c=>c.label===label);let id=ex?ex.id:trSlug(label);while(vus.has(id))id+='_';vus.add(id);
   const options=['choix','multi'].includes(type)?String(optsT||'').split('|').map(x=>x.trim()).filter(Boolean):undefined;if(options&&!options.length)err.push(`ligne ${i+1} : indiquez les choix séparés par |`);
-  return {id,label,type,...(options?{options}:{}),...(/requis|oui|obligatoire/i.test(req||'')||/requis/i.test(optsT||'')&&!options?{requis:true}:{}),...(ex&&ex.aide?{aide:ex.aide}:{})}});
+  const garde=ex?Object.fromEntries(Object.entries(ex).filter(([k])=>!['id','label','type','options','requis','q'].includes(k))):{};return {id,label,type,...(options?{options}:{}),...(/requis|oui|obligatoire/i.test(req||'')||/requis/i.test(optsT||'')&&!options?{requis:true}:{}),...garde,...(q?{q}:{})}});
  if(!champs.length)err.push('au moins une question');return [champs,err]}
 
 /* ---------- documents imprimables (papier à en-tête, Word) ---------- */
@@ -6330,10 +6494,20 @@ function trCorpsOutil(o,p,x){const v=x||{},d=v.donnees||{},vide='<span style="di
  return `<h1 class="doc-t">${esc(o.titre.toUpperCase())}</h1><p class="doc-s">${esc(OUT_TYPES[o.type]||'')}${o.theme?', '+esc(o.theme):''}</p>
  ${kv([['Projet',esc(p?libProj(p):'')],['Agent',x?esc(who(v.agent_id)):vide],['Date',x?fmtD(v.date_activite):vide+' &nbsp; Heure de début : '+vide.replace('160','60')+' &nbsp; de fin : '+vide.replace('160','60')],['Localité',x?esc(v.localite)+(v.sous_prefecture?' (s/p '+esc(v.sous_prefecture)+')':''):vide+' &nbsp; Sous-préfecture : '+vide],['Lieu précis',x?esc(v.lieu||''):vide]].concat(x&&v.heure_debut?[['Horaire',esc(v.heure_debut)+(v.heure_fin?', '+esc(v.heure_fin):'')]]:[]))}
  ${o.consignes&&!x?`<p class="petit"><b>Consignes :</b> ${esc(o.consignes)}</p>`:''}
- ${o.champs.length?`<h2>Contenu de l'activité</h2>`:''}${(()=>{let h='',rows=[];const flush=()=>{if(rows.length)h+=kv(rows);rows=[]};o.champs.forEach(c=>{if(c.type==='section'){flush();h+=`<h3>${esc(c.label)}</h3>`}else rows.push([esc(c.label),val(c)])});flush();return h})()}
+ ${o.champs.some(c=>c.q)?trQuestionnairePapier(o,x?d:null):''}${o.champs.length&&!o.champs.some(c=>c.q)?`<h2>Contenu de l'activité</h2>`:''}${o.champs.some(c=>c.q)?'':(()=>{let h='',rows=[];const flush=()=>{if(rows.length)h+=kv(rows);rows=[]};o.champs.forEach(c=>{if(c.type==='section'){flush();h+=`<h3>${esc(c.label)}</h3>`}else rows.push([esc(c.label),val(c)])});flush();return h})()}
  ${pres}
  <div class="bloc"><div class="sig"><div><b>L'agent</b>${x?esc(who(v.agent_id)):''}<br>Date et signature</div><div><b>Vérifié par le superviseur</b>${x&&v.verifie_par?esc(who(v.verifie_par))+'<br>le '+fmtD(v.verifie_le):'Nom, date et signature'}</div><div><b>Validé par</b>${x&&v.valide_par?esc(who(v.valide_par))+'<br>le '+fmtD(v.valide_le):'Chef de projet ou suivi-évaluation'}</div></div>
  ${x?'':'<p class="petit">À recopier dans OSV Gestion dans les 48 heures, avec la photo de cette fiche. Fiche à conserver par le superviseur : elle est la pièce justificative de l\'activité et des frais.</p>'}</div>`}
+/* questionnaire papier : numéro, question à lire, consigne, réponses codées à entourer */
+function trQuestionnairePapier(o,D){const N=trNumeros(o.champs),code=(c,i,x)=>c.type==='ouinon'?(x==='Oui'?1:2):(/^Ne sait pas$/i.test(x)?8:i+1);
+ const rep=c=>{const v=D?D[c.id]:null;if(D){if(v==null||v==='')return '<span class="petit">non renseigné</span>';return esc(Array.isArray(v)?v.join(', '):c.type==='ouinon'?(v==='oui'?'Oui':'Non'):String(v))}
+  if(c.type==='choix'||c.type==='ouinon'||c.type==='multi'){const O=c.type==='ouinon'?['Oui','Non']:c.options||[];return O.map((x,i)=>`<span style="display:inline-block;min-width:46%;margin:1px 0">☐ ${esc(x)} <span class="petit">(${code(c,i,x)})</span></span>`).join('')}
+  if(c.type==='long')return '<div style="height:52px;border-bottom:.6pt dotted #555"></div>';return '<span style="display:inline-block;min-width:120px;border-bottom:.6pt dotted #555">&nbsp;</span>'};
+ const filtre=c=>{if(!c.si)return '';const k=o.champs.find(x=>x.id===c.si[0]);return k?`Seulement si ${N[k.id]||k.label} = ${esc(c.si[1]==='oui'?'Oui':c.si[1]==='non'?'Non':c.si[1])}. `:''};
+ let h='<h2>Questionnaire</h2><table><thead><tr><th style="width:7%">N°</th><th style="width:53%">Question à lire et consigne</th><th>Réponse</th></tr></thead><tbody>';
+ o.champs.forEach(c=>{if(c.type==='section'){h+=`<tr class="th"><th colspan="3">${esc(c.label)}${c.q?`<br><i style="font-weight:normal">${esc(c.q)}</i>`:''}${c.aide?`<br><span class="petit" style="font-weight:normal">${esc(c.aide)}</span>`:''}</th></tr>`;return}
+  h+=`<tr><td><b>${N[c.id]||''}</b></td><td>${c.q?`<b>${esc(c.q)}</b>`:`<b>${esc(c.label)}</b>`}${c.aide||c.si||c.lire?`<br><i class="petit">${filtre(c)}${c.lire?'Lire les réponses. ':''}${esc(c.aide||'')}</i>`:''}</td><td>${rep(c)}</td></tr>`});
+ return h+'</tbody></table><p class="petit">Codes : 1 = oui, 2 = non, 8 = ne sait pas. Une fiche par personne, sans nom.</p>'}
 function trImpVierge(o,p){ouvrirPapier(o.titre,trCorpsOutil(o,p,null),{projet:p&&p.id,nom:`Fiche_vierge_${trSlug(o.titre)}`,ref:`Fiche n° ________<br>${esc(p?p.code||'':'')}`})}
 function trImpFiche(x){const o=trOutil(x.outil_id),p=projet(x.projet_id);if(!o)return;ouvrirPapier(o.titre,trCorpsOutil(o,p,x),{projet:x.projet_id,nom:`Fiche_${trSlug(o.titre)}_${x.date_activite}`,ref:`${esc(p.code||'')}<br>Fiche du <b>${fmtD(x.date_activite)}</b><br>${FT_ST[x.statut][0]}`,filigrane:x.statut==='validee'?null:x.statut==='rejetee'?'REJETÉE':'NON VALIDÉE'})}
 function trImpRef(r){const p=projet(r.projet_id),kv=rows=>`<table class="kv">${rows.map(x=>`<tr><th>${x[0]}</th><td>${x[1]}</td></tr>`).join('')}</table>`,v='<span style="display:inline-block;min-width:200px;border-bottom:.6pt dotted #555">&nbsp;</span>';
@@ -6464,13 +6638,19 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.targ
  if(a==='terInstaller'){const L=b.dataset.v==='*'?MOD_OUTILS.filter(m=>!trOutils(p).some(o=>o.modele===m.code)):b.dataset.v==='pack:chantier'?PACK_CHANTIER.map(k=>MOD_OUTILS.find(m=>m.code===k)).filter(m=>m&&!trOutils(p).some(o=>o.modele===m.code)):[MOD_OUTILS.find(m=>m.code===b.dataset.v)];if(!L.length)return;
   action(()=>ins('outils_collecte',L.map(m=>({org_id:S.org.id,projet_id:p.id,modele:m.code,titre:m.titre,type:m.type,theme:m.theme,presence:m.presence,consignes:m.consignes,champs:m.champs}))),`${L.length} outil(s) installé(s). Adaptez-les si besoin, puis reliez-les aux indicateurs du projet.`);return}
  if(a==='terOutilEd'){TR.outil=id;render();scrollTo(0,0);return}
+ if(a==='terOutilMaj'){const o=trOutil(id),m=MOD_OUTILS.find(x=>x.code===o.modele);if(!m||!confirm('Remplacer les questions de « '+o.titre+' » par la nouvelle version de la bibliothèque OSV, avec les questions à poser, les consignes et les filtres ? Les fiches déjà remplies ne changent pas ; les questions communes gardent leur historique.'))return;
+  action(()=>upd('outils_collecte',`id=eq.${id}`,{champs:m.champs,consignes:m.consignes,titre:m.titre}),'Questionnaire mis à jour : les agents ont maintenant les questions à poser.');return}
+ if(a==='terEnqCompo'){const f=b.closest('form'),mods=[...f.querySelectorAll('[name=em]:checked')].map(x=>x.value),ch=f.elements.public.value==='chantier',titre=String(f.elements.titre.value||'').trim(),age=Number(f.elements.age.value)||15;
+  if(!mods.length){alert('Cochez au moins un thème.');return}if(!titre){alert('Donnez un titre au questionnaire.');return}
+  action(()=>ins('outils_collecte',[{org_id:S.org.id,projet_id:p.id,modele:'ENQ:'+mods.join('+'),titre,type:'enquete',theme:'Connaissances, attitudes et pratiques',presence:'non',consignes:ENQ_CONSIGNES+` Personnes de ${age} ans et plus.`,champs:enqComposer(mods,ch)}]),'Questionnaire créé : il est disponible pour les agents, et ses résultats s\'affichent dans « Résultats des enquêtes ».');return}
+ if(a==='terEnqImp'){const el=document.getElementById('trEnqRes'),o=trOutil(TR.enq)||trOutils(p).find(x=>x.type==='enquete');if(!el)return;ouvrirPapier('Résultats de l\'enquête',`<h1 class="doc-t">RÉSULTATS DE L'ENQUÊTE</h1><p class="doc-s">${esc(o?o.titre:'')}<br>${esc(libProj(p))}</p>`+el.innerHTML.replace(/<select[\s\S]*?<\/select>/g,'').replace(/<button[\s\S]*?<\/button>/g,''),{projet:p.id,nom:'Resultats_enquete'});return}
  if(a==='terOutilActif'){const o=trOutil(id);action(()=>upd('outils_collecte',`id=eq.${id}`,{actif:!o.actif}),o.actif?'Outil retiré : il n\'est plus proposé aux agents.':'Outil remis en service.');return}
 },true);
 function trNumeroter(){const rows=document.querySelectorAll('.trPres tbody tr');rows.forEach((r,i)=>{const n=r.querySelector('.trN');if(n)n.textContent=i+1});const t=document.querySelector('.trPresTot');if(t){const F=[...rows].filter(r=>r.querySelector('[data-k="sexe"]').value==='F').length,M=[...rows].filter(r=>r.querySelector('[data-k="sexe"]').value==='M').length;t.textContent=F+M?`${F+M} personne(s) : ${F} F, ${M} H`:''}}
 document.addEventListener('change',e=>{if(MODE!=='srv'||!me)return;const t=e.target,k=t.dataset&&t.dataset.ter;
  if(k==='pid'){TR.pid=t.value;TR.agent='';TR.outilF='';render();return}
  if(k==='mois'){if(t.value)TR.mois=t.value;render();return}
- if(['agent','statut','outilF'].includes(k)){TR[k]=t.value;render();return}
+ if(['agent','statut','outilF','enq'].includes(k)){TR[k]=t.value;render();return}
  if(k==='tout'){document.querySelectorAll('.trSel').forEach(x=>x.checked=t.checked);return}
  if(k==='motif'){const vbg=/VBG/i.test(t.value);t.form.querySelectorAll('.trNom').forEach(x=>{x.hidden=vbg;x.querySelectorAll('input').forEach(i=>{if(vbg)i.value=''})});return}
  const f=t.closest&&t.closest('form[data-form="terFiche"]');if(f){if(t.dataset.k==='sexe')trNumeroter();trBrouillon(f)}});
