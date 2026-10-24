@@ -492,6 +492,36 @@ details>summary{font-size:.9rem}
 .trPb{text-align:center;color:var(--ink);font-size:.74rem}
 .trPf,.trPh{display:flex;height:12px}.trPf{justify-content:flex-end}
 .trPf i,.trPh i{display:block;height:100%;min-width:2px}.trPf i{background:var(--sx-f);border-radius:4px 0 0 4px}.trPh i{background:var(--sx-m);border-radius:0 4px 4px 0}
+
+/* ===== Assistant Claude et dictée ===== */
+.dictW{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin-top:.35rem}
+.dictBtn .ico{width:15px;height:15px;vertical-align:-2px}
+.dictBtn.rec{background:color-mix(in srgb,var(--bad) 10%,var(--panel));border-color:var(--bad);color:var(--bad)}
+.dictBtn.rec .ico{animation:dictPouls 1.2s ease-in-out infinite}
+@keyframes dictPouls{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.dictBtn.rec .ico{animation:none}}
+.dictLive{font-size:.8rem;font-style:italic;color:var(--muted);max-width:40ch}
+.iaRac{background:color-mix(in srgb,var(--brand-tint) 60%,var(--panel));border-color:color-mix(in srgb,var(--brand) 22%,var(--line))}
+.iaRac h3 .ico{width:17px;height:17px;vertical-align:-3px;color:var(--brand)}
+div.iaRac{border:1px solid color-mix(in srgb,var(--brand) 22%,var(--line));border-radius:10px;padding:.8rem 1rem}
+.iaRow{gap:.6rem;align-items:center;margin-top:.5rem}
+.btn.iaB{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.iaB:hover{filter:brightness(1.08)}
+.btn.iaB .ico{width:15px;height:15px;vertical-align:-2px}
+.btn.iaB:disabled{opacity:.75;cursor:progress}
+.iaPoints::after{content:'';display:inline-block;width:1.2em;text-align:left;animation:iaPts 1.2s steps(4) infinite}
+@keyframes iaPts{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+body.iaBusy{cursor:progress}
+.iaNoteF{border-left:3px solid var(--brand)}.iaNoteF p{margin:0}.iaNoteF ul{margin:.4rem 0 0}
+.dictNon{font-size:.78rem;margin:.4rem 0 0}
+.trL2{grid-column:span 2}@media (max-width:640px){.trL2{grid-column:1/-1}}
+.tdrsB{display:grid;gap:.4rem;margin:.3rem 0 .5rem}
+.tdrsL{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1.3fr);gap:.4rem}
+.mpEnt,.mpL{display:grid;grid-template-columns:9.5rem minmax(0,1fr) minmax(0,1.3fr) 6rem 2.4rem;gap:.4rem;align-items:center}
+.mpEnt{font-size:.72rem;color:var(--muted);font-weight:600;margin-bottom:.2rem}.mpLs{display:grid;gap:.4rem}
+@media (max-width:700px){.mpEnt{display:none}.mpL{grid-template-columns:1fr 6rem 2.4rem;padding:.5rem 0;border-bottom:1px solid var(--line)}.mpL [data-m=date]{grid-column:1/-1}.mpL [data-m=localite],.mpL [data-m=activite]{grid-column:1/-1}.tdrsL{grid-template-columns:1fr 1fr}.tdrsL [data-b=libelle]{grid-column:1/-1}}
+.joRec textarea{font-size:.92rem;line-height:1.55;min-height:12rem}
+.btn.joBig{font-size:.95rem;padding:.65rem 1.1rem}
+.pvDoc h3{margin:1.2rem 0 .4rem;color:var(--brand)}.pvDoc h3:first-child{margin-top:0}.pvDoc ul{margin:.2rem 0 .6rem 1.1rem}.pvDoc p{max-width:80ch}
 </style>
 </head>
 <body>
@@ -1791,7 +1821,7 @@ async function authRefresh(){const s=sess;if(!s)return;sess=null;
 async function authLogout(){try{if(sess)await api('/auth/v1/logout',{method:'POST'})}catch(e){}sessEcrire(null)}
 
 /* ---------- chargement des données autorisées ---------- */
-function srvVide(){return {org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],outils:[],fterrain:[],refs:[],microplans:[],rterrain:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
+function srvVide(){return {org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],journal:[],capis:[],iaUsage:[],outils:[],fterrain:[],refs:[],microplans:[],rterrain:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
 async function srvLoad(){
  const uid=sess.user.id,mine=await sel('membres',`select=*&user_id=eq.${uid}&actif=is.true`);
  const m=(mine||[]).find(x=>!x.fin_acces||x.fin_acces>=today());
@@ -1822,17 +1852,19 @@ async function srvLoad(){
  const T7=await opt(sel('mission_membres',f+'&order=ordre'));p07=T7!==null;N.mmembres=T7||[];p11=p07&&(await opt(sel('missions','select=revision&limit=1')))!==null;N.mrev=p11?(await opt(sel('missions_revisions',f+'&order=le')))||[]:[];
  const T8=await Promise.all([sel('tdrs',f+'&order=cree_le.desc'),sel('tdr_avis',f+'&order=le'),sel('acces_budget',f)].map(opt));p08=T8[0]!==null;N.tdrs=T8[0]||[];N.tavis=T8[1]||[];N.accBud=T8[2]||[];
  const T10=await opt(sel('contrats',f+'&order=redige_le.desc'));p10=T10!==null;N.contrats=T10||[];p10f=p10&&(await opt(sel('contrats','select=fiche&limit=1')))!==null;
+ const T13=await Promise.all([sel('journal',f+'&order=date_evt.desc&limit=3000'),sel('capitalisations',f+'&order=cree_le.desc'),sel('ia_reglages',f)].map(opt));p13=T13[0]!==null;N.journal=T13[0]||[];N.capis=T13[1]||[];N.iaReg=(T13[2]||[])[0]||null;
  const T12=await Promise.all([sel('outils_collecte',f+'&order=cree_le'),sel('fiches_terrain',f+'&order=date_activite.desc,saisi_le.desc&limit=10000'),sel('references_communautaires',f+'&order=date_reference.desc&limit=10000'),sel('microplans',f),sel('rapports_terrain',f+'&order=mois.desc')].map(opt));p12=T12[0]!==null;[N.outils,N.fterrain,N.refs,N.microplans,N.rterrain]=T12.map(x=>x||[]);
  [N.comptes,N.mouvements,N.rapprochements,N.avances,N.fournisseurs,N.seuilsAchat,N.achats,N.devis,N.baremes,N.missions,N.biens,N.inventaires,N.pcomptes,N.correspondances,N.invLignes]=T6.map(x=>x||[]);
  S=N;me=S.staff.find(x=>x.id===uid);
  Object.keys(ROLES).forEach(k=>ROLES[k].nav=srvNav(k));
  srvAudit=me.role==='DE'?await sel('audit',`${f}&order=le.desc&limit=300`):[];
+ S.iaUsage=me.role==='DE'&&p13?(await sel('ia_usage',`${f}&le=gte.${new Date(Date.now()-40*864e5).toISOString().slice(0,10)}&order=le.desc&limit=20000`).catch(()=>[])):[];
 }
 const APPUI=['RH','RA','CPT','LOG'];
 function srvNav(r){if(r==='EXT')return ['politiques'];const appui=APPUI.includes(r),n=[];
  if(p03&&['DE','DP','CA'].includes(r))n.push('strategie','programmes');
  if(!appui)n.push('projets');if(p12&&['ASC','SUP','SE','CP','DP','DE','CA'].includes(r)){if(['ASC','SUP'].includes(r))n.splice(n.indexOf('projets'),0,'terrain');else n.push('terrain')}if(p03&&['DE','DP','CA',...APPUI].includes(r))n.push('equipes');if(p05&&['DE','DP','CA','RA','CPT'].includes(r))n.push('finances');if(p06&&['DE','DP','CA','RA','CPT','LOG'].includes(r))n.push('adm');
- if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');if(p08)n.push('missions');if(p06)n.push('mesdem');
+ if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');if(p08)n.push('missions');if(p06)n.push('mesdem');if(p13)n.push('journal');
  if(p10&&['DE','DP','RH','RA'].includes(r))n.push('contrats');if(['DE','RH'].includes(r))n.push('personnel');if(r==='DE')n.push('audit');return n}
 async function notifierSrv(dest,texte,lien,ref){const ids=[...new Set(dest.filter(Boolean))].filter(id=>id!==me.id&&S.staff.some(u=>u.id===id));
  if(!ids.length)return 0;await ins('notifications',ids.map(id=>({org_id:S.org.id,user_id:id,texte,lien,ref,envoye_par:me.id})));return ids.length}
@@ -1842,7 +1874,7 @@ async function action(fn,msg){if(srvBusy)return;srvBusy=true;document.body.class
 
 /* ---------- écrans du mode serveur ---------- */
 function srvHome(){const n=ROLES[me.role].nav,pa=polEnAttente().length;
- const D={terrain:'Fiches d\'activité, listes de présence, références, microplans et rapports des agents communautaires',adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
+ const D={journal:'Réunions, visites et missions : dictées, comptes rendus rédigés avec Claude, capitalisation',terrain:'Fiches d\'activité, listes de présence, références, microplans et rapports des agents communautaires',adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
  return accHero()+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+notifBox()+
  (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:'')+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
  `${['DE','DP','CA'].includes(me.role)&&p03?'':accTableauBord()}
@@ -4755,7 +4787,7 @@ const TDR_COLS=['TDR','Mission','Dates','Rédigé par','Statut','Ordre de missio
 const tdrLigne=t=>{const om=tdrOM(t);return [`${t.numero?`<b>${esc(t.numero)}</b><br>`:''}${esc(t.titre)}`,`${esc(t.destination||'—')}${t.projet_id?`<br><span class="muted">${esc(libProj(projet(t.projet_id)))}</span>`:''}`,`${fmtD(t.date_debut)} → ${fmtD(t.date_fin)}`,esc(who(t.auteur_id)),tag(TDR_ST[t.statut]),
  om?`${esc(om.numero||'')} ${tag(MI_ST[om.statut])}`:t.statut==='valide'?'<span class="muted">à établir</span>':'—',`<button class="btn sm${tdrActeur(t)?'':' ghost'}" data-act="tdrOuvrir" data-id="${t.id}">${tdrActeur(t)?'Traiter':'Ouvrir'}</button>`]};
 
-function svMissions(){if(!p08)return head('TDR et ordres de mission','')+'<p class="note">Exécutez le script 08 dans Supabase pour activer les TDR.</p>';
+function svMissions(){if(!tdrEdit){tdrPre=null;tdrSimple=null}if(!p08)return head('TDR et ordres de mission','')+'<p class="note">Exécutez le script 08 dans Supabase pour activer les TDR.</p>';
  if(tdrEdit)return tdrEditeur(tdrEdit==='new'?null:S.tdrs.find(t=>t.id===tdrEdit));
  if(tdrSel&&S.tdrs.find(t=>t.id===tdrSel))return tdrDetail(S.tdrs.find(t=>t.id===tdrSel));
  const aT=S.tdrs.filter(tdrActeur),mes=S.tdrs.filter(t=>t.auteur_id===me.id&&t.statut!=='annule'),autres=S.tdrs.filter(t=>t.auteur_id!==me.id&&!aT.includes(t)&&t.statut!=='annule');
@@ -4768,10 +4800,10 @@ function svMissions(){if(!p08)return head('TDR et ordres de mission','')+'<p cla
  <section class="card"><h3>Mes TDR (${mes.length})</h3>${svT(TDR_COLS,mes.map(tdrLigne),'Vous n\'avez pas encore rédigé de TDR. Chaque mission commence par là : « Rédiger un TDR ».')}</section>
  ${autres.length?`<section class="card"><h3>Autres TDR que vous pouvez consulter (${autres.length})</h3>${svT(TDR_COLS,autres.map(tdrLigne))}</section>`:''}`}
 
-function tdrEditeur(t){t=t||{};const proj=S.projets.filter(p=>!['cloture','archive','rejete'].includes(p.statut)),acts=S.cadre.filter(c=>c.niveau==='act'),c=Math.round(tdrComplet(t)*100);
+function tdrEditeur(t){t=t||{};if(tdrPre&&tdrPre._pour===(t.id||'new'))t={...t,...tdrPre};if(tdrSimpleOn())return tdrEditeurSimple(t);const proj=S.projets.filter(p=>!['cloture','archive','rejete'].includes(p.statut)),acts=S.cadre.filter(c=>c.niveau==='act'),c=Math.round(tdrComplet(t)*100);
  const bud=(t.budget||[]).map(b=>`${b.libelle} ; ${b.quantite} ; ${b.unite||''} ; ${b.cout}`).join('\n');
  const cor=t.id&&S.tavis.filter(a=>a.tdr_id===t.id&&a.decision==='a_corriger').slice(-1)[0];
- return `<p><button class="lnk" data-act="tdrRetour">← TDR et ordres de mission</button></p>`+head(t.id?'Modifier le TDR':'Rédiger un TDR','Remplissez ce que vous savez ; le brouillon s\'enregistre et se complète plus tard. Pour soumettre, l\'objectif général, les résultats attendus, la destination et les dates sont obligatoires.')+
+ return `<p><button class="lnk" data-act="tdrRetour">← TDR et ordres de mission</button></p>`+head(t.id?'Modifier le TDR':'Rédiger un TDR','Remplissez ce que vous savez ; le brouillon s\'enregistre et se complète plus tard. Pour soumettre, l\'objectif général, les résultats attendus, la destination et les dates sont obligatoires.')+(srvMsg&&tdrPre?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+`<p class="row"><button class="btn ghost sm" data-act="iaTdrMode" data-v="1">Version simple</button></p>`+
  (cor?`<section class="card notif"><h3>Corrections demandées par ${esc(who(cor.par))}</h3><p class="pre">${esc(cor.commentaire||'')}</p></section>`:'')+
  `<form data-form="tdrForm" data-id="${t.id||''}" class="card grid tdrF" style="align-items:end">
  <h3 style="grid-column:1/-1">Identification de la mission</h3>
@@ -4794,7 +4826,7 @@ function tdrDetail(t){const om=tdrOM(t),av=S.tavis.filter(a=>a.tdr_id===t.id).so
   <form data-form="tdrDecision" data-id="${t.id}"><label for="tdrAvis">Votre avis (obligatoire pour un renvoi)</label><textarea id="tdrAvis" name="avis" rows="3" placeholder="ex. Préciser les villages et les effectifs attendus par village ; ajouter la langue des séances."></textarea>
   <div class="row" style="margin-top:.6rem"><button class="btn" type="submit" value="ok">${TDR_BTN[t.statut]}</button><button class="btn ghost" type="submit" value="a_corriger">Renvoyer pour correction</button>${['de','ca'].includes(t.statut)?'<button class="btn danger" type="submit" value="rejete">Rejeter</button>':''}</div></form></section>`:''}
  ${auteur&&['brouillon','a_corriger'].includes(t.statut)?`<div class="row" style="margin-bottom:1rem"><button class="btn" data-act="tdrModif" data-id="${t.id}">Modifier</button><button class="btn ghost" data-act="tdrSoumettre" data-id="${t.id}">Soumettre</button><button class="btn danger sm" data-act="tdrRetirer" data-id="${t.id}">Retirer ce TDR</button></div>`:''}
- ${tdrPeutOM(t)?`<section class="card notif"><h3>Le TDR est validé : établissez l'ordre de mission</h3><p class="muted">Le formulaire est prérempli à partir du TDR. Complétez les missionnaires, l'itinéraire, les structures d'accueil et les moyens, puis envoyez-le à la signature.</p>${omForm(t)}</section>`:''}
+ ${tdrPeutOM(t)?(me.role==='ASC'?`<section class="card notif"><h3>Votre TDR est validé : demandez votre ordre de mission</h3>${omFormSimple(t)}</section>`:`<section class="card notif"><h3>Le TDR est validé : établissez l'ordre de mission</h3><p class="muted">Le formulaire est prérempli à partir du TDR. Complétez les missionnaires, l'itinéraire, les structures d'accueil et les moyens, puis envoyez-le à la signature.</p>${omForm(t)}</section>`):''}
  <div class="row" style="margin-bottom:1rem"><button class="btn ghost sm" data-act="tdrImprimer" data-id="${t.id}">Imprimer ou enregistrer en PDF</button>${om?`<button class="btn ghost sm" data-act="miOM" data-id="${om.id}">Voir l'ordre de mission</button>${omPeutModifier(om)?`<button class="btn ghost sm" data-act="miModif" data-id="${om.id}">Modifier l'ordre de mission</button>`:''}${omPeutReviser(om)?`<button class="btn ghost sm" data-act="miRev" data-id="${om.id}">Réviser l'ordre de mission</button>`:''}`:''}</div>
  <article class="card tdrDoc">${t.projet_id&&projet(t.projet_id)?`<p class="muted">Projet : ${esc(libProj(projet(t.projet_id)))}${t.activite_id&&S.cadre.find(x=>x.id===t.activite_id)?` · activité ${esc(S.cadre.find(x=>x.id===t.activite_id).code||'')} ${esc(S.cadre.find(x=>x.id===t.activite_id).libelle)}`:''}</p>`:''}
  ${TDR_SEC.map(([k,l],i)=>`<h3>${i+1}. ${l}</h3>${t[k]?`<p class="pre">${esc(t[k])}</p>`:'<p class="muted">Non renseigné.</p>'}`).join('')}
@@ -5517,7 +5549,7 @@ function trSaisir(p,niv){const O=trOutils(p).filter(o=>o.actif),cor=trFiches(p).
  return (cor.length?`<section class="card notif"><h3>À corriger (${cor.length})</h3><p class="muted">Ces fiches vous ont été renvoyées. Corrigez-les : elles repartent automatiquement à la vérification.</p>
    ${cor.map(f=>`<div class="q-row"><div><b>${esc((trOutil(f.outil_id)||{}).titre||'Fiche')}</b> · ${fmtD(f.date_activite)} · ${esc(f.localite)}<br><span class="muted">Remarque de ${esc(who(f.retour_par))} : ${esc(f.retour_motif||'')}</span></div><button class="btn sm" data-act="terCorriger" data-id="${f.id}">Corriger</button></div>`).join('')}</section>`:'')+
   (br&&br.pid===p.id&&trOutil(br.outil)?`<section class="card"><h3>Fiche commencée</h3><div class="q-row"><div><b>${esc(trOutil(br.outil).titre)}</b><br><span class="muted">gardée sur ce téléphone le ${new Date(br.le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}</span></div><div class="row"><button class="btn sm" data-act="terReprendre">Reprendre</button><button class="btn ghost sm" data-act="terAbandon">Abandonner</button></div></div></section>`:'')+
-  `<section class="card"><h3>Remplir une fiche</h3>${O.length?`<p class="muted">Choisissez l'outil qui correspond à l'activité menée. Sans réseau, la fiche est gardée sur ce téléphone et part dès que le réseau revient.</p><div class="trOutils">${O.map(o=>`<button class="trO" data-act="terRemplir" data-id="${o.id}"><b>${esc(o.titre)}</b><span>${esc(OUT_TYPES[o.type]||'')}${o.presence==='nominative'?' · liste de présence':o.presence==='anonyme'?' · décompte anonyme':''}</span></button>`).join('')}</div>`
+  iaRacontCarte(p)+`<section class="card"><h3>Remplir une fiche</h3>${O.length?`<p class="muted">Choisissez l'outil qui correspond à l'activité menée. Sans réseau, la fiche est gardée sur ce téléphone et part dès que le réseau revient.</p><div class="trOutils">${O.map(o=>`<button class="trO" data-act="terRemplir" data-id="${o.id}"><b>${esc(o.titre)}</b><span>${esc(OUT_TYPES[o.type]||'')}${o.presence==='nominative'?' · liste de présence':o.presence==='anonyme'?' · décompte anonyme':''}</span></button>`).join('')}</div>`
    :`<p class="empty">Aucun outil de collecte n'est encore installé pour ce projet.${niv==='projet'?' Ouvrez l\'onglet « Outils de collecte » pour installer les fiches OSV.':' Le chef de projet doit les installer.'}</p>`}</section>`+
   `<section class="card"><h3>Orienter une personne vers un service</h3><p class="muted">Dépistage, planification familiale, consultation prénatale, prise en charge d'une violence… Chaque orientation a sa fiche de référence, avec un talon de contre-référence à faire remplir par la structure.</p><button class="btn ghost sm" data-act="terTab" data-v="references" data-ref="1">Nouvelle référence</button></section>`}
 
@@ -5525,7 +5557,7 @@ function trSaisir(p,niv){const O=trOutils(p).filter(o=>o.actif),cor=trFiches(p).
 function trChamp(c,v){const n='c_'+c.id,val=v==null?'':v,req=c.requis?' required':'',aide=c.aide?`<small class="muted">${esc(c.aide)}</small>`:'';
  const lab=`<label for="tf_${c.id}">${esc(c.label)}${c.requis?' <span class="req" aria-hidden="true">*</span>':''}</label>`;
  if(c.type==='section')return `<h4 class="trSec">${esc(c.label)}</h4>`;
- if(c.type==='long')return `<div class="trL">${lab}<textarea id="tf_${c.id}" name="${n}" rows="3"${req}>${esc(val)}</textarea>${aide}</div>`;
+ if(c.type==='long')return `<div class="trL">${lab}<textarea id="tf_${c.id}" name="${n}" rows="3"${req}>${esc(val)}</textarea>${dictBtn('tf_'+c.id)}${aide}</div>`;
  if(c.type==='choix'||c.type==='ouinon'){const O=c.type==='ouinon'?[['oui','Oui'],['non','Non']]:(c.options||[]).map(x=>[x,x]);return `<div${c.type==='choix'&&String(c.label).length>60?' class="trL"':''}>${lab}<select id="tf_${c.id}" name="${n}"${req}>${opts(O,val,'— choisir —')}</select>${aide}</div>`}
  if(c.type==='multi'){const V=Array.isArray(v)?v:[];return `<fieldset class="trL trMulti"><legend>${esc(c.label)}${c.requis?' <span class="req" aria-hidden="true">*</span>':''}</legend>${(c.options||[]).map(x=>`<label><input type="checkbox" name="${n}" value="${esc(x)}"${V.includes(x)?' checked':''}> ${esc(x)}</label>`).join('')}${aide}</fieldset>`}
  const t={nombre:'number',date:'date',heure:'time'}[c.type]||'text';
@@ -5551,9 +5583,10 @@ function trSaisieVue(p){const s=TR.saisie,o=trOutil(s.outil);if(!o){TR.saisie=nu
  const ags=trCollecteurs(p).filter(u=>u.id===me.id||trVerifie(p,u.id));const locs=[...new Set(trFiches(p).map(x=>x.localite))].sort();
  return `<p><button class="lnk" data-act="terFermer">← Collecte terrain</button></p><div class="head"><h1>${esc(o.titre)}</h1><p>${esc(libProj(p))}${s.id?' · correction de la fiche du '+fmtD(f.date_activite):''}</p></div>
  ${f&&f.retour_motif&&f.statut==='a_corriger'?`<p class="note"><b>À corriger :</b> ${esc(f.retour_motif)} <span class="muted">(${esc(who(f.retour_par))})</span></p>`:''}
+ ${s.ia?`<section class="card iaNoteF"><p><b>${ico('etoile')} Fiche préremplie par Claude à partir de votre récit.</b> Vérifiez chaque réponse avant d'envoyer.${v.participants&&v.participants.length?` Les lignes de la liste de présence sont préparées (${v.participants.length}) : recopiez les noms et les âges depuis la liste signée.`:''}</p>${s.ia.a_verifier.length?`<ul>${s.ia.a_verifier.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</section>`:''}
  ${o.consignes?`<details class="card trCons"><summary><b>Consignes de remplissage</b></summary><p>${esc(o.consignes)}</p></details>`:''}
  <form data-form="terFiche" data-outil="${o.id}" data-id="${s.id||''}" class="card grid trForm" novalidate>
-  <h4 class="trSec">Identification de l'activité</h4>
+  <h4 class="trSec">Identification de l'activité</h4>${(v.donnees||{})._recit?`<input type="hidden" name="_recit" value="${esc(v.donnees._recit)}">`:''}
   ${pourAutre&&!s.id?`<div><label for="tf_agent">Agent qui a mené l'activité</label><select id="tf_agent" name="agent">${opts(ags.map(u=>[u.id,`${u.nom} (${posteLib(u)})`]),v.agent_id||me.id)}</select></div>`:''}
   <div><label for="tf_date">Date de l'activité <span class="req" aria-hidden="true">*</span></label><input id="tf_date" name="date_activite" type="date" max="${today()}" required value="${v.date_activite||today()}"></div>
   <div><label for="tf_hd">Heure de début</label><input id="tf_hd" name="heure_debut" type="time" value="${esc(v.heure_debut||'')}"></div>
@@ -5576,6 +5609,7 @@ function trLire(f){const o=trOutil(f.dataset.outil),g=n=>String((f.elements[n]||
   if(c.requis&&(v===''||(Array.isArray(v)&&!v.length)))err.push(c.label);
   if(c.type==='nombre'&&v!==''&&!(v>=0))err.push(c.label+' (nombre positif)');
   if(!(v===''||(Array.isArray(v)&&!v.length)))donnees[c.id]=v});
+ if(g('_recit'))donnees._recit=g('_recit');
  const conf=!!(f.elements.confidentiel&&f.elements.confidentiel.checked)||(donnees._vbg==='oui');
  const participants=[...f.querySelectorAll('tr[data-p]')].map(tr=>{const q=k=>tr.querySelector(`[data-k="${k}"]`);
   return {nom:q('nom').value.trim(),sexe:q('sexe').value,age:q('age').value===''?null:Number(q('age').value),tel:q('tel').value.trim(),handicap:q('handicap').checked,vuln:q('vuln').value,signe:q('signe').checked}})
@@ -5628,6 +5662,7 @@ function trFicheVue(x){const p=projet(x.projet_id),o=trOutil(x.outil_id)||{titre
   <div><span>Saisie</span><b>${new Date(x.saisi_le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}${x.saisi_par&&x.saisi_par!==x.agent_id?' par '+esc(who(x.saisi_par)):''}</b></div>
   <div><span>Circuit</span><b>${x.verifie_par?'vérifiée par '+esc(who(x.verifie_par)):'—'}${x.valide_par?' · validée par '+esc(who(x.valide_par)):''}</b></div></div>
   ${o.champs.filter(c=>c.type!=='section'&&(x.donnees||{})[c.id]!=null).length?`<table class="trKv">${o.champs.filter(c=>c.type!=='section'&&(x.donnees||{})[c.id]!=null&&(x.donnees||{})[c.id]!=='').map(c=>`<tr><th>${esc(c.label)}</th><td>${val(c,x.donnees[c.id])}</td></tr>`).join('')}</table>`:''}
+  ${(x.donnees||{})._recit?`<p style="margin-top:.8rem"><b>Récit de l'agent :</b> <span class="pre">${esc(x.donnees._recit)}</span></p>`:''}
   <p style="margin-top:.8rem"><b>Pièce jointe :</b> ${x.piece_id?docLien(x.piece_id):'<span class="muted">aucune</span>'}</p>
   ${aut&&['soumise','a_corriger'].includes(x.statut)&&!x.piece_id?`<form data-form="terPiece" data-id="${x.id}" class="row"><input name="fichier" type="file" accept="image/*,.pdf" capture="environment" required aria-label="Photo de la liste signée"><button class="btn sm" type="submit">Joindre</button></form>`:''}</section>
  ${P.length?`<section class="card"><h3>Liste de présence (${P.length})</h3>${svT(['N°','Nom et prénoms','Sexe','#Âge','Téléphone','Handicap','Vulnérabilité','Émargement'],P.map((q,i)=>[i+1,esc(q.nom||(x.confidentiel?'(confidentiel)':'')),q.sexe||'',q.age??'—',esc(q.tel||''),q.handicap?'Oui':'',esc(q.vuln||''),q.signe===false?'<span class="tag bad">non</span>':'oui']))}</section>`:''}
@@ -5688,9 +5723,7 @@ function trMicroplan(p,niv){const F=trFiches(p),M=(S.microplans||[]).filter(m=>m
   return `<section class="card"><h3>Mon microplan de ${moisLib(TR.mois).toLowerCase()}</h3><p class="muted">Le microplan liste, avant le début du mois, les activités que vous prévoyez : date, localité, activité et nombre de personnes visées. Votre superviseur le valide. Chaque fiche envoyée à la même date et dans la même localité est comptée comme réalisée.</p>
   ${mp?`<p>${tag(MP_ST[mp.statut])}${mp.motif&&mp.statut==='a_corriger'?` <span class="muted">${esc(mp.motif)}</span>`:''} · réalisé : <b>${ok} / ${R.length}</b> activité(s) (${pcS(ok,R.length)})</p>
    ${svT(['Date','Localité','Activité','#Personnes visées','Réalisé','#Personnes touchées'],R.map(r=>[fmtD(r.date),esc(r.localite),esc(r.activite),num(r.cible),r.fiche?tag(['oui','ok']):(r.date<today()?tag(['non','bad']):'<span class="muted">à venir</span>'),r.fiche?num(r.fiche.nb_total):'']))}`:''}
-  ${!mp||mp.statut!=='valide'?`<form data-form="terMp" data-id="${mp?mp.id:''}" style="margin-top:.8rem"><label for="trMpL">Activités prévues : une par ligne, « jj/mm/aaaa ; localité ; activité ; personnes visées »</label>
-   <textarea id="trMpL" name="lignes" rows="6" placeholder="05/11/2026 ; Kong ; Causerie éducative IST/VIH ; 25&#10;07/11/2026 ; Nafana ; Porte-à-porte ; 40">${esc(mp?(mp.lignes||[]).map(l=>[l.date.split('-').reverse().join('/'),l.localite,l.activite,l.cible??''].join(' ; ')).join('\n'):'')}</textarea>
-   <button class="btn" type="submit" style="margin-top:.5rem">${mp?'Renvoyer au superviseur':'Envoyer au superviseur'}</button></form>`:''}</section>`}
+  ${!mp||mp.statut!=='valide'?mpEditeur(p,mp):''}</section>`}
  const A=trAgents(p).filter(u=>niv==='projet'||trVerifie(p,u.id));
  return `<section class="card"><h3>Microplans de ${moisLib(TR.mois).toLowerCase()}</h3><p class="muted">Un microplan validé par agent et par mois : c'est la base du suivi de la réalisation et de la complétude.</p>
  ${svT(['Agent','Statut','#Activités prévues','Réalisées','#Personnes visées','#Touchées',''],A.map(u=>{const mp=M.find(m=>m.agent_id===u.id);if(!mp)return [esc(u.nom),tag(['Non reçu','bad']),'','','','',''];const R=trRealise(mp,F),ok=R.filter(r=>r.fiche).length;
@@ -5709,8 +5742,8 @@ function trChiffresHTML(d){if(!d||d.fiches==null)return '<p class="muted">Aucune
  ${d.localites&&d.localites.length?`<h4>Par localité</h4>${trBarres(d.localites.slice(0,12).map(l=>[l.localite,l.total,`${l.n} fiche(s) · ${l.f} F / ${l.h} H`]))}`:''}
  ${d.outils&&d.outils.length?`<h4>Par outil</h4>${d.outils.map(o=>`<details class="trOd"><summary><b>${esc(o.titre)}</b> · ${num(o.n)} fiche(s), ${num(o.total)} personne(s)</summary>${o.champs.map(c=>typeof c.v==='number'?`<p>${esc(c.label)} : <b>${num(c.v)}</b></p>`:`<p class="muted" style="margin:.6rem 0 .2rem">${esc(c.label)}</p>${trBarres(Object.entries(c.v).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[c.type==='ouinon'?(k==='oui'?'Oui':'Non'):k,v]))}`).join('')}</details>`).join('')}`:''}`}
 function trBarres(L){if(!L.length)return '';const max=Math.max(...L.map(x=>x[1]),1);return `<ul class="tb-bars tb-cnt">${L.map(([l,v,t])=>`<li title="${esc(t||l)} : ${num(v)}"><span class="tb-l">${esc(l)}</span><span class="tb-track" style="width:${(v/max*100).toFixed(1)}%"><i style="width:100%"></i></span><span class="tb-v">${num(v)}</span></li>`).join('')}</ul>`}
-function trRapForm(p,niv,r,d){const enRetard=today()>trLimite(TR.mois,niv);const F=(k,l,ph)=>`<div class="trL"><label>${l}</label><textarea name="${k}" rows="3" placeholder="${ph||''}">${esc(r?r[k]||'':'')}</textarea></div>`;
- return `<form data-form="terRap" data-niv="${niv}" data-id="${r?r.id:''}" class="grid">${F('faits','Faits marquants du mois','Ce qui a bien marché, les résultats obtenus, les témoignages')}${F('difficultes','Difficultés rencontrées','Accès, météo, réticences, manque de supports…')}
+function trRapForm(p,niv,r,d){const enRetard=today()>trLimite(TR.mois,niv);const F=(k,l,ph)=>`<div class="trL"><label for="rap_${k}">${l}</label><textarea id="rap_${k}" name="${k}" rows="3" placeholder="${ph||''}">${esc(r?r[k]||'':'')}</textarea>${dictBtn('rap_'+k)}</div>`;
+ return `<form data-form="terRap" data-niv="${niv}" data-id="${r?r.id:''}" class="grid">${iaOK()?`<div class="trL iaRac"><p class="muted">${niv==='agent'?'Vos chiffres sont déjà calculés à partir de vos fiches. Parlez ou écrivez ce que vous avez vécu ce mois, ou laissez Claude rédiger à partir de vos fiches et de vos récits.':'Claude rédige à partir des chiffres consolidés et de ce que les agents ont remonté. Relisez avant d\'envoyer.'}</p><div class="row iaRow">${iaBtn('iaRapport','Rédiger avec Claude')}</div><p class="iaNote muted" hidden>Texte proposé par Claude : relisez, corrigez, puis envoyez.</p></div>`:''}${F('faits','Faits marquants du mois','Ce qui a bien marché, les résultats obtenus, les témoignages')}${F('difficultes','Difficultés rencontrées','Accès, météo, réticences, manque de supports…')}
  ${F('alertes','Alertes communautaires et rumeurs','Rumeurs, incidents, tensions, cas graves à signaler (sans nom)')}${F('besoins','Besoins','Supports, préservatifs, formation, moyens de déplacement…')}${niv!=='agent'?F('recommandations','Recommandations',''):''}
  <div class="trL"><button class="btn" type="submit">${r?'Renvoyer le rapport':'Envoyer le rapport'}</button> <span class="muted">Date limite : ${fmtD(trLimite(TR.mois,niv))}${enRetard&&!r?' · <b class="txt-bad">délai dépassé</b>':''}</span></div></form>`}
 function trRapAff(r){return `<p>${tag(RT_ST[r.statut])}${r.a_temps?'':' '+tag(['envoyé en retard','warn'])} <span class="muted">envoyé le ${fmtD(r.premier_envoi)}${r.valide_par?' · validé par '+esc(who(r.valide_par)):''}</span>${r.motif&&r.statut==='a_corriger'?` <span class="muted">· ${esc(r.motif)}</span>`:''}</p>
@@ -5982,14 +6015,324 @@ function tbTerrain(){if(!p12||!me)return '';const L=trProjets();if(!L.length)ret
  const lignes=[[num(mes.length),'fiche(s) envoyée(s) ce mois'],[num(somme(mes,f=>f.nb_total)),'personne(s) touchée(s) ce mois']].concat(cor?[[num(cor),'fiche(s) à corriger']]:[]).concat(av?[[num(av),'fiche(s) à vérifier ou valider']]:[]).concat(file?[[num(file),'envoi(s) en attente de réseau']]:[]);
  return tbCarte('Collecte terrain',moisLib(m).toLowerCase(),`<ul class="tb-act">${lignes.map(([v,l])=>`<li><b style="font-size:1.1rem;color:var(--brand)">${v}</b> <span class="muted">${l}</span></li>`).join('')}</ul><p class="tb-plus"><button class="btn sm" data-act="go" data-v="terrain" data-tab="${av&&!['ASC'].includes(me.role)?'verifier':'saisir'}">${av&&me.role!=='ASC'?'Traiter les fiches':'Saisir une fiche'}</button></p>`)}
 
+
+/* =====================================================================
+   ASSISTANT CLAUDE · dictée vocale · journal, comptes rendus et capitalisation
+   La clé de l'API Claude reste sur le serveur (Edge Function « claude ») :
+   l'application n'envoie qu'une tâche et des données, jamais de consigne libre.
+   ===================================================================== */
+let p13=false;
+const JR={tab:'liste',sel:null,edit:null,pvEdit:false,capSel:null,capEdit:false,filtre:'moi',user:null};
+let tdrSimple=null,tdrPre=null;
+ICO.mic='<path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="13" rx="3"/>';
+ICO.journal='<path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"/><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"/>';
+ICO.etoile='<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>';
+
+/* ---------- appel de l'assistant ---------- */
+const iaOK=()=>p13&&!(S.iaReg&&S.iaReg.actif===false);
+const iaTel=s=>String(s).replace(/(\+?225[\s.]?)?\b0\d([\s.]?\d{2}){4}\b/g,'[téléphone]');
+const iaNettoyer=x=>typeof x==='string'?iaTel(x):Array.isArray(x)?x.map(iaNettoyer):x&&typeof x==='object'?Object.fromEntries(Object.entries(x).map(([k,v])=>[k,iaNettoyer(v)])):x;
+async function iaAppel(tache,donnees){if(!p13)throw new Error('Exécutez le script 13 dans Supabase pour activer l\'assistant.');
+ if(sess&&sess.expires_at&&sess.expires_at*1000-Date.now()<60000)await authRefresh();
+ let r;try{r=await fetch(SUPA.url+'/functions/v1/claude',{method:'POST',headers:{apikey:SUPA.key,Authorization:'Bearer '+sess.access_token,'Content-Type':'application/json'},body:JSON.stringify({tache,donnees:iaNettoyer(donnees)})})}
+ catch(e){throw new Error('Assistant injoignable : il a besoin d\'Internet. Vérifiez la connexion et réessayez.')}
+ const j=await r.json().catch(()=>null);
+ if(r.status===404)throw new Error('L\'assistant Claude n\'est pas encore installé sur le serveur (fonction « claude » dans Supabase).');
+ if(!r.ok)throw new Error((j&&(j.erreur||j.message||j.msg))||('Erreur '+r.status));return j.resultat}
+async function iaAvec(btn,fn){if(srvBusy)return;const lib=btn?btn.innerHTML:'';if(btn){btn.disabled=true;btn.innerHTML='Claude rédige… <span class="iaPoints" aria-hidden="true"></span>'}
+ srvBusy=true;document.body.classList.add('busy','iaBusy');try{await fn()}catch(e){alert(e.message||String(e))}finally{srvBusy=false;document.body.classList.remove('busy','iaBusy');if(btn&&document.contains(btn)){btn.disabled=false;btn.innerHTML=lib}}}
+const iaBtn=(act,lib,extra='')=>iaOK()?`<button type="button" class="btn sm iaB" data-act="${act}" ${extra}>${ico('etoile')} ${lib}</button>`:'';
+
+/* ---------- dictée vocale (reconnaissance de la parole du navigateur) ---------- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let dict=null;
+const dictBtn=(cible,lib='Parler')=>SR?`<span class="dictW"><button type="button" class="btn ghost sm dictBtn" data-act="dicter" data-cible="${cible}" aria-pressed="false">${ico('mic')} <span>${lib}</span></button><span class="dictLive" data-live="${cible}" aria-live="polite"></span></span>`:'';
+const dictAide=()=>SR?'':'<p class="muted dictNon">Pour parler au lieu d\'écrire, ouvrez l\'application dans Google Chrome (téléphone ou ordinateur).</p>';
+function dictStop(){if(!dict)return;const d=dict;dict=null;d.actif=false;try{d.rec.stop()}catch(_){}clearInterval(d.timer);if(d.wake)d.wake.release().catch(()=>{});
+ if(document.contains(d.btn)){d.btn.setAttribute('aria-pressed','false');d.btn.classList.remove('rec');d.btn.querySelector('span').textContent=d.lib}const l=document.querySelector(`[data-live="${d.btn.dataset.cible}"]`);if(l)l.textContent=''}
+async function dictStart(btn){const cible=document.getElementById(btn.dataset.cible);if(!cible)return;dictStop();
+ const rec=new SR();rec.lang='fr-FR';rec.continuous=true;rec.interimResults=true;
+ const d=dict={rec,cible,btn,actif:true,debut:Date.now(),lib:btn.querySelector('span').textContent,wake:null};
+ const live=document.querySelector(`[data-live="${btn.dataset.cible}"]`);
+ rec.onresult=e=>{if(!document.contains(cible)){dictStop();return}let fin='',inter='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t;else inter+=t}
+  if(fin.trim()){const v=cible.value;cible.value=(v&&!/\s$/.test(v)?v+' ':v)+fin.trim()+' ';cible.dispatchEvent(new Event('input',{bubbles:true}));cible.scrollTop=cible.scrollHeight}if(live)live.textContent=inter};
+ rec.onerror=e=>{if(['not-allowed','service-not-allowed'].includes(e.error)){alert('Le micro est refusé. Autorisez le micro pour ce site (icône à gauche de l\'adresse), puis réessayez.');dictStop()}
+  else if(e.error==='network'&&live)live.textContent='Pas de réseau : la dictée a besoin d\'Internet. Écrivez, ou réessayez plus tard.';else if(e.error==='audio-capture'){alert('Aucun micro détecté sur cet appareil.');dictStop()}};
+ rec.onend=()=>{if(dict===d&&d.actif){try{rec.start()}catch(_){}}};
+ try{rec.start()}catch(e){alert('La dictée n\'a pas pu démarrer : '+e.message);dict=null;return}
+ btn.setAttribute('aria-pressed','true');btn.classList.add('rec');
+ const maj=()=>{const s=Math.floor((Date.now()-d.debut)/1000);btn.querySelector('span').textContent=`Arrêter · ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`};maj();d.timer=setInterval(maj,1000);
+ try{if(navigator.wakeLock)d.wake=await navigator.wakeLock.request('screen')}catch(_){}}
+
+/* ---------- l'agent raconte, Claude remplit la fiche ---------- */
+function iaRacontCarte(p){if(!iaOK())return '';const O=trOutils(p).filter(o=>o.actif&&o.type!=='plainte');if(!O.length)return '';
+ return `<section class="card iaRac"><h3>${ico('mic')} Raconter mon activité</h3><p class="muted">Parlez comme à votre superviseur : où et quand, ce que vous avez fait, combien de femmes et d'hommes, ce que les gens ont demandé. <b>Ne dites pas les noms des personnes.</b> Claude remplit la fiche ; vous vérifiez, vous recopiez la liste signée, puis vous envoyez.</p>
+ <div class="grid" style="align-items:end"><div><label for="racOutil">Quelle activité ?</label><select id="racOutil">${opts(O.map(o=>[o.id,o.titre]),'')}</select></div></div>
+ <label for="racTxt" style="margin-top:.6rem">Mon récit</label><textarea id="racTxt" rows="5" placeholder="Ex. : Ce matin à Nafana, sur la place du marché, j'ai fait une causerie sur le VIH et la sécurité routière. Il y avait 12 femmes et 8 hommes. J'ai donné 30 préservatifs. Une femme a demandé si le préservatif rend stérile.">${esc(trLS.get('Recit',''))}</textarea>
+ <div class="row iaRow">${dictBtn('racTxt','Parler')}<button type="button" class="btn iaB" data-act="iaFiche">${ico('etoile')} Remplir la fiche avec Claude</button></div>${dictAide()}</section>`}
+function iaVersFiche(o,res,recit){const v={date_activite:/^\d{4}-\d{2}-\d{2}$/.test(res.date_activite||'')&&res.date_activite<=today()?res.date_activite:today(),heure_debut:/^\d{2}:\d{2}$/.test(res.heure_debut||'')?res.heure_debut:'',heure_fin:/^\d{2}:\d{2}$/.test(res.heure_fin||'')?res.heure_fin:'',
+  localite:res.localite||'',sous_prefecture:res.sous_prefecture||'',lieu:res.lieu||'',donnees:{_recit:recit},decompte:{},participants:[]};
+ o.champs.forEach(c=>{const x=(res.donnees||{})[c.id];if(x==null||x==='')return;
+  if(c.type==='choix'){if((c.options||[]).includes(x))v.donnees[c.id]=x}else if(c.type==='multi'){const L=(Array.isArray(x)?x:[x]).filter(y=>(c.options||[]).includes(y));if(L.length)v.donnees[c.id]=L}
+  else if(c.type==='ouinon'){if(['oui','non'].includes(String(x).toLowerCase()))v.donnees[c.id]=String(x).toLowerCase()}else if(c.type==='nombre'){const n=Number(x);if(n>=0)v.donnees[c.id]=n}else v.donnees[c.id]=String(x)});
+ if(o.presence==='anonyme'&&res.decompte)['F','M'].forEach(s=>{v.decompte[s]={};Object.entries(res.decompte[s]||{}).forEach(([b,n])=>{if(TR_BANDES.includes(b)&&Number(n)>=0)v.decompte[s][b]=Number(n)})});
+ const sg=res.participants_signales||{},nf=Math.max(0,Math.min(80,Number(sg.femmes)||0)),nh=Math.max(0,Math.min(80,Number(sg.hommes)||0));
+ if(o.presence==='nominative'&&nf+nh)v.participants=[...Array(nf).fill(0).map(()=>({sexe:'F'})),...Array(nh).fill(0).map(()=>({sexe:'M'}))];
+ return v}
+
+/* ---------- formulaires simples pour les agents communautaires ---------- */
+const tdrSimpleOn=()=>tdrSimple==null?me.role==='ASC':tdrSimple;
+function tdrEditeurSimple(t){const proj=S.projets.filter(p=>!['cloture','archive','rejete'].includes(p.statut)&&(trEmploye(p)||['DE','DP'].includes(me.role)));
+ const caches=['contexte','objectifs_specifiques','inclusion','equipe','chronogramme','risques','indicateurs','livrables'];
+ const Q=(k,l,ph,rows=3)=>`<div class="trL"><label for="tdrs_${k}">${l}</label><textarea id="tdrs_${k}" name="${k}" rows="${rows}" placeholder="${esc(ph)}">${esc(t[k]||'')}</textarea>${dictBtn('tdrs_'+k)}</div>`;
+ const B=(t.budget||[]).length?t.budget:[{},{}];
+ return `<p><button class="lnk" data-act="tdrRetour">← TDR et ordres de mission</button></p>`+head(t.id?'Modifier mon TDR':'Préparer mon activité (TDR)','Répondez simplement aux questions, en écrivant ou en parlant. Votre superviseur relit, puis le Directeur des programmes et le Directeur exécutif valident.')+
+ `<p class="row"><button class="btn ghost sm" data-act="iaTdrMode" data-v="0">Passer à la version complète</button></p>
+ ${iaOK()?`<section class="card iaRac"><h3>${ico('mic')} Tout dire d'un coup</h3><p class="muted">Expliquez votre activité comme à votre chef : quoi, où, quand, pour qui, combien de personnes, comment, ce qu'il vous faut. Claude rédige un TDR complet que vous relisez.</p>
+  <textarea id="tdrRecit" rows="5" placeholder="Ex. : Je veux faire des causeries sur le VIH à Nafana et Kolon du 5 au 7 novembre, pour les femmes et les jeunes du chantier, environ 60 personnes. Il me faut le transport en moto et des dépliants."></textarea>
+  <div class="row iaRow">${dictBtn('tdrRecit','Parler')}<button type="button" class="btn iaB" data-act="iaTdr">${ico('etoile')} Rédiger le TDR avec Claude</button></div>${dictAide()}</section>`:''}
+ <form data-form="tdrForm" data-id="${t.id||''}" class="card grid tdrF trForm">
+  <input type="hidden" name="type_mission" value="${esc(t.type_mission||'Activité de terrain')}"><input type="hidden" name="activite" value="${esc(t.activite_id||'')}"><input type="hidden" name="ligne" value="${esc(t.ligne_id||'')}">
+  ${caches.map(k=>`<input type="hidden" name="${k}" value="${esc(t[k]||'')}">`).join('')}
+  <div class="trL"><label for="tdrs_titre">Quelle activité ? <span class="req">*</span></label><input id="tdrs_titre" name="titre" required value="${esc(t.titre||'')}" placeholder="ex. Causeries sur le VIH à Nafana"></div>
+  ${proj.length>1?`<div><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),t.projet_id||(proj[0]||{}).id||'')}</select></div>`:`<input type="hidden" name="projet" value="${esc(t.projet_id||(proj[0]||{}).id||'')}">`}
+  <div><label for="tdrs_dest">Où ?</label><input id="tdrs_dest" name="destination" value="${esc(t.destination||'')}" placeholder="villages, quartiers"></div>
+  <div><label>Du</label><input name="date_debut" type="date" value="${t.date_debut||''}"></div><div><label>Au</label><input name="date_fin" type="date" value="${t.date_fin||''}"></div>
+  ${Q('objectif_general','Pourquoi ? Qu\'est-ce que je veux changer ? <span class="req">*</span>','ex. Que les riverains sachent se protéger du VIH')}
+  ${Q('cibles','Pour qui ? Combien de personnes ?','ex. Femmes et jeunes de Nafana, environ 60 personnes')}
+  ${Q('methodologie','Comment je vais faire ?','ex. 3 causeries de 1 h, en dioula, avec la boîte à images')}
+  ${Q('resultats','Qu\'est-ce que je vais obtenir ? (avec des chiffres) <span class="req">*</span>','ex. 60 personnes sensibilisées, dont 30 femmes ; 3 listes de présence signées',2)}
+  <fieldset class="trL"><legend>Ce qu'il me faut</legend><div class="tdrsB">${B.map(b=>tdrsLigne(b)).join('')}</div>
+   <button type="button" class="btn ghost sm" data-act="iaTdrB">+ une ligne</button><textarea name="budget" hidden>${esc((t.budget||[]).map(b=>`${b.libelle} ; ${b.quantite} ; ${b.unite||''} ; ${b.cout}`).join('\n'))}</textarea></fieldset>
+  <div class="trL row"><button class="btn ghost" type="submit" value="brouillon">Enregistrer</button><button class="btn" type="submit" value="soumettre">Envoyer à mon superviseur</button></div></form>`}
+const tdrsLigne=(b={})=>`<div class="tdrsL"><input data-b="libelle" placeholder="Quoi ? (ex. carburant moto)" value="${esc(b.libelle||'')}" aria-label="Quoi"><input data-b="quantite" type="number" min="0" placeholder="Combien ?" value="${b.quantite??''}" aria-label="Combien"><input data-b="cout" type="number" min="0" placeholder="Prix de l'unité (FCFA)" value="${b.cout??''}" aria-label="Prix de l'unité"></div>`;
+function tdrsSync(f){const L=[...f.querySelectorAll('.tdrsL')].map(r=>{const q=k=>r.querySelector(`[data-b="${k}"]`).value.trim();return q('libelle')?`${q('libelle')} ; ${q('quantite')||1} ; unité ; ${q('cout')||0}`:''}).filter(Boolean);f.elements.budget.value=L.join('\n')}
+function omFormSimple(t){if(!p07)return '';const caches={type_mission:t.type_mission||'Activité de terrain',projet:t.projet_id||'',activite:t.activite_id||'',ligne:t.ligne_id||'',agent:t.auteur_id||me.id,tdr:[t.objectif_general,t.objectifs_specifiques].filter(Boolean).join('\n')||t.titre||'',resultats:[t.resultats,t.livrables].filter(Boolean).join('\n'),securite:OM_SECU,hebergement:OM_HEB[0],autres_frais:0};
+ return `<form data-form="mdMission" class="grid trForm" style="margin-top:.6rem"><input type="hidden" name="tdr_id" value="${t.id}">${Object.entries(caches).map(([k,v])=>`<input type="hidden" name="${k}" value="${esc(v)}">`).join('')}
+  <p class="note trL">Votre TDR est validé. Vérifiez ces quelques informations : l'ordre de mission part ensuite à la signature.</p>
+  <div class="trL"><label>Objet de la mission</label><input name="objet" required value="${esc(t.titre||'')}"></div>
+  <div><label>Où ?</label><input name="destination" required value="${esc(t.destination||'')}"></div><div><label>Départ</label><input name="date_depart" type="date" required value="${t.date_debut||''}"></div><div><label>Retour</label><input name="date_retour" type="date" required value="${t.date_fin||''}"></div>
+  <div><label>Moyen de transport</label><select name="transport">${opts(OM_TRANSP.map(x=>[x,x]),'Moto de service')}</select></div>
+  ${S.baremes.length?`<div><label>Per diem</label><select name="bareme">${opts(S.baremes.map(b=>[`${b.categorie}|${b.zone}`,`${b.categorie} · ${b.zone} · ${num(b.per_diem)}/jour`]),'','— choisir —')}</select></div>`:`<div><label>Per diem par jour (FCFA)</label><input name="per_diem" type="number" min="0"></div>`}
+  <div><label>Frais de transport (FCFA)</label><input name="frais_transport" type="number" min="0" value="0"></div>
+  <div class="trL"><label>Qui appeler en cas de problème ? (nom et téléphone)</label><input name="urgence" required placeholder="ex. KONE Ali, superviseur, 07 00 00 00 00"></div>
+  <details class="trL"><summary>Plus de détails (facultatif) : étapes du voyage, personnes à rencontrer</summary><div class="grid" style="margin-top:.6rem">
+   <div class="trL"><label>Étapes : une par ligne, « date ; heure ; de ; à ; moyen »</label><textarea name="itineraire" rows="2"></textarea></div>
+   <div class="trL"><label>Personnes ou structures à rencontrer : « structure ; localité ; contact »</label><textarea name="accueil" rows="2"></textarea></div></div></details>
+  <div class="trL"><button class="btn" type="submit">Envoyer pour signature</button></div></form>`}
+const mpLigne=(l={},p)=>`<div class="mpL"><input type="date" data-m="date" value="${l.date||''}" min="${moisD(TR.mois)}" max="${finMois(TR.mois)}" aria-label="Date"><input data-m="localite" list="trMpLoc" value="${esc(l.localite||'')}" placeholder="Localité" aria-label="Localité"><input data-m="activite" list="trMpAct" value="${esc(l.activite||'')}" placeholder="Activité" aria-label="Activité"><input data-m="cible" type="number" min="0" inputmode="numeric" value="${l.cible??''}" placeholder="Personnes" aria-label="Personnes visées"><button type="button" class="btn ghost sm" data-act="iaMpDel" aria-label="Retirer">×</button></div>`;
+function mpSync(f){f.elements.lignes.value=[...f.querySelectorAll('.mpL')].map(r=>{const q=k=>r.querySelector(`[data-m="${k}"]`).value.trim();return q('date')?[q('date').split('-').reverse().join('/'),q('localite'),q('activite'),q('cible')||0].join(' ; '):''}).filter(Boolean).join('\n')}
+function mpEditeur(p,mp){const L=mp?(mp.lignes||[]):[{},{},{}],locs=[...new Set(trFiches(p).map(x=>x.localite).concat(L.map(l=>l.localite)).filter(Boolean))],acts=trOutils(p).filter(o=>o.actif).map(o=>o.titre);
+ return `<form data-form="terMp" data-id="${mp?mp.id:''}" class="mpF" style="margin-top:.8rem"><p><b>Mes activités prévues</b> <span class="muted">(une ligne par activité)</span></p>
+  ${iaOK()?`<div class="iaRac" style="margin-bottom:.8rem"><label for="mpRecit">Ou dites votre plan du mois, Claude remplit les lignes :</label><textarea id="mpRecit" rows="3" placeholder="Ex. : Le 5 novembre causerie à Nafana pour 25 personnes, le 12 porte-à-porte à Kong pour 40 personnes…"></textarea><div class="row iaRow">${dictBtn('mpRecit','Parler')}<button type="button" class="btn sm iaB" data-act="iaMicroplan">${ico('etoile')} Remplir avec Claude</button></div></div>`:''}
+  <div class="mpEnt" aria-hidden="true"><span>Date</span><span>Localité</span><span>Activité</span><span>Personnes</span><span></span></div><div class="mpLs">${L.map(l=>mpLigne(l,p)).join('')}</div>
+  <datalist id="trMpLoc">${locs.map(l=>`<option value="${esc(l)}">`).join('')}</datalist><datalist id="trMpAct">${acts.map(a=>`<option value="${esc(a)}">`).join('')}</datalist>
+  <textarea name="lignes" hidden>${esc(L.filter(l=>l.date).map(l=>[l.date.split('-').reverse().join('/'),l.localite,l.activite,l.cible??0].join(' ; ')).join('\n'))}</textarea><div class="row" style="margin-top:.5rem"><button type="button" class="btn ghost sm" data-act="iaMpAdd">+ une activité</button><button class="btn" type="submit">${mp?'Renvoyer au superviseur':'Envoyer au superviseur'}</button></div></form>`}
+
+/* ---------- aide à la rédaction des rapports mensuels ---------- */
+function iaNotesRapport(p,niv){const F=trFiches(p).filter(x=>moisDe(x.date_activite)===TR.mois&&x.statut!=='rejetee'&&!x.confidentiel),RT=(S.rterrain||[]).filter(r=>r.projet_id===p.id&&moisDe(r.mois)===TR.mois);
+ const txtF=x=>{const o=trOutil(x.outil_id)||{champs:[]},d=x.donnees||{};return `${x.date_activite} · ${x.localite} · ${o.titre} · ${x.nb_total} personnes (${x.nb_f} F, ${x.nb_h} H)`+[d._recit,...o.champs.filter(c=>c.type==='long').map(c=>d[c.id])].filter(Boolean).map(s=>' · '+String(s).slice(0,600)).join('')};
+ if(niv==='agent')return F.filter(x=>x.agent_id===me.id).map(txtF);
+ const ags=trAgents(p).filter(u=>niv==='projet'||trVerifie(p,u.id)).map(u=>u.id);
+ const rap=RT.filter(r=>r.niveau!=='projet'&&(niv==='projet'||ags.includes(r.auteur_id))).map(r=>`Rapport ${r.niveau} de ${who(r.auteur_id)} : `+['faits','difficultes','alertes','besoins','recommandations'].filter(k=>r[k]).map(k=>`${k} : ${r[k]}`).join(' · '));
+ return rap.concat(F.filter(x=>niv==='projet'||ags.includes(x.agent_id)).slice(0,60).map(txtF))}
+function iaChiffres(d){if(!d)return {};const {age,vuln,...r}=d;return {...r,age_sexe:age,vulnerabilites:vuln}}
+
+/* ---------- journal d'activités et comptes rendus ---------- */
+const JO_T={reunion:'Réunion',atelier:'Atelier',visite:'Visite',mission:'Mission',formation:'Formation',activite:'Activité',autre:'Autre'};
+const JO_P={prive:'Moi seul(e)',direction:'Ma hiérarchie et la direction',projet:'L\'équipe du projet'};
+const CAP_T={capitalisation:'Document de capitalisation',redevabilite:'Rapport de redevabilité',durabilite:'Note de durabilité et de pérennité',apprentissage:'Document d\'apprentissage (leçons apprises)',bonnes_pratiques:'Fiche de bonnes pratiques'};
+const capPeut=()=>['DE','DP','CP','SE'].includes(me.role);
+function svJournal(){if(!p13)return head('Journal et comptes rendus','')+'<p class="note">Exécutez le script 13 dans Supabase pour activer le journal, les comptes rendus et l\'assistant Claude.</p>';
+ if(JR.user!==me.id)Object.assign(JR,{user:me.id,tab:'liste',sel:null,edit:null,pvEdit:false,capSel:null,capEdit:false,filtre:'moi'});
+ if(JR.edit)return joEditeur(JR.edit==='new'?null:S.journal.find(j=>j.id===JR.edit));
+ if(JR.sel&&S.journal.some(j=>j.id===JR.sel))return joDetail(S.journal.find(j=>j.id===JR.sel));
+ if(JR.capSel&&(S.capis||[]).some(c=>c.id===JR.capSel))return capDetail(S.capis.find(c=>c.id===JR.capSel));
+ const tabs=[['liste','Journal'],...(capPeut()||me.role==='CA'?[['capi','Capitalisation et redevabilité']]:[]),...(me.role==='DE'?[['assistant','Assistant Claude']]:[])];
+ if(!tabs.some(t=>t[0]===JR.tab))JR.tab='liste';
+ return head('Journal et comptes rendus','Consignez chaque réunion, atelier, visite ou mission : dictez pendant l\'activité ou résumez après. Claude rédige le compte rendu ; vous le relisez et le validez. Ce journal nourrit la capitalisation, la redevabilité et l\'apprentissage de l\'organisation.')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
+ `<nav class="subnav">${tabs.map(([k,l])=>`<button data-act="joTab" data-v="${k}" ${JR.tab===k?'aria-current="page"':''}>${l}</button>`).join('')}</nav>`+({liste:joListe,capi:capListe,assistant:iaReglagesVue}[JR.tab])()}
+function joListe(){let L=S.journal.slice();if(JR.filtre==='moi')L=L.filter(j=>j.auteur_id===me.id);L.sort((a,b)=>a.date_evt<b.date_evt?1:-1);
+ const tous=S.journal.some(j=>j.auteur_id!==me.id);
+ return `<section class="card"><div class="row" style="justify-content:space-between;margin-bottom:.8rem"><button class="btn" data-act="joNouveau">${ico('mic')} Nouvelle réunion ou activité</button>${tous?`<div class="row"><label class="trChk"><input type="radio" name="joF" data-jo="moi" ${JR.filtre==='moi'?'checked':''}> Mon journal</label><label class="trChk"><input type="radio" name="joF" data-jo="tous" ${JR.filtre==='tous'?'checked':''}> Tout ce que je peux voir</label></div>`:''}</div>
+ ${svT(['Date','Type','Objet','Lieu','Par','Compte rendu',''],L.map(j=>[fmtD(j.date_evt),esc(JO_T[j.type]||j.type),`<b>${esc(j.titre)}</b>${j.projet_id&&projet(j.projet_id)?`<br><span class="muted">${esc(libProj(projet(j.projet_id)))}</span>`:''}`,esc(j.lieu||''),esc(who(j.auteur_id)),
+  j.statut==='valide'?tag(['validé','ok']):j.pv?tag(['à relire','warn']):tag(['notes seulement','']),`<button class="btn ghost sm" data-act="joVoir" data-id="${j.id}">Ouvrir</button>`]),'Aucune entrée. Commencez par votre prochaine réunion : ouvrez une entrée et lancez l\'enregistrement.')}</section>`}
+function joEditeur(j){j=j||{};const proj=S.projets.filter(p=>!['archive','rejete'].includes(p.statut));
+ return `<p><button class="lnk" data-act="joFermer">← Journal</button></p>`+head(j.id?'Modifier l\'entrée':'Nouvelle réunion ou activité','Pendant la réunion, posez le téléphone ou l\'ordinateur devant vous et lancez l\'enregistrement : la parole est transcrite au fil de l\'eau. À la fin, Claude rédige le compte rendu.')+
+ `<form data-form="joForm" data-id="${j.id||''}" class="card grid trForm">
+  <div><label>Type</label><select name="type">${opts(Object.entries(JO_T),j.type||'reunion')}</select></div>
+  <div class="trL2"><label>Objet <span class="req">*</span></label><input name="titre" required value="${esc(j.titre||'')}" placeholder="ex. Réunion de coordination à la Direction départementale de la santé"></div>
+  <div><label>Date</label><input name="date_evt" type="date" required value="${j.date_evt||today()}"></div><div><label>Lieu</label><input name="lieu" value="${esc(j.lieu||'')}"></div>
+  <div><label>Projet concerné</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),j.projet_id||'','— aucun —')}</select></div>
+  <div class="trL"><label for="jo_part">Participants (noms, fonctions, structures)</label><textarea id="jo_part" name="participants" rows="2">${esc(j.participants||'')}</textarea></div>
+  <div class="trL joRec"><label for="jo_tr">Enregistrement de la réunion (transcription)</label><div class="row iaRow">${SR?`<button type="button" class="btn dictBtn joBig" data-act="dicter" data-cible="jo_tr" aria-pressed="false">${ico('mic')} <span>Démarrer l'enregistrement</span></button><span class="dictLive" data-live="jo_tr" aria-live="polite"></span>`:''}</div>${dictAide()}
+   <textarea id="jo_tr" name="transcription" rows="10" placeholder="La transcription s'écrit ici pendant que l'on parle. Vous pouvez aussi coller ou taper vos notes.">${esc(j.transcription||'')}</textarea>
+   <small class="muted">L'écran reste allumé pendant l'enregistrement. La dictée a besoin d'Internet ; elle comprend le français. Relisez les noms propres.</small></div>
+  <div class="trL"><label for="jo_notes">Mes notes (décisions, chiffres, points à retenir)</label><textarea id="jo_notes" name="notes" rows="4">${esc(j.notes||'')}</textarea>${dictBtn('jo_notes')}</div>
+  <div><label>Qui peut lire ?</label><select name="partage">${opts(Object.entries(JO_P),j.partage||'direction')}</select></div>
+  <div class="trL"><label class="trChk"><input type="checkbox" name="confidentiel" ${j.confidentiel?'checked':''}> Confidentiel : seul le Directeur exécutif pourra le lire, une fois validé</label></div>
+  <div class="trL row"><button class="btn ghost" type="submit" value="brouillon">Enregistrer</button>${iaOK()?`<button class="btn iaB" type="submit" value="pv">${ico('etoile')} Enregistrer et rédiger le compte rendu avec Claude</button>`:''}</div></form>`}
+function joDetail(j){const a=j.auteur_id===me.id,pv=j.pv;
+ return `<p><button class="lnk" data-act="joFermer">← Journal</button></p>${srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:''}<div class="head"><h1>${esc(j.titre)}</h1><p>${esc(JO_T[j.type])} · ${fmtD(j.date_evt)}${j.lieu?' · '+esc(j.lieu):''} · ${esc(who(j.auteur_id))}${j.projet_id&&projet(j.projet_id)?' · '+esc(libProj(projet(j.projet_id))):''}</p></div>
+ <div class="row" style="margin-bottom:1rem">${j.statut==='valide'?tag(['Compte rendu validé','ok']):tag(['Brouillon','warn'])}${j.confidentiel?tag(['Confidentiel','bad']):''}<span class="muted">Lecture : ${esc(JO_P[j.partage])}</span></div>
+ ${a?`<div class="row" style="margin-bottom:1rem"><button class="btn ghost sm" data-act="joModif" data-id="${j.id}">Modifier les notes</button>${iaOK()?`<button class="btn sm iaB" data-act="joPv" data-id="${j.id}">${ico('etoile')} ${pv?'Refaire':'Rédiger'} le compte rendu avec Claude</button>`:''}${pv&&!JR.pvEdit?`<button class="btn ghost sm" data-act="joPvEdit">Corriger le compte rendu</button>`:''}${pv&&j.statut!=='valide'?`<button class="btn sm" data-act="joValider" data-id="${j.id}">Valider le compte rendu</button>`:''}${j.statut!=='valide'?`<button class="btn danger sm" data-act="joSuppr" data-id="${j.id}">Supprimer</button>`:''}</div>`:''}
+ ${pv?(JR.pvEdit&&a?pvEditeur(j):`<article class="card pvDoc">${pvHTML(pv)}</article><p><button class="btn ghost sm" data-act="joImp" data-id="${j.id}">Imprimer ou télécharger en Word</button></p>`):`<p class="note">Pas encore de compte rendu.${a&&iaOK()?' Cliquez sur « Rédiger le compte rendu avec Claude ».':''}</p>`}
+ ${j.participants?`<section class="card"><h3>Participants</h3><p class="pre">${esc(j.participants)}</p></section>`:''}
+ ${j.notes?`<section class="card"><h3>Notes</h3><p class="pre">${esc(j.notes)}</p></section>`:''}
+ ${j.transcription?`<details class="card"><summary><b>Transcription</b> <span class="muted">(${num(j.transcription.split(/\s+/).length)} mots)</span></summary><p class="pre" style="margin-top:.6rem">${esc(j.transcription)}</p></details>`:''}`}
+const L2=v=>(Array.isArray(v)?v:[]).filter(Boolean);
+function pvHTML(pv,papier){const H=papier?'h2':'h3',ul=L=>L.length?`<ul>${L.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'';let n=0;const T=t=>`<${H}>${++n}. ${t}</${H}>`;
+ const part=L2(pv.participants);
+ return `${pv.resume?`<p><b>En bref :</b> ${esc(pv.resume)}</p>`:''}
+ ${pv.contexte?T('Contexte et objet')+`<p class="pre">${esc(pv.contexte)}</p>`:''}
+ ${part.length?T('Participants')+`<table class="${papier?'':'trKv'}"><thead><tr><th>Nom</th><th>Fonction</th><th>Structure</th></tr></thead><tbody>${part.map(x=>`<tr><td>${esc(x.nom||'')}</td><td>${esc(x.fonction||'')}</td><td>${esc(x.structure||'')}</td></tr>`).join('')}</tbody></table>`:''}
+ ${L2(pv.ordre_du_jour).length?T('Ordre du jour')+ul(L2(pv.ordre_du_jour)):''}
+ ${L2(pv.points).length?T('Déroulement et points discutés')+L2(pv.points).map(x=>`<p><b>${esc(x.titre||'')}</b><br>${esc(x.synthese||'')}</p>`).join(''):''}
+ ${L2(pv.decisions).length?T('Décisions')+ul(L2(pv.decisions)):''}
+ ${L2(pv.actions).length?T('Actions à suivre')+`<table class="${papier?'':'trKv'}"><thead><tr><th>Action</th><th>Responsable</th><th>Échéance</th></tr></thead><tbody>${L2(pv.actions).map(x=>`<tr><td>${esc(x.action||'')}</td><td>${esc(x.responsable||'')}</td><td>${esc(x.echeance||'')}</td></tr>`).join('')}</tbody></table>`:''}
+ ${L2(pv.engagements_osv).length?T('Engagements d\'OSV')+ul(L2(pv.engagements_osv)):''}
+ ${L2(pv.redevabilite).length?T('Redevabilité')+ul(L2(pv.redevabilite)):''}
+ ${L2(pv.lecons).length||L2(pv.bonnes_pratiques).length?T('Leçons apprises et bonnes pratiques')+ul(L2(pv.lecons))+ul(L2(pv.bonnes_pratiques).map(x=>'Bonne pratique : '+x)):''}
+ ${pv.suite?T('Suite à donner')+`<p class="pre">${esc(pv.suite)}</p>`:''}`}
+function pvEditeur(j){const pv=j.pv||{},Lg=(k)=>L2(pv[k]).join('\n'),A=(k,l,v,r=3)=>`<div class="trL"><label for="pv_${k}">${l}</label><textarea id="pv_${k}" name="${k}" rows="${r}">${esc(v)}</textarea></div>`;
+ return `<form data-form="joPvForm" data-id="${j.id}" class="card grid trForm"><p class="muted trL">Une ligne par élément. Pour les tableaux, séparez les colonnes par « ; ».</p>
+ ${A('resume','En bref',pv.resume||'',2)}${A('contexte','Contexte et objet',pv.contexte||'')}${A('participants','Participants : « nom ; fonction ; structure »',L2(pv.participants).map(x=>[x.nom,x.fonction,x.structure].join(' ; ')).join('\n'))}
+ ${A('ordre_du_jour','Ordre du jour',Lg('ordre_du_jour'))}${A('points','Points discutés : « titre ; synthèse »',L2(pv.points).map(x=>[x.titre,x.synthese].join(' ; ')).join('\n'),6)}${A('decisions','Décisions',Lg('decisions'))}
+ ${A('actions','Actions à suivre : « action ; responsable ; échéance »',L2(pv.actions).map(x=>[x.action,x.responsable,x.echeance].join(' ; ')).join('\n'))}${A('engagements_osv','Engagements d\'OSV',Lg('engagements_osv'))}${A('redevabilite','Redevabilité',Lg('redevabilite'))}
+ ${A('lecons','Leçons apprises',Lg('lecons'))}${A('bonnes_pratiques','Bonnes pratiques',Lg('bonnes_pratiques'))}${A('suite','Suite à donner',pv.suite||'',2)}
+ <div class="trL row"><button class="btn" type="submit">Enregistrer les corrections</button><button class="btn ghost" type="button" data-act="joPvAnnul">Annuler</button></div></form>`}
+function joImprimer(j){const corps=`<h1 class="doc-t">${j.type==='reunion'?'COMPTE RENDU DE RÉUNION':'COMPTE RENDU'}</h1><p class="doc-s">${esc(j.titre)}</p>
+ <table class="kv"><tr><th>Date</th><td>${fmtD(j.date_evt)}</td></tr>${j.lieu?`<tr><th>Lieu</th><td>${esc(j.lieu)}</td></tr>`:''}${j.projet_id&&projet(j.projet_id)?`<tr><th>Projet</th><td>${esc(libProj(projet(j.projet_id)))}</td></tr>`:''}<tr><th>Rédigé par</th><td>${esc(who(j.auteur_id))}</td></tr></table>
+ ${pvHTML(j.pv||{},true)}<div class="bloc"><div class="sig" style="--n:2"><div><b>Rédigé par</b>${esc(who(j.auteur_id))}</div><div><b>${j.statut==='valide'?'Validé le':'Statut'}</b>${j.statut==='valide'?fmtD(j.valide_le):'brouillon'}</div></div></div>`;
+ ouvrirPapier('Compte rendu – '+j.titre,corps,{nom:`Compte_rendu_${j.date_evt}_${trSlug(j.titre)}`,ref:`<b>${fmtD(j.date_evt)}</b><br>${esc(JO_T[j.type])}`,filigrane:j.statut==='valide'?null:'BROUILLON'})}
+
+/* ---------- capitalisation, redevabilité, durabilité, apprentissage ---------- */
+function capListe(){const L=(S.capis||[]).slice(),proj=S.projets.filter(p=>!['rejete'].includes(p.statut)&&(['DE','DP'].includes(me.role)||trEmploye(p)));
+ const a=new Date();a.setMonth(a.getMonth()-6);
+ return (capPeut()&&iaOK()?`<section class="card iaRac"><h3>${ico('etoile')} Préparer un document avec Claude</h3><p class="muted">Claude s'appuie uniquement sur ce qui est validé dans l'application : comptes rendus du journal, rapports mensuels de collecte, indicateurs, TDR et missions de la période. Plus le journal est tenu, plus le document est riche. Relisez, complétez, puis faites valider par le DE ou le DP.</p>
+ <form data-form="capForm" class="grid" style="align-items:end"><div class="trL2"><label>Document</label><select name="type">${opts(Object.entries(CAP_T),'capitalisation')}</select></div>
+  <div class="trL2"><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),'',['DE','DP'].includes(me.role)?'— toute l\'organisation —':undefined)}</select></div>
+  <div><label>Du</label><input name="debut" type="date" value="${a.toISOString().slice(0,10)}" required></div><div><label>Au</label><input name="fin" type="date" value="${today()}" required></div>
+  <div class="trL"><label>Ce que vous voulez mettre en avant (facultatif)</label><textarea id="cap_note" name="note" rows="2"></textarea>${dictBtn('cap_note')}</div>
+  <div class="trL"><button class="btn iaB" type="submit">${ico('etoile')} Rédiger avec Claude</button></div></form></section>`:'')+
+ `<section class="card"><h3>Documents (${L.length})</h3>${svT(['Document','Projet','Période','Statut','Par',''],L.map(c=>[`<b>${esc(c.titre)}</b><br><span class="muted">${esc(CAP_T[c.type])}</span>`,c.projet_id&&projet(c.projet_id)?esc(libProj(projet(c.projet_id))):'Organisation',`${fmtD(c.periode_debut)} → ${fmtD(c.periode_fin)}`,c.statut==='valide'?tag(['validé','ok']):tag(['brouillon','warn']),esc(who(c.auteur_id)),`<button class="btn ghost sm" data-act="capVoir" data-id="${c.id}">Ouvrir</button>`]),'Aucun document pour le moment.')}</section>`}
+function capSources(pid,d1,d2){const dans=d=>d&&d>=d1&&d<=d2,P=pid?[projet(pid)].filter(Boolean):S.projets.filter(p=>!['rejete'].includes(p.statut));
+ const J=S.journal.filter(j=>j.statut==='valide'&&!j.confidentiel&&dans(j.date_evt)&&(!pid||j.projet_id===pid)).slice(0,120).map(j=>({date:j.date_evt,type:JO_T[j.type],objet:j.titre,lieu:j.lieu,
+  ...(j.pv?{resume:j.pv.resume,decisions:j.pv.decisions,actions:j.pv.actions,engagements:j.pv.engagements_osv,lecons:j.pv.lecons,bonnes_pratiques:j.pv.bonnes_pratiques,redevabilite:j.pv.redevabilite}:{notes:String(j.notes||j.transcription||'').slice(0,2500)})}));
+ const R=(S.rterrain||[]).filter(r=>r.niveau==='projet'&&r.statut==='valide'&&(!pid||r.projet_id===pid)&&moisDe(r.mois)>=d1.slice(0,7)&&moisDe(r.mois)<=d2.slice(0,7)).map(r=>({projet:(projet(r.projet_id)||{}).nom,mois:moisDe(r.mois),chiffres:iaChiffres({fiches:r.donnees.fiches,total:r.donnees.total,f:r.donnees.f,h:r.donnees.h,handicap:r.donnees.handicap,references:r.donnees.references,completude:r.donnees.completude,localites:(r.donnees.localites||[]).slice(0,10)}),faits:r.faits,difficultes:r.difficultes,alertes:r.alertes,besoins:r.besoins,recommandations:r.recommandations}));
+ const FV=(S.fterrain||[]).filter(f=>f.statut==='validee'&&dans(f.date_activite)&&(!pid||f.projet_id===pid)),A=trAgreger(FV);
+ const I=(S.inds||[]).filter(i=>P.some(p=>p&&p.id===i.projet_id)).map(i=>{const M=(S.mesures||[]).filter(m=>m.indicateur_id===i.id&&m.statut==='validee').sort((a,b)=>a.periode_fin<b.periode_fin?-1:1);return {indicateur:i.libelle,unite:i.unite,reference:i.baseline,cible:i.cible,mesures_validees:M.map(m=>({au:m.periode_fin,valeur:Number(m.valeur),femmes:m.valeur_f,hommes:m.valeur_h}))}});
+ const T=(S.tdrs||[]).filter(t=>t.statut==='valide'&&dans(t.date_debut)&&(!pid||t.projet_id===pid)).map(t=>({titre:t.titre,lieu:t.destination,du:t.date_debut,au:t.date_fin,resultats_attendus:String(t.resultats||'').slice(0,500)}));
+ return {projets:P.map(p=>({nom:p.nom,code:p.code,zone:p.zone,bailleur:p.bailleur,debut:p.debut,fin:p.fin,statut:(PSTAT[p.statut]||[p.statut])[0]})),
+  activites_terrain_validees:{fiches:A.n,personnes:A.total,femmes:A.f,hommes:A.h,handicap:A.hand,par_localite:Object.entries(A.loc).slice(0,15).map(([k,v])=>({localite:k,personnes:v.total})),age_sexe:A.age},
+  rapports_mensuels_valides:R,journal_valide:J,indicateurs:I,missions_tdr_valides:T}}
+function capDetail(c){const s=(c.contenu&&c.contenu.sections)||[],a=c.auteur_id===me.id,val=['DE','DP'].includes(me.role)&&c.statut!=='valide';
+ return `<p><button class="lnk" data-act="capFermer">← Capitalisation</button></p>${srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:''}<div class="head"><h1>${esc(c.titre)}</h1><p>${esc(CAP_T[c.type])} · ${c.projet_id&&projet(c.projet_id)?esc(libProj(projet(c.projet_id))):'Organisation'} · du ${fmtD(c.periode_debut)} au ${fmtD(c.periode_fin)}</p></div>
+ <div class="row" style="margin-bottom:1rem">${c.statut==='valide'?tag(['Validé par '+who(c.valide_par),'ok']):tag(['Brouillon à relire','warn'])}${c.statut!=='valide'&&a&&!JR.capEdit?'<button class="btn ghost sm" data-act="capEdit">Corriger</button>':''}${val?`<button class="btn sm" data-act="capValider" data-id="${c.id}">Valider le document</button>`:''}<button class="btn ghost sm" data-act="capImp" data-id="${c.id}">Imprimer ou télécharger en Word</button>${a&&c.statut!=='valide'?`<button class="btn danger sm" data-act="capSuppr" data-id="${c.id}">Supprimer</button>`:''}</div>
+ ${JR.capEdit&&a?`<form data-form="capEditForm" data-id="${c.id}" class="card grid trForm"><div class="trL"><label>Titre</label><input name="titre" value="${esc(c.titre)}"></div>${s.map((x,i)=>`<div class="trL"><label for="cs_${i}">${esc(x.titre)}</label><input type="hidden" name="t_${i}" value="${esc(x.titre)}"><textarea id="cs_${i}" name="c_${i}" rows="8">${esc(x.contenu)}</textarea>${dictBtn('cs_'+i)}</div>`).join('')}<div class="trL row"><button class="btn" type="submit">Enregistrer</button><button class="btn ghost" type="button" data-act="capEditAnnul">Annuler</button></div></form>`
+  :`<article class="card pvDoc">${s.map((x,i)=>`<h3>${i+1}. ${esc(x.titre)}</h3>${String(x.contenu||'').split(/\n{2,}/).map(p=>`<p class="pre">${esc(p)}</p>`).join('')}`).join('')}</article>`}
+ ${(c.sources||{}).resume?`<p class="muted">Sources utilisées : ${esc(c.sources.resume)}.</p>`:''}`}
+function capImprimer(c){const s=(c.contenu&&c.contenu.sections)||[],corps=`<h1 class="doc-t">${esc(c.titre.toUpperCase())}</h1><p class="doc-s">${esc(CAP_T[c.type])}<br>${c.projet_id&&projet(c.projet_id)?esc(libProj(projet(c.projet_id))):'ONG Sécurité Vie'} · du ${fmtD(c.periode_debut)} au ${fmtD(c.periode_fin)}</p>
+ ${s.map((x,i)=>`<h2>${i+1}. ${esc(x.titre)}</h2>${String(x.contenu||'').split(/\n{2,}/).map(p=>`<p class="pre">${esc(p)}</p>`).join('')}`).join('')}
+ <p class="petit">Document préparé à partir des données validées dans OSV Gestion${(c.sources||{}).resume?' ('+esc(c.sources.resume)+')':''}, rédigé avec l'assistant Claude puis relu${c.statut==='valide'?' et validé par '+esc(who(c.valide_par))+' le '+fmtD(c.valide_le):''}.</p>`;
+ ouvrirPapier(c.titre,corps,{nom:`${trSlug(CAP_T[c.type])}_${c.periode_fin||''}`,ref:`<b>${esc(CAP_T[c.type])}</b><br>${fmtD(c.periode_fin)}`,filigrane:c.statut==='valide'?null:'PROJET'})}
+function iaReglagesVue(){const g=S.iaReg||{actif:true,quota_jour:40,quota_org_jour:600},U=S.iaUsage||[],j=today(),m=today().slice(0,7);
+ const uj=U.filter(u=>u.le.slice(0,10)===j),um=U.filter(u=>u.le.slice(0,7)===m),tk=L=>somme(L,u=>u.tokens_in)+somme(L,u=>u.tokens_out);
+ const parT={};um.forEach(u=>parT[u.tache]=(parT[u.tache]||0)+1);const parU={};um.forEach(u=>parU[u.user_id]=(parU[u.user_id]||0)+1);
+ return `<section class="card"><h3>Réglages de l'assistant Claude</h3><p class="muted">La clé de l'API est rangée sur le serveur (secrets Supabase), jamais dans l'application. Vous pouvez suspendre l'assistant à tout moment et limiter le nombre de demandes, pour maîtriser la facture.</p>
+ <form data-form="iaReg" class="grid" style="align-items:end"><div><label class="trChk"><input type="checkbox" name="actif" ${g.actif!==false?'checked':''}> Assistant activé</label></div><div><label>Demandes par personne et par jour</label><input name="quota_jour" type="number" min="0" max="1000" value="${g.quota_jour}"></div><div><label>Demandes par jour pour toute l'organisation</label><input name="quota_org_jour" type="number" min="0" max="20000" value="${g.quota_org_jour}"></div><div><button class="btn" type="submit">Enregistrer</button></div></form></section>
+ <div class="kpis"><div class="kpi"><b>${num(uj.length)}</b><span>demandes aujourd'hui</span></div><div class="kpi"><b>${num(um.length)}</b><span>demandes ce mois</span></div><div class="kpi"><b>${num(Math.round(tk(um)/1000))} k</b><span>jetons ce mois (entrée + sortie)</span></div><div class="kpi"><b>${num(um.filter(u=>u.statut==='erreur').length)}</b><span>échecs ce mois</span></div></div>
+ <section class="card"><h3>Utilisation du mois</h3>${trBarres(Object.entries(parT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[{fiche:'Fiches remplies à partir d\'un récit',tdr:'TDR rédigés',microplan:'Microplans',rapport:'Rapports mensuels',pv:'Comptes rendus',capitalisation:'Capitalisation et redevabilité',ameliorer:'Améliorations de texte'}[k]||k,v]))||'<p class="empty">Aucune demande ce mois.</p>'}
+ ${Object.keys(parU).length?`<h4>Par personne</h4>${trBarres(Object.entries(parU).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>[who(k),v]))}`:''}
+ <p class="muted">Le coût dépend du nombre de jetons et du modèle choisi ; consultez la page des tarifs de Claude et votre console Anthropic pour la facture réelle.</p></section>`}
+
+/* ---------- formulaires ---------- */
+document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target,t=f.dataset&&f.dataset.form;if(!['joForm','joPvForm','capForm','capEditForm','iaReg'].includes(t))return;e.preventDefault();e.stopImmediatePropagation();srvMsg='';dictStop();
+ const d=Object.fromEntries(new FormData(f).entries()),sub=e.submitter&&e.submitter.value;
+ if(t==='joForm'){const id=f.dataset.id||uuid(),rec={type:d.type,titre:String(d.titre||'').trim(),date_evt:d.date_evt,lieu:(d.lieu||'').trim()||null,projet_id:d.projet||null,participants:(d.participants||'').trim()||null,transcription:(d.transcription||'').trim()||null,notes:(d.notes||'').trim()||null,partage:d.partage,confidentiel:!!d.confidentiel};
+  if(!rec.titre){alert('Indiquez l\'objet.');return}
+  if(sub==='pv'&&!rec.transcription&&!rec.notes){alert('Il n\'y a encore ni transcription ni notes : enregistrez la réunion ou écrivez vos notes.');return}
+  const nouveau=!f.dataset.id;
+  iaAvec(e.submitter,async()=>{if(nouveau)await ins('journal',{id,org_id:S.org.id,...rec});else await upd('journal',`id=eq.${id}`,rec);
+   if(sub==='pv'){const pv=await iaAppel('pv',{type:JO_T[rec.type],titre:rec.titre,date:rec.date_evt,lieu:rec.lieu,participants:rec.participants,notes:rec.notes,transcription:rec.transcription});await upd('journal',`id=eq.${id}`,{pv})}
+   await srvLoad();JR.edit=null;JR.sel=id;JR.pvEdit=false;srvMsg=sub==='pv'?'Compte rendu rédigé par Claude : relisez-le, corrigez-le si besoin, puis validez-le.':'Entrée enregistrée.';render();scrollTo(0,0)});return}
+ if(t==='joPvForm'){const Lg=k=>String(d[k]||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean),C=k=>Lg(k).map(l=>l.split(';').map(x=>x.trim()));
+  const pv={resume:(d.resume||'').trim(),contexte:(d.contexte||'').trim(),participants:C('participants').map(([nom,fonction,structure])=>({nom,fonction:fonction||'',structure:structure||''})),ordre_du_jour:Lg('ordre_du_jour'),points:C('points').map(([titre,...r])=>({titre,synthese:r.join(' ; ')})),decisions:Lg('decisions'),
+   actions:C('actions').map(([action,responsable,echeance])=>({action,responsable:responsable||'',echeance:echeance||''})),engagements_osv:Lg('engagements_osv'),redevabilite:Lg('redevabilite'),lecons:Lg('lecons'),bonnes_pratiques:Lg('bonnes_pratiques'),suite:(d.suite||'').trim()};
+  action(async()=>{await upd('journal',`id=eq.${f.dataset.id}`,{pv});JR.pvEdit=false},'Compte rendu corrigé.');return}
+ if(t==='capForm'){if(d.fin<d.debut){alert('La fin de la période précède son début.');return}const src=capSources(d.projet||null,d.debut,d.fin);
+  const n=src.journal_valide.length+src.rapports_mensuels_valides.length+src.activites_terrain_validees.fiches+src.missions_tdr_valides.length;
+  if(!n&&!confirm('Aucune donnée validée sur cette période (journal, rapports, fiches, TDR). Le document sera très incomplet. Continuer ?'))return;
+  const p=d.projet&&projet(d.projet),resume=`${src.journal_valide.length} compte(s) rendu(s), ${src.rapports_mensuels_valides.length} rapport(s) mensuel(s), ${src.activites_terrain_validees.fiches} fiche(s) terrain, ${src.indicateurs.length} indicateur(s), ${src.missions_tdr_valides.length} TDR`;
+  iaAvec(e.submitter,async()=>{const r=await iaAppel('capitalisation',{type:d.type,document:CAP_T[d.type],periode:{du:d.debut,au:d.fin},projet:p?p.nom:'Toute l\'organisation',a_mettre_en_avant:(d.note||'').trim(),donnees:src});
+   const id=uuid();await ins('capitalisations',{id,org_id:S.org.id,type:d.type,titre:String(r.titre||CAP_T[d.type]).slice(0,200),projet_id:d.projet||null,periode_debut:d.debut,periode_fin:d.fin,contenu:{sections:(r.sections||[]).map(s=>({titre:String(s.titre||''),contenu:String(s.contenu||'')}))},sources:{resume}});
+   await srvLoad();JR.capSel=id;JR.capEdit=false;srvMsg='Document rédigé par Claude à partir des données validées : relisez et complétez les passages « [à compléter] ».';render();scrollTo(0,0)});return}
+ if(t==='capEditForm'){const c=S.capis.find(x=>x.id===f.dataset.id),s=((c.contenu||{}).sections||[]).map((x,i)=>({titre:d['t_'+i]||x.titre,contenu:d['c_'+i]??x.contenu}));
+  action(async()=>{await upd('capitalisations',`id=eq.${c.id}`,{titre:String(d.titre||c.titre).trim(),contenu:{sections:s}});JR.capEdit=false},'Document enregistré.');return}
+ if(t==='iaReg'){const rec={actif:!!d.actif,quota_jour:Number(d.quota_jour)||0,quota_org_jour:Number(d.quota_org_jour)||0,modifie_par:me.id,modifie_le:new Date().toISOString()};
+  action(async()=>{if(S.iaReg)await upd('ia_reglages',`org_id=eq.${S.org.id}`,rec);else await ins('ia_reglages',{org_id:S.org.id,...rec})},'Réglages de l\'assistant enregistrés.');return}
+},true);
+
+/* ---------- actions ---------- */
+document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.target.closest('[data-act="go"]');if(g){dictStop();if(g.dataset.v==='journal'){JR.sel=null;JR.edit=null;JR.capSel=null}if(g.dataset.v==='missions')tdrPre=null}
+ const b=e.target.closest('[data-act="dicter"],[data-act^="ia"],[data-act^="jo"],[data-act^="cap"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const a=b.dataset.act,id=b.dataset.id;
+ if(a==='dicter'){if(dict&&dict.btn===b)dictStop();else dictStart(b);return}
+ dictStop();srvMsg='';
+ if(a==='iaFiche'){const p=trP(),o=trOutil(document.getElementById('racOutil').value),recit=document.getElementById('racTxt').value.trim();if(!o)return;if(recit.length<20){alert('Racontez un peu plus votre activité (au moins une phrase).');return}
+  trLS.set('Recit',recit);iaAvec(b,async()=>{const res=await iaAppel('fiche',{outil:{titre:o.titre,type:o.type,presence:o.presence,champs:o.champs.filter(c=>c.type!=='section').map(({id,label,type,options})=>({id,label,type,options}))},recit,aujourd_hui:today()});
+   trLS.del('Recit');TR.saisie={outil:o.id,v:iaVersFiche(o,res,recit),ia:{a_verifier:L2(res.a_verifier),resume:res.resume||''}};render();scrollTo(0,0)});return}
+ if(a==='iaTdrMode'){tdrSimple=b.dataset.v==='1';render();return}
+ if(a==='iaTdrB'){b.closest('fieldset').querySelector('.tdrsB').insertAdjacentHTML('beforeend',tdrsLigne());return}
+ if(a==='iaTdr'){const f=document.querySelector('form[data-form="tdrForm"]'),recit=document.getElementById('tdrRecit').value.trim(),fd=Object.fromEntries(new FormData(f).entries());
+  if(recit.length<20&&!fd.objectif_general){alert('Dites ou écrivez d\'abord ce que vous voulez faire.');return}
+  iaAvec(b,async()=>{const pj=projet(fd.projet);const r=await iaAppel('tdr',{recit,deja_rempli:{titre:fd.titre,destination:fd.destination,date_debut:fd.date_debut,date_fin:fd.date_fin,pourquoi:fd.objectif_general,pour_qui:fd.cibles,comment:fd.methodologie,resultats:fd.resultats,besoins:fd.budget},type_mission:fd.type_mission,projet:pj?{nom:pj.nom,zone:pj.zone}:null,redacteur:posteLib(S.staff.find(u=>u.id===me.id)||{}),aujourd_hui:today()});
+   const P={_pour:f.dataset.id||'new'};['titre','destination',...TDR_SEC.map(s=>s[0])].forEach(k=>{if(r[k])P[k]=String(r[k])});['date_debut','date_fin'].forEach(k=>{if(/^\d{4}-\d{2}-\d{2}$/.test(r[k]||''))P[k]=r[k]});
+   if(Array.isArray(r.budget)&&r.budget.length)P.budget=r.budget.map(x=>({libelle:String(x.libelle||''),quantite:Number(x.quantite)||0,unite:String(x.unite||''),cout:Number(x.cout)||0})).filter(x=>x.libelle);
+   if(fd.projet)P.projet_id=fd.projet;tdrPre=P;tdrSimple=false;srvMsg='TDR rédigé par Claude à partir de votre récit : relisez chaque partie, corrigez, puis enregistrez.';render();scrollTo(0,0)});return}
+ if(a==='iaMpAdd'){const f=b.closest('form');f.querySelector('.mpLs').insertAdjacentHTML('beforeend',mpLigne({},trP()));return}
+ if(a==='iaMpDel'){const f=b.closest('form');b.closest('.mpL').remove();mpSync(f);return}
+ if(a==='iaMicroplan'){const f=b.closest('form'),recit=document.getElementById('mpRecit').value.trim(),p=trP();if(recit.length<15){alert('Dites d\'abord votre plan du mois.');return}
+  iaAvec(b,async()=>{const r=await iaAppel('microplan',{recit,mois:TR.mois,aujourd_hui:today(),activites_possibles:trOutils(p).filter(o=>o.actif).map(o=>o.titre),localites_connues:[...new Set(trFiches(p).map(x=>x.localite))].slice(0,40)});
+   const L=L2(r.lignes).filter(l=>/^\d{4}-\d{2}-\d{2}$/.test(l.date||'')&&moisDe(l.date)===TR.mois);if(!L.length){alert('Claude n\'a trouvé aucune activité datée dans le mois : précisez les dates.');return}
+   f.querySelector('.mpLs').innerHTML=L.map(l=>mpLigne(l,p)).join('');mpSync(f);if(L2(r.a_verifier).length)alert('À vérifier :\n· '+L2(r.a_verifier).join('\n· '))});return}
+ if(a==='iaRapport'){const f=b.closest('form'),niv=f.dataset.niv,p=trP(),F=trFiches(p).filter(x=>moisDe(x.date_activite)===TR.mois),R=trRefs(p).filter(x=>moisDe(x.date_reference)===TR.mois);
+  const ags=trAgents(p).filter(u=>niv==='projet'||trVerifie(p,u.id)).map(u=>u.id);
+  const ch=niv==='agent'?trInstantane(p,F.filter(x=>x.agent_id===me.id&&x.statut!=='rejetee'),R.filter(x=>x.agent_id===me.id)):niv==='superviseur'?trInstantane(p,F.filter(x=>ags.includes(x.agent_id)&&['verifiee','validee'].includes(x.statut)),R.filter(x=>ags.includes(x.agent_id))):trInstantane(p,F.filter(x=>x.statut==='validee'),R);
+  const deja=['faits','difficultes','alertes','besoins','recommandations'].reduce((o,k)=>(f.elements[k]&&f.elements[k].value.trim()&&(o[k]=f.elements[k].value.trim()),o),{});
+  iaAvec(b,async()=>{const r=await iaAppel('rapport',{niveau:{agent:'agent communautaire',superviseur:'superviseur',projet:'projet'}[niv],mois:moisLib(TR.mois),projet:p.nom,chiffres:iaChiffres(ch),notes_du_terrain:iaNotesRapport(p,niv),deja_ecrit:deja});
+   ['faits','difficultes','alertes','besoins','recommandations'].forEach(k=>{if(f.elements[k]&&r[k]!=null&&String(r[k]).trim())f.elements[k].value=String(r[k])});
+   const n=f.querySelector('.iaNote');if(n)n.hidden=false});return}
+ if(a==='joTab'){JR.tab=b.dataset.v;render();return}
+ if(a==='joNouveau'){JR.edit='new';render();scrollTo(0,0);return}
+ if(a==='joModif'){JR.edit=id;render();scrollTo(0,0);return}
+ if(a==='joVoir'){JR.sel=id;JR.pvEdit=false;render();scrollTo(0,0);return}
+ if(a==='joFermer'){if(JR.edit&&!confirm('Quitter sans enregistrer ? Ce qui n\'est pas enregistré sera perdu.'))return;JR.edit=null;JR.sel=null;JR.pvEdit=false;render();return}
+ if(a==='joPvEdit'){JR.pvEdit=true;render();return}
+ if(a==='joPvAnnul'){JR.pvEdit=false;render();return}
+ if(a==='joPv'){const j=S.journal.find(x=>x.id===id);if(!j.transcription&&!j.notes){alert('Il n\'y a ni transcription ni notes à résumer.');return}if(j.pv&&!confirm('Remplacer le compte rendu actuel par une nouvelle rédaction ?'))return;
+  iaAvec(b,async()=>{const pv=await iaAppel('pv',{type:JO_T[j.type],titre:j.titre,date:j.date_evt,lieu:j.lieu,participants:j.participants,notes:j.notes,transcription:j.transcription});await upd('journal',`id=eq.${id}`,{pv,statut:'brouillon'});await srvLoad();srvMsg='Compte rendu rédigé par Claude : relisez-le, puis validez-le.';render()});return}
+ if(a==='joValider'){if(!confirm('Valider ce compte rendu ? Il pourra servir aux documents de capitalisation et de redevabilité.'))return;action(()=>upd('journal',`id=eq.${id}`,{statut:'valide'}),'Compte rendu validé.');return}
+ if(a==='joSuppr'){if(!confirm('Supprimer cette entrée du journal ?'))return;action(async()=>{await del('journal',`id=eq.${id}`);JR.sel=null},'Entrée supprimée.');return}
+ if(a==='joImp'){joImprimer(S.journal.find(x=>x.id===id));return}
+ if(a==='capVoir'){JR.capSel=id;JR.capEdit=false;render();scrollTo(0,0);return}
+ if(a==='capFermer'){JR.capSel=null;JR.capEdit=false;JR.tab='capi';render();return}
+ if(a==='capEdit'){JR.capEdit=true;render();return}
+ if(a==='capEditAnnul'){JR.capEdit=false;render();return}
+ if(a==='capValider'){if(!confirm('Valider ce document ? Il ne pourra plus être modifié.'))return;action(()=>upd('capitalisations',`id=eq.${id}`,{statut:'valide'}),'Document validé.');return}
+ if(a==='capSuppr'){if(!confirm('Supprimer ce brouillon ?'))return;action(async()=>{await del('capitalisations',`id=eq.${id}`);JR.capSel=null},'Document supprimé.');return}
+ if(a==='capImp'){capImprimer(S.capis.find(x=>x.id===id));return}
+},true);
+document.addEventListener('input',e=>{const f=e.target.closest&&e.target.closest('form');if(!f)return;if(e.target.closest('.tdrsL'))tdrsSync(f);if(e.target.closest('.mpL'))mpSync(f)});
+document.addEventListener('change',e=>{const r=e.target;if(r.dataset&&r.dataset.jo){JR.filtre=r.dataset.jo;render()}});
+
 /* ---------- démarrage ---------- */
 async function srvInit(){
  if(MODE!=='srv'){render();return}
  save=function(){};                                              // rien de réel n'est gardé dans le navigateur
  const _log=log;log=function(a){if(me&&S.org&&S.org.id)ins('audit',{org_id:S.org.id,user_id:me.id,action:String(a).slice(0,500)}).catch(()=>{})};
- loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{terrain:'Collecte terrain',contrats:'Contrats et conventions',missions:'TDR et ordres de mission',adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
+ loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{journal:'Journal et comptes rendus',terrain:'Collecte terrain',contrats:'Contrats et conventions',missions:'TDR et ordres de mission',adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
  render=srvRender;
- viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,missions:svMissions,contrats:svContrats,terrain:svTerrain,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
+ viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,missions:svMissions,contrats:svContrats,terrain:svTerrain,journal:svJournal,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
  S=srvVide();me=null;sess=sessLire();await omVerifCharger();
  const h=new URLSearchParams(location.hash.slice(1));                // retour d'un lien « mot de passe oublié »
  if(h.get('access_token')){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
