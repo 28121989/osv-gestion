@@ -1827,7 +1827,7 @@ async function authRefresh(){const s=sess;if(!s)return;sess=null;
 async function authLogout(){try{if(sess)await api('/auth/v1/logout',{method:'POST'})}catch(e){}sessEcrire(null)}
 
 /* ---------- chargement des données autorisées ---------- */
-function srvVide(){return {org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],journal:[],capis:[],iaUsage:[],outils:[],fterrain:[],refs:[],microplans:[],rterrain:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
+function srvVide(){return {org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],veille:[],opps:[],journal:[],capis:[],iaUsage:[],outils:[],fterrain:[],refs:[],microplans:[],rterrain:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
 async function srvLoad(){
  const uid=sess.user.id,mine=await sel('membres',`select=*&user_id=eq.${uid}&actif=is.true`);
  const m=(mine||[]).find(x=>!x.fin_acces||x.fin_acces>=today());
@@ -1859,6 +1859,7 @@ async function srvLoad(){
  const T8=await Promise.all([sel('tdrs',f+'&order=cree_le.desc'),sel('tdr_avis',f+'&order=le'),sel('acces_budget',f)].map(opt));p08=T8[0]!==null;N.tdrs=T8[0]||[];N.tavis=T8[1]||[];N.accBud=T8[2]||[];
  const T10=await opt(sel('contrats',f+'&order=redige_le.desc'));p10=T10!==null;N.contrats=T10||[];p10f=p10&&(await opt(sel('contrats','select=fiche&limit=1')))!==null;
  const T13=await Promise.all([sel('journal',f+'&order=date_evt.desc&limit=3000'),sel('capitalisations',f+'&order=cree_le.desc'),sel('ia_reglages',f)].map(opt));p13=T13[0]!==null;N.journal=T13[0]||[];N.capis=T13[1]||[];N.iaReg=(T13[2]||[])[0]||null;p14=p13&&(await opt(sel('journal','select=cadre&limit=1')))!==null;
+ const T15=await Promise.all([sel('veille_notes',f+'&order=date_evt.desc&limit=3000'),sel('opportunites',f+'&order=cree_le.desc')].map(opt));p15=T15[0]!==null;N.veille=T15[0]||[];N.opps=T15[1]||[];
  const T12=await Promise.all([sel('outils_collecte',f+'&order=cree_le'),sel('fiches_terrain',f+'&order=date_activite.desc,saisi_le.desc&limit=10000'),sel('references_communautaires',f+'&order=date_reference.desc&limit=10000'),sel('microplans',f),sel('rapports_terrain',f+'&order=mois.desc')].map(opt));p12=T12[0]!==null;[N.outils,N.fterrain,N.refs,N.microplans,N.rterrain]=T12.map(x=>x||[]);
  [N.comptes,N.mouvements,N.rapprochements,N.avances,N.fournisseurs,N.seuilsAchat,N.achats,N.devis,N.baremes,N.missions,N.biens,N.inventaires,N.pcomptes,N.correspondances,N.invLignes]=T6.map(x=>x||[]);
  S=N;me=S.staff.find(x=>x.id===uid);
@@ -1870,7 +1871,7 @@ const APPUI=['RH','RA','CPT','LOG'];
 function srvNav(r){if(r==='EXT')return ['politiques'];const appui=APPUI.includes(r),n=[];
  if(p03&&['DE','DP','CA'].includes(r))n.push('strategie','programmes');
  if(!appui)n.push('projets');if(p12&&['ASC','SUP','SE','CP','DP','DE','CA'].includes(r)){if(['ASC','SUP'].includes(r))n.splice(n.indexOf('projets'),0,'terrain');else n.push('terrain')}if(p03&&['DE','DP','CA',...APPUI].includes(r))n.push('equipes');if(p05&&['DE','DP','CA','RA','CPT'].includes(r))n.push('finances');if(p06&&['DE','DP','CA','RA','CPT','LOG'].includes(r))n.push('adm');
- if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');if(p08)n.push('missions');if(p06)n.push('mesdem');if(p13)n.push('journal');
+ if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');if(p08)n.push('missions');if(p06)n.push('mesdem');if(p13)n.push('journal');if(p15&&['DE','DP','RA','CA','CP'].includes(r))n.push('veille');
  if(p10&&['DE','DP','RH','RA'].includes(r))n.push('contrats');if(['DE','RH'].includes(r))n.push('personnel');if(r==='DE')n.push('audit');return n}
 async function notifierSrv(dest,texte,lien,ref){const ids=[...new Set(dest.filter(Boolean))].filter(id=>id!==me.id&&S.staff.some(u=>u.id===id));
  if(!ids.length)return 0;await ins('notifications',ids.map(id=>({org_id:S.org.id,user_id:id,texte,lien,ref,envoye_par:me.id})));return ids.length}
@@ -1880,7 +1881,7 @@ async function action(fn,msg){if(srvBusy)return;srvBusy=true;document.body.class
 
 /* ---------- écrans du mode serveur ---------- */
 function srvHome(){const n=ROLES[me.role].nav,pa=polEnAttente().length;
- const D={journal:'Réunions, visites et missions : dictées, comptes rendus rédigés automatiquement, capitalisation',terrain:'Fiches d\'activité, listes de présence, références, microplans et rapports des agents communautaires',adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
+ const D={veille:'Alertes, opportunités, besoins des communautés et leçons tirés des activités : réservé à la direction',journal:'Réunions, visites et missions : dictées, comptes rendus rédigés automatiquement, capitalisation',terrain:'Fiches d\'activité, listes de présence, références, microplans et rapports des agents communautaires',adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
  return accHero()+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+notifBox()+
  (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:'')+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
  `${['DE','DP','CA'].includes(me.role)&&p03?'':accTableauBord()}
@@ -1997,6 +1998,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv')return;const b=e.target.cl
  if(a==='notifOuvrir'){const n=S.pol.notifs.find(x=>x.id===b.dataset.id);if(n){upd('notifications',`id=eq.${n.id}`,{lu:true}).catch(()=>{});if(n.lien==='adm'||n.lien==='mesdem'){stop();n.lus.push(me.id);view=n.lien==='adm'&&ROLES[me.role].nav.includes('adm')?'adm':'mesdem';render();return}
   if(n.lien==='finances'){stop();n.lus.push(me.id);finSel=n.ref||null;if(ROLES[me.role].nav.includes('finances'))view='finances';else{dosSel=n.ref;dosTab='fin';view='dossier'}render();return}
   if(n.lien==='contrats'){stop();n.lus.push(me.id);ctrSel=n.ref||null;ctrEdit=null;view=ROLES[me.role].nav.includes('contrats')?'contrats':'mesdem';render();return}
+  if(n.lien==='veille'){stop();n.lus.push(me.id);VE.sel=n.ref||null;view=ROLES[me.role].nav.includes('veille')?'veille':'home';render();return}
   if(n.lien==='terrain'){stop();n.lus.push(me.id);TR.saisie=null;TR.outil=null;TR.fiche=n.ref&&S.fterrain.some(x=>x.id===n.ref)?n.ref:null;view=ROLES[me.role].nav.includes('terrain')?'terrain':'home';render();return}
   if(n.lien==='missions'){stop();n.lus.push(me.id);tdrSel=n.ref||null;tdrEdit=null;view=ROLES[me.role].nav.includes('missions')?'missions':'home';render();return}
   if(n.lien==='equipes'){stop();n.lus.push(me.id);eqF.proj=n.ref||'';eqF.etat='';view='equipes';render();return}
@@ -2145,7 +2147,7 @@ function alertes(){const A=[],t=today(),d60=new Date(Date.now()+60*864e5).toISOS
  S.jalons.filter(j=>j.echeance&&j.echeance<t&&!['fait','abandonne'].includes(j.statut)).forEach(j=>A.push(['bad',`Jalon en retard : ${j.libelle} (${fmtD(j.echeance)}) · ${libProg(programme(j.programme_id))}`,'svPg',j.programme_id]));
  S.risques.filter(r=>r.statut!=='clos'&&r.probabilite*r.impact>=15).forEach(r=>A.push(['bad',`Risque élevé (${r.probabilite*r.impact}) : ${r.libelle}`,r.projet_id?'svDos':'svPg',r.projet_id||r.programme_id,'rq']));
  S.inds.filter(i=>indPerf(i).st==='bad').slice(0,8).forEach(i=>A.push(['bad',`Indicateur en retard : ${i.libelle}`,i.projet_id?'svDos':i.programme_id?'svPg':'go',i.projet_id||i.programme_id||'strategie','ind']));
- return A.concat(finAlertes(),admAlertes(),tdrAlertes(),ctrAlertes(),trAlertes())}
+ return A.concat(finAlertes(),admAlertes(),tdrAlertes(),ctrAlertes(),trAlertes(),veAlertes())}
 function alerteHTML(A){return A.length?`<ul class="svAl">${A.slice(0,15).map(([c,t,act,id,tab])=>`<li class="${c}"><button class="lnk" data-act="${act}" ${act==='go'?`data-v="${id}"`:`data-id="${id||''}"`} ${tab?`data-tab="${tab}"`:''}>${esc(t)}</button></li>`).join('')}</ul>${A.length>15?`<p class="muted">… et ${A.length-15} autre(s).</p>`:''}`:'<p class="empty">Aucune alerte. Tout est à jour.</p>'}
 function pilotageHTML(){const pl=planCourant(),pp=perfPlan(pl),ps=S.projets,actifs=ps.filter(p=>['active','execution'].includes(p.statut));
  const s=synth(S.inds),budget=ps.filter(p=>!['rejete','archive'].includes(p.statut)).reduce((x,p)=>x+(p.budgetApprouve||p.montant||0),0),A=alertes();
@@ -6197,6 +6199,7 @@ function joDetail(j){const a=j.auteur_id===me.id,pv=j.pv,p=j.projet_id&&projet(j
  <div class="row" style="margin-bottom:1rem">${j.statut==='valide'?tag(['Document validé','ok']):tag(['Brouillon','warn'])}${j.confidentiel?tag(['Confidentiel','bad']):''}${nm&&j.statut!=='valide'?tag([nm+' passage(s) à compléter','bad']):''}<span class="muted">Lecture : ${esc(JO_P[j.partage])}</span></div>
  ${pv?`<div class="row" style="margin-bottom:1rem"><button class="btn" data-act="joWord" data-id="${j.id}">Télécharger en Word</button><button class="btn ghost sm" data-act="joImp" data-id="${j.id}">Aperçu, impression ou PDF</button></div>`:''}
  ${a?`<div class="row" style="margin-bottom:1rem"><button class="btn ghost sm" data-act="joModif" data-id="${j.id}">Modifier les informations et les notes</button>${pv&&!JR.pvEdit&&j.statut!=='valide'?`<button class="btn ghost sm" data-act="joPvEdit">Corriger le document</button>`:''}${iaOK()&&j.statut!=='valide'?`<button class="btn ghost sm iaB2" data-act="joPv" data-id="${j.id}">${ico('etoile')} ${pv?'Rédiger à nouveau':'Rédiger le document'}</button>`:''}${pv&&j.statut!=='valide'?`<button class="btn sm" data-act="joValider" data-id="${j.id}">Valider le document</button>`:''}${j.statut!=='valide'?`<button class="btn danger sm" data-act="joSuppr" data-id="${j.id}">Supprimer</button>`:''}</div>`:''}
+ ${(S.veille||[]).some(v=>v.journal_id===j.id)?`<p class="note">Une note de veille stratégique a été tirée de cette activité. <button class="lnk" data-act="veVoir" data-id="${S.veille.find(v=>v.journal_id===j.id).id}">L'ouvrir</button></p>`:''}
  ${nm&&a&&j.statut!=='valide'?`<p class="note">Les passages <mark>surlignés</mark> sont à compléter avant validation : cliquez sur « Corriger le document ».</p>`:''}
  ${pv?(JR.pvEdit&&a?pvEditeur(j):`<article class="card pvDoc">${pvHTML(pv,false,j)}</article>`):`<p class="note">Pas encore de document.${a&&iaOK()?' Cliquez sur « Rédiger le document ».':''}</p>`}
  ${j.notes?`<details class="card"><summary><b>Notes</b></summary><p class="pre" style="margin-top:.6rem">${esc(j.notes)}</p></details>`:''}
@@ -6221,10 +6224,6 @@ function pvHTML(pv,papier,j){const M=s=>joMark(String(s??''),papier),ul=L=>L.len
  if(L2(pv.recommandations).length)h+=T('Recommandations')+ol(L2(pv.recommandations));
  if(L2(pv.actions).length)h+=T('Plan d\'actions')+tab(['N°','Action','Responsable','Échéance'],'6,54,22,18',L2(pv.actions).map((x,i)=>[i+1,M(x.action),M(x.responsable),M(x.echeance)]));
  if(L2(pv.engagements_osv).length)h+=T('Engagements d\'OSV')+ul(L2(pv.engagements_osv));
- if(L2(pv.opportunites).length)h+=T('Opportunités pour OSV')+ul(L2(pv.opportunites));
- if(L2(pv.redevabilite).length)h+=T('Redevabilité')+ul(L2(pv.redevabilite));
- if(L2(pv.lecons).length||L2(pv.bonnes_pratiques).length)h+=T('Leçons apprises et bonnes pratiques')+(L2(pv.lecons).length?`<p>Leçons apprises :</p>${ul(L2(pv.lecons))}`:'')+(L2(pv.bonnes_pratiques).length?`<p>Bonnes pratiques :</p>${ul(L2(pv.bonnes_pratiques))}`:'');
- if(pv.suite||pv.conclusion)h+=T('Conclusion et prochaines étapes')+para(pv.conclusion)+para(pv.suite);
  return h}
 function pvEditeur(j){const pv=j.pv||{},Lg=k=>L2(pv[k]).join('\n'),A=(k,l,v,r=3)=>`<div class="trL"><label for="pv_${k}">${l}</label><textarea id="pv_${k}" name="${k}" rows="${r}">${esc(v)}</textarea></div>`;
  return `<form data-form="joPvForm" data-id="${j.id}" class="card grid trForm"><p class="muted trL">Une ligne par élément. Dans les tableaux, séparez les colonnes par « ; ». Remplacez chaque « [à compléter : …] » par l'information exacte.</p>
@@ -6234,8 +6233,7 @@ function pvEditeur(j){const pv=j.pv||{},Lg=k=>L2(pv[k]).join('\n'),A=(k,l,v,r=3)
  ${A('constats','Constats',Lg('constats'))}${A('acquis','Acquis et compétences renforcées',Lg('acquis'))}${A('position_osv','Position et contributions d\'OSV',Lg('position_osv'))}
  ${A('decisions','Décisions',Lg('decisions'))}${A('recommandations','Recommandations',Lg('recommandations'))}
  ${A('actions','Plan d\'actions : « action ; responsable ; échéance »',L2(pv.actions).map(x=>[x.action,x.responsable,x.echeance].join(' ; ')).join('\n'))}
- ${A('engagements_osv','Engagements d\'OSV',Lg('engagements_osv'))}${A('opportunites','Opportunités pour OSV',Lg('opportunites'))}${A('redevabilite','Redevabilité',Lg('redevabilite'))}
- ${A('lecons','Leçons apprises',Lg('lecons'))}${A('bonnes_pratiques','Bonnes pratiques',Lg('bonnes_pratiques'))}${A('conclusion','Conclusion',pv.conclusion||'',3)}${A('suite','Prochaines étapes',pv.suite||'',2)}
+ ${A('engagements_osv','Engagements d\'OSV',Lg('engagements_osv'))}
  <div class="trL row"><button class="btn" type="submit">Enregistrer les corrections</button><button class="btn ghost" type="button" data-act="joPvAnnul">Annuler</button></div></form>`}
 function joCorps(j){const pv=j.pv||{},p=j.projet_id&&projet(j.projet_id),u=S.staff.find(x=>x.id===j.auteur_id)||{},fonc=u.id?posteLib(u):'';
  const lig=[['Objet',esc(pv.titre||j.titre)],['Date',fmtD(j.date_evt)+(j.heure_debut?`, de ${esc(j.heure_debut)}${j.heure_fin?' à '+esc(j.heure_fin):''}`:'')],...(j.lieu?[['Lieu',esc(j.lieu)]]:[]),...(j.organisateur?[['Organisé par',esc(j.organisateur)]]:[]),
@@ -6278,7 +6276,8 @@ function capSources(pid,d1,d2){const dans=d=>d&&d>=d1&&d<=d2,P=pid?[projet(pid)]
  const FV=(S.fterrain||[]).filter(f=>f.statut==='validee'&&dans(f.date_activite)&&(!pid||f.projet_id===pid)),A=trAgreger(FV);
  const I=(S.inds||[]).filter(i=>P.some(p=>p&&p.id===i.projet_id)).map(i=>{const M=(S.mesures||[]).filter(m=>m.indicateur_id===i.id&&m.statut==='validee').sort((a,b)=>a.periode_fin<b.periode_fin?-1:1);return {indicateur:i.libelle,unite:i.unite,reference:i.baseline,cible:i.cible,mesures_validees:M.map(m=>({au:m.periode_fin,valeur:Number(m.valeur),femmes:m.valeur_f,hommes:m.valeur_h}))}});
  const T=(S.tdrs||[]).filter(t=>t.statut==='valide'&&dans(t.date_debut)&&(!pid||t.projet_id===pid)).map(t=>({titre:t.titre,lieu:t.destination,du:t.date_debut,au:t.date_fin,resultats_attendus:String(t.resultats||'').slice(0,500)}));
- return {projets:P.map(p=>({nom:p.nom,code:p.code,zone:p.zone,bailleur:p.bailleur,debut:p.debut,fin:p.fin,statut:(PSTAT[p.statut]||[p.statut])[0]})),
+ const V=(S.veille||[]).filter(v=>dans(v.date_evt)&&(!pid||v.projet_id===pid)).map(v=>({date:v.date_evt,activite:v.titre,importance:v.importance,synthese:(v.contenu||{}).synthese_direction,lecons:(v.contenu||{}).lecons,bonnes_pratiques:(v.contenu||{}).bonnes_pratiques,redevabilite:(v.contenu||{}).redevabilite,opportunites:(v.contenu||{}).opportunites,besoins:(v.contenu||{}).besoins_communautaires,orientation:v.decision}));
+ return {notes_de_veille:V,projets:P.map(p=>({nom:p.nom,code:p.code,zone:p.zone,bailleur:p.bailleur,debut:p.debut,fin:p.fin,statut:(PSTAT[p.statut]||[p.statut])[0]})),
   activites_terrain_validees:{fiches:A.n,personnes:A.total,femmes:A.f,hommes:A.h,handicap:A.hand,par_localite:Object.entries(A.loc).slice(0,15).map(([k,v])=>({localite:k,personnes:v.total})),age_sexe:A.age},
   rapports_mensuels_valides:R,journal_valide:J,indicateurs:I,missions_tdr_valides:T}}
 function capDetail(c){const s=(c.contenu&&c.contenu.sections)||[],a=c.auteur_id===me.id,val=['DE','DP'].includes(me.role)&&c.statut!=='valide';
@@ -6297,7 +6296,7 @@ function iaReglagesVue(){const g=S.iaReg||{actif:true,quota_jour:40,quota_org_jo
  return `<section class="card"><h3>Réglages de l'assistant de rédaction</h3><p class="muted">La clé de l'API est rangée sur le serveur (secrets Supabase), jamais dans l'application. Vous pouvez suspendre l'assistant à tout moment et limiter le nombre de demandes, pour maîtriser la facture.</p>
  <form data-form="iaReg" class="grid" style="align-items:end"><div><label class="trChk"><input type="checkbox" name="actif" ${g.actif!==false?'checked':''}> Assistant activé</label></div><div><label>Demandes par personne et par jour</label><input name="quota_jour" type="number" min="0" max="1000" value="${g.quota_jour}"></div><div><label>Demandes par jour pour toute l'organisation</label><input name="quota_org_jour" type="number" min="0" max="20000" value="${g.quota_org_jour}"></div><div><button class="btn" type="submit">Enregistrer</button></div></form></section>
  <div class="kpis"><div class="kpi"><b>${num(uj.length)}</b><span>demandes aujourd'hui</span></div><div class="kpi"><b>${num(um.length)}</b><span>demandes ce mois</span></div><div class="kpi"><b>${num(Math.round(tk(um)/1000))} k</b><span>jetons ce mois (entrée + sortie)</span></div><div class="kpi"><b>${num(um.filter(u=>u.statut==='erreur').length)}</b><span>échecs ce mois</span></div></div>
- <section class="card"><h3>Utilisation du mois</h3>${trBarres(Object.entries(parT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[{fiche:'Fiches remplies à partir d\'un récit',tdr:'TDR rédigés',microplan:'Microplans',rapport:'Rapports mensuels',pv:'Comptes rendus',capitalisation:'Capitalisation et redevabilité',ameliorer:'Améliorations de texte'}[k]||k,v]))||'<p class="empty">Aucune demande ce mois.</p>'}
+ <section class="card"><h3>Utilisation du mois</h3>${trBarres(Object.entries(parT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[{fiche:'Fiches remplies à partir d\'un récit',tdr:'TDR rédigés',microplan:'Microplans',rapport:'Rapports mensuels',pv:'Comptes rendus',capitalisation:'Capitalisation et redevabilité',veille:'Notes de veille',bulletin:'Bulletins de veille',ameliorer:'Améliorations de texte'}[k]||k,v]))||'<p class="empty">Aucune demande ce mois.</p>'}
  ${Object.keys(parU).length?`<h4>Par personne</h4>${trBarres(Object.entries(parU).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>[who(k),v]))}`:''}
  <p class="muted">Le coût dépend du nombre de jetons et du modèle choisi ; consultez la console de votre fournisseur (Anthropic) pour la facture réelle.</p></section>`}
 
@@ -6333,7 +6332,7 @@ document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.tar
 },true);
 
 /* ---------- actions ---------- */
-document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.target.closest('[data-act="go"]');if(g){dictStop();if(g.dataset.v==='journal'){JR.sel=null;JR.edit=null;JR.capSel=null}if(g.dataset.v==='missions')tdrPre=null}
+document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.target.closest('[data-act="go"]');if(g){dictStop();if(g.dataset.v==='journal'){JR.sel=null;JR.edit=null;JR.capSel=null;JR.tab='liste'}if(g.dataset.v==='veille'){VE.sel=null}if(g.dataset.v==='missions')tdrPre=null}
  const b=e.target.closest('[data-act="dicter"],[data-act^="ia"],[data-act^="jo"],[data-act^="cap"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const a=b.dataset.act,id=b.dataset.id;
  if(a==='dicter'){if(dict&&dict.btn===b)dictStop();else dictStart(b);return}
  dictStop();srvMsg='';
@@ -6371,7 +6370,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.targ
  if(a==='joPv'){const j=S.journal.find(x=>x.id===id);if(!j.transcription&&!j.notes){alert('Il n\'y a ni transcription ni notes à résumer.');return}if(j.pv&&!confirm('Remplacer le compte rendu actuel par une nouvelle rédaction ?'))return;
   iaAvec(b,async()=>{const pv=await iaAppel('pv',joPayload(j,j.id));await upd('journal',`id=eq.${id}`,{pv,statut:'brouillon'});await srvLoad();srvMsg='Document rédigé : relisez-le, complétez les passages surlignés, puis validez-le.';render()});return}
  if(a==='joWord'){joWord(S.journal.find(x=>x.id===id));return}
- if(a==='joValider'){const nm=joMarques((S.journal.find(x=>x.id===id)||{}).pv);if(nm&&!confirm(`Il reste ${nm} passage(s) « à compléter » dans le document. Valider quand même ?`))return;if(!nm&&!confirm('Valider ce compte rendu ? Il pourra servir aux documents de capitalisation et de redevabilité.'))return;action(()=>upd('journal',`id=eq.${id}`,{statut:'valide'}),'Compte rendu validé.');return}
+ if(a==='joValider'){const nm=joMarques((S.journal.find(x=>x.id===id)||{}).pv);if(nm&&!confirm(`Il reste ${nm} passage(s) « à compléter » dans le document. Valider quand même ?`))return;if(!nm&&!confirm('Valider ce compte rendu ? Il pourra servir aux documents de capitalisation et de redevabilité.'))return;const jv=S.journal.find(x=>x.id===id);let vm='',okv=false;action(async()=>{await upd('journal',`id=eq.${id}`,{statut:'valide'});okv=true;if(p15&&iaOK()&&!jv.confidentiel||p15&&iaOK()&&me.role==='DE'){try{await veProduire({...jv,statut:'valide'});vm=' Une note de veille stratégique a été transmise à la direction.'}catch(e){vm=' (La note de veille n\'a pas pu être produite : '+e.message+')'}}},null).then(()=>{if(okv){srvMsg='Document validé.'+vm;render()}});return}
  if(a==='joSuppr'){if(!confirm('Supprimer cette entrée du journal ?'))return;action(async()=>{await del('journal',`id=eq.${id}`);JR.sel=null},'Entrée supprimée.');return}
  if(a==='joImp'){joImprimer(S.journal.find(x=>x.id===id));return}
  if(a==='capVoir'){JR.capSel=id;JR.capEdit=false;render();scrollTo(0,0);return}
@@ -6386,14 +6385,138 @@ document.addEventListener('input',e=>{const f=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{const r=e.target;if(r.dataset&&r.dataset.jo){JR.filtre=r.dataset.jo;render()}
  if(r.hasAttribute&&r.hasAttribute('data-jo-cadre')){const f=r.form,pj=r.value==='projet';f.querySelector('.joProj').hidden=!pj;const ty=f.elements.type;if(pj&&['reunion_externe'].includes(ty.value))ty.value='reunion_projet';if(!pj&&ty.value==='reunion_projet')ty.value='reunion_externe';if(f.elements.role_osv)f.elements.role_osv.value=pj?'organisateur':'invite';if(!pj&&f.elements.partage.value==='projet')f.elements.partage.value='direction'}});
 
+
+/* =====================================================================
+   VEILLE STRATÉGIQUE · réservée à la direction, au CA et au chef du projet
+   Chaque compte rendu validé produit une note de veille : alertes,
+   opportunités, besoins des communautés, leçons, redevabilité.
+   ===================================================================== */
+let p15=false;
+const VE={tab:'tableau',sel:null,per:'3',dom:'',user:null};
+ICO.veille='<path d="M19.07 4.93A10 10 0 0 0 6.99 3.34"/><path d="M4 6h.01"/><path d="M2.29 9.62A10 10 0 1 0 21.31 8.35"/><path d="M16.24 7.76A6 6 0 1 0 8.23 16.67"/><path d="M12 18h.01"/><path d="M17.99 11.66A6 6 0 0 1 15.77 16.67"/><circle cx="12" cy="12" r="2"/><path d="m13.41 10.59 5.66-5.66"/>';
+const VE_IMP={urgente:['Urgente','bad'],elevee:['Élevée','warn'],moyenne:['Moyenne',''],faible:['Faible','']};
+const VE_ST={a_examiner:['À examiner','warn'],examinee:['Examinée',''],suivie:['Suivie (actions engagées)','ok'],classee:['Classée','']};
+const OP_T={financement:'Financement',partenariat:'Partenariat',visibilite:'Visibilité',plaidoyer:'Plaidoyer',recrutement:'Recrutement',autre:'Autre'};
+const OP_ST={a_etudier:['À étudier','warn'],en_preparation:['En préparation','warn'],soumise:['Soumise',''],obtenue:['Obtenue','ok'],abandonnee:['Abandonnée','']};
+const VE_DOM=['DSSR-VBG','Eau et assainissement','Environnement et résilience climatique','Sécurité routière','Sécurité au travail','Agriculture durable','Gestion des plaintes','Gouvernance et partenariats'];
+const veDirige=()=>['DE','DP'].includes(me.role);
+const veRang={urgente:0,elevee:1,moyenne:2,faible:3};
+function veNotes(){const n=Number(VE.per),lim=n?new Date(Date.now()-n*30.5*864e5).toISOString().slice(0,10):'0000';
+ return (S.veille||[]).filter(v=>v.date_evt>=lim&&(!VE.dom||(v.domaines||[]).includes(VE.dom))).sort((a,b)=>a.date_evt<b.date_evt?1:-1)}
+const veSrc=v=>`<button class="lnk" data-act="veVoir" data-id="${v.id}">${esc(v.titre)}</button> <span class="muted">· ${fmtD(v.date_evt)}</span>`;
+function svVeille(){if(!p15)return head('Veille stratégique','')+'<p class="note">Exécutez le script 15 dans Supabase pour activer la veille stratégique.</p>';
+ if(VE.user!==me.id)Object.assign(VE,{user:me.id,tab:'tableau',sel:null});
+ if(VE.sel&&(S.veille||[]).some(v=>v.id===VE.sel))return veDetail(S.veille.find(v=>v.id===VE.sel));
+ const tabs=[['tableau','Tableau de veille'],['notes','Notes ('+(S.veille||[]).length+')'],...(['DE','DP','RA','CA'].includes(me.role)?[['opps','Opportunités'],['terrain','Signaux du terrain'],['bulletins','Bulletins']]:[])];
+ if(!tabs.some(t=>t[0]===VE.tab))VE.tab='tableau';
+ return head('Veille stratégique','Ce que les réunions, formations, ateliers et missions révèlent pour OSV : alertes, opportunités, besoins des communautés, évolution du contexte, leçons et engagements. Réservé à la direction, au Conseil d\'administration et au chef du projet concerné.')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
+ `<nav class="subnav">${tabs.map(([k,l])=>`<button data-act="veTab" data-v="${k}" ${VE.tab===k?'aria-current="page"':''}>${l}</button>`).join('')}</nav>`+
+ (['tableau','notes'].includes(VE.tab)?`<div class="trBarre"><div><label for="vePer">Période</label><select id="vePer" data-ve="per">${opts([['1','Le dernier mois'],['3','Les 3 derniers mois'],['12','Les 12 derniers mois'],['0','Tout']],VE.per)}</select></div><div><label for="veDom">Domaine</label><select id="veDom" data-ve="dom">${opts(VE_DOM.map(d=>[d,d]),VE.dom,'Tous')}</select></div></div>`:'')+
+ ({tableau:veTableau,notes:veListe,opps:veOpps,terrain:veTerrain,bulletins:veBulletins}[VE.tab])()}
+function veTableau(){const N=veNotes(),C=k=>N.flatMap(v=>L2((v.contenu||{})[k]).map(x=>({x,v})));
+ const al=C('alertes').sort((a,b)=>(veRang[a.x.gravite]??3)-(veRang[b.x.gravite]??3)),op=C('opportunites'),be=C('besoins_communautaires'),ctx=C('evolution_contexte'),le=C('lecons'),bp=C('bonnes_pratiques'),re=C('redevabilite'),rc=C('recommandations');
+ const aEx=N.filter(v=>v.statut==='a_examiner'),chaud=N.filter(v=>['urgente','elevee'].includes(v.importance)&&v.statut==='a_examiner'),O=(S.opps||[]).filter(o=>['a_etudier','en_preparation'].includes(o.statut));
+ const deja=new Set((S.opps||[]).map(o=>o.titre.toLowerCase()));
+ const bloc=(t,L,f,vide)=>`<section class="card"><h3>${t} <span class="muted">(${L.length})</span></h3>${L.length?`<ul class="veL">${L.slice(0,12).map(f).join('')}</ul>${L.length>12?`<p class="muted">et ${L.length-12} autre(s) dans les notes.</p>`:''}`:`<p class="empty">${vide}</p>`}</section>`;
+ return `<div class="kpis"><div class="kpi"><b>${num(aEx.length)}</b><span>notes à examiner</span></div><div class="kpi"><b class="${chaud.length?'txt-bad':''}">${num(chaud.length)}</b><span>d'importance élevée ou urgente, non traitées</span></div><div class="kpi"><b>${num(O.length)}</b><span>opportunités en cours de suivi</span></div><div class="kpi"><b>${num(be.length)}</b><span>besoins des communautés repérés</span></div></div>
+ ${chaud.length?`<section class="card notif"><h3>À examiner en priorité</h3>${chaud.map(v=>`<div class="q-row"><div>${tag(VE_IMP[v.importance])} <b>${esc(v.titre)}</b> <span class="muted">· ${fmtD(v.date_evt)}</span><br><span class="muted">${esc((v.contenu||{}).synthese_direction||'')}</span></div><button class="btn sm" data-act="veVoir" data-id="${v.id}">Examiner</button></div>`).join('')}</section>`:''}
+ <div class="tb-grid">
+ ${bloc('Alertes et risques',al,({x,v})=>`<li>${tag([({elevee:'Élevée',moyenne:'Moyenne',faible:'Faible'})[x.gravite]||'—',x.gravite==='elevee'?'bad':x.gravite==='moyenne'?'warn':''])} <b>${esc(x.titre)}</b>${x.detail?` : ${esc(x.detail)}`:''}<br>${veSrc(v)}</li>`,'Aucune alerte sur la période.')}
+ ${bloc('Opportunités repérées',op,({x,v})=>`<li><b>${esc(x.titre)}</b> <span class="tag">${esc(OP_T[x.type]||x.type||'')}</span>${x.echeance?` <span class="muted">échéance ${fmtD(x.echeance)}</span>`:''}${x.detail?`<br>${esc(x.detail)}`:''}<br>${veSrc(v)} ${veDirige()&&!deja.has(String(x.titre).toLowerCase())?`<button class="btn ghost sm" data-act="veSuivre" data-id="${v.id}" data-t="${esc(x.titre)}">Suivre</button>`:deja.has(String(x.titre).toLowerCase())?tag(['suivie','ok']):''}</li>`,'Aucune opportunité repérée sur la période.')}
+ </div>
+ ${bloc('Besoins des communautés et pistes de nouveaux projets',be,({x,v})=>`<li><b>${esc(x.probleme)}</b>${x.zone?` · ${esc(x.zone)}`:''}${x.public?` · ${esc(x.public)}`:''}${x.piste_de_projet?`<br>Piste : ${esc(x.piste_de_projet)}`:''}<br>${veSrc(v)}</li>`,'Rien de repéré sur la période. Les réunions avec les communautés et les autorités nourrissent cette banque d\'idées pour vos futurs projets.')}
+ <div class="tb-grid">
+ ${bloc('Évolution du contexte',ctx,({x,v})=>`<li>${esc(x)}<br>${veSrc(v)}</li>`,'—')}
+ ${bloc('Engagements et redevabilité à suivre',re,({x,v})=>`<li><b>${esc(x.engagement||'')}</b>${x.envers?` · envers ${esc(x.envers)}`:''}${x.echeance?` · ${esc(x.echeance)}`:''}<br>${veSrc(v)}</li>`,'—')}
+ ${bloc('Leçons apprises',le,({x,v})=>`<li>${esc(x)}<br>${veSrc(v)}</li>`,'—')}
+ ${bloc('Bonnes pratiques',bp,({x,v})=>`<li>${esc(x)}<br>${veSrc(v)}</li>`,'—')}
+ </div>
+ ${bloc('Recommandations à la direction',rc,({x,v})=>`<li><b>${esc(x.mesure||'')}</b>${x.responsable_suggere?` · ${esc(x.responsable_suggere)}`:''}${x.delai?` · ${esc(x.delai)}`:''}<br>${veSrc(v)}</li>`,'—')}`}
+function veListe(){const N=veNotes();
+ return `<section class="card"><h3>Notes de veille (${N.length})</h3><p class="muted">Une note par compte rendu validé. Examinez-la, donnez une orientation, puis classez-la.</p>
+ ${svT(['Date','Activité','Cadre','Importance','Domaines','Statut',''],N.map(v=>[fmtD(v.date_evt),`<b>${esc(v.titre)}</b><br><span class="muted">rédigée d'après le compte rendu de ${esc(who(v.auteur_id))}</span>`,v.projet_id&&projet(v.projet_id)?esc(projet(v.projet_id).code||projet(v.projet_id).nom):'Institutionnel',tag(VE_IMP[v.importance]),esc((v.domaines||[]).join(', ')),tag(VE_ST[v.statut]),`<button class="btn ghost sm" data-act="veVoir" data-id="${v.id}">Ouvrir</button>`]),'Aucune note de veille sur la période.')}</section>`}
+function veDetail(v){const c=v.contenu||{},j=S.journal.find(x=>x.id===v.journal_id),peut=veDirige()||(v.projet_id&&(projet(v.projet_id)||{}).chefId===me.id);
+ const L=(t,arr,f)=>arr.length?`<h3>${t}</h3><ul>${arr.map(f).join('')}</ul>`:'';
+ return `<p><button class="lnk" data-act="veFermer">← Veille stratégique</button></p>${srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:''}
+ <div class="head"><h1>Note de veille · ${esc(v.titre)}</h1><p>${fmtD(v.date_evt)} · ${v.projet_id&&projet(v.projet_id)?'Projet '+esc(libProj(projet(v.projet_id))):'Activité institutionnelle'} · compte rendu de ${esc(who(v.auteur_id))}</p></div>
+ <div class="row" style="margin-bottom:1rem">${tag(VE_IMP[v.importance])}${tag(VE_ST[v.statut])}${v.confidentiel?tag(['Confidentiel','bad']):''}${(v.domaines||[]).map(d=>`<span class="tag">${esc(d)}</span>`).join('')}${j?`<button class="btn ghost sm" data-act="veCR" data-id="${j.id}">Lire le compte rendu</button>`:''}<button class="btn ghost sm" data-act="veWord" data-id="${v.id}">Télécharger en Word</button></div>
+ <article class="card pvDoc">${c.synthese_direction?`<p><b>Ce que la direction doit retenir.</b> ${esc(c.synthese_direction)}</p>`:''}
+ ${L('Alertes et risques',L2(c.alertes),x=>`<li><b>${esc(x.titre)}</b> (gravité ${esc(x.gravite||'—')})${x.detail?` : ${esc(x.detail)}`:''}</li>`)}
+ ${L('Opportunités',L2(c.opportunites),x=>`<li><b>${esc(x.titre)}</b> · ${esc(OP_T[x.type]||x.type||'')}${x.echeance?` · échéance ${fmtD(x.echeance)}`:''}${x.detail?` : ${esc(x.detail)}`:''}${veDirige()?` <button class="btn ghost sm" data-act="veSuivre" data-id="${v.id}" data-t="${esc(x.titre)}">Suivre</button>`:''}</li>`)}
+ ${L('Besoins des communautés et pistes de projets',L2(c.besoins_communautaires),x=>`<li><b>${esc(x.probleme)}</b>${x.zone?` · ${esc(x.zone)}`:''}${x.public?` · ${esc(x.public)}`:''}${x.piste_de_projet?` — piste : ${esc(x.piste_de_projet)}`:''}</li>`)}
+ ${L('Évolution du contexte',L2(c.evolution_contexte),x=>`<li>${esc(x)}</li>`)}
+ ${L('Engagements et redevabilité',L2(c.redevabilite),x=>`<li><b>${esc(x.engagement||'')}</b>${x.envers?` · envers ${esc(x.envers)}`:''}${x.echeance?` · ${esc(x.echeance)}`:''}</li>`)}
+ ${L('Leçons apprises',L2(c.lecons),x=>`<li>${esc(x)}</li>`)}${L('Bonnes pratiques',L2(c.bonnes_pratiques),x=>`<li>${esc(x)}</li>`)}
+ ${L('Recommandations à la direction',L2(c.recommandations),x=>`<li><b>${esc(x.mesure||'')}</b>${x.responsable_suggere?` · ${esc(x.responsable_suggere)}`:''}${x.delai?` · ${esc(x.delai)}`:''}</li>`)}</article>
+ ${peut?`<form data-form="veDecision" data-id="${v.id}" class="card grid"><h3 class="trL" style="margin:0">Suite à donner</h3>
+  <div><label>Statut</label><select name="statut">${opts(Object.entries(VE_ST).map(([k,x])=>[k,x[0]]),v.statut)}</select></div><div><label>Importance</label><select name="importance">${opts(Object.entries(VE_IMP).map(([k,x])=>[k,x[0]]),v.importance)}</select></div>
+  <div class="trL"><label for="ve_dec">Orientation de la direction (qui fait quoi, pour quand)</label><textarea id="ve_dec" name="decision" rows="3">${esc(v.decision||'')}</textarea>${dictBtn('ve_dec')}</div>
+  <div class="trL"><button class="btn" type="submit">Enregistrer</button>${v.decide_par?` <span class="muted">Dernière orientation : ${esc(who(v.decide_par))}, ${fmtD(v.decide_le)}</span>`:''}</div></form>`:v.decision?`<section class="card"><h3>Orientation de la direction</h3><p class="pre">${esc(v.decision)}</p></section>`:''}`}
+function veOpps(){const O=(S.opps||[]).slice().sort((a,b)=>(a.echeance||'9999')<(b.echeance||'9999')?-1:1),j=d=>d?Math.round((new Date(d)-new Date(today()))/864e5):null,staff=S.staff.filter(u=>accesOK(u)&&u.role!=='EXT');
+ return `<section class="card"><h3>Opportunités suivies (${O.length})</h3><p class="muted">Une opportunité repérée en réunion ne doit pas se perdre : désignez un responsable et une échéance, puis suivez-la jusqu'à son issue.</p>
+ ${svT(['Opportunité','Type','Échéance','Responsable','Statut',''],O.map(o=>{const n=j(o.echeance);return [`<b>${esc(o.titre)}</b>${o.detail?`<br><span class="muted">${esc(o.detail)}</span>`:''}${o.veille_id&&S.veille.some(v=>v.id===o.veille_id)?`<br><button class="lnk" data-act="veVoir" data-id="${o.veille_id}">Note d'origine</button>`:''}`,esc(OP_T[o.type]||o.type),o.echeance?`${fmtD(o.echeance)}${n!=null&&n<=15&&['a_etudier','en_preparation'].includes(o.statut)?` <b class="txt-bad">(${n<0?'dépassée':'J-'+n})</b>`:''}`:'—',
+  veDirige()?`<select data-op="responsable_id" data-id="${o.id}" aria-label="Responsable">${opts(staff.map(u=>[u.id,u.nom]),o.responsable_id||'','—')}</select>`:esc(who(o.responsable_id)),
+  veDirige()||o.responsable_id===me.id?`<select data-op="statut" data-id="${o.id}" aria-label="Statut">${opts(Object.entries(OP_ST).map(([k,x])=>[k,x[0]]),o.statut)}</select>`:tag(OP_ST[o.statut]),
+  veDirige()||o.responsable_id===me.id?`<button class="btn ghost sm" data-act="veOpNote" data-id="${o.id}">Note</button>`:'']}),'Aucune opportunité suivie. Cliquez sur « Suivre » dans une note de veille.')}
+ ${veDirige()?`<details style="margin-top:.8rem"><summary>Ajouter une opportunité</summary><form data-form="veOp" class="grid" style="margin-top:.6rem;align-items:end"><div class="trL2"><label>Opportunité</label><input name="titre" required></div><div><label>Type</label><select name="type">${opts(Object.entries(OP_T),'financement')}</select></div><div><label>Échéance</label><input name="echeance" type="date"></div><div><label>Responsable</label><select name="responsable_id">${opts(staff.map(u=>[u.id,u.nom]),'','—')}</select></div><div class="trL"><label>Détail</label><input name="detail"></div><div><button class="btn" type="submit">Ajouter</button></div></form></details>`:''}</section>`}
+function veTerrain(){const lim=new Date(Date.now()-92*864e5).toISOString().slice(0,7),R=(S.rterrain||[]).filter(r=>moisDe(r.mois)>=lim&&(r.alertes||r.difficultes||r.besoins)).sort((a,b)=>a.mois<b.mois?1:-1);
+ return `<section class="card"><h3>Signaux remontés par le terrain · 3 derniers mois</h3><p class="muted">Alertes, rumeurs, difficultés et besoins écrits par les agents, les superviseurs et les chefs de projet dans leurs rapports mensuels. Ce sont souvent les premiers signes d'un problème ou d'un besoin nouveau dans les communautés.</p>
+ ${R.length?R.map(r=>`<div class="q-row"><div><b>${esc(libProj(projet(r.projet_id)||{nom:'Projet'}))}</b> · ${moisLib(moisDe(r.mois))} · ${esc(who(r.auteur_id))} (${r.niveau})<br>${r.alertes?`<span class="tag bad">alerte</span> ${esc(r.alertes)}<br>`:''}${r.difficultes?`<span class="tag warn">difficulté</span> ${esc(r.difficultes)}<br>`:''}${r.besoins?`<span class="tag">besoin</span> ${esc(r.besoins)}`:''}</div></div>`).join(''):'<p class="empty">Aucun signal remonté sur la période.</p>'}</section>`}
+function veBulletins(){const B=(S.capis||[]).filter(c=>c.type==='bulletin_veille'),a=new Date();a.setMonth(a.getMonth()-1);
+ return (veDirige()&&iaOK()?`<section class="card iaRac"><h3>${ico('etoile')} Préparer le bulletin de veille</h3><p class="muted">Le bulletin rassemble, pour la direction et le Conseil d'administration, les notes de veille, les signaux du terrain et les opportunités suivies de la période, du plus important au moins important.</p>
+ <form data-form="veBulletin" class="grid" style="align-items:end"><div><label>Du</label><input name="debut" type="date" required value="${a.toISOString().slice(0,10)}"></div><div><label>Au</label><input name="fin" type="date" required value="${today()}"></div><div><button class="btn iaB" type="submit">${ico('etoile')} Rédiger le bulletin</button></div></form></section>`:'')+
+ `<section class="card"><h3>Bulletins (${B.length})</h3>${svT(['Bulletin','Période','Statut',''],B.map(c=>[`<b>${esc(c.titre)}</b>`,`${fmtD(c.periode_debut)} → ${fmtD(c.periode_fin)}`,c.statut==='valide'?tag(['validé','ok']):tag(['brouillon','warn']),`<button class="btn ghost sm" data-act="veBull" data-id="${c.id}">Ouvrir</button>`]),'Aucun bulletin pour le moment.')}</section>`}
+function veCorps(v){const c=v.contenu||{},ul=(arr,f)=>arr.length?`<ul>${arr.map(x=>`<li>${f(x)}</li>`).join('')}</ul>`:'<p>—</p>';let n=0;const T=t=>`<h2>${++n}. ${t}</h2>`;
+ return `<h1 class="doc-t">NOTE DE VEILLE STRATÉGIQUE</h1><p class="doc-s">${esc(v.titre)} · ${fmtD(v.date_evt)}<br><b>Diffusion restreinte : direction et Conseil d'administration</b></p>
+ <table class="kv"><tr><th>Importance</th><td>${VE_IMP[v.importance][0]}</td></tr><tr><th>Cadre</th><td>${v.projet_id&&projet(v.projet_id)?esc(projet(v.projet_id).nom):'Activité institutionnelle'}</td></tr><tr><th>Domaines</th><td>${esc((v.domaines||[]).join(', ')||'—')}</td></tr></table>
+ ${T('Ce que la direction doit retenir')}<p>${esc(c.synthese_direction||'—')}</p>
+ ${T('Alertes et risques')}${ul(L2(c.alertes),x=>`<b>${esc(x.titre)}</b> (gravité ${esc(x.gravite||'—')})${x.detail?' : '+esc(x.detail):''}`)}
+ ${T('Opportunités')}${ul(L2(c.opportunites),x=>`<b>${esc(x.titre)}</b> · ${esc(OP_T[x.type]||'')}${x.echeance?' · échéance '+fmtD(x.echeance):''}${x.detail?' : '+esc(x.detail):''}`)}
+ ${T('Besoins des communautés et pistes de projets')}${ul(L2(c.besoins_communautaires),x=>`<b>${esc(x.probleme)}</b>${x.zone?' · '+esc(x.zone):''}${x.piste_de_projet?' — piste : '+esc(x.piste_de_projet):''}`)}
+ ${T('Évolution du contexte')}${ul(L2(c.evolution_contexte),esc)}
+ ${T('Engagements et redevabilité')}${ul(L2(c.redevabilite),x=>`${esc(x.engagement||'')}${x.envers?' · envers '+esc(x.envers):''}${x.echeance?' · '+esc(x.echeance):''}`)}
+ ${T('Leçons apprises et bonnes pratiques')}${ul([...L2(c.lecons),...L2(c.bonnes_pratiques).map(x=>'Bonne pratique : '+x)],esc)}
+ ${T('Recommandations')}${ul(L2(c.recommandations),x=>`${esc(x.mesure||'')}${x.responsable_suggere?' · '+esc(x.responsable_suggere):''}${x.delai?' · '+esc(x.delai):''}`)}
+ ${v.decision?T('Orientation de la direction')+`<p class="pre">${esc(v.decision)}</p>`:''}`}
+function veillePayload(j){return {activite:{nature:JO_T[j.type]||j.type,titre:j.titre,date:j.date_evt,lieu:j.lieu,structure_organisatrice:j.organisateur,role_osv:JO_ROLE[j.role_osv]||''},compte_rendu:j.pv,notes:j.notes,transcription:String(j.transcription||'').slice(0,60000),contexte:joContexte(j,j.id)}}
+function veAlertes(){if(!p15||!me||!['DE','DP'].includes(me.role))return [];const n=(S.veille||[]).filter(v=>v.statut==='a_examiner'&&['urgente','elevee'].includes(v.importance)).length,o=(S.opps||[]).filter(x=>['a_etudier','en_preparation'].includes(x.statut)&&x.echeance&&x.echeance>=today()&&(new Date(x.echeance)-new Date(today()))/864e5<=15).length;
+ return [...(n?[['bad',`${n} note(s) de veille importante(s) à examiner`,'go','veille']]:[]),...(o?[['warn',`${o} opportunité(s) dont l'échéance tombe dans moins de 15 jours`,'go','veille']]:[])]}
+async function veProduire(j){if(!p15||!iaOK())return null;const v=await iaAppel('veille',veillePayload(j));await rpc('veille_enregistrer',{j:j.id,c:v,imp:v.importance||'moyenne',dom:L2(v.domaines).map(String)});return v}
+
+document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target,t=f.dataset&&f.dataset.form;if(!['veDecision','veOp','veBulletin'].includes(t))return;e.preventDefault();e.stopImmediatePropagation();srvMsg='';dictStop();
+ const d=Object.fromEntries(new FormData(f).entries());
+ if(t==='veDecision'){action(()=>upd('veille_notes',`id=eq.${f.dataset.id}`,{statut:d.statut,importance:d.importance,decision:(d.decision||'').trim()||null}),'Orientation enregistrée.');return}
+ if(t==='veOp'){action(()=>ins('opportunites',{org_id:S.org.id,titre:String(d.titre).trim(),type:d.type,echeance:d.echeance||null,responsable_id:d.responsable_id||null,detail:(d.detail||'').trim()||null}),'Opportunité ajoutée au suivi.');return}
+ if(t==='veBulletin'){if(d.fin<d.debut){alert('La fin de la période précède son début.');return}const N=(S.veille||[]).filter(v=>v.date_evt>=d.debut&&v.date_evt<=d.fin);
+  const R=(S.rterrain||[]).filter(r=>moisDe(r.mois)>=d.debut.slice(0,7)&&moisDe(r.mois)<=d.fin.slice(0,7)&&(r.alertes||r.difficultes||r.besoins)).map(r=>({projet:(projet(r.projet_id)||{}).nom,mois:moisDe(r.mois),niveau:r.niveau,alertes:r.alertes,difficultes:r.difficultes,besoins:r.besoins}));
+  if(!N.length&&!R.length&&!confirm('Aucune note de veille ni aucun signal du terrain sur cette période. Continuer ?'))return;
+  iaAvec(e.submitter,async()=>{const r=await iaAppel('bulletin',{periode:{du:d.debut,au:d.fin},notes_de_veille:N.map(v=>({date:v.date_evt,activite:v.titre,importance:v.importance,domaines:v.domaines,projet:v.projet_id?(projet(v.projet_id)||{}).nom:'institutionnel',contenu:v.contenu,orientation_direction:v.decision})),signaux_terrain:R,opportunites_suivies:(S.opps||[]).map(o=>({titre:o.titre,type:o.type,statut:OP_ST[o.statut][0],echeance:o.echeance,responsable:who(o.responsable_id)}))});
+   const id=uuid();await ins('capitalisations',{id,org_id:S.org.id,type:'bulletin_veille',titre:String(r.titre||'Bulletin de veille stratégique').slice(0,200),periode_debut:d.debut,periode_fin:d.fin,contenu:{sections:L2(r.sections).map(s=>({titre:String(s.titre||''),contenu:String(s.contenu||'')}))},sources:{resume:`${N.length} note(s) de veille, ${R.length} signal(aux) du terrain, ${(S.opps||[]).length} opportunité(s) suivie(s)`}});
+   await srvLoad();view='journal';JR.tab='capi';JR.capSel=id;JR.capEdit=false;srvMsg='Bulletin rédigé : relisez-le, complétez-le, puis validez-le avant de le transmettre au Conseil d\'administration.';render();scrollTo(0,0)});return}
+},true);
+document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.target.closest('[data-act^="ve"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const a=b.dataset.act,id=b.dataset.id;srvMsg='';
+ if(a==='veTab'){VE.tab=b.dataset.v;VE.sel=null;render();return}
+ if(a==='veVoir'){view='veille';VE.sel=id;render();scrollTo(0,0);return}
+ if(a==='veFermer'){VE.sel=null;render();return}
+ if(a==='veCR'){view='journal';JR.sel=id;JR.edit=null;JR.capSel=null;render();scrollTo(0,0);return}
+ if(a==='veWord'){const v=S.veille.find(x=>x.id===id);telechargerWord(`Note_de_veille_${v.date_evt}.docx`,'Note de veille stratégique – '+v.titre,veCorps(v),{ref:`<b>DIFFUSION RESTREINTE</b><br>${fmtD(v.date_evt)}`});return}
+ if(a==='veSuivre'){const v=S.veille.find(x=>x.id===id),o=L2((v.contenu||{}).opportunites).find(x=>x.titre===b.dataset.t)||{titre:b.dataset.t};
+  action(()=>ins('opportunites',{org_id:S.org.id,veille_id:v.id,titre:String(o.titre).slice(0,300),type:OP_T[o.type]?o.type:'autre',detail:o.detail||null,echeance:/^\d{4}-\d{2}-\d{2}$/.test(o.echeance||'')?o.echeance:null}),'Opportunité ajoutée au suivi : désignez un responsable dans l\'onglet « Opportunités ».');return}
+ if(a==='veOpNote'){const o=S.opps.find(x=>x.id===id),n=prompt('Note de suivi (démarches, contacts, prochaine étape) :',o.notes||'');if(n==null)return;action(()=>upd('opportunites',`id=eq.${id}`,{notes:n.trim()||null,modifie_le:new Date().toISOString()}),'Note enregistrée.');return}
+ if(a==='veBull'){view='journal';JR.tab='capi';JR.capSel=id;JR.capEdit=false;render();scrollTo(0,0);return}
+},true);
+document.addEventListener('change',e=>{if(MODE!=='srv'||!me)return;const t=e.target;
+ if(t.dataset&&t.dataset.ve){VE[t.dataset.ve]=t.value;render();return}
+ if(t.dataset&&t.dataset.op){const k=t.dataset.op;action(()=>upd('opportunites',`id=eq.${t.dataset.id}`,{[k]:t.value||null,modifie_le:new Date().toISOString()}),'Opportunité mise à jour.')}});
+
 /* ---------- démarrage ---------- */
 async function srvInit(){
  if(MODE!=='srv'){render();return}
  save=function(){};                                              // rien de réel n'est gardé dans le navigateur
  const _log=log;log=function(a){if(me&&S.org&&S.org.id)ins('audit',{org_id:S.org.id,user_id:me.id,action:String(a).slice(0,500)}).catch(()=>{})};
- loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{journal:'Journal et comptes rendus',terrain:'Collecte terrain',contrats:'Contrats et conventions',missions:'TDR et ordres de mission',adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
+ loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{veille:'Veille stratégique',journal:'Journal et comptes rendus',terrain:'Collecte terrain',contrats:'Contrats et conventions',missions:'TDR et ordres de mission',adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
  render=srvRender;
- viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,missions:svMissions,contrats:svContrats,terrain:svTerrain,journal:svJournal,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
+ viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,missions:svMissions,contrats:svContrats,terrain:svTerrain,journal:svJournal,veille:svVeille,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
  S=srvVide();me=null;sess=sessLire();await omVerifCharger();
  const h=new URLSearchParams(location.hash.slice(1));                // retour d'un lien « mot de passe oublié »
  if(h.get('access_token')){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
