@@ -436,6 +436,8 @@ details>summary{font-size:.9rem}
 .trO b{font-size:.9rem;font-weight:600;line-height:1.3}.trO span{font-size:.76rem;color:var(--muted)}
 .trCat{min-height:5.4rem;border-color:color-mix(in srgb,var(--brand) 25%,var(--line))}.trCat b{font-size:1rem;color:var(--brand)}.trCat .trNb{margin-top:auto;font-weight:600}
 .trProj{margin:.35rem 0 0;line-height:1.35}
+.trGen{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-top:.6rem}.trGenB{display:grid;gap:.45rem;align-content:start;border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;background:var(--panel)}.trGenB h4{margin:0}.trGenB .btn{justify-self:start;margin-top:.3rem}
+.trPropQ{margin:.4rem 0 .6rem 1.2rem;font-size:.86rem}.trPropQ li{margin:.15rem 0}.trPropQ li.sec{display:block;margin-left:-1.2rem;margin-top:.5rem}.trProp summary{display:list-item;cursor:pointer;padding:.3rem 0}.trProp summary .trChk{display:inline-flex;gap:.4rem;align-items:center;margin-right:.3rem}
 .trO:hover,.trO:focus-visible{border-color:var(--brand);background:var(--brand-tint)}
 .trForm{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));align-items:start}
 .trForm>div>label,.trForm .lbl{display:block;margin-bottom:.25rem}
@@ -5616,6 +5618,78 @@ const MOD_OUTILS=[
   champs:[C('phase','Phase de l\'enquête contrôlée','choix',{requis:true,options:['Base (avant)','Finale (après)']}),C('ref','Repère du questionnaire contrôlé (heure, lieu)','texte',{requis:true}),
    C('q_age','Âge concordant','ouinon',{pts:true}),C('q_public','Public concordant','ouinon',{pts:true}),C('q_v1','Réponse sur le préservatif concordante','ouinon',{pts:true}),C('q_v8','Réponse sur le test du VIH concordante','ouinon',{pts:true}),C('q_c3','Réponse sur le mécanisme de plainte concordante','ouinon',{pts:true}),
    C('entretien','La personne confirme avoir été interrogée','ouinon',{requis:true}),C('obs','Observations','long')]}];
+
+/* ---------- outils de collecte conçus ou importés automatiquement ---------- */
+const OUT_ROLE={agent:'Agents communautaires',superviseur:'Superviseur',suivi_evaluation:'Suivi-évaluation',chef_projet:'Chef de projet'};
+const OUT_TYPES_OK=['seance','visite','mobilisation','distribution','plainte','enquete','suivi','autre'],CH_TYPES_OK=['texte','long','nombre','date','heure','choix','multi','ouinon','section'];
+const trSlugId=(s,vus)=>{let b=String(s||'q').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,30)||'q';if(/^\d/.test(b))b='q_'+b;let k=b,i=2;while(vus.has(k))k=b+'_'+i++;vus.add(k);return k};
+/* la réponse de l'assistant est contrôlée avant d'être proposée : types, options, tailles */
+function trPropNettoyer(r){const T=s=>String(s??'').trim();
+ const O=L2(r&&r.outils).slice(0,15).map(o=>{const vus=new Set(['phase_x']);const champs=L2(o.champs).slice(0,80).map(c=>{let type=CH_TYPES_OK.includes(c.type)?c.type:'texte';const options=L2(c.options).map(T).filter(Boolean).slice(0,40);
+   if(['choix','multi'].includes(type)&&options.length<2)type=options.length?'texte':'texte';
+   return {id:trSlugId(c.id||c.label,vus),label:T(c.label).slice(0,300)||'Question',type,...(['choix','multi'].includes(type)?{options:[...new Set(options)]}:{}),...(c.requis===true?{requis:true}:{}),...(T(c.aide)?{aide:T(c.aide).slice(0,300)}:{})}}).filter(c=>c.label);
+  const role=OUT_ROLE[o.role]?o.role:'agent';
+  return {titre:T(o.titre).slice(0,150)||'Outil',role,type:OUT_TYPES_OK.includes(o.type)?o.type:'autre',presence:['nominative','anonyme','non'].includes(o.presence)?o.presence:'non',theme:T(o.theme).slice(0,150),consignes:T(o.consignes).slice(0,2000),indicateurs:L2(o.indicateurs).map(T).filter(Boolean).slice(0,10),champs,choisi:true}}).filter(o=>o.champs.length||o.presence!=='non');
+ return {outils:O,remarques:L2(r&&r.remarques).map(T).filter(Boolean).slice(0,15)}}
+
+/* contexte du projet envoyé à l'assistant : uniquement ce qui sert à concevoir les outils */
+function trGenContexte(p,note){const N={og:'Objectif global',os:'Objectif spécifique',res:'Résultat attendu',act:'Activité'};
+ return {projet:{nom:p.nom,code:p.code,bailleur:p.bailleur,zone:p.zone,domaines:p.domaines||p.domaine,debut:p.debut,fin:p.fin},
+  cadre_logique:(S.cadre||[]).filter(x=>x.projet_id===p.id).map(x=>`${N[x.niveau]||x.niveau}${x.code?' '+x.code:''} : ${x.libelle}`).slice(0,60),
+  indicateurs:(S.inds||[]).filter(i=>i.projet_id===p.id).map(i=>({libelle:i.libelle,unite:i.unite,cible:i.cible,desagregation:i.desagregation||null})).slice(0,40),
+  tdr:(S.tdrs||[]).filter(t=>t.projet_id===p.id&&t.statut!=='brouillon').slice(0,6).map(t=>({titre:t.titre,objectifs:t.objectifs_specifiques,resultats:t.resultats,methodologie:String(t.methodologie||'').slice(0,800)})),
+  outils_deja_installes:trOutils(p).map(o=>o.titre),note_du_chef_de_projet:note||''}}
+
+/* Word et Excel : le texte est extrait dans le navigateur (le fichier ne quitte pas l'appareil tel quel) */
+async function zipLire(buf){const u=new Uint8Array(buf),dv=new DataView(buf),F={};let e=-1;for(let i=u.length-22;i>=Math.max(0,u.length-70000);i--)if(dv.getUint32(i,true)===0x06054b50){e=i;break}
+ if(e<0)throw new Error('Fichier illisible.');let off=dv.getUint32(e+16,true);const n=dv.getUint16(e+10,true),td=new TextDecoder();
+ for(let k=0;k<n;k++){const meth=dv.getUint16(off+10,true),csz=dv.getUint32(off+20,true),nl=dv.getUint16(off+28,true),xl=dv.getUint16(off+30,true),cl=dv.getUint16(off+32,true),lo=dv.getUint32(off+42,true),name=td.decode(u.subarray(off+46,off+46+nl));
+  F[name]=async()=>{const ln=dv.getUint16(lo+26,true),lx=dv.getUint16(lo+28,true),data=u.subarray(lo+30+ln+lx,lo+30+ln+lx+csz);if(meth===0)return td.decode(data);
+   const s=new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'));return await new Response(s).text()};off+=46+nl+xl+cl}
+ return F}
+const xmlTxt=s=>s.replace(/<[^>]+>/g,'').replace(/&#x([0-9a-f]+);/gi,(_,h)=>String.fromCodePoint(parseInt(h,16))).replace(/&#(\d+);/g,(_,d)=>String.fromCodePoint(Number(d))).replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&');
+async function trTexteBureautique(file){const F=await zipLire(await file.arrayBuffer());
+ if(F['word/document.xml']){const x=await F['word/document.xml']();return xmlTxt(x.replace(/<w:tab\/>/g,'\t').replace(/<\/w:p>\s*<\/w:tc>/g,'</w:tc>').replace(/<\/w:tc>/g,' | ').replace(/<\/w:p>/g,'\n').replace(/<\/w:tr>/g,'\n'))}
+ if(F['xl/workbook.xml']){const ss=F['xl/sharedStrings.xml']?[...(await F['xl/sharedStrings.xml']()).matchAll(/<si>([\s\S]*?)<\/si>/g)].map(m=>xmlTxt(m[1])):[];let out='';
+  for(const k of Object.keys(F).filter(k=>/^xl\/worksheets\/sheet\d+\.xml$/.test(k)).sort()){const x=await F[k]();out+=`\n=== Feuille ${k.match(/sheet(\d+)/)[1]} ===\n`;
+   for(const r of x.matchAll(/<row[^>]*>([\s\S]*?)<\/row>/g)){const cells=[...r[1].matchAll(/<c([^>]*)>([\s\S]*?)<\/c>/g)].map(c=>{const v=(c[2].match(/<v>([\s\S]*?)<\/v>/)||[])[1],is=(c[2].match(/<is>([\s\S]*?)<\/is>/)||[])[1];return /t="s"/.test(c[1])&&v!=null?ss[Number(v)]||'':is?xmlTxt(is):v??''});if(cells.some(Boolean))out+=cells.join(' | ')+'\n'}}
+  return out}
+ throw new Error(file.name+' : format non reconnu. Utilisez Word (.docx), Excel (.xlsx), PDF ou une photo.')}
+async function trPreparerFichiers(files){const imgs=[],textes=[];let poids=0;
+ for(const f of files){const x=f.name.split('.').pop().toLowerCase();
+  if(f.type.startsWith('image/')){const r=await imgReduire(f,2000,.85);imgs.push({media_type:'image/jpeg',data:b64De(r.data)});poids+=r.data.length}
+  else if(x==='pdf'){if(f.size>5*1024*1024)throw new Error(f.name+' : PDF trop lourd (5 Mo au plus). Découpez-le ou photographiez les pages utiles.');const d=await new Promise((ok,ko)=>{const fr=new FileReader();fr.onload=()=>ok(String(fr.result).split(',')[1]);fr.onerror=()=>ko(new Error('Lecture impossible : '+f.name));fr.readAsDataURL(f)});imgs.push({media_type:'application/pdf',data:d});poids+=d.length}
+  else if(['docx','xlsx'].includes(x))textes.push(`--- ${f.name} ---\n`+(await trTexteBureautique(f)).slice(0,60000));
+  else if(['txt','csv'].includes(x))textes.push(`--- ${f.name} ---\n`+(await f.text()).slice(0,60000));
+  else throw new Error(f.name+' : format non accepté. Utilisez une photo, un PDF, un fichier Word (.docx) ou Excel (.xlsx). Un ancien .doc ou .xls s\'enregistre d\'abord en .docx ou .xlsx.')}
+ if(imgs.length>8)throw new Error('8 photos ou PDF au plus à la fois.');if(poids>9000000)throw new Error('Fichiers trop lourds : envoyez-en moins à la fois.');
+ return {imgs,texte:textes.join('\n\n')}}
+
+function trGenCarte(p){if(!iaOK()||!['DE','DP','CP','SE'].includes(me.role))return '';
+ return `<section class="card iaRac"><h3>${ico('etoile')} Créer les outils automatiquement</h3>
+ <p class="muted">Deux façons, au choix. Les outils proposés s'affichent d'abord : vous cochez ceux à garder, puis vous les installez. Ils restent modifiables, et chaque modification crée une nouvelle version.</p>
+ <div class="trGen"><form data-form="terGen" class="trGenB"><h4>1. À partir du projet</h4><p class="muted">L'assistant lit le cadre logique, les indicateurs et les TDR de ce projet, puis conçoit les fiches de chaque niveau : agents, superviseur, suivi-évaluation.</p>
+  <label for="terGenNote">Précisions utiles (facultatif)</label><textarea id="terGenNote" name="note" rows="3" placeholder="ex. Les agents ne savent pas tous lire ; enquête avant et après ; le bailleur veut le nombre de femmes enceintes référées."></textarea>${dictBtn('terGenNote')}
+  <button class="btn iaB" type="submit">${ico('etoile')} Concevoir les outils de ce projet</button></form>
+ <form data-form="terImp" class="trGenB"><h4>2. À partir des outils du bailleur</h4><p class="muted">Photo ou scan des fiches papier, PDF, Word ou Excel : chaque outil est recopié fidèlement en formulaire, mêmes questions et mêmes choix.</p>
+  <label for="terImpF">Fichiers (8 au plus)</label><input id="terImpF" name="fichiers" type="file" multiple accept="image/*,.pdf,.docx,.xlsx,.txt,.csv">
+  <label for="terImpT">Ou collez le texte de l'outil</label><textarea id="terImpT" name="texte" rows="3"></textarea>
+  <button class="btn iaB" type="submit">${ico('etoile')} Convertir en formulaires</button></form></div></section>`}
+
+function trPropVue(p){const P=TR.prop;if(!P)return '';
+ return `<section class="card trProp"><h3>${P.source==='bailleur'?'Outils du bailleur convertis':'Outils proposés pour ce projet'} (${P.outils.length})</h3>
+ <p class="muted">Relisez chaque outil : décochez ceux à ne pas garder. Après l'installation, vous pourrez modifier les questions avec « Modifier ».</p>
+ ${P.remarques.length?`<div class="note"><b>À vérifier :</b><ul>${P.remarques.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
+ <form data-form="terPropInst">${P.outils.map((o,i)=>`<details class="trOd" ${i<2?'open':''}><summary><label class="trChk"><input type="checkbox" name="o_${i}" ${o.choisi?'checked':''}> <b>${esc(o.titre)}</b></label> <span class="muted">· ${esc(OUT_ROLE[o.role])} · ${esc(OUT_TYPES[o.type]||o.type)} · ${o.presence==='nominative'?'liste de présence':o.presence==='anonyme'?'comptage anonyme':'sans liste'} · ${o.champs.filter(c=>c.type!=='section').length} question(s)</span></summary>
+  ${o.indicateurs.length?`<p class="muted">Indicateurs alimentés : ${o.indicateurs.map(esc).join(' ; ')}</p>`:''}${o.consignes?`<p class="muted">Consignes : ${esc(o.consignes)}</p>`:''}
+  <ol class="trPropQ">${o.champs.map(c=>c.type==='section'?`<li class="sec"><b>${esc(c.label)}</b></li>`:`<li>${esc(c.label)}${c.requis?' <span class="req">*</span>':''} <span class="muted">(${esc({texte:'texte court',long:'texte long',nombre:'nombre',date:'date',heure:'heure',choix:'un choix',multi:'plusieurs choix',ouinon:'oui ou non'}[c.type])}${c.options?' : '+c.options.map(esc).join(', '):''})</span></li>`).join('')}</ol></details>`).join('')}
+ <div class="row" style="margin-top:.8rem"><button class="btn" type="submit">Installer les outils cochés</button><button class="btn ghost" type="button" data-act="terPropAnnul">Abandonner la proposition</button></div></form></section>`}
+
+async function trPropInstaller(p,choix){const L=TR.prop.outils.filter((o,i)=>choix[i]);if(!L.length)throw new Error('Cochez au moins un outil.');
+ await ins('outils_collecte',L.map(o=>({org_id:S.org.id,projet_id:p.id,modele:(['superviseur','suivi_evaluation'].includes(o.role)?'IA-SUP-':'IA-')+uuid().slice(0,8),titre:o.titre,type:o.type,theme:o.theme||null,presence:o.presence,
+  consignes:[o.consignes,o.indicateurs.length?'Indicateurs alimentés : '+o.indicateurs.join(' ; ')+'.':''].filter(Boolean).join('\n\n')||null,champs:o.champs.map(({id,label,type,options,requis,aide})=>({id,label,type,...(options?{options}:{}),...(requis?{requis}:{}),...(aide?{aide}:{})}))})));
+ return L.length}
+
 /* l'agent choisit d'abord ce qu'il fait, puis le type d'activité */
 const TR_CAT=[['prep','Préparer le terrain','Profil du village, consultation, mobilisation des leaders',['PROFIL','CONSULT','MOBIL']],
  ['enq','Enquête','Questionnaire avant ou après, comptage des casques',['ENQCH','CAP','COMPTAGE']],
@@ -5627,7 +5701,7 @@ const TR_LIB={SEANCE:['Causerie de groupe','avec liste de présence'],VAD:['Visi
  PROFIL:['Profil du village et croquis','une fois par localité'],CONSULT:['Consultation communautaire','une fiche par groupe consulté'],MOBIL:['Rencontre avec les leaders','chefferie, religieux, associations'],
  ENQCH:['Questionnaire d\'enquête','une personne interrogée, sans nom'],CAP:['Enquête CAP','questionnaire individuel'],COMPTAGE:['Comptage des casques','30 minutes à un point fixe'],
  DISTRIB:['Distribution','liste d\'émargement'],PLAINTE:['Plainte d\'un habitant','mécanisme de gestion des plaintes'],INCIDENT:['Incident ou alerte','accident, rumeur, tension'],SUPERV:['Grille de supervision','observer un ASC, score calculé'],CQENQ:['Contrôle des enquêtes','réinterroger 1 personne sur 10']};
-const trCatDe=o=>(TR_CAT.find(c=>c[3].includes(o.modele))||['autre'])[0];
+const trCatDe=o=>{const c=TR_CAT.find(c=>c[3].includes(o.modele));if(c)return c[0];if(trEstSupO(o))return 'sup';return {enquete:'enq',seance:'sens',visite:'sens',mobilisation:'prep',distribution:'dist',plainte:'alerte'}[o.type]||'autre'};
 function trChoixOutils(O){const C=[...TR_CAT.map(c=>({k:c[0],t:c[1],d:c[2],L:O.filter(o=>trCatDe(o)===c[0])})),{k:'autre',t:'Autres activités',d:'Outils propres à ce projet',L:O.filter(o=>trCatDe(o)==='autre')}].filter(c=>c.L.length);
  const btn=o=>{const l=TR_LIB[o.modele];return `<button class="trO" data-act="terRemplir" data-id="${o.id}"><b>${esc(l?l[0]:o.titre)}</b><span>${esc(l?l[1]:(OUT_TYPES[o.type]||''))}${o.presence==='nominative'&&!(l&&/liste/.test(l[1]))?' · liste de présence':''}</span></button>`};
  if(C.length<2)return `<div class="trOutils">${O.map(btn).join('')}</div>`;
@@ -5636,7 +5710,7 @@ function trChoixOutils(O){const C=[...TR_CAT.map(c=>({k:c[0],t:c[1],d:c[2],L:O.f
  return `<p><button class="lnk" data-act="terCat" data-v="">← Autre type d'activité</button></p><h4 class="trSec" style="margin-top:.2rem">${esc(cur.t)} : quel type ?</h4><div class="trOutils">${cur.L.map(btn).join('')}</div>`}
 /* outils remplis par l'encadrement (superviseure, suivi-évaluation), pas proposés aux ASC */
 const OUT_SUP=['SUPERV','CQENQ'];
-const trEstSupO=o=>!!o&&OUT_SUP.includes(o.modele);
+const trEstSupO=o=>!!o&&(OUT_SUP.includes(o.modele)||/^IA-SUP-/.test(o.modele||''));
 const trEstSup=x=>trEstSupO(trOutil(x.outil_id));
 /* score d'une grille : « oui » = 1 point, « non » = 0, « sans objet » retiré du total */
 function trScore(o,d){const P=(o&&o.champs||[]).filter(c=>c.pts);let ok=0,n=0;P.forEach(c=>{const v=(d||{})[c.id];if(v==='oui'){ok++;n++}else if(v==='non')n++});return {ok,n,pct:n?Math.round(100*ok/n):null}}
@@ -5649,7 +5723,7 @@ const PACK_CHANTIER=['PROFIL','CONSULT','ENQCH','COMPTAGE','MOBIL','SEANCE','MAS
 /* ---------- vue principale ---------- */
 function svTerrain(){
  if(!p12)return head('Collecte terrain','')+'<p class="note">Exécutez le script 12 dans Supabase pour activer la collecte des données terrain.</p>';
- if(TR.user!==me.id)Object.assign(TR,{user:me.id,tab:null,pid:null,fiche:null,saisie:null,outil:null,agent:'',statut:'',outilF:'',refForm:false,cat:null});
+ if(TR.user!==me.id)Object.assign(TR,{user:me.id,tab:null,pid:null,fiche:null,saisie:null,outil:null,agent:'',statut:'',outilF:'',refForm:false,cat:null,prop:null});
  const L=trProjets(),p=trP();
  if(!p)return head('Collecte terrain','Fiches d\'activité, listes de présence, références et rapports des agents communautaires.')+'<p class="empty">Vous n\'êtes affecté(e) à aucun projet. Le chef de projet ou le DP vous affecte dans « Personnel des projets ».</p>';
  TR.pid=p.id;const niv=trNiv(p);
@@ -5959,7 +6033,7 @@ function trQualite(p){const F=trFiches(p).filter(f=>moisDe(f.date_activite)===TR
 /* ---------- outils de collecte ---------- */
 function trOutilsVue(p,niv){const O=trOutils(p),gere=niv==='projet',inst=new Set(O.map(o=>o.modele));
  const F=trFiches(p);
- return `<section class="card"><h3>${gere?'Outils du projet':'Fiches du projet'} (${O.length})</h3><p class="muted">${gere?'Chaque projet a ses propres outils. Installez ceux de la bibliothèque OSV, adaptez-les (questions, choix), ou créez-en un. Modifier un outil crée une nouvelle version ; les fiches déjà remplies ne sont pas touchées.':'Imprimez les fiches vierges pour le terrain : elles portent le papier à en-tête d\'OSV. Recopiez-les ensuite dans l\'application et joignez la photo.'}</p>
+ return (gere?trPropVue(p)+(TR.prop?'':trGenCarte(p)):'')+`<section class="card"><h3>${gere?'Outils du projet':'Fiches du projet'} (${O.length})</h3><p class="muted">${gere?'Chaque projet a ses propres outils. Installez ceux de la bibliothèque OSV, adaptez-les (questions, choix), ou créez-en un. Modifier un outil crée une nouvelle version ; les fiches déjà remplies ne sont pas touchées.':'Imprimez les fiches vierges pour le terrain : elles portent le papier à en-tête d\'OSV. Recopiez-les ensuite dans l\'application et joignez la photo.'}</p>
  ${svT(['Outil','Type','Liste','#Questions','#Fiches','Indicateurs alimentés','Statut',''],O.map(o=>[`<b>${esc(o.titre)}</b>${o.theme?`<br><span class="muted">${esc(o.theme)}</span>`:''}`,esc(OUT_TYPES[o.type]||o.type),o.presence==='nominative'?'nominative':o.presence==='anonyme'?'décompte':'—',o.champs.filter(c=>c.type!=='section').length,num(F.filter(f=>f.outil_id===o.id).length),
   (o.liens||[]).filter(l=>l.indicateur_id).map(l=>esc(((S.inds||[]).find(i=>i.id===l.indicateur_id)||{}).libelle||'')).join('<br>')||'<span class="muted">aucun</span>',o.actif?tag(['en service','ok']):tag(['retiré','']),
   `<div class="row"><button class="btn ghost sm" data-act="terImpVierge" data-id="${o.id}">Fiche vierge</button>${gere?`<button class="btn ghost sm" data-act="terOutilEd" data-id="${o.id}">Modifier</button><button class="btn ghost sm" data-act="terOutilActif" data-id="${o.id}">${o.actif?'Retirer':'Remettre en service'}</button>`:o.actif?`<button class="btn sm" data-act="terRemplir" data-id="${o.id}">Remplir</button>`:''}</div>`]),'Aucun outil installé.')}
@@ -6051,6 +6125,10 @@ function trAlertes(){if(!p12||!me)return [];const A=[],L=trProjets();let av=0,co
 document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target,t=f.dataset&&f.dataset.form;if(!t||!t.startsWith('ter'))return;e.preventDefault();e.stopImmediatePropagation();srvMsg='';
  const d=Object.fromEntries(new FormData(f).entries()),p=trP();
  if(t==='terFiche'){trEnvoyerFiche(f);return}
+ if(t==='terGen'){iaAvec(e.submitter,async()=>{const r=await iaAppel('outils',trGenContexte(p,String(d.note||'').trim()));const P=trPropNettoyer(r);if(!P.outils.length)throw new Error('Aucun outil n\'a pu être proposé. Complétez le cadre logique et les indicateurs du projet, ou ajoutez des précisions.');TR.prop={source:'projet',...P};render();scrollTo(0,0)});return}
+ if(t==='terImp'){const files=[...f.elements.fichiers.files],txt=String(d.texte||'').trim();if(!files.length&&txt.length<30){alert('Choisissez les fichiers des outils du bailleur, ou collez leur texte.');return}
+  iaAvec(e.submitter,async()=>{const {imgs,texte}=await trPreparerFichiers(files);const r=await iaAppel('outil_import',{projet:p.nom,texte:[texte,txt].filter(Boolean).join('\n\n').slice(0,150000)},imgs.length?imgs:undefined);const P=trPropNettoyer(r);if(!P.outils.length)throw new Error('Aucun outil n\'a été reconnu dans ces fichiers.');TR.prop={source:'bailleur',...P};render();scrollTo(0,0)});return}
+ if(t==='terPropInst'){const ch=TR.prop.outils.map((o,i)=>!!(f.elements['o_'+i]&&f.elements['o_'+i].checked));action(async()=>{const n=await trPropInstaller(p,ch);TR.prop=null;srvMsg=`${n} outil(s) installé(s). Les agents les voient dès maintenant ; vous pouvez les modifier à tout moment.`},null);return}
  if(t==='terPiece'){const file=f.elements.fichier.files[0];action(()=>trJoindre(f.dataset.id,file),'Photo jointe à la fiche.');return}
  if(t==='terRef'){const r={id:uuid(),org_id:S.org.id,projet_id:p.id,agent_id:d.agent||me.id,date_reference:d.date_reference,code_beneficiaire:String(d.code_beneficiaire).trim().toUpperCase(),nom:(d.nom||'').trim()||null,telephone:(d.telephone||'').trim()||null,
    sexe:d.sexe,age:d.age===''?null:Number(d.age),handicap:!!d.handicap,localite:String(d.localite).trim(),motif:d.motif,motif_detail:(d.motif_detail||'').trim()||null,urgence:!!d.urgence,structure:String(d.structure).trim(),accompagne:!!d.accompagne};r.client_uuid=r.id;
@@ -6082,6 +6160,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.targ
  const fx=id&&S.fterrain.find(x=>x.id===id);
  if(a==='terTab'){TR.tab=b.dataset.v;TR.fiche=null;if(b.dataset.ref)TR.refForm=true;render();return}
  if(a==='terProjet'){TR.pid=id;render();return}
+ if(a==='terPropAnnul'){if(confirm('Abandonner cette proposition ?')){TR.prop=null;render()}return}
  if(a==='terCat'){TR.cat=b.dataset.v||null;render();return}
  if(a==='terRemplir'){const br=trLS.get('Brouillon',null);if(br&&br.outil===id&&br.pid===TR.pid)TR.saisie={outil:id,v:br.v};else{if(br&&!confirm('Une autre fiche commencée est gardée sur ce téléphone. La remplacer par une nouvelle fiche ?'))return;trLS.del('Brouillon');TR.saisie={outil:id}}render();scrollTo(0,0);return}
  if(a==='terReprendre'){const br=trLS.get('Brouillon',null);if(br){TR.pid=br.pid;TR.saisie={outil:br.outil,v:br.v}}render();scrollTo(0,0);return}
@@ -6586,7 +6665,7 @@ function iaReglagesVue(){const g=S.iaReg||{actif:true,quota_jour:40,quota_org_jo
  return `<section class="card"><h3>Réglages de l'assistant de rédaction</h3><p class="muted">La clé de l'API est rangée sur le serveur (secrets Supabase), jamais dans l'application. Vous pouvez suspendre l'assistant à tout moment et limiter le nombre de demandes, pour maîtriser la facture.</p>
  <form data-form="iaReg" class="grid" style="align-items:end"><div><label class="trChk"><input type="checkbox" name="actif" ${g.actif!==false?'checked':''}> Assistant activé</label></div><div><label>Demandes par personne et par jour</label><input name="quota_jour" type="number" min="0" max="1000" value="${g.quota_jour}"></div><div><label>Demandes par jour pour toute l'organisation</label><input name="quota_org_jour" type="number" min="0" max="20000" value="${g.quota_org_jour}"></div><div><button class="btn" type="submit">Enregistrer</button></div></form></section>
  <div class="kpis"><div class="kpi"><b>${num(uj.length)}</b><span>demandes aujourd'hui</span></div><div class="kpi"><b>${num(um.length)}</b><span>demandes ce mois</span></div><div class="kpi"><b>${num(Math.round(tk(um)/1000))} k</b><span>jetons ce mois (entrée + sortie)</span></div><div class="kpi"><b>${num(um.filter(u=>u.statut==='erreur').length)}</b><span>échecs ce mois</span></div></div>
- <section class="card"><h3>Utilisation du mois</h3>${trBarres(Object.entries(parT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[{fiche:'Fiches remplies à partir d\'un récit',tdr:'TDR rédigés',microplan:'Microplans',rapport:'Rapports mensuels',pv:'Comptes rendus',capitalisation:'Capitalisation et redevabilité',veille:'Notes de veille',bulletin:'Bulletins de veille',ameliorer:'Améliorations de texte',presence:'Listes de présence lues sur photo',compilation:'Rapports globaux compilés'}[k]||k,v]))||'<p class="empty">Aucune demande ce mois.</p>'}
+ <section class="card"><h3>Utilisation du mois</h3>${trBarres(Object.entries(parT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[{fiche:'Fiches remplies à partir d\'un récit',tdr:'TDR rédigés',microplan:'Microplans',rapport:'Rapports mensuels',pv:'Comptes rendus',capitalisation:'Capitalisation et redevabilité',veille:'Notes de veille',bulletin:'Bulletins de veille',ameliorer:'Améliorations de texte',presence:'Listes de présence lues sur photo',compilation:'Rapports globaux compilés',outils:'Outils de collecte conçus',outil_import:'Outils de bailleurs convertis'}[k]||k,v]))||'<p class="empty">Aucune demande ce mois.</p>'}
  ${Object.keys(parU).length?`<h4>Par personne</h4>${trBarres(Object.entries(parU).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>[who(k),v]))}`:''}
  <p class="muted">Le coût dépend du nombre de jetons et du modèle choisi ; consultez la console de votre fournisseur (Anthropic) pour la facture réelle.</p></section>`}
 
