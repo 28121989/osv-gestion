@@ -574,6 +574,15 @@ td{padding:.6rem .7rem}
 .lnk{font-size:.92rem}
 label{color:color-mix(in srgb,var(--ink) 82%,var(--muted))}
 .note{border-radius:10px}
+.tdrApercu .tdr{max-width:860px}.tdrApercu .saut{border-top:1px dashed var(--line);margin:1.6rem 0}.tdrApercu .tg{min-height:0;display:block;padding:0}
+.tdrApercu .tg-proj{text-align:center;font-weight:700;letter-spacing:.03em;color:var(--c-vert);margin:.4rem 0}.tdrApercu .tg-sp{text-align:center;font-style:italic;font-weight:700;color:var(--c-bord);margin:0 0 1rem}
+.tdrApercu .tg-tdr{text-align:center;font-weight:700;letter-spacing:.18em;color:var(--c-vert);margin:.6rem 0}.tdrApercu .tg-boite{border:1px solid var(--c-violet);background:var(--c-violet-t);border-radius:10px;padding:1.4rem 1rem;margin:0 auto 1.2rem;max-width:640px;text-align:center}
+.tdrApercu .tg-boite b{display:block;font-size:1.3rem;line-height:1.3;color:var(--c-violet)}.tdrApercu .tg-boite i{display:block;margin-top:.5rem}
+.tdrApercu table{width:100%;border-collapse:collapse;margin:.4rem 0 1rem}.tdrApercu th,.tdrApercu td{border:1px solid var(--line);padding:.45rem .6rem;text-align:left;vertical-align:top}.tdrApercu thead th{background:var(--c-vert)!important;color:#fff!important}
+.tdrApercu table.tg-kv{max-width:640px;margin:0 auto 1.2rem}.tdrApercu table.tg-kv th{width:38%}.tdrApercu .tg-sig{display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:640px;margin:0 auto}.tdrApercu .tg-sig small{display:block;font-weight:700;letter-spacing:.08em;color:var(--c-vert);font-size:.72rem}.tdrApercu .tg-sig b{display:block}
+.tdrApercu h2{font-size:1.08rem;color:var(--c-vert);margin:1.3rem 0 .5rem}.tdrApercu h3.tdr-s,.tdrApercu h4{color:var(--c-bord);font-size:.98rem;margin:.9rem 0 .35rem}.tdrApercu .tdr-som{list-style:none;padding:0}.tdrApercu .tdr-som li.s{padding-left:1.2rem;color:var(--muted)}
+.tdrApercu td.c{font-weight:700;color:var(--c-violet)}.tdrApercu td.g{font-weight:600}.tdrApercu tr.tot td{font-weight:700}.tdrApercu ol.os{list-style:none;padding-left:.8rem}.tdrApercu ol.os li{font-weight:600}.tdrApercu .num{text-align:right}
+
 .pfNom{min-width:15rem;max-width:22rem;display:flex;flex-direction:column;align-items:flex-start;gap:.15rem}
 .pfNom .lnk{text-align:left;font-weight:600;line-height:1.4;color:var(--c-vert)}
 .pfCode{font-size:.72rem;letter-spacing:.06em;color:var(--c-violet);font-weight:650}
@@ -1908,7 +1917,7 @@ async function srvLoad(){
  const T5=await Promise.all([sel('budget_lignes',f),sel('depenses',f),sel('financements',f),sel('seuils_approbation',f)].map(opt));p05=T5[0]!==null;[N.blignes,N.depenses,N.financements,N.seuils]=T5.map(x=>x||[]);
  const T6=await Promise.all(['comptes_tresorerie','mouvements','rapprochements','avances','fournisseurs','seuils_achat','achats','devis','baremes_mission','missions','biens','inventaires','plan_comptable','correspondances'].map(t=>sel(t,f)).concat([sel('inventaire_lignes')]).map(opt));p06=T6[3]!==null;
  const T7=await opt(sel('mission_membres',f+'&order=ordre'));p07=T7!==null;N.mmembres=T7||[];p11=p07&&(await opt(sel('missions','select=revision&limit=1')))!==null;N.mrev=p11?(await opt(sel('missions_revisions',f+'&order=le')))||[]:[];
- const T8=await Promise.all([sel('tdrs',f+'&order=cree_le.desc'),sel('tdr_avis',f+'&order=le'),sel('acces_budget',f)].map(opt));p08=T8[0]!==null;N.tdrs=T8[0]||[];N.tavis=T8[1]||[];N.accBud=T8[2]||[];
+ const T8=await Promise.all([sel('tdrs',f+'&order=cree_le.desc'),sel('tdr_avis',f+'&order=le'),sel('acces_budget',f)].map(opt));p08=T8[0]!==null;p20=p08&&(await opt(sel('tdrs','select=details&limit=1')))!==null;N.tdrs=T8[0]||[];N.tavis=T8[1]||[];N.accBud=T8[2]||[];
  const T10=await opt(sel('contrats',f+'&order=redige_le.desc'));p10=T10!==null;N.contrats=T10||[];p10f=p10&&(await opt(sel('contrats','select=fiche&limit=1')))!==null;
  const T13=await Promise.all([sel('journal',f+'&order=date_evt.desc&limit=3000'),sel('capitalisations',f+'&order=cree_le.desc'),sel('ia_reglages',f)].map(opt));p13=T13[0]!==null;N.journal=T13[0]||[];N.capis=T13[1]||[];N.iaReg=(T13[2]||[])[0]||null;p14=p13&&(await opt(sel('journal','select=cadre&limit=1')))!==null;p16=p14&&(await opt(sel('journal','select=parent_id&limit=1')))!==null;
  const T19=await opt(sel('projets','select=id,entete_logos&'+f));p19=T19!==null;(T19||[]).forEach(r=>{const x=N.projets.find(y=>y.id===r.id);if(x)x.entete=r.entete_logos||null});
@@ -4632,16 +4641,16 @@ function omForm(t,m){if(!p07)return '';t=t||{};const tous=gAdm()||['DP','CP'].in
  const autres=S.staff.filter(u=>accesOK(u)&&u.role!=='EXT').sort((a,b)=>a.nom.localeCompare(b.nom));
  const acts=S.cadre.filter(c=>c.niveau==='act'),proj=S.projets.filter(p=>!['cloture','archive','rejete'].includes(p.statut)||(m&&p.id===m.projet_id));
  const h=t=>`<h4 style="grid-column:1/-1;margin:.8rem 0 0;border-bottom:1px solid var(--line,#ddd);padding-bottom:.2rem">${t}</h4>`;
- const jj=d=>d?d.split('-').reverse().join('/'):'';const mb=m?omMembres(m):[],coches=new Set(mb.map(x=>x.user_id).filter(Boolean));
+ const jj=d=>d?d.split('-').reverse().join('/'):'';const mb=m?omMembres(m):[],X=m?null:tdrVersOM(t),coches=m?new Set(mb.map(x=>x.user_id).filter(Boolean)):X.membres;
  /* valeurs : ordre existant (modification), sinon TDR validé (préremplissage) */
  const V=m?{type:m.type_mission,objet:m.objet,projet:m.projet_id,activite:m.activite_id,ligne:m.ligne_id,agent:m.agent_id,dest:m.destination,d1:m.date_depart,d2:m.date_retour,
    ext:mb.filter(x=>!x.user_id).map(x=>[x.nom,x.fonction||'',x.structure||''].join(' ; ')).join('\n'),
    it:(m.itineraire||[]).map(e=>[jj(e.date),e.heure,e.de,e.a,e.moyen].join(' ; ')).join('\n'),acc:(m.accueil||[]).map(a=>[a.structure,a.localite,a.contact].join(' ; ')).join('\n'),
    transport:m.transport,vehicule:m.vehicule||'',chauffeur:m.chauffeur||'',heb:m.hebergement,tdr:m.tdr||'',res:m.resultats||'',pd:m.per_diem_jour,ft:m.frais_transport,af:m.autres_frais,urg:m.urgence||'',secu:m.securite??OM_SECU}
-  :{type:t.type_mission,objet:t.titre||'',projet:t.projet_id||'',activite:t.activite_id||'',ligne:t.ligne_id||'',agent:t.auteur_id||me.id,dest:t.destination||'',d1:t.date_debut||'',d2:t.date_fin||'',ext:'',it:'',acc:'',
-   transport:OM_TRANSP[0],vehicule:'',chauffeur:'',heb:OM_HEB[0],tdr:[t.objectif_general,t.objectifs_specifiques].filter(Boolean).join('\n'),res:[t.resultats,t.livrables].filter(Boolean).join('\n'),pd:'',ft:0,af:0,urg:'',secu:OM_SECU};
+  :{type:t.type_mission,objet:t.titre||'',projet:t.projet_id||'',activite:t.activite_id||'',ligne:t.ligne_id||'',agent:X.agent,dest:t.destination||'',d1:t.date_debut||'',d2:t.date_fin||'',ext:X.ext,it:X.it,acc:X.acc,
+   transport:X.transport||OM_TRANSP[0],vehicule:X.vehicule,chauffeur:X.chauffeur,heb:X.heb||OM_HEB[0],tdr:[t.objectif_general,t.objectifs_specifiques].filter(Boolean).join('\n'),res:[t.resultats,t.livrables].filter(Boolean).join('\n'),pd:X.pd,ft:X.ft||0,af:0,urg:X.urg,secu:OM_SECU};
  const plus=(L,v)=>v&&!L.includes(v)?[...L,v]:L;
- const form=`<form data-form="mdMission" class="grid" style="align-items:end"${m?` data-mid="${m.id}"`:''}>${m?`<input type="hidden" name="mid" value="${m.id}">`:t.id?`<input type="hidden" name="tdr_id" value="${t.id}"><p class="note" style="grid-column:1/-1">Prérempli depuis le TDR ${esc(t.numero||'')} « ${esc(t.titre)} ».</p>`:''}
+ const form=`<form data-form="mdMission" class="grid" style="align-items:end"${m?` data-mid="${m.id}"`:''}>${m?`<input type="hidden" name="mid" value="${m.id}">`:t.id?`<input type="hidden" name="tdr_id" value="${t.id}"><p class="note" style="grid-column:1/-1">Prérempli depuis le TDR ${esc(t.numero||'')} « ${esc(t.titre)} »${X&&X.repris?' : objet, cadre, dates, équipe, itinéraire, moyens et frais repris du TDR. Vérifiez, puis envoyez à la signature':''}.</p>`:''}
  ${h('1. Objet et cadre')}
  <div><label>Type de mission</label><select name="type_mission">${opts(plus(OM_TYPES,V.type).map(x=>[x,x]),V.type||OM_TYPES[0])}</select></div>
  <div style="grid-column:span 2"><label>Objet de la mission</label><input name="objet" required value="${esc(V.objet)}" placeholder="ex. Sensibilisation des riverains du chantier"></div>
@@ -4832,7 +4841,7 @@ const TDR_SEC=[['contexte','Contexte et justification','Pourquoi cette mission, 
  ['resultats','Résultats attendus (chiffrés)','ex. 300 riverains sensibilisés, dont au moins 50 % de femmes ; 4 séances tenues ; 20 plaintes enregistrées et transmises sous 72 h.'],
  ['cibles','Publics cibles','Qui, combien, où : effectifs prévus par village, par sexe et par tranche d\'âge.'],
  ['inclusion','Inclusion','Comment la mission atteint les femmes, les jeunes, les personnes âgées, les personnes handicapées et les non-lettrés : langue locale, horaires, lieux accessibles, interprète.'],
- ['methodologie','Démarche et activités','Déroulement, outils (causeries, porte-à-porte, théâtre forum…), supports, partenaires mobilisés.'],
+ ['methodologie','Approche méthodologique','Comment la mission est conduite : déroulement des séances, outils (causeries, porte-à-porte, théâtre forum…), supports, prise de parole, validation et adoption des conclusions.'],
  ['equipe','Composition de l\'équipe','Chef de mission, membres, rôle de chacun.'],
  ['chronogramme','Chronogramme','Jour par jour : date, lieu, activité.'],
  ['risques','Risques, sécurité et protection','Risques (route, santé, tensions, météo) et mesures ; rappel du code de conduite et de la protection contre l\'exploitation et les abus sexuels.'],
@@ -4865,23 +4874,210 @@ function svMissions(){if(!tdrEdit){tdrPre=null;tdrSimple=null}if(!p08)return hea
  <section class="card"><h3>Mes TDR (${mes.length})</h3>${svT(TDR_COLS,mes.map(tdrLigne),'Vous n\'avez pas encore rédigé de TDR. Chaque mission commence par là : « Rédiger un TDR ».')}</section>
  ${autres.length?`<section class="card"><h3>Autres TDR que vous pouvez consulter (${autres.length})</h3>${svT(TDR_COLS,autres.map(tdrLigne))}</section>`:''}`}
 
-function tdrEditeur(t){t=t||{};if(tdrPre&&tdrPre._pour===(t.id||'new'))t={...t,...tdrPre};if(tdrSimpleOn())return tdrEditeurSimple(t);const proj=S.projets.filter(p=>!['cloture','archive','rejete'].includes(p.statut)),acts=S.cadre.filter(c=>c.niveau==='act'),c=Math.round(tdrComplet(t)*100);
+/* ===== TDR au format complet : page de garde, sommaire, sigles, tableaux, logistique reprise dans l'ordre de mission ===== */
+let p20=false,TDRF=[];
+const TDR_TABS={
+ parties:['Parties prenantes pour la page de garde : une par ligne, « rôle ; nom »',['Rôle','Nom'],'Entreprise ; EBOMAF\nMission de contrôle ; BNETD\nMaître d\'œuvre délégué ; SODEXAM'],
+ sigles:['Sigles et abréviations : une ligne par sigle, « sigle ; signification »',['Sigle','Signification'],'BNETD ; Bureau national d\'études techniques et de développement\nIST ; Infections sexuellement transmissibles'],
+ resultats_tab:['Tableau des résultats : « résultat attendu ; indicateur et cible ; source de vérification »',['Résultat attendu','Indicateur et cible','Source de vérification'],'La réunion de démarrage est tenue ; 1 réunion le 26/10/2026 ; Compte rendu et liste de présence'],
+ chrono_tab:['Chronogramme : « date ; activités ; lieu ; responsable »',['Date','Activités','Lieu','Responsable'],'Dim. 25/10/2026 ; Départ, installation, préparation des supports ; Yamoussoukro, Kong ; Chef de projet'],
+ equipe_tab:['Équipe de la mission : « fonction ; nom ; responsabilités pendant la mission »',['Fonction','Nom','Responsabilités'],'Chef de projet ; Dr ASSAMOA Indé Nicolas ; Coordination, présentation du calendrier, compte rendu'],
+ materiel_tab:['Moyens matériels : « matériel ; quantité ; usage »',['Matériel','Quantité','Usage'],'Véhicule ; 1 ; Déplacement Yamoussoukro, Kong, Yamoussoukro\nVidéoprojecteur ; 1 ; Projection des supports'],
+ livrables_tab:['Livrables : « livrable ; échéance ; destinataire »',['Livrable','Échéance','Destinataire'],'Compte rendu et liste de présence ; 5 jours ouvrables après le retour ; EBOMAF, BNETD, SODEXAM'],
+ agenda_tab:['Agenda : « horaire ; séquence ; intervenant »',['Horaire','Séquence','Intervenant'],'09 h 00 à 09 h 15 ; Accueil et installation ; EBOMAF, OSV']};
+const tdrD=t=>(t&&t.details&&typeof t.details==='object'&&!Array.isArray(t.details))?t.details:{};
+const tdrTab=(D,k)=>(Array.isArray(D[k])?D[k]:[]).filter(r=>Array.isArray(r)&&r.some(x=>String(x??'').trim())).map(r=>r.map(x=>String(x??'').trim()));
+const tabTxt=a=>(Array.isArray(a)?a:[]).map(r=>(Array.isArray(r)?r:[r]).map(x=>String(x??'').trim()).join(' ; ')).join('\n');
+const txtTab=(s,n)=>lignesTexte(s).map(c=>{const r=c.slice(0,n);while(r.length<n)r.push('');if(c.length>n)r[n-1]=c.slice(n-1).join(' ; ');return r}).filter(r=>r.some(Boolean));
+const nmNorm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\b(dr|docteur|m|mme|mlle|mr|pr)\b\.?/g,' ').replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();
+/* un nom écrit dans un TDR (« Dr ASSAMOA Indé Nicolas ») retrouvé parmi le personnel d'OSV */
+function staffDeNom(n){const a=nmNorm(n);if(!a)return null;const mots=a.split(' ').filter(w=>w.length>2);
+ return S.staff.find(u=>{const b=nmNorm(u.nom);if(!b)return false;if(a===b)return true;const mb=b.split(' ').filter(w=>w.length>2);return mb.length>=2&&mb.every(w=>mots.includes(w))||mots.length>=2&&mots.every(w=>mb.includes(w))})||null}
+/* texte libre vers blocs : paragraphes, puces « - », listes « 1. », intertitres « 1.1 … », « Activité 1 … » */
+function txtBlocs(s){const out=[];let ul=null,ol=null;String(s||'').split(/\r?\n/).forEach(l=>{const x=l.trim();if(!x){ul=ol=null;return}let m;
+ if((m=x.match(/^[-•*]\s+(.*)$/))){if(!ul){ul=[];out.push({ul})}ol=null;ul.push(m[1]);return}
+ if((m=x.match(/^\d{1,2}[.)]\s+(.*)$/))&&!/^\d+\.\d/.test(x)){if(!ol){ol=[];out.push({ol})}ul=null;ol.push(m[1]);return}
+ ul=ol=null;if(x.length<=150&&/^(\d+\.\d+\.?\s|(Activité|Étape|Phase|Jour|Séquence|Volet|Axe)\s+\d+\b)/i.test(x)){out.push({h3:x});return}
+ out.push({p:x})});return out}
+const tdrSignataires=t=>{const a=S.staff.find(u=>u.id===t.auteur_id)||{},v=t.valide_par&&S.staff.find(u=>u.id===t.valide_par),de=S.staff.find(u=>u.role==='DE'&&accesOK(u));
+ return {red:{nom:a.nom||who(t.auteur_id),fct:a.id?posteLib(a):''},val:v?{nom:v.nom,fct:posteLib(v),le:t.valide_le}:{nom:a.role==='DE'?'Président du Conseil d\'administration':(de?de.nom:'Directeur exécutif'),fct:a.role==='DE'?'':'Directeur exécutif',attente:true}}};
+/* le modèle du document : page de garde, sigles, sections numérotées, annexes */
+function tdrModele(t){const D=tdrD(t),p=t.projet_id&&projet(t.projet_id),secs=[],tb=k=>tdrTab(D,k),L=D.logistique||{};
+ const sec=(titre,blocs,subs)=>{blocs=(blocs||[]).filter(Boolean);subs=(subs||[]).filter(s=>s&&s.blocs&&s.blocs.length);if(blocs.length||subs.length)secs.push({titre,blocs,subs})};
+ sec('Contexte et justification',txtBlocs(t.contexte));
+ const os=String(t.objectifs_specifiques||'').split(/\r?\n/).map(x=>x.replace(/^\s*[-•*]\s*/,'').replace(/^\d{1,2}[.)]\s+/,'').trim()).filter(Boolean);
+ sec('Objectifs de la mission',[],[{titre:'Objectif général',blocs:txtBlocs(t.objectif_general)},{titre:'Objectifs spécifiques',blocs:os.length?[{ol:os.map((x,i)=>/^OS\s?\d+/i.test(x)?x:`OS${i+1} : ${x}`),os:true}]:[]}]);
+ const rt=tb('resultats_tab');
+ sec('Résultats attendus et indicateurs',rt.length?[{tab:{cols:['N°','Résultat attendu','Indicateur et cible','Source de vérification'],w:[7,37,30,26],rows:rt.map((r,i)=>[`R${i+1}`,r[0],r[1],r[2]]),code:1}},...txtBlocs(t.indicateurs)]:[...txtBlocs(t.resultats),...(t.indicateurs?[{h3:'Indicateurs de suivi'},...txtBlocs(t.indicateurs)]:[])]);
+ sec('Publics cibles et inclusion',[],[{titre:'Publics cibles',blocs:txtBlocs(t.cibles)},{titre:'Inclusion et accessibilité',blocs:txtBlocs(t.inclusion)}]);
+ sec('Description des activités',txtBlocs(D.activites));
+ const ct=tb('chrono_tab');sec('Chronogramme de la mission',ct.length?[{tab:{cols:['Date','Activités','Lieu','Responsable'],w:[17,43,20,20],rows:ct,g:1}}]:txtBlocs(t.chronogramme));
+ sec('Approche méthodologique',txtBlocs(t.methodologie));
+ const et=tb('equipe_tab');sec('Équipe de la mission et responsabilités',[...(et.length?[{tab:{cols:['Fonction','Nom','Responsabilités pendant la mission'],w:[25,25,50],rows:et,g:1}}]:[]),...txtBlocs(t.equipe)]);
+ const mt=tb('materiel_tab'),lg=[L.transport&&`Transport : ${L.transport}${L.vehicule?`, véhicule ${L.vehicule}`:''}${L.chauffeur?`, chauffeur ${L.chauffeur}`:''}.`,L.hebergement&&`Hébergement : ${L.hebergement}.`].filter(Boolean);
+ sec('Moyens logistiques et matériels',[...(mt.length?[{tab:{cols:['Matériel','Quantité','Usage'],w:[30,15,55],rows:mt,g:1,c2:1}}]:[]),...(lg.length?[{ul:lg}]:[])]);
+ sec('Risques, sécurité et protection',txtBlocs(t.risques));
+ const B=(t.budget||[]).filter(b=>b.libelle),tot=B.reduce((s,b)=>s+Math.round((Number(b.quantite)||0)*(Number(b.cout)||0)),0);
+ sec('Budget prévisionnel de la mission',B.length?[{tab:{cols:['Poste','Quantité','Unité','Coût unitaire (FCFA)','Montant (FCFA)'],w:[38,12,16,17,17],rows:[...B.map(b=>[b.libelle,num(b.quantite),b.unite||'',num(b.cout),num(Math.round((Number(b.quantite)||0)*(Number(b.cout)||0)))]),['Total','','','',num(tot)]],nums:[1,3,4],total:1}}]:[{p:'Le budget détaillé de la mission est arrêté avec le service administratif et financier.'}]);
+ const lt=tb('livrables_tab');sec('Livrables',[...(lt.length?[{tab:{cols:['Livrable','Échéance','Destinataire'],w:[42,28,30],rows:lt,g:1}}]:[]),...txtBlocs(t.livrables)]);
+ const ann=[],ag=tb('agenda_tab');if(ag.length)ann.push({titre:D.agenda_titre||'Agenda',blocs:[{tab:{cols:['Horaire','Séquence','Intervenant'],w:[22,50,28],rows:ag,g:1}}]});
+ const av=(S.tavis||[]).filter(a=>a.tdr_id===t.id&&!['brouillon','a_corriger'].includes(a.etape)).sort((a,b)=>a.le<b.le?-1:1);
+ if(t.id&&(av.length||t.statut!=='brouillon'))ann.push({titre:'Circuit de validation',blocs:[{tab:{cols:['Étape','Nom','Décision','Date'],w:[24,26,32,18],rows:[['Rédaction',who(t.auteur_id),'Rédigé',fmtD(t.cree_le)],...av.map(a=>[TDR_ETAPE[a.etape]||a.etape,who(a.par),((TDR_ST[a.decision]||[a.decision])[0])+(a.commentaire?' : '+a.commentaire:''),fmtD(a.le)])]}},...(t.statut==='valide'?[{p:`TDR ${t.numero||''} validé électroniquement dans OSV Gestion${t.valide_par?' par '+who(t.valide_par):''} le ${new Date(t.valide_le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}.`}]:[])]});
+ const parties=tb('parties'),aOSV=parties.some(r=>/s[ée]curit[ée] vie|\bOSV\b/i.test(r.join(' ')));
+ const kv=[['Date de début',fmtD(t.date_debut)],['Date de fin',fmtD(t.date_fin)],['Lieu des activités',D.lieu||t.destination||''],...(p&&p.bailleur?[['Bailleur',p.bailleur]]:[]),...parties.map(r=>[r[0],r[1]]),...(aOSV?[]:[['Structure de mise en œuvre',S.org.nom]]),['Référence',t.numero||'Attribuée à la validation']].filter(r=>r[1]);
+ const sig=tdrSignataires(t),sigles=tb('sigles');
+ return {garde:{projet:p?p.nom:'',sous_projet:D.sous_projet||'',titre:t.titre||'',sous_titre:D.sous_titre||'',type:t.type_mission||'',kv,sig},sigles,secs,ann,valide:t.statut==='valide'}}
+
+/* ---------- rendu HTML (aperçu à l'écran et impression) ---------- */
+const TDR_CSS=`.tdr,.tdr *{-webkit-print-color-adjust:exact;print-color-adjust:exact}.tg{padding-top:4mm}.tg-proj{text-align:center;font-weight:bold;font-size:11.5pt;letter-spacing:.03em;color:#1F5A45;margin:4mm 0 2mm}.tg-sp{text-align:center;font-style:italic;font-weight:bold;font-size:10.5pt;color:#7E2635;margin:0 0 8mm}
+.tg-tdr{text-align:center;font-weight:bold;font-size:12pt;letter-spacing:.18em;color:#1F5A45;margin:2mm 0 4mm}.tg-boite{border:1pt solid #4E417E;background:#F2F0F8;border-radius:3mm;padding:9mm 8mm;margin:0 6mm 9mm;text-align:center}.tg-boite b{display:block;font-size:17pt;line-height:1.25;color:#4E417E;letter-spacing:.02em}.tg-boite i{display:block;margin-top:4mm;font-size:10.5pt;color:#2b2b2b}
+table.tg-kv{width:88%;margin:0 auto 14mm}table.tg-kv th{width:38%;background:#F3F6F4;color:#1F5A45;font-size:9pt}table.tg-kv td{font-size:9.5pt}.tg-sig{display:grid;grid-template-columns:1fr 1fr;gap:10mm;margin:0 6mm;break-inside:avoid;page-break-inside:avoid}.tg-sig div{font-size:9.5pt;line-height:1.5}.tg-sig small{display:block;font-weight:bold;letter-spacing:.08em;color:#1F5A45;font-size:8pt}.tg-sig b{display:block}
+.tdr h2{font-size:12pt;letter-spacing:0;color:#1F5A45;margin:16px 0 6px}.tdr h3.tdr-s{font-size:10.5pt;color:#7E2635;margin:10px 0 4px}.tdr h4{font-size:10pt;color:#7E2635;margin:9px 0 3px}.tdr .tdr-som{list-style:none;padding:0;margin:0 0 6mm}.tdr .tdr-som li{padding:2px 0}.tdr .tdr-som li.s{padding-left:16px;color:#333}
+.tdr thead th{background:#1F5A45;color:#fff;font-size:8.5pt}.tdr tbody tr:nth-child(even) td{background:#F5F7F6}.tdr td.c{font-weight:bold;color:#4E417E;white-space:nowrap}.tdr td.g{font-weight:bold}.tdr tr.tot td{font-weight:bold;background:#F3F6F4}.tdr ol.os{list-style:none;padding-left:4mm}.tdr ol.os li{font-weight:bold;margin:2px 0}`;
+function tdrBlocsHTML(L){return L.map(b=>{if(b.p)return `<p>${esc(b.p)}</p>`;if(b.h3)return `<h4>${esc(b.h3)}</h4>`;if(b.ul)return `<ul>${b.ul.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;if(b.ol)return `<ol${b.os?' class="os"':''}>${b.ol.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`;
+ if(b.tab){const T=b.tab,n=T.rows.length;return `<table data-w="${T.w.join(',')}"><thead><tr>${T.cols.map((c,i)=>`<th${(T.nums||[]).includes(i)?' class="num"':''}>${esc(c)}</th>`).join('')}</tr></thead><tbody>${T.rows.map((r,ri)=>`<tr${T.total&&ri===n-1?' class="tot"':''}>${r.map((x,i)=>`<td class="${[T.code&&i===0?'c':'',T.g&&i===0?'g':'',(T.nums||[]).includes(i)||T.c2&&i===1?'num':''].filter(Boolean).join(' ')}">${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table>`}return ''}).join('')}
+function tdrHTML(t){const M=tdrModele(t),g=M.garde;
+ const garde=`<section class="tg">${g.projet?`<p class="tg-proj">${esc(g.projet.toUpperCase())}</p>`:''}${g.sous_projet?`<p class="tg-sp">${esc(/^sous-projet/i.test(g.sous_projet)?g.sous_projet:'Sous-projet : '+g.sous_projet)}</p>`:''}
+ <p class="tg-tdr">TERMES DE RÉFÉRENCE</p><div class="tg-boite"><b>${esc(g.titre.toUpperCase())}</b>${g.sous_titre?`<i>${esc(g.sous_titre)}</i>`:''}</div>
+ <table class="kv tg-kv">${g.kv.map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</table>
+ <div class="tg-sig"><div><small>TDR RÉDIGÉ PAR</small><b>${esc(g.sig.red.nom)}</b>${esc(g.sig.red.fct)}</div><div><small>TDR VALIDÉ PAR</small><b>${esc(g.sig.val.nom)}</b>${esc(g.sig.val.fct)}${g.sig.val.le?`<br><span class="petit">le ${fmtD(g.sig.val.le)}</span>`:g.sig.val.attente?'<br><span class="petit">En attente de validation</span>':''}</div></div></section>`;
+ const som=`<h2>Table des matières</h2><ul class="tdr-som">${M.sigles.length?'<li>Sigles et abréviations</li>':''}${M.secs.map((s,i)=>`<li>${i+1}. ${esc(s.titre)}</li>${s.subs.map((x,j)=>`<li class="s">${i+1}.${j+1} ${esc(x.titre)}</li>`).join('')}`).join('')}${M.ann.map((a,i)=>`<li>Annexe ${i+1}. ${esc(a.titre)}</li>`).join('')}</ul>${M.sigles.length?`<h2>Sigles et abréviations</h2>${tdrBlocsHTML([{tab:{cols:['Sigle','Signification'],w:[22,78],rows:M.sigles,g:1}}])}`:''}`;
+ const corps=M.secs.map((s,i)=>`<h2>${i+1}. ${esc(s.titre)}</h2>${tdrBlocsHTML(s.blocs)}${s.subs.map((x,j)=>`<h3 class="tdr-s">${i+1}.${j+1} ${esc(x.titre)}</h3>${tdrBlocsHTML(x.blocs)}`).join('')}`).join('');
+ const ann=M.ann.map((a,i)=>`<h2>Annexe ${i+1}. ${esc(a.titre)}</h2>${tdrBlocsHTML(a.blocs)}`).join('');
+ return `<div class="tdr">${garde}<div class="saut"></div>${som}<div class="saut"></div>${corps}${ann?`<div class="saut"></div>${ann}`:''}</div>`}
+function tdrImprimer(t){if(!t)return;ouvrirPapier(`TDR ${t.numero||''} ${t.titre}`,tdrHTML(t),{nom:`TDR_${(t.numero||'brouillon').replace(/\//g,'-')}`,projet:t.projet_id,css:TDR_CSS,ref:`TDR N° <b>${esc(t.numero||'-')}</b>`,filigrane:t.statut==='valide'?null:'PROJET NON VALIDÉ',wordFn:()=>tdrWord(t)})}
+
+/* ---------- export Word : page de garde, sommaire automatique, styles de titres, tableaux harmonisés ---------- */
+const TX={V:'1F5A45',B:'7E2635',Vi:'4E417E',Z:'F5F7F6',K:'F3F6F4',L:'C3CDC8'};
+function txP(runs,o={}){return `<w:p><w:pPr>${o.style?`<w:pStyle w:val="${o.style}"/>`:''}${o.keep?'<w:keepNext/>':''}${o.saut?'<w:pageBreakBefore/>':''}${o.tabs?`<w:tabs>${o.tabs}</w:tabs>`:''}${o.bas?`<w:pBdr><w:bottom w:val="single" w:sz="4" w:space="2" w:color="${o.bas}"/></w:pBdr>`:''}<w:spacing w:before="${o.av??0}" w:after="${o.ap??120}"${o.line?` w:line="${o.line}" w:lineRule="auto"`:''}/>${o.ind?`<w:ind w:left="${o.ind}" w:hanging="${o.hang||0}"/>`:''}<w:jc w:val="${o.jc||'both'}"/></w:pPr>${runs}</w:p>`}
+const txR=(t,f={})=>dxRun(String(t??''),{font:'Arial',...f});
+function txTable(T,o={}){const W=o.W||DX_W,w=T.w.map(x=>Math.floor(W*x/100)),brd=`<w:tblBorders>${['top','left','bottom','right','insideH','insideV'].map(b=>`<w:${b} w:val="single" w:sz="4" w:space="0" w:color="${TX.L}"/>`).join('')}</w:tblBorders>`;
+ const cell=(x,i,h,ri,tot)=>{const num=(T.nums||[]).includes(i)||T.c2&&i===1,fill=h?TX.V:tot?TX.K:ri%2?TX.Z:null;
+  return `<w:tc><w:tcPr><w:tcW w:w="${w[i]}" w:type="dxa"/>${fill?`<w:shd w:val="clear" w:color="auto" w:fill="${fill}"/>`:''}<w:tcMar><w:top w:w="50" w:type="dxa"/><w:bottom w:w="50" w:type="dxa"/></w:tcMar><w:vAlign w:val="${h?'center':'top'}"/></w:tcPr>${txP(txR(x,h?{b:true,sz:17,color:'FFFFFF'}:{sz:18,b:!!(tot||(T.code||T.g)&&i===0),color:T.code&&i===0?TX.Vi:null}),{ap:0,jc:num?(h?'center':'right'):'left'})}</w:tc>`};
+ return `<w:tbl><w:tblPr><w:tblW w:w="${W}" w:type="dxa"/>${o.centre?'<w:jc w:val="center"/>':''}${brd}<w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="100" w:type="dxa"/><w:right w:w="100" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${w.map(x=>`<w:gridCol w:w="${x}"/>`).join('')}</w:tblGrid>`+
+  `<w:tr><w:trPr><w:cantSplit/><w:tblHeader/></w:trPr>${T.cols.map((c,i)=>cell(c,i,true,0)).join('')}</w:tr>`+
+  T.rows.map((r,ri)=>`<w:tr><w:trPr><w:cantSplit/></w:trPr>${T.cols.map((c,i)=>cell(r[i]??'',i,false,ri,T.total&&ri===T.rows.length-1)).join('')}</w:tr>`).join('')+`</w:tbl>${txP('',{ap:80})}`}
+function txBlocs(L){return L.map(b=>{if(b.p)return txP(txR(b.p),{line:276});if(b.h3)return txP(txR(b.h3),{style:'Titre3',keep:true});
+ if(b.ul)return b.ul.map(x=>txP(txR('•',{color:TX.V})+'<w:r><w:tab/></w:r>'+txR(x),{ind:420,hang:280,ap:60,line:264,tabs:'<w:tab w:val="left" w:pos="420"/>'})).join('');
+ if(b.ol)return b.ol.map((x,i)=>b.os?txP(txR(x,{b:true}),{ind:280,ap:80,line:264,jc:'left'}):txP(txR(`${i+1}.`)+'<w:r><w:tab/></w:r>'+txR(x),{ind:420,hang:280,ap:60,line:264,tabs:'<w:tab w:val="left" w:pos="420"/>'})).join('');
+ if(b.tab)return txTable(b.tab);return ''}).join('')}
+async function tdrWord(t){try{const M=tdrModele(t),g=M.garde,ctx={imgs:[],n:0},band=bandeauDe(t.projet_id);
+ /* page de garde */
+ const nb='<w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(b=>`<w:${b} w:val="nil"/>`).join('')+'</w:tblBorders>';
+ const boite=`<w:tbl><w:tblPr><w:tblW w:w="8600" w:type="dxa"/><w:jc w:val="center"/><w:tblBorders>${['top','left','bottom','right'].map(b=>`<w:${b} w:val="single" w:sz="10" w:space="0" w:color="${TX.Vi}"/>`).join('')}</w:tblBorders><w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid><w:gridCol w:w="8600"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="8600" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F2F0F8"/><w:tcMar><w:top w:w="420" w:type="dxa"/><w:bottom w:w="420" w:type="dxa"/><w:left w:w="300" w:type="dxa"/><w:right w:w="300" w:type="dxa"/></w:tcMar></w:tcPr>${txP(txR(g.titre.toUpperCase(),{b:true,sz:34,color:TX.Vi}),{jc:'center',ap:g.sous_titre?160:0,line:252})}${g.sous_titre?txP(txR(g.sous_titre,{i:true,sz:22}),{jc:'center',ap:0}):''}</w:tc></w:tr></w:tbl>`;
+ const kvW=[3300,5300],kv=`<w:tbl><w:tblPr><w:tblW w:w="8600" w:type="dxa"/><w:jc w:val="center"/><w:tblBorders>${['top','bottom','insideH'].map(b=>`<w:${b} w:val="single" w:sz="4" w:space="0" w:color="${TX.L}"/>`).join('')}${['left','right','insideV'].map(b=>`<w:${b} w:val="nil"/>`).join('')}</w:tblBorders><w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid>${kvW.map(x=>`<w:gridCol w:w="${x}"/>`).join('')}</w:tblGrid>${g.kv.map(([k,v])=>`<w:tr><w:trPr><w:cantSplit/></w:trPr><w:tc><w:tcPr><w:tcW w:w="${kvW[0]}" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="${TX.K}"/><w:tcMar><w:top w:w="60" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/></w:tcMar></w:tcPr>${txP(txR(k,{b:true,sz:18,color:TX.V}),{ap:0,jc:'left'})}</w:tc><w:tc><w:tcPr><w:tcW w:w="${kvW[1]}" w:type="dxa"/><w:tcMar><w:top w:w="60" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/></w:tcMar></w:tcPr>${txP(txR(v,{sz:19}),{ap:0,jc:'left'})}</w:tc></w:tr>`).join('')}</w:tbl>`;
+ const sigC=(lab,s)=>`<w:tc><w:tcPr><w:tcW w:w="4300" w:type="dxa"/></w:tcPr>${txP(txR(lab,{b:true,sz:16,color:TX.V,sp:16}),{ap:60,jc:'left'})}${txP(txR(s.nom,{b:true,sz:19}),{ap:0,jc:'left'})}${s.fct?txP(txR(s.fct,{sz:18}),{ap:0,jc:'left'}):''}${s.le?txP(txR('le '+fmtD(s.le),{sz:16,color:'555555'}),{ap:0,jc:'left'}):s.attente?txP(txR('En attente de validation',{i:true,sz:16,color:'555555'}),{ap:0,jc:'left'}):''}</w:tc>`;
+ const sig=`<w:tbl><w:tblPr><w:tblW w:w="8600" w:type="dxa"/><w:jc w:val="center"/>${nb}<w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid><w:gridCol w:w="4300"/><w:gridCol w:w="4300"/></w:tblGrid><w:tr><w:trPr><w:cantSplit/></w:trPr>${sigC('TDR RÉDIGÉ PAR',g.sig.red)}${sigC('TDR VALIDÉ PAR',g.sig.val)}</w:tr></w:tbl>`;
+ let body=(g.projet?txP(txR(g.projet.toUpperCase(),{b:true,sz:24,color:TX.V,sp:10}),{jc:'center',av:200,ap:100}):txP('',{av:200}))+
+  (g.sous_projet?txP(txR(/^sous-projet/i.test(g.sous_projet)?g.sous_projet:'Sous-projet : '+g.sous_projet,{b:true,i:true,sz:21,color:TX.B}),{jc:'center',ap:360}):'')+
+  txP(txR('TERMES DE RÉFÉRENCE',{b:true,sz:26,color:TX.V,sp:60}),{jc:'center',av:240,ap:240})+boite+txP('',{ap:420})+kv+txP('',{ap:900})+sig;
+ /* sommaire et sigles */
+ const toc=[...(M.sigles.length?[[1,'Sigles et abréviations']]:[]),...M.secs.flatMap((s,i)=>[[1,`${i+1}. ${s.titre}`],...s.subs.map((x,j)=>[2,`${i+1}.${j+1} ${x.titre}`])]),...M.ann.map((a,i)=>[1,`Annexe ${i+1}. ${a.titre}`])];
+ body+=txP(txR('Table des matières',{b:true,sz:26,color:TX.V}),{saut:true,ap:200,jc:'left'})+
+  `<w:p><w:pPr><w:pStyle w:val="TM1"/><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="${DX_W}"/></w:tabs></w:pPr><w:r><w:fldChar w:fldCharType="begin" w:dirty="true"/></w:r><w:r><w:instrText xml:space="preserve"> TOC \\o "1-2" \\h \\z \\u </w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r>${txR(toc[0]?toc[0][1]:'')}</w:p>`+
+  toc.slice(1).map(([n,x])=>txP(txR(x),{style:'TM'+n,ap:40,jc:'left'})).join('')+`<w:p><w:r><w:fldChar w:fldCharType="end"/></w:r></w:p>`+
+  (M.sigles.length?txP(txR('Sigles et abréviations'),{style:'Titre1',av:360})+txTable({cols:['Sigle','Signification'],w:[22,78],rows:M.sigles,g:1}):'');
+ M.secs.forEach((s,i)=>{body+=txP(txR(`${i+1}. ${s.titre}`),{style:'Titre1',saut:i===0})+txBlocs(s.blocs)+s.subs.map((x,j)=>txP(txR(`${i+1}.${j+1} ${x.titre}`),{style:'Titre2'})+txBlocs(x.blocs)).join('')});
+ M.ann.forEach((a,i)=>{body+=txP(txR(`Annexe ${i+1}. ${a.titre}`),{style:'Titre1',saut:i===0})+txBlocs(a.blocs)});
+ const nBody=ctx.imgs.length;
+ /* en-têtes : la page de garde porte le bandeau complet, les pages suivantes une ligne discrète */
+ const h1=dxEntete(ctx,'',band),nH1=ctx.imgs.length;
+ const court=(t.titre||'').length>70?t.titre.slice(0,68)+'…':t.titre;
+ const h2=txP(txR(`${S.org.nom.toUpperCase()}, Termes de référence`,{sz:15,color:TX.V,b:true})+'<w:r><w:tab/></w:r>'+txR(`${court}${t.numero?', '+t.numero:''}`,{sz:15,color:'555555'}),{tabs:`<w:tab w:val="right" w:pos="${DX_W}"/>`,bas:TX.L,ap:0,jc:'left'});
+ const ftr=dxPied(null);
+ const NS='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"';
+ const rels=L=>`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${L.join('')}</Relationships>`,IR=i=>`<Relationship Id="${i.rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${i.nom}"/>`;
+ const te=new TextEncoder(),F=(name,str)=>({name,data:te.encode(str)});
+ const sty=(id,nom,rpr,ppr,lvl)=>`<w:style w:type="paragraph" w:styleId="${id}"><w:name w:val="${nom}"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/><w:pPr>${ppr}${lvl!=null?`<w:outlineLvl w:val="${lvl}"/>`:''}</w:pPr><w:rPr>${rpr}</w:rPr></w:style>`;
+ const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial" w:eastAsia="Arial"/><w:color w:val="1A1F1D"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:lang w:val="fr-FR"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style>`+
+  sty('Titre1','heading 1',`<w:b/><w:color w:val="${TX.V}"/><w:sz w:val="26"/><w:szCs w:val="26"/>`,'<w:keepNext/><w:spacing w:before="380" w:after="140"/><w:jc w:val="left"/>',0)+
+  sty('Titre2','heading 2',`<w:b/><w:color w:val="${TX.B}"/><w:sz w:val="22"/><w:szCs w:val="22"/>`,'<w:keepNext/><w:spacing w:before="240" w:after="100"/><w:jc w:val="left"/>',1)+
+  sty('Titre3','heading 3',`<w:b/><w:color w:val="${TX.B}"/><w:sz w:val="20"/><w:szCs w:val="20"/>`,'<w:keepNext/><w:spacing w:before="180" w:after="80"/><w:jc w:val="left"/>',2)+
+  sty('TM1','toc 1','<w:b/><w:sz w:val="20"/>',`<w:tabs><w:tab w:val="right" w:leader="dot" w:pos="${DX_W}"/></w:tabs><w:spacing w:before="80" w:after="40"/>`)+
+  sty('TM2','toc 2','<w:sz w:val="19"/>',`<w:tabs><w:tab w:val="right" w:leader="dot" w:pos="${DX_W}"/></w:tabs><w:spacing w:before="0" w:after="30"/><w:ind w:left="300"/>`)+`</w:styles>`;
+ const bI=ctx.imgs.slice(0,nBody),h1I=ctx.imgs.slice(nBody,nH1);
+ const files=[F('[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="gif" ContentType="image/gif"/><Default Extension="jpeg" ContentType="image/jpeg"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/header2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`),
+  F('_rels/.rels',rels(['<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>','<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>'])),
+  F('docProps/core.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${dxE('Termes de référence, '+(t.titre||''))}</dc:title><dc:creator>${dxE(S.org.nom)}</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString().slice(0,19)}Z</dcterms:created></cp:coreProperties>`),
+  F('word/styles.xml',styles),
+  F('word/settings.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:updateFields w:val="true"/><w:defaultTabStop w:val="708"/><w:characterSpacingControl w:val="doNotCompress"/></w:settings>`),
+  F('word/document.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ${NS}><w:body>${body}<w:sectPr><w:headerReference w:type="first" r:id="rIdH1"/><w:headerReference w:type="default" r:id="rIdH2"/><w:footerReference w:type="first" r:id="rIdF"/><w:footerReference w:type="default" r:id="rIdF"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1985" w:right="964" w:bottom="1814" w:left="964" w:header="454" w:footer="397" w:gutter="0"/><w:titlePg/></w:sectPr></w:body></w:document>`),
+  F('word/_rels/document.xml.rels',rels(['<Relationship Id="rIdS" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>','<Relationship Id="rIdT" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>','<Relationship Id="rIdH1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>','<Relationship Id="rIdH2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header2.xml"/>','<Relationship Id="rIdF" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>',...bI.map(IR)])),
+  F('word/header1.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr ${NS}>${h1}</w:hdr>`),F('word/_rels/header1.xml.rels',rels(h1I.map(IR))),
+  F('word/header2.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr ${NS}>${h2}</w:hdr>`),
+  F('word/footer1.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr ${NS}>${ftr}</w:ftr>`),
+  ...ctx.imgs.map(i=>({name:'word/media/'+i.nom,data:i.data}))];
+ const b=new Blob([await zipper(files).arrayBuffer()],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}),a=document.createElement('a');
+ a.href=URL.createObjectURL(b);a.download=`TDR_${(t.numero||'brouillon').replace(/\//g,'-')}_${String(t.titre||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'_').slice(0,50)}.docx`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}
+ catch(e){alert('Le fichier Word n\'a pas pu être créé : '+(e.message||e))}}
+
+/* ---------- éditeur complet ---------- */
+function tdrEditeur(t){t=t||{};if(tdrPre&&tdrPre._pour===(t.id||'new'))t={...t,...tdrPre};if(tdrSimpleOn())return tdrEditeurSimple(t);const proj=S.projets.filter(p=>!['cloture','archive','rejete'].includes(p.statut)),acts=S.cadre.filter(c=>c.niveau==='act'),c=Math.round(tdrComplet(t)*100),D=tdrD(t),L=D.logistique||{};
  const bud=(t.budget||[]).map(b=>`${b.libelle} ; ${b.quantite} ; ${b.unite||''} ; ${b.cout}`).join('\n');
  const cor=t.id&&S.tavis.filter(a=>a.tdr_id===t.id&&a.decision==='a_corriger').slice(-1)[0];
- return `<p><button class="lnk" data-act="tdrRetour">Retour aux TDR et ordres de mission</button></p>`+head(t.id?'Modifier le TDR':'Rédiger un TDR','Remplissez ce que vous savez ; le brouillon s\'enregistre et se complète plus tard. Pour soumettre, l\'objectif général, les résultats attendus, la destination et les dates sont obligatoires.')+(srvMsg&&tdrPre?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+`<p class="row"><button class="btn ghost sm" data-act="iaTdrMode" data-v="1">Version simple</button></p>`+
- (cor?`<section class="card notif"><h3>Corrections demandées par ${esc(who(cor.par))}</h3><p class="pre">${esc(cor.commentaire||'')}</p></section>`:'')+
- `<form data-form="tdrForm" data-id="${t.id||''}" class="card grid tdrF" style="align-items:end">
- <h3 style="grid-column:1/-1">Identification de la mission</h3>
- <div style="grid-column:span 2"><label>Intitulé de la mission</label><input name="titre" required value="${esc(t.titre||'')}" placeholder="ex. Sensibilisation des riverains du chantier de l'aéroport de Kong"></div>
- <div><label>Type de mission</label><select name="type_mission">${opts(OM_TYPES.map(x=>[x,x]),t.type_mission||OM_TYPES[0])}</select></div>
+ const TS=Object.fromEntries(TDR_SEC.map(s=>[s[0],s])),plein='grid-column:1/-1';
+ const sec=(k,n)=>{const [,l,ph]=TS[k];return `<div style="${plein}"><label for="tdr_${k}">${l}${['objectif_general','resultats'].includes(k)?' <span class="req">*</span>':''}</label><textarea id="tdr_${k}" name="${k}" rows="${n||3}" placeholder="${esc(ph)}">${esc(t[k]||'')}</textarea>${dictBtn('tdr_'+k)}</div>`};
+ const tabZ=(k,n=3)=>p20?`<div style="${plein}"><label for="tdrT_${k}">${TDR_TABS[k][0]}</label><textarea id="tdrT_${k}" name="det_${k}" rows="${n}" placeholder="${esc(TDR_TABS[k][2])}">${esc(tabTxt(D[k]))}</textarea></div>`:'';
+ const txD=(k,l,ph,n=4)=>p20?`<div style="${plein}"><label for="tdrD_${k}">${l}</label><textarea id="tdrD_${k}" name="det_${k}" rows="${n}" placeholder="${esc(ph)}">${esc(D[k]||'')}</textarea>${dictBtn('tdrD_'+k)}</div>`:'';
+ const st=S.staff.filter(u=>accesOK(u)&&u.role!=='EXT').sort((a,b)=>a.nom.localeCompare(b.nom)),plus=(Lst,v)=>v&&!Lst.includes(v)?[...Lst,v]:Lst;
+ const h3=(x,sous)=>`<h3 style="${plein};margin:1.2rem 0 0">${x}</h3>${sous?`<p class="muted" style="${plein};margin:0">${sous}</p>`:''}`;
+ const ia=iaOK()?`<section class="card iaRac"><h3>${ico('etoile')} Partir d'un document, du clavier ou de la voix</h3>
+  <p class="muted">Collez un texte (TDR du bailleur, note, courriel, ancien TDR) ou importez le fichier, puis ajoutez vos consignes et vos commentaires, à l'écrit ou au micro. Le contenu fourni est gardé et rangé dans les bonnes rubriques ; vos commentaires le complètent ou le corrigent. Ce qui est déjà rempli plus bas est conservé, sauf si vous demandez de le changer.</p>
+  <div class="row" style="gap:.6rem;align-items:center;margin-bottom:.5rem"><label class="btn ghost sm" for="tdrFich" style="cursor:pointer;margin:0">Importer un fichier</label><input id="tdrFich" type="file" accept=".docx,.pdf,.txt,image/png,image/jpeg" multiple hidden><span class="muted" id="tdrFichLib">${TDRF.length?`${TDRF.length} document(s) joint(s)`:'Word, PDF, texte ou photo'}</span></div>
+  <label for="tdrColle">Texte collé ou importé</label><textarea id="tdrColle" rows="6" placeholder="Collez ici le texte de départ (Ctrl+V)."></textarea>
+  <label for="tdrRecit" style="margin-top:.6rem">Vos consignes et commentaires</label><textarea id="tdrRecit" rows="4" placeholder="Ex. : La réunion se tient le 26 octobre dans les bureaux d'EBOMAF à Kong. Ajoute le BNETD et la SODEXAM comme participants. L'équipe part le 25 avec le véhicule OSV. Prévois un agenda de 9 h à 15 h."></textarea>
+  <div class="row iaRow">${dictBtn('tdrRecit','Parler')}<button type="button" class="btn iaB" data-act="iaTdr">${ico('etoile')} Rédiger ou compléter le TDR</button></div>${dictAide()}</section>`:'';
+ return `<p><button class="lnk" data-act="tdrRetour">Retour aux TDR et ordres de mission</button></p>`+head(t.id?'Modifier le TDR':'Rédiger un TDR','Remplissez ce que vous savez ; le brouillon s\'enregistre et se complète plus tard. Pour soumettre, l\'objectif général, les résultats attendus, la destination et les dates sont obligatoires. Chaque zone de texte accepte la dictée.')+(srvMsg&&tdrPre?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+`<p class="row"><button class="btn ghost sm" data-act="iaTdrMode" data-v="1">Version simple</button></p>`+
+ (cor?`<section class="card notif"><h3>Corrections demandées par ${esc(who(cor.par))}</h3><p class="pre">${esc(cor.commentaire||'')}</p></section>`:'')+ia+
+ `<form data-form="tdrForm" data-id="${t.id||''}" class="card grid tdrF" style="align-items:end">${p20?'<input type="hidden" name="det_on" value="1">':''}
+ ${h3('Page de garde')}
+ <div style="grid-column:span 2"><label>Intitulé de la mission</label><input name="titre" required value="${esc(t.titre||'')}" placeholder="ex. Réunion de démarrage du sous-projet"></div>
+ ${p20?`<div style="grid-column:span 2"><label>Sous-titre</label><input name="det_sous_titre" value="${esc(D.sous_titre||'')}" placeholder="ex. Validation du calendrier, des messages et des maquettes"></div>`:''}
+ <div><label>Type de mission</label><select name="type_mission">${opts(plus(OM_TYPES,t.type_mission).map(x=>[x,x]),t.type_mission||OM_TYPES[0])}</select></div>
  <div><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),t.projet_id||'','Hors projet')}</select></div>
+ ${p20?`<div style="grid-column:span 2"><label>Sous-projet ou volet</label><input name="det_sous_projet" value="${esc(D.sous_projet||'')}" placeholder="ex. Campagne de sensibilisation sur les IST, le VIH/sida et la sécurité routière"></div>`:''}
  <div style="grid-column:span 2"><label>Activité du cadre logique</label><select name="activite">${opts(acts.map(a=>[a.id,`${(projet(a.projet_id)||{}).code||''}, ${a.code?a.code+' ':''}${a.libelle}`.slice(0,140)]),t.activite_id||'','Aucune')}</select></div>
  <div style="grid-column:span 2"><label>Ligne budgétaire</label><select name="ligne">${opts(S.blignes.filter(l=>proj.some(p=>p.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''}, ${l.code?l.code+' ':''}${l.libelle}`.slice(0,140)]),t.ligne_id||'','À préciser')}</select></div>
- <div><label>Destination</label><input name="destination" value="${esc(t.destination||'')}" placeholder="ex. Kong"></div>
+ <div><label>Destination (ville)</label><input name="destination" value="${esc(t.destination||'')}" placeholder="ex. Kong"></div>
+ ${p20?`<div style="grid-column:span 2"><label>Lieu des activités (détail)</label><input name="det_lieu" value="${esc(D.lieu||'')}" placeholder="ex. Kong, bureaux d'EBOMAF (réunion le 26/10/2026)"></div>`:''}
  <div><label>Du</label><input name="date_debut" type="date" value="${t.date_debut||''}"></div><div><label>Au</label><input name="date_fin" type="date" value="${t.date_fin||''}"></div>
- ${TDR_SEC.map(([k,l,ph],i)=>`<div style="grid-column:1/-1"><label for="tdr_${k}">${i+1}. ${l}${['objectif_general','resultats'].includes(k)?' <span class="req">*</span>':''}</label><textarea id="tdr_${k}" name="${k}" rows="${['contexte','methodologie','chronogramme'].includes(k)?4:3}" placeholder="${esc(ph)}">${esc(t[k]||'')}</textarea></div>`).join('')}
- <div style="grid-column:1/-1"><label for="tdr_budget">${TDR_SEC.length+1}. Budget estimatif : une ligne par poste, « libellé ; quantité ; unité ; coût unitaire »</label><textarea id="tdr_budget" name="budget" rows="4" placeholder="Per diem équipe ; 12 ; personne-jour ; 15000&#10;Carburant ; 200 ; litre ; 875&#10;Location de sonorisation ; 4 ; séance ; 25000">${esc(bud)}</textarea></div>
- <div style="grid-column:1/-1" class="row"><button class="btn ghost" type="submit" value="brouillon">Enregistrer le brouillon</button><button class="btn" type="submit" value="soumettre">Enregistrer et soumettre</button>${t.id?'':''}<span class="muted">${t.id?`Complet à ${c} %`:''}</span></div></form>`}
+ ${tabZ('parties',3)}
+ ${h3('Contenu des termes de référence','Pour les listes, commencez la ligne par « - ». Pour un intertitre, écrivez par exemple « 1.1 Le projet » ou « Activité 1 : … » sur sa propre ligne.')}
+ ${tabZ('sigles',3)}
+ ${sec('contexte',6)}${sec('objectif_general',2)}${sec('objectifs_specifiques',4)}${sec('resultats',3)}${tabZ('resultats_tab',4)}${sec('indicateurs',2)}${sec('cibles',3)}${sec('inclusion',3)}
+ ${txD('activites','Description des activités','Activité 1 : Déplacement et préparation (25/10/2026)\n- Départ de Yamoussoukro pour Kong\n- Préparation des documents de travail',6)}
+ ${tabZ('chrono_tab',4)}${sec('chronogramme',2)}${sec('methodologie',5)}${tabZ('equipe_tab',4)}${sec('equipe',2)}${tabZ('materiel_tab',3)}${sec('risques',3)}
+ <div style="${plein}"><label for="tdr_budget">Budget estimatif : une ligne par poste, « libellé ; quantité ; unité ; coût unitaire »</label><textarea id="tdr_budget" name="budget" rows="4" placeholder="Per diem équipe ; 12 ; personne-jour ; 15000&#10;Carburant ; 200 ; litre ; 875&#10;Location de sonorisation ; 4 ; séance ; 25000">${esc(bud)}</textarea></div>
+ ${tabZ('livrables_tab',3)}${sec('livrables',2)}
+ ${p20?`<div style="grid-column:span 2"><label>Titre de l'agenda (annexe)</label><input name="det_agenda_titre" value="${esc(D.agenda_titre||'')}" placeholder="ex. Agenda de la réunion du 26 octobre 2026"></div>${tabZ('agenda_tab',4)}`:''}
+ ${p20?`${h3('Logistique de la mission','Ces informations et l\'équipe ci-dessus passent automatiquement dans l\'ordre de mission dès que le TDR est validé.')}
+ <div><label>Chef de mission</label><select name="log_chef">${opts(st.map(u=>[u.id,`${u.nom} (${posteLib(u)})`]),L.chef||t.auteur_id||me.id)}</select></div>
+ <div><label>Moyen de transport</label><select name="log_transport">${opts(plus(OM_TRANSP,L.transport).map(x=>[x,x]),L.transport||'','À préciser')}</select></div>
+ <div><label>Véhicule (immatriculation)</label><input name="log_vehicule" value="${esc(L.vehicule||'')}"></div><div><label>Chauffeur</label><input name="log_chauffeur" value="${esc(L.chauffeur||'')}"></div>
+ <div><label>Hébergement</label><select name="log_heb">${opts(plus(OM_HEB,L.hebergement).map(x=>[x,x]),L.hebergement||'','À préciser')}</select></div>
+ <div style="grid-column:span 2"><label>Contact d'urgence (nom et téléphone)</label><input name="log_urg" value="${esc(L.urgence||'')}"></div>
+ <div style="${plein}"><label>Étapes du voyage : une par ligne, « date ; heure ; de ; à ; moyen »</label><textarea name="log_it" rows="2" placeholder="25/10/2026 ; 06:00 ; Yamoussoukro ; Kong ; Véhicule OSV">${esc(tabTxt(L.itineraire))}</textarea></div>
+ <div style="${plein}"><label>Structures d'accueil et personnes à rencontrer : « structure ; localité ; contact »</label><textarea name="log_acc" rows="2" placeholder="EBOMAF, base vie ; Kong ; Responsable HSE">${esc(tabTxt(L.accueil))}</textarea></div>`:''}
+ <div style="${plein}" class="row"><button class="btn ghost" type="submit" value="brouillon">Enregistrer le brouillon</button><button class="btn" type="submit" value="soumettre">Enregistrer et soumettre</button><span class="muted">${t.id?`Complet à ${c} %`:''}</span></div></form>`}
+const tdrPatch=(d,anc)=>{const budget=lignesTexte(d.budget).map(c=>({libelle:c[0]||'',quantite:nbr(c[1])||0,unite:c[2]||'',cout:nbr(c[3])||0})).filter(b=>b.libelle);
+ const r={titre:String(d.titre||'').trim(),type_mission:d.type_mission||null,projet_id:d.projet||null,activite_id:d.activite||null,ligne_id:d.ligne||null,destination:(d.destination||'').trim()||null,date_debut:d.date_debut||null,date_fin:d.date_fin||null,budget};
+ TDR_SEC.forEach(([k])=>r[k]=(d[k]||'').trim()||null);
+ if(p20&&d.det_on){const D={...tdrD(anc)};['sous_titre','sous_projet','lieu','activites','agenda_titre'].forEach(k=>D[k]=String(d['det_'+k]||'').trim());
+  Object.entries(TDR_TABS).forEach(([k,v])=>D[k]=txtTab(d['det_'+k],v[1].length));
+  D.logistique={...(D.logistique||{}),chef:d.log_chef||null,transport:d.log_transport||'',vehicule:String(d.log_vehicule||'').trim(),chauffeur:String(d.log_chauffeur||'').trim(),hebergement:d.log_heb||'',urgence:String(d.log_urg||'').trim(),itineraire:txtTab(d.log_it,5),accueil:txtTab(d.log_acc,3)};
+  r.details=D}
+ return r};
+
+document.addEventListener('change',async e=>{const i=e.target;if(!i||i.id!=='tdrFich'||!i.files.length)return;const lib=document.getElementById('tdrFichLib'),ce=document.getElementById('tdrColle');
+ try{lib.textContent='Lecture en cours…';const r=await trPreparerFichiers([...i.files]);if(r.texte&&ce)ce.value=(ce.value.trim()?ce.value.trim()+'\n\n':'')+r.texte;TDRF=[...TDRF,...r.imgs].slice(0,8);
+  lib.textContent=[r.texte?'Texte ajouté dans la zone ci-dessous':'',TDRF.length?`${TDRF.length} document(s) PDF ou photo joint(s)`:''].filter(Boolean).join(', ')||'Rien à lire dans ce fichier'}catch(x){lib.textContent='';alert(x.message||x)}i.value=''});
+/* ---------- du TDR validé vers l'ordre de mission ---------- */
+function tdrVersOM(t){const D=tdrD(t),L=D.logistique||{},B=t.budget||[],chef=L.chef||t.auteur_id||me.id,mb=new Set(),ext=[];
+ tdrTab(D,'equipe_tab').forEach(r=>{const u=staffDeNom(r[1]);if(u){if(u.id!==chef)mb.add(u.id)}else if(r[1])ext.push([r[1],r[0],''].join(' ; '))});
+ if(!tdrTab(D,'equipe_tab').length&&t.equipe){const tx=' '+nmNorm(t.equipe)+' ';S.staff.forEach(u=>{const b=nmNorm(u.nom);if(b&&b.split(' ').filter(w=>w.length>2).length>=2&&tx.includes(' '+b+' ')&&u.id!==chef)mb.add(u.id)})}
+ const pdL=B.find(b=>/per\s*-?\s*diem/i.test(b.libelle||'')),trL=B.filter(b=>/carburant|transport|billet|location (de |d'un )?(v[ée]hicule|moto|voiture)|p[ée]age/i.test(b.libelle||''));
+ const ft=trL.reduce((s,b)=>s+Math.round((Number(b.quantite)||0)*(Number(b.cout)||0)),0);
+ return {agent:chef,membres:mb,ext:ext.join('\n'),it:tabTxt(L.itineraire),acc:tabTxt(L.accueil),transport:L.transport||'',vehicule:L.vehicule||'',chauffeur:L.chauffeur||'',heb:L.hebergement||'',urg:L.urgence||'',pd:pdL?(Number(pdL.cout)||''):'',ft,repris:mb.size||ext.length||L.transport||L.itineraire&&L.itineraire.length||pdL||ft}}
 
 function tdrDetail(t){const om=tdrOM(t),av=S.tavis.filter(a=>a.tdr_id===t.id).sort((a,b)=>a.le<b.le?-1:1),act=tdrActeur(t),auteur=t.auteur_id===me.id,c=Math.round(tdrComplet(t)*100),tot=tdrTot(t);
  return `<p><button class="lnk" data-act="tdrRetour">Retour aux TDR et ordres de mission</button></p>${srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:''}
@@ -4892,22 +5088,17 @@ function tdrDetail(t){const om=tdrOM(t),av=S.tavis.filter(a=>a.tdr_id===t.id).so
   <div class="row" style="margin-top:.6rem"><button class="btn" type="submit" value="ok">${TDR_BTN[t.statut]}</button><button class="btn ghost" type="submit" value="a_corriger">Renvoyer pour correction</button>${['de','ca'].includes(t.statut)?'<button class="btn danger" type="submit" value="rejete">Rejeter</button>':''}</div></form></section>`:''}
  ${auteur&&['brouillon','a_corriger'].includes(t.statut)?`<div class="row" style="margin-bottom:1rem"><button class="btn" data-act="tdrModif" data-id="${t.id}">Modifier</button><button class="btn ghost" data-act="tdrSoumettre" data-id="${t.id}">Soumettre</button><button class="btn danger sm" data-act="tdrRetirer" data-id="${t.id}">Retirer ce TDR</button></div>`:''}
  ${tdrPeutOM(t)?(me.role==='ASC'?`<section class="card notif"><h3>Votre TDR est validé : demandez votre ordre de mission</h3>${omFormSimple(t)}</section>`:`<section class="card notif"><h3>Le TDR est validé : établissez l'ordre de mission</h3><p class="muted">Le formulaire est prérempli à partir du TDR. Complétez les missionnaires, l'itinéraire, les structures d'accueil et les moyens, puis envoyez-le à la signature.</p>${omForm(t)}</section>`):''}
- <div class="row" style="margin-bottom:1rem"><button class="btn ghost sm" data-act="tdrImprimer" data-id="${t.id}">Imprimer ou enregistrer en PDF</button>${om?`<button class="btn ghost sm" data-act="miOM" data-id="${om.id}">Voir l'ordre de mission</button>${omPeutModifier(om)?`<button class="btn ghost sm" data-act="miModif" data-id="${om.id}">Modifier l'ordre de mission</button>`:''}${omPeutReviser(om)?`<button class="btn ghost sm" data-act="miRev" data-id="${om.id}">Réviser l'ordre de mission</button>`:''}`:''}</div>
- <article class="card tdrDoc">${t.projet_id&&projet(t.projet_id)?`<p class="muted">Projet : ${esc(libProj(projet(t.projet_id)))}${t.activite_id&&S.cadre.find(x=>x.id===t.activite_id)?`, activité ${esc(S.cadre.find(x=>x.id===t.activite_id).code||'')} ${esc(S.cadre.find(x=>x.id===t.activite_id).libelle)}`:''}</p>`:''}
- ${TDR_SEC.map(([k,l],i)=>`<h3>${i+1}. ${l}</h3>${t[k]?`<p class="pre">${esc(t[k])}</p>`:'<p class="muted">Non renseigné.</p>'}`).join('')}
- <h3>${TDR_SEC.length+1}. Budget estimatif</h3>${(t.budget||[]).length?svT(['Poste','#Quantité','Unité','#Coût unitaire','#Montant (FCFA)'],[...t.budget.map(b=>[esc(b.libelle),num(b.quantite),esc(b.unite||''),num(b.cout),num(Math.round(b.quantite*b.cout))]),['<b>Total</b>','','','',`<b>${num(tot)}</b>`]]):'<p class="muted">Non renseigné.</p>'}</article>
+ <div class="row" style="margin-bottom:1rem"><button class="btn ghost sm" data-act="tdrWord" data-id="${t.id}">Télécharger en Word</button><button class="btn ghost sm" data-act="tdrImprimer" data-id="${t.id}">Imprimer ou enregistrer en PDF</button>${om?`<button class="btn ghost sm" data-act="miOM" data-id="${om.id}">Voir l'ordre de mission</button>${omPeutModifier(om)?`<button class="btn ghost sm" data-act="miModif" data-id="${om.id}">Modifier l'ordre de mission</button>`:''}${omPeutReviser(om)?`<button class="btn ghost sm" data-act="miRev" data-id="${om.id}">Réviser l'ordre de mission</button>`:''}`:''}</div>
+ <article class="card tdrDoc tdrApercu">${t.activite_id&&S.cadre.find(x=>x.id===t.activite_id)?`<p class="muted">Activité du cadre logique : ${esc(S.cadre.find(x=>x.id===t.activite_id).code||'')} ${esc(S.cadre.find(x=>x.id===t.activite_id).libelle)}</p>`:''}${tdrHTML(t)}</article>
  <section class="card"><h3>Circuit de validation</h3>${av.length?svT(['Date','Étape','Décision','Par','Avis'],av.map(a=>[new Date(a.le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'}),esc(TDR_ETAPE[a.etape]||a.etape),tag(TDR_ST[a.decision]||[a.decision,'']),esc(who(a.par)),esc(a.commentaire||'')])):'<p class="muted">Pas encore soumis.</p>'}</section>`}
 
-const tdrPatch=d=>{const budget=lignesTexte(d.budget).map(c=>({libelle:c[0]||'',quantite:nbr(c[1])||0,unite:c[2]||'',cout:nbr(c[3])||0})).filter(b=>b.libelle);
- const r={titre:String(d.titre||'').trim(),type_mission:d.type_mission||null,projet_id:d.projet||null,activite_id:d.activite||null,ligne_id:d.ligne||null,destination:(d.destination||'').trim()||null,date_debut:d.date_debut||null,date_fin:d.date_fin||null,budget};
- TDR_SEC.forEach(([k])=>r[k]=(d[k]||'').trim()||null);return r};
 async function tdrNotifier(id){const r=(await sel('tdrs',`select=id,statut,titre,auteur_id&id=eq.${id}`))[0];if(!r)return;const a=S.staff.find(u=>u.id===r.auteur_id)||{},R=x=>S.staff.filter(u=>u.role===x&&accesOK(u)).map(u=>u.id);
  const dest={sup:[a.supId],dp:R('DP'),de:R('DE'),ca:R('CA')}[r.statut];
  if(dest)await notifierSrv(dest,`TDR à traiter (${TDR_ST[r.statut][0].replace(/^./,c=>c.toLowerCase())}) : ${r.titre}`,'missions',id);
  if(['valide','a_corriger','rejete'].includes(r.statut))await notifierSrv([r.auteur_id],r.statut==='valide'?`Votre TDR « ${r.titre} » est validé : établissez l'ordre de mission`:r.statut==='a_corriger'?`Votre TDR « ${r.titre} » est renvoyé pour correction`:`Votre TDR « ${r.titre} » est rejeté`,'missions',id)}
 document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target,t=f.dataset&&f.dataset.form;if(!['tdrForm','tdrDecision'].includes(t))return;e.preventDefault();e.stopImmediatePropagation();
  const d=Object.fromEntries(new FormData(f)),go=e.submitter&&e.submitter.value;srvMsg='';
- if(t==='tdrForm'){const r=tdrPatch(d);if(!r.titre){alert('Donnez un intitulé à la mission.');return}if(r.date_debut&&r.date_fin&&r.date_fin<r.date_debut){alert('La date de fin doit suivre la date de début.');return}
+ if(t==='tdrForm'){const r=tdrPatch(d,S.tdrs.find(x=>x.id===f.dataset.id));if(!r.titre){alert('Donnez un intitulé à la mission.');return}if(r.date_debut&&r.date_fin&&r.date_fin<r.date_debut){alert('La date de fin doit suivre la date de début.');return}
   const ac=r.activite_id&&S.cadre.find(x=>x.id===r.activite_id),li=r.ligne_id&&S.blignes.find(x=>x.id===r.ligne_id);
   if((ac&&ac.projet_id!==r.projet_id)||(li&&li.projet_id!==r.projet_id)){alert('L\'activité et la ligne budgétaire doivent appartenir au projet choisi.');return}
   let id=f.dataset.id;action(async()=>{if(id)await upd('tdrs',`id=eq.${id}`,r);else{id=uuid();await ins('tdrs',{id,org_id:S.org.id,...r})}
@@ -4921,6 +5112,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.targ
  if(a==='tdrOuvrir'){tdrSel=id;tdrEdit=null;render();scrollTo(0,0);return}
  if(a==='tdrModif'){tdrEdit=id;render();scrollTo(0,0);return}
  if(a==='tdrImprimer'){tdrImprimer(S.tdrs.find(t=>t.id===id));return}
+ if(a==='tdrWord'){tdrWord(S.tdrs.find(t=>t.id===id));return}
  if(a==='tdrSoumettre'){action(async()=>{await upd('tdrs',`id=eq.${id}`,{statut:'sup',avis_courant:null});await tdrNotifier(id)},'TDR soumis : il suit maintenant le circuit de validation.');return}
  if(a==='tdrRetirer'){if(!confirm('Retirer ce TDR ? Il ne sera plus soumis.'))return;action(async()=>{await upd('tdrs',`id=eq.${id}`,{statut:'annule'})},'TDR retiré.');tdrSel=null;return}},true);
 document.addEventListener('click',e=>{const b=e.target.closest('[data-act="go"]');if(b&&b.dataset.v==='missions'){tdrSel=null;tdrEdit=null}},true);
@@ -5146,14 +5338,6 @@ function ordreMission(m){if(!m)return;
  ouvrirPapier(`Ordre de mission ${m.numero||'(projet)'}`,corps,{projet:m.projet_id,nom:`Ordre_de_mission_${(m.numero||'projet').replace(/\//g,'-')}`,ref:`N° <b>${esc(m.numero||'-')}</b>${Number(m.revision)>0?`<br>Révision <b>${m.revision}</b>${valide?' du '+fmtD(m.approuve_le):' (en cours)'}`:''}<br>Établi le ${fmtD(m.cree_le)}<br>par ${esc(who(m.demande_par))}`,filigrane:valide?null:annule?'ANNULÉ':'NON SIGNÉ, SANS VALEUR',avis:valide?'':annule?'Ordre annulé : document sans valeur.':m.numero?`Révision ${m.revision} en cours, pas encore signée : document de travail sans valeur. L'ordre signé précédent n'est plus valable.`:'Ordre non signé : document de travail sans valeur.'})}
 
 /* ---------- termes de référence ---------- */
-function tdrImprimer(t){if(!t)return;const av=S.tavis.filter(a=>a.tdr_id===t.id).sort((a,b)=>a.le<b.le?-1:1),ok=t.statut==='valide',tot=tdrTot(t),p=t.projet_id&&projet(t.projet_id);
- const corps=`<h1 class="doc-t">TERMES DE RÉFÉRENCE</h1><p class="doc-s"><b>${esc(t.titre)}</b><br>${esc(t.type_mission||'Mission')}, ${esc(t.destination||'')}, du ${fmtD(t.date_debut)} au ${fmtD(t.date_fin)}${p?`<br>Projet : ${esc(libProj(p))}${p.bailleur?', bailleur : '+esc(p.bailleur):''}`:''}</p>
- ${TDR_SEC.map(([k,l],i)=>t[k]?`<h2>${i+1}. ${l}</h2><p class="pre">${esc(t[k])}</p>`:'').join('')}
- ${(t.budget||[]).length?`<div class="bloc"><h2>${TDR_SEC.length+1}. Budget estimatif</h2><table><thead><tr><th>Poste</th><th class="num">Quantité</th><th>Unité</th><th class="num">Coût unitaire</th><th class="num">Montant (FCFA)</th></tr></thead><tbody>${t.budget.map(b=>`<tr><td>${esc(b.libelle)}</td><td class="num">${num(b.quantite)}</td><td>${esc(b.unite||'')}</td><td class="num">${num(b.cout)}</td><td class="num">${num(Math.round(b.quantite*b.cout))}</td></tr>`).join('')}<tr class="th"><th colspan="4">Total</th><th class="num">${num(tot)}</th></tr></tbody></table></div>`:''}
- <div class="bloc"><h2>Circuit de validation</h2><table><thead><tr><th>Étape</th><th>Nom</th><th>Décision</th><th>Date</th></tr></thead><tbody><tr><td>Rédaction</td><td>${esc(who(t.auteur_id))}</td><td>Rédigé</td><td>${fmtD(t.cree_le)}</td></tr>${av.filter(a=>!['brouillon','a_corriger'].includes(a.etape)).map(a=>`<tr><td>${esc(TDR_ETAPE[a.etape]||a.etape)}</td><td>${esc(who(a.par))}</td><td>${esc((TDR_ST[a.decision]||[a.decision])[0])}${a.commentaire?' : '+esc(a.commentaire):''}</td><td>${fmtD(a.le)}</td></tr>`).join('')}</tbody></table>
- ${ok?`<p>Validé électroniquement dans OSV Gestion par ${esc(who(t.valide_par))} le ${new Date(t.valide_le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}.</p>`:''}</div>`;
- ouvrirPapier(`TDR ${t.numero||''} ${t.titre}`,corps,{nom:`TDR_${(t.numero||'brouillon').replace(/\//g,'-')}`,projet:t.projet_id,ref:`TDR N° <b>${esc(t.numero||'-')}</b><br>Rédigé par ${esc(who(t.auteur_id))}`,filigrane:ok?null:'PROJET NON VALIDÉ'})}
-
 /* ---------- contrats ---------- */
 function ctrCorps(c){const p=c.projet_id&&projet(c.projet_id),ben=c.type==='benevolat',ent=c.type==='prestation_entreprise',d=ctrDE(),sup=c.superviseur_id&&S.staff.find(u=>u.id===c.superviseur_id);
  const P=ben?'le Bénévole':'le Prestataire',Pm=ben?'Le Bénévole':'Le Prestataire',Pd=ben?'du Bénévole':'du Prestataire',acte=ben?'la présente convention':'le présent contrat',Acte=ben?'La présente convention':'Le présent contrat',de_l=ben?'de la convention':'du contrat',li=c.ligne_id&&S.blignes.find(l=>l.id===c.ligne_id);
@@ -5400,7 +5584,7 @@ async function docxBlob(corps,o={}){const ctx={imgs:[],n:0},doc=new DOMParser().
  return new Blob([await zipper(files).arrayBuffer()],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})}
 async function telechargerWord(nom,titre,corps,o={}){try{const b=await docxBlob(corps,{...o,titre}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=nom.replace(/\.doc$/,'.docx');document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800)}catch(e){alert('Le fichier Word n\'a pas pu être créé : '+e.message)}}
 /* bouton « Word » dans chaque aperçu imprimable */
-const OSV_DOCS={};window.osvWord=k=>{const d=OSV_DOCS[k];if(d)telechargerWord(d.nom,d.titre,d.corps,d.o)};
+const OSV_DOCS={};window.osvWord=k=>{const d=OSV_DOCS[k];if(!d)return;if(d.o&&d.o.wordFn)d.o.wordFn();else telechargerWord(d.nom,d.titre,d.corps,d.o)};
 
 
 /* ===== Accueil : tableau de bord (remplace les tuiles qui doublaient le menu) et pied de page ===== */
@@ -6394,18 +6578,18 @@ function tdrEditeurSimple(t){const proj=S.projets.filter(p=>!['cloture','archive
   <div class="trL row"><button class="btn ghost" type="submit" value="brouillon">Enregistrer</button><button class="btn" type="submit" value="soumettre">Envoyer à mon superviseur</button></div></form>`}
 const tdrsLigne=(b={})=>`<div class="tdrsL"><input data-b="libelle" placeholder="Quoi ? (ex. carburant moto)" value="${esc(b.libelle||'')}" aria-label="Quoi"><input data-b="quantite" type="number" min="0" placeholder="Combien ?" value="${b.quantite??''}" aria-label="Combien"><input data-b="cout" type="number" min="0" placeholder="Prix de l'unité (FCFA)" value="${b.cout??''}" aria-label="Prix de l'unité"></div>`;
 function tdrsSync(f){const L=[...f.querySelectorAll('.tdrsL')].map(r=>{const q=k=>r.querySelector(`[data-b="${k}"]`).value.trim();return q('libelle')?`${q('libelle')} ; ${q('quantite')||1} ; unité ; ${q('cout')||0}`:''}).filter(Boolean);f.elements.budget.value=L.join('\n')}
-function omFormSimple(t){if(!p07)return '';const caches={type_mission:t.type_mission||'Activité de terrain',projet:t.projet_id||'',activite:t.activite_id||'',ligne:t.ligne_id||'',agent:t.auteur_id||me.id,tdr:[t.objectif_general,t.objectifs_specifiques].filter(Boolean).join('\n')||t.titre||'',resultats:[t.resultats,t.livrables].filter(Boolean).join('\n'),securite:OM_SECU,hebergement:OM_HEB[0],autres_frais:0};
- return `<form data-form="mdMission" class="grid trForm" style="margin-top:.6rem"><input type="hidden" name="tdr_id" value="${t.id}">${Object.entries(caches).map(([k,v])=>`<input type="hidden" name="${k}" value="${esc(v)}">`).join('')}
+function omFormSimple(t){if(!p07)return '';const X=tdrVersOM(t),caches={type_mission:t.type_mission||'Activité de terrain',projet:t.projet_id||'',activite:t.activite_id||'',ligne:t.ligne_id||'',agent:X.agent,externes:X.ext,vehicule:X.vehicule,chauffeur:X.chauffeur,tdr:[t.objectif_general,t.objectifs_specifiques].filter(Boolean).join('\n')||t.titre||'',resultats:[t.resultats,t.livrables].filter(Boolean).join('\n'),securite:OM_SECU,hebergement:X.heb||OM_HEB[0],autres_frais:0};
+ return `<form data-form="mdMission" class="grid trForm" style="margin-top:.6rem"><input type="hidden" name="tdr_id" value="${t.id}">${Object.entries(caches).map(([k,v])=>`<input type="hidden" name="${k}" value="${esc(v)}">`).join('')}${[...X.membres].map(id=>`<input type="checkbox" name="membres" value="${id}" checked hidden>`).join('')}
   <p class="note trL">Votre TDR est validé. Vérifiez ces quelques informations : l'ordre de mission part ensuite à la signature.</p>
   <div class="trL"><label>Objet de la mission</label><input name="objet" required value="${esc(t.titre||'')}"></div>
   <div><label>Où ?</label><input name="destination" required value="${esc(t.destination||'')}"></div><div><label>Départ</label><input name="date_depart" type="date" required value="${t.date_debut||''}"></div><div><label>Retour</label><input name="date_retour" type="date" required value="${t.date_fin||''}"></div>
-  <div><label>Moyen de transport</label><select name="transport">${opts(OM_TRANSP.map(x=>[x,x]),'Moto de service')}</select></div>
-  ${S.baremes.length?`<div><label>Per diem</label><select name="bareme">${opts(S.baremes.map(b=>[`${b.categorie}|${b.zone}`,`${b.categorie}, ${b.zone}, ${num(b.per_diem)}/jour`]),'','Choisir')}</select></div>`:`<div><label>Per diem par jour (FCFA)</label><input name="per_diem" type="number" min="0"></div>`}
-  <div><label>Frais de transport (FCFA)</label><input name="frais_transport" type="number" min="0" value="0"></div>
-  <div class="trL"><label>Qui appeler en cas de problème ? (nom et téléphone)</label><input name="urgence" required placeholder="ex. KONE Ali, superviseur, 07 00 00 00 00"></div>
+  <div><label>Moyen de transport</label><select name="transport">${opts((X.transport&&!OM_TRANSP.includes(X.transport)?[...OM_TRANSP,X.transport]:OM_TRANSP).map(x=>[x,x]),X.transport||'Moto de service')}</select></div>
+  ${S.baremes.length?`<div><label>Per diem</label><select name="bareme">${opts(S.baremes.map(b=>[`${b.categorie}|${b.zone}`,`${b.categorie}, ${b.zone}, ${num(b.per_diem)}/jour`]),'','Choisir')}</select></div>`:`<div><label>Per diem par jour (FCFA)</label><input name="per_diem" type="number" min="0" value="${X.pd}"></div>`}
+  <div><label>Frais de transport (FCFA)</label><input name="frais_transport" type="number" min="0" value="${X.ft||0}"></div>
+  <div class="trL"><label>Qui appeler en cas de problème ? (nom et téléphone)</label><input name="urgence" required value="${esc(X.urg)}" placeholder="ex. KONE Ali, superviseur, 07 00 00 00 00"></div>
   <details class="trL"><summary>Plus de détails (facultatif) : étapes du voyage, personnes à rencontrer</summary><div class="grid" style="margin-top:.6rem">
-   <div class="trL"><label>Étapes : une par ligne, « date ; heure ; de ; à ; moyen »</label><textarea name="itineraire" rows="2"></textarea></div>
-   <div class="trL"><label>Personnes ou structures à rencontrer : « structure ; localité ; contact »</label><textarea name="accueil" rows="2"></textarea></div></div></details>
+   <div class="trL"><label>Étapes : une par ligne, « date ; heure ; de ; à ; moyen »</label><textarea name="itineraire" rows="2">${esc(X.it)}</textarea></div>
+   <div class="trL"><label>Personnes ou structures à rencontrer : « structure ; localité ; contact »</label><textarea name="accueil" rows="2">${esc(X.acc)}</textarea></div></div></details>
   <div class="trL"><button class="btn" type="submit">Envoyer pour signature</button></div></form>`}
 const mpLigne=(l={},p)=>`<div class="mpL"><input type="date" data-m="date" value="${l.date||''}" min="${moisD(TR.mois)}" max="${finMois(TR.mois)}" aria-label="Date"><input data-m="localite" list="trMpLoc" value="${esc(l.localite||'')}" placeholder="Localité" aria-label="Localité"><input data-m="activite" list="trMpAct" value="${esc(l.activite||'')}" placeholder="Activité" aria-label="Activité"><input data-m="cible" type="number" min="0" inputmode="numeric" value="${l.cible??''}" placeholder="Personnes" aria-label="Personnes visées"><button type="button" class="btn ghost sm" data-act="iaMpDel" aria-label="Retirer">×</button></div>`;
 function mpSync(f){f.elements.lignes.value=[...f.querySelectorAll('.mpL')].map(r=>{const q=k=>r.querySelector(`[data-m="${k}"]`).value.trim();return q('date')?[q('date').split('-').reverse().join('/'),q('localite'),q('activite'),q('cible')||0].join(' ; '):''}).filter(Boolean).join('\n')}
@@ -6809,12 +6993,21 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.targ
    trLS.del('Recit');TR.saisie={outil:o.id,v:iaVersFiche(o,res,recit),ia:{a_verifier:L2(res.a_verifier),resume:res.resume||''}};render();scrollTo(0,0)});return}
  if(a==='iaTdrMode'){tdrSimple=b.dataset.v==='1';render();return}
  if(a==='iaTdrB'){b.closest('fieldset').querySelector('.tdrsB').insertAdjacentHTML('beforeend',tdrsLigne());return}
- if(a==='iaTdr'){const f=document.querySelector('form[data-form="tdrForm"]'),recit=document.getElementById('tdrRecit').value.trim(),fd=Object.fromEntries(new FormData(f).entries());
-  if(recit.length<20&&!fd.objectif_general){alert('Dites ou écrivez d\'abord ce que vous voulez faire.');return}
-  iaAvec(b,async()=>{const pj=projet(fd.projet);const r=await iaAppel('tdr',{recit,deja_rempli:{titre:fd.titre,destination:fd.destination,date_debut:fd.date_debut,date_fin:fd.date_fin,pourquoi:fd.objectif_general,pour_qui:fd.cibles,comment:fd.methodologie,resultats:fd.resultats,besoins:fd.budget},type_mission:fd.type_mission,projet:pj?{nom:pj.nom,zone:pj.zone}:null,redacteur:posteLib(S.staff.find(u=>u.id===me.id)||{}),aujourd_hui:today()});
-   const P={_pour:f.dataset.id||'new'};['titre','destination',...TDR_SEC.map(s=>s[0])].forEach(k=>{if(r[k])P[k]=String(r[k])});['date_debut','date_fin'].forEach(k=>{if(/^\d{4}-\d{2}-\d{2}$/.test(r[k]||''))P[k]=r[k]});
-   if(Array.isArray(r.budget)&&r.budget.length)P.budget=r.budget.map(x=>({libelle:String(x.libelle||''),quantite:Number(x.quantite)||0,unite:String(x.unite||''),cout:Number(x.cout)||0})).filter(x=>x.libelle);
-   if(fd.projet)P.projet_id=fd.projet;tdrPre=P;tdrSimple=false;srvMsg='TDR rédigé à partir de votre récit : relisez chaque partie, corrigez, puis enregistrez.';render();scrollTo(0,0)});return}
+ if(a==='iaTdr'){const f=document.querySelector('form[data-form="tdrForm"]'),recit=document.getElementById('tdrRecit').value.trim(),ce=document.getElementById('tdrColle'),colle=ce?ce.value.trim():'',fd=Object.fromEntries(new FormData(f).entries()),anc=S.tdrs.find(x=>x.id===f.dataset.id);
+  if(recit.length<20&&colle.length<20&&!TDRF.length&&!fd.objectif_general){alert('Collez un texte, importez un fichier ou dites ce que vous voulez faire.');return}
+  const cur=tdrPatch(fd,anc),Dc=cur.details||tdrD(anc),deja={titre:cur.titre,destination:cur.destination,date_debut:cur.date_debut,date_fin:cur.date_fin,type_mission:cur.type_mission,budget:cur.budget};TDR_SEC.forEach(([k])=>{if(cur[k])deja[k]=cur[k]});
+  Object.entries(Dc).forEach(([k,v])=>{if(k!=='logistique'&&(Array.isArray(v)?v.length:String(v||'').trim()))deja[k]=v});
+  iaAvec(b,async()=>{const pj=projet(fd.projet);const r=await iaAppel('tdr',{texte_colle:colle.slice(0,150000),commentaires:recit,recit,deja_rempli:deja,format_complet:p20,type_mission:fd.type_mission,projet:pj?{nom:pj.nom,code:pj.code,zone:pj.zone,bailleur:pj.bailleur}:null,
+    redacteur:posteLib(S.staff.find(u=>u.id===me.id)||{}),personnel_osv:S.staff.filter(u=>accesOK(u)&&u.role!=='EXT').map(u=>({nom:u.nom,poste:posteLib(u)})),aujourd_hui:today()},TDRF.length?TDRF:undefined);
+   const P={_pour:f.dataset.id||'new'},T=v=>String(v??'').trim();['titre','destination',...TDR_SEC.map(s=>s[0])].forEach(k=>{if(T(r[k]))P[k]=T(r[k])});['date_debut','date_fin'].forEach(k=>{if(/^\d{4}-\d{2}-\d{2}$/.test(r[k]||''))P[k]=r[k]});
+   if(Array.isArray(r.budget)&&r.budget.length)P.budget=r.budget.map(x=>({libelle:T(x.libelle),quantite:Number(x.quantite)||0,unite:T(x.unite),cout:Number(x.cout)||0})).filter(x=>x.libelle);
+   if(OM_TYPES.includes(r.type_mission))P.type_mission=r.type_mission;
+   if(p20){const D={...Dc},tab=(v,n)=>(Array.isArray(v)?v:[]).map(x=>Array.isArray(x)?x:x&&typeof x==='object'?Object.values(x):[x]).map(x=>{const y=x.slice(0,n).map(T);while(y.length<n)y.push('');return y}).filter(x=>x.some(Boolean));
+    ['sous_titre','sous_projet','lieu','activites','agenda_titre'].forEach(k=>{if(T(r[k]))D[k]=T(r[k])});Object.entries(TDR_TABS).forEach(([k,v])=>{const x=tab(r[k],v[1].length);if(x.length)D[k]=x});
+    const L={...(D.logistique||{})},lg=r.logistique||{};if(lg.chef_de_mission){const u=staffDeNom(lg.chef_de_mission);if(u)L.chef=u.id}
+    if(OM_TRANSP.includes(lg.transport))L.transport=lg.transport;if(OM_HEB.includes(lg.hebergement))L.hebergement=lg.hebergement;['vehicule','chauffeur','urgence'].forEach(k=>{if(T(lg[k]))L[k]=T(lg[k])});
+    const it=tab(lg.itineraire,5),ac=tab(lg.accueil,3);if(it.length)L.itineraire=it;if(ac.length)L.accueil=ac;D.logistique=L;P.details=D}
+   if(fd.projet)P.projet_id=fd.projet;tdrPre=P;tdrSimple=false;TDRF=[];srvMsg='TDR rédigé : relisez chaque partie, corrigez si besoin, puis enregistrez. Chaque zone accepte encore la dictée.';render();scrollTo(0,0)});return}
  if(a==='iaMpAdd'){const f=b.closest('form');f.querySelector('.mpLs').insertAdjacentHTML('beforeend',mpLigne({},trP()));return}
  if(a==='iaMpDel'){const f=b.closest('form');b.closest('.mpL').remove();mpSync(f);return}
  if(a==='iaMicroplan'){const f=b.closest('form'),recit=document.getElementById('mpRecit').value.trim(),p=trP();if(recit.length<15){alert('Dites d\'abord votre plan du mois.');return}
