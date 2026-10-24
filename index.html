@@ -533,6 +533,9 @@ body.iaBusy{cursor:progress}
 .joFic{cursor:pointer;position:relative}.joFic .ico{width:15px;height:15px;vertical-align:-2px;color:var(--brand)}
 .joG{display:flex;flex-wrap:wrap;gap:.5rem;margin:.3rem 0 .8rem}.joV{padding:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg);cursor:zoom-in;line-height:0}
 .joV img{width:132px;height:99px;object-fit:cover;display:block}.joH4{font-size:.86rem;margin:.6rem 0 .2rem}
+.pwW{position:relative;display:block}.pwW input{padding-right:2.9rem;width:100%}
+.pwOeil{position:absolute;right:.35rem;top:50%;transform:translateY(-50%);width:2.3rem;height:2.3rem;display:grid;place-items:center;border:0;background:transparent;color:var(--muted);cursor:pointer;border-radius:8px;padding:0}
+.pwOeil:hover,.pwOeil:focus-visible{color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,transparent)}.pwOeil svg{width:20px;height:20px}
 </style>
 </head>
 <body>
@@ -6716,6 +6719,17 @@ document.addEventListener('change',e=>{if(MODE!=='srv'||!me)return;const t=e.tar
  if(t.dataset&&t.dataset.ve){VE[t.dataset.ve]=t.value;render();return}
  if(t.dataset&&t.dataset.op){const k=t.dataset.op;action(()=>upd('opportunites',`id=eq.${t.dataset.id}`,{[k]:t.value||null,modifie_le:new Date().toISOString()}),'Opportunité mise à jour.')}});
 
+
+/* ---------- mot de passe : un œil pour afficher ou masquer ce qu'on tape ---------- */
+const OEIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></svg>',
+ OEIL_NON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c4.97 0 8.4 3.6 9.94 6.65a1 1 0 0 1 0 .7 10.8 10.8 0 0 1-1.64 2.67"/><path d="M6.61 6.61A13.5 13.5 0 0 0 2.06 11.65a1 1 0 0 0 0 .7C3.6 15.4 7.03 19 12 19a9.7 9.7 0 0 0 5.39-1.61"/><path d="m2 2 20 20"/><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/></svg>';
+function pwOeils(){document.querySelectorAll('input[type="password"]:not([data-oeil])').forEach(i=>{i.dataset.oeil='1';const w=document.createElement('span');w.className='pwW';i.parentNode.insertBefore(w,i);w.appendChild(i);
+ const b=document.createElement('button');b.type='button';b.className='pwOeil';b.setAttribute('aria-label','Afficher le mot de passe');b.setAttribute('aria-pressed','false');b.innerHTML=OEIL;w.appendChild(b)})}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.pwOeil');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const i=b.parentNode.querySelector('input');if(!i)return;
+ const voir=i.type==='password';i.type=voir?'text':'password';b.innerHTML=voir?OEIL_NON:OEIL;b.setAttribute('aria-pressed',String(voir));b.setAttribute('aria-label',voir?'Masquer le mot de passe':'Afficher le mot de passe');i.focus()},true);
+/* le mot de passe est remasqué avant l'envoi : il n'est jamais mémorisé en clair par le navigateur */
+document.addEventListener('submit',e=>{e.target.querySelectorAll&&e.target.querySelectorAll('input[data-oeil][type="text"]').forEach(i=>{i.type='password';const b=i.parentNode.querySelector('.pwOeil');if(b){b.innerHTML=OEIL;b.setAttribute('aria-pressed','false')}})},true);
+new MutationObserver(pwOeils).observe(document.documentElement,{childList:true,subtree:true});
 /* ---------- démarrage ---------- */
 async function srvInit(){
  if(MODE!=='srv'){render();return}
