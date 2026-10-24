@@ -493,7 +493,7 @@ details>summary{font-size:.9rem}
 .trPf,.trPh{display:flex;height:12px}.trPf{justify-content:flex-end}
 .trPf i,.trPh i{display:block;height:100%;min-width:2px}.trPf i{background:var(--sx-f);border-radius:4px 0 0 4px}.trPh i{background:var(--sx-m);border-radius:0 4px 4px 0}
 
-/* ===== Assistant Claude et dictée ===== */
+/* ===== Assistant de rédaction et dictée ===== */
 .dictW{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin-top:.35rem}
 .dictBtn .ico{width:15px;height:15px;vertical-align:-2px}
 .dictBtn.rec{background:color-mix(in srgb,var(--bad) 10%,var(--panel));border-color:var(--bad);color:var(--bad)}
@@ -522,6 +522,12 @@ body.iaBusy{cursor:progress}
 .joRec textarea{font-size:.92rem;line-height:1.55;min-height:12rem}
 .btn.joBig{font-size:.95rem;padding:.65rem 1.1rem}
 .pvDoc h3{margin:1.2rem 0 .4rem;color:var(--brand)}.pvDoc h3:first-child{margin-top:0}.pvDoc ul{margin:.2rem 0 .6rem 1.1rem}.pvDoc p{max-width:80ch}
+
+.pvDoc mark{background:color-mix(in srgb,var(--or) 28%,transparent);color:inherit;padding:0 .15em;border-radius:3px}
+.pvDoc h2{font-size:.98rem;margin:1.3rem 0 .45rem;color:var(--brand)}.pvDoc h2:first-child{margin-top:0}.pvDoc h3{font-size:.9rem;margin:.9rem 0 .3rem;color:var(--ink)}
+.pvDoc table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.3rem 0 .8rem}.pvDoc th,.pvDoc td{border:1px solid var(--line);padding:.4rem .55rem;text-align:left;vertical-align:top}.pvDoc th{background:var(--soft);font-weight:600}
+.pvDoc ol,.pvDoc ul{margin:.2rem 0 .7rem 1.2rem}
+.joCadre{display:grid;gap:.35rem}.iaB2 .ico{width:15px;height:15px;vertical-align:-2px;color:var(--brand)}
 </style>
 </head>
 <body>
@@ -1852,7 +1858,7 @@ async function srvLoad(){
  const T7=await opt(sel('mission_membres',f+'&order=ordre'));p07=T7!==null;N.mmembres=T7||[];p11=p07&&(await opt(sel('missions','select=revision&limit=1')))!==null;N.mrev=p11?(await opt(sel('missions_revisions',f+'&order=le')))||[]:[];
  const T8=await Promise.all([sel('tdrs',f+'&order=cree_le.desc'),sel('tdr_avis',f+'&order=le'),sel('acces_budget',f)].map(opt));p08=T8[0]!==null;N.tdrs=T8[0]||[];N.tavis=T8[1]||[];N.accBud=T8[2]||[];
  const T10=await opt(sel('contrats',f+'&order=redige_le.desc'));p10=T10!==null;N.contrats=T10||[];p10f=p10&&(await opt(sel('contrats','select=fiche&limit=1')))!==null;
- const T13=await Promise.all([sel('journal',f+'&order=date_evt.desc&limit=3000'),sel('capitalisations',f+'&order=cree_le.desc'),sel('ia_reglages',f)].map(opt));p13=T13[0]!==null;N.journal=T13[0]||[];N.capis=T13[1]||[];N.iaReg=(T13[2]||[])[0]||null;
+ const T13=await Promise.all([sel('journal',f+'&order=date_evt.desc&limit=3000'),sel('capitalisations',f+'&order=cree_le.desc'),sel('ia_reglages',f)].map(opt));p13=T13[0]!==null;N.journal=T13[0]||[];N.capis=T13[1]||[];N.iaReg=(T13[2]||[])[0]||null;p14=p13&&(await opt(sel('journal','select=cadre&limit=1')))!==null;
  const T12=await Promise.all([sel('outils_collecte',f+'&order=cree_le'),sel('fiches_terrain',f+'&order=date_activite.desc,saisi_le.desc&limit=10000'),sel('references_communautaires',f+'&order=date_reference.desc&limit=10000'),sel('microplans',f),sel('rapports_terrain',f+'&order=mois.desc')].map(opt));p12=T12[0]!==null;[N.outils,N.fterrain,N.refs,N.microplans,N.rterrain]=T12.map(x=>x||[]);
  [N.comptes,N.mouvements,N.rapprochements,N.avances,N.fournisseurs,N.seuilsAchat,N.achats,N.devis,N.baremes,N.missions,N.biens,N.inventaires,N.pcomptes,N.correspondances,N.invLignes]=T6.map(x=>x||[]);
  S=N;me=S.staff.find(x=>x.id===uid);
@@ -1874,7 +1880,7 @@ async function action(fn,msg){if(srvBusy)return;srvBusy=true;document.body.class
 
 /* ---------- écrans du mode serveur ---------- */
 function srvHome(){const n=ROLES[me.role].nav,pa=polEnAttente().length;
- const D={journal:'Réunions, visites et missions : dictées, comptes rendus rédigés avec Claude, capitalisation',terrain:'Fiches d\'activité, listes de présence, références, microplans et rapports des agents communautaires',adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
+ const D={journal:'Réunions, visites et missions : dictées, comptes rendus rédigés automatiquement, capitalisation',terrain:'Fiches d\'activité, listes de présence, références, microplans et rapports des agents communautaires',adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
  return accHero()+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+notifBox()+
  (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:'')+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
  `${['DE','DP','CA'].includes(me.role)&&p03?'':accTableauBord()}
@@ -5251,7 +5257,8 @@ function dxCell(ctx,td,head,kvTh,w){const span=Number(td.getAttribute('colspan')
  return `<w:tc><w:tcPr>${w?`<w:tcW w:w="${w}" w:type="dxa"/>`:''}${span>1?`<w:gridSpan w:val="${span}"/>`:''}${shade?`<w:shd w:val="clear" w:color="auto" w:fill="${shade}"/>`:''}<w:tcMar><w:top w:w="40" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/></w:tcMar></w:tcPr>${inner||'<w:p/>'}</w:tc>`}
 function dxTable(ctx,t){const kv=t.classList.contains('kv'),rows=[...t.querySelectorAll(':scope>thead>tr,:scope>tbody>tr,:scope>tr')];
  const ncol=Math.max(1,...rows.map(r=>[...r.children].reduce((s,c)=>s+(Number(c.getAttribute('colspan'))||1),0)));
- const widths=kv?[Math.round(DX_W*.3),DX_W-Math.round(DX_W*.3)]:Array(ncol).fill(Math.floor(DX_W/ncol));
+ const pw=String(t.dataset&&t.dataset.w||'').split(',').map(Number).filter(x=>x>0);
+ const widths=kv?[Math.round(DX_W*.3),DX_W-Math.round(DX_W*.3)]:pw.length===ncol?pw.map(x=>Math.floor(DX_W*x/100)):Array(ncol).fill(Math.floor(DX_W/ncol));
  return `<w:tbl><w:tblPr><w:tblW w:w="${DX_W}" w:type="dxa"/>${dxBrd()}<w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="90" w:type="dxa"/><w:right w:w="90" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${widths.map(w=>`<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>`+
   rows.map(r=>{const head=r.parentElement.tagName==='THEAD'||r.classList.contains('th'),cells=[...r.children],h=(r.querySelector('[style*="height"]')||{}).style;let ci=0;
    return `<w:tr><w:trPr><w:cantSplit/>${head&&r.parentElement.tagName==='THEAD'?'<w:tblHeader/>':''}${h&&h.height?`<w:trHeight w:val="${Math.round(parseFloat(h.height)*15)}" w:hRule="atLeast"/>`:''}</w:trPr>${cells.map(c=>{const sp=Number(c.getAttribute('colspan'))||1,w=widths.slice(ci,ci+sp).reduce((a,b)=>a+b,0);ci+=sp;return dxCell(ctx,c,head,kv&&c.tagName==='TH',w)}).join('')}</w:tr>`}).join('')+`</w:tbl>${dxP('',{ap:60})}`}
@@ -5583,7 +5590,7 @@ function trSaisieVue(p){const s=TR.saisie,o=trOutil(s.outil);if(!o){TR.saisie=nu
  const ags=trCollecteurs(p).filter(u=>u.id===me.id||trVerifie(p,u.id));const locs=[...new Set(trFiches(p).map(x=>x.localite))].sort();
  return `<p><button class="lnk" data-act="terFermer">← Collecte terrain</button></p><div class="head"><h1>${esc(o.titre)}</h1><p>${esc(libProj(p))}${s.id?' · correction de la fiche du '+fmtD(f.date_activite):''}</p></div>
  ${f&&f.retour_motif&&f.statut==='a_corriger'?`<p class="note"><b>À corriger :</b> ${esc(f.retour_motif)} <span class="muted">(${esc(who(f.retour_par))})</span></p>`:''}
- ${s.ia?`<section class="card iaNoteF"><p><b>${ico('etoile')} Fiche préremplie par Claude à partir de votre récit.</b> Vérifiez chaque réponse avant d'envoyer.${v.participants&&v.participants.length?` Les lignes de la liste de présence sont préparées (${v.participants.length}) : recopiez les noms et les âges depuis la liste signée.`:''}</p>${s.ia.a_verifier.length?`<ul>${s.ia.a_verifier.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</section>`:''}
+ ${s.ia?`<section class="card iaNoteF"><p><b>${ico('etoile')} Fiche préremplie à partir de votre récit.</b> Vérifiez chaque réponse avant d'envoyer.${v.participants&&v.participants.length?` Les lignes de la liste de présence sont préparées (${v.participants.length}) : recopiez les noms et les âges depuis la liste signée.`:''}</p>${s.ia.a_verifier.length?`<ul>${s.ia.a_verifier.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</section>`:''}
  ${o.consignes?`<details class="card trCons"><summary><b>Consignes de remplissage</b></summary><p>${esc(o.consignes)}</p></details>`:''}
  <form data-form="terFiche" data-outil="${o.id}" data-id="${s.id||''}" class="card grid trForm" novalidate>
   <h4 class="trSec">Identification de l'activité</h4>${(v.donnees||{})._recit?`<input type="hidden" name="_recit" value="${esc(v.donnees._recit)}">`:''}
@@ -5743,7 +5750,7 @@ function trChiffresHTML(d){if(!d||d.fiches==null)return '<p class="muted">Aucune
  ${d.outils&&d.outils.length?`<h4>Par outil</h4>${d.outils.map(o=>`<details class="trOd"><summary><b>${esc(o.titre)}</b> · ${num(o.n)} fiche(s), ${num(o.total)} personne(s)</summary>${o.champs.map(c=>typeof c.v==='number'?`<p>${esc(c.label)} : <b>${num(c.v)}</b></p>`:`<p class="muted" style="margin:.6rem 0 .2rem">${esc(c.label)}</p>${trBarres(Object.entries(c.v).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[c.type==='ouinon'?(k==='oui'?'Oui':'Non'):k,v]))}`).join('')}</details>`).join('')}`:''}`}
 function trBarres(L){if(!L.length)return '';const max=Math.max(...L.map(x=>x[1]),1);return `<ul class="tb-bars tb-cnt">${L.map(([l,v,t])=>`<li title="${esc(t||l)} : ${num(v)}"><span class="tb-l">${esc(l)}</span><span class="tb-track" style="width:${(v/max*100).toFixed(1)}%"><i style="width:100%"></i></span><span class="tb-v">${num(v)}</span></li>`).join('')}</ul>`}
 function trRapForm(p,niv,r,d){const enRetard=today()>trLimite(TR.mois,niv);const F=(k,l,ph)=>`<div class="trL"><label for="rap_${k}">${l}</label><textarea id="rap_${k}" name="${k}" rows="3" placeholder="${ph||''}">${esc(r?r[k]||'':'')}</textarea>${dictBtn('rap_'+k)}</div>`;
- return `<form data-form="terRap" data-niv="${niv}" data-id="${r?r.id:''}" class="grid">${iaOK()?`<div class="trL iaRac"><p class="muted">${niv==='agent'?'Vos chiffres sont déjà calculés à partir de vos fiches. Parlez ou écrivez ce que vous avez vécu ce mois, ou laissez Claude rédiger à partir de vos fiches et de vos récits.':'Claude rédige à partir des chiffres consolidés et de ce que les agents ont remonté. Relisez avant d\'envoyer.'}</p><div class="row iaRow">${iaBtn('iaRapport','Rédiger avec Claude')}</div><p class="iaNote muted" hidden>Texte proposé par Claude : relisez, corrigez, puis envoyez.</p></div>`:''}${F('faits','Faits marquants du mois','Ce qui a bien marché, les résultats obtenus, les témoignages')}${F('difficultes','Difficultés rencontrées','Accès, météo, réticences, manque de supports…')}
+ return `<form data-form="terRap" data-niv="${niv}" data-id="${r?r.id:''}" class="grid">${iaOK()?`<div class="trL iaRac"><p class="muted">${niv==='agent'?'Vos chiffres sont déjà calculés à partir de vos fiches. Parlez ou écrivez ce que vous avez vécu ce mois, ou laissez l\'assistant rédiger à partir de vos fiches et de vos récits.':'L\'assistant rédige à partir des chiffres consolidés et de ce que les agents ont remonté. Relisez avant d\'envoyer.'}</p><div class="row iaRow">${iaBtn('iaRapport','Rédiger automatiquement')}</div><p class="iaNote muted" hidden>Texte proposé automatiquement : relisez, corrigez, puis envoyez.</p></div>`:''}${F('faits','Faits marquants du mois','Ce qui a bien marché, les résultats obtenus, les témoignages')}${F('difficultes','Difficultés rencontrées','Accès, météo, réticences, manque de supports…')}
  ${F('alertes','Alertes communautaires et rumeurs','Rumeurs, incidents, tensions, cas graves à signaler (sans nom)')}${F('besoins','Besoins','Supports, préservatifs, formation, moyens de déplacement…')}${niv!=='agent'?F('recommandations','Recommandations',''):''}
  <div class="trL"><button class="btn" type="submit">${r?'Renvoyer le rapport':'Envoyer le rapport'}</button> <span class="muted">Date limite : ${fmtD(trLimite(TR.mois,niv))}${enRetard&&!r?' · <b class="txt-bad">délai dépassé</b>':''}</span></div></form>`}
 function trRapAff(r){return `<p>${tag(RT_ST[r.statut])}${r.a_temps?'':' '+tag(['envoyé en retard','warn'])} <span class="muted">envoyé le ${fmtD(r.premier_envoi)}${r.valide_par?' · validé par '+esc(who(r.valide_par)):''}</span>${r.motif&&r.statut==='a_corriger'?` <span class="muted">· ${esc(r.motif)}</span>`:''}</p>
@@ -6018,7 +6025,7 @@ function tbTerrain(){if(!p12||!me)return '';const L=trProjets();if(!L.length)ret
 
 /* =====================================================================
    ASSISTANT CLAUDE · dictée vocale · journal, comptes rendus et capitalisation
-   La clé de l'API Claude reste sur le serveur (Edge Function « claude ») :
+   La clé du service de rédaction reste sur le serveur (Edge Function) :
    l'application n'envoie qu'une tâche et des données, jamais de consigne libre.
    ===================================================================== */
 let p13=false;
@@ -6037,9 +6044,9 @@ async function iaAppel(tache,donnees){if(!p13)throw new Error('Exécutez le scri
  let r;try{r=await fetch(SUPA.url+'/functions/v1/claude',{method:'POST',headers:{apikey:SUPA.key,Authorization:'Bearer '+sess.access_token,'Content-Type':'application/json'},body:JSON.stringify({tache,donnees:iaNettoyer(donnees)})})}
  catch(e){throw new Error('Assistant injoignable : il a besoin d\'Internet. Vérifiez la connexion et réessayez.')}
  const j=await r.json().catch(()=>null);
- if(r.status===404)throw new Error('L\'assistant Claude n\'est pas encore installé sur le serveur (fonction « claude » dans Supabase).');
+ if(r.status===404)throw new Error('L\'assistant de rédaction n\'est pas encore installé sur le serveur.');
  if(!r.ok)throw new Error((j&&(j.erreur||j.message||j.msg))||('Erreur '+r.status));return j.resultat}
-async function iaAvec(btn,fn){if(srvBusy)return;const lib=btn?btn.innerHTML:'';if(btn){btn.disabled=true;btn.innerHTML='Claude rédige… <span class="iaPoints" aria-hidden="true"></span>'}
+async function iaAvec(btn,fn){if(srvBusy)return;const lib=btn?btn.innerHTML:'';if(btn){btn.disabled=true;btn.innerHTML='Rédaction en cours… <span class="iaPoints" aria-hidden="true"></span>'}
  srvBusy=true;document.body.classList.add('busy','iaBusy');try{await fn()}catch(e){alert(e.message||String(e))}finally{srvBusy=false;document.body.classList.remove('busy','iaBusy');if(btn&&document.contains(btn)){btn.disabled=false;btn.innerHTML=lib}}}
 const iaBtn=(act,lib,extra='')=>iaOK()?`<button type="button" class="btn sm iaB" data-act="${act}" ${extra}>${ico('etoile')} ${lib}</button>`:'';
 
@@ -6064,12 +6071,12 @@ async function dictStart(btn){const cible=document.getElementById(btn.dataset.ci
  const maj=()=>{const s=Math.floor((Date.now()-d.debut)/1000);btn.querySelector('span').textContent=`Arrêter · ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`};maj();d.timer=setInterval(maj,1000);
  try{if(navigator.wakeLock)d.wake=await navigator.wakeLock.request('screen')}catch(_){}}
 
-/* ---------- l'agent raconte, Claude remplit la fiche ---------- */
+/* ---------- l'agent raconte, l'assistant remplit la fiche ---------- */
 function iaRacontCarte(p){if(!iaOK())return '';const O=trOutils(p).filter(o=>o.actif&&o.type!=='plainte');if(!O.length)return '';
- return `<section class="card iaRac"><h3>${ico('mic')} Raconter mon activité</h3><p class="muted">Parlez comme à votre superviseur : où et quand, ce que vous avez fait, combien de femmes et d'hommes, ce que les gens ont demandé. <b>Ne dites pas les noms des personnes.</b> Claude remplit la fiche ; vous vérifiez, vous recopiez la liste signée, puis vous envoyez.</p>
+ return `<section class="card iaRac"><h3>${ico('mic')} Raconter mon activité</h3><p class="muted">Parlez comme à votre superviseur : où et quand, ce que vous avez fait, combien de femmes et d'hommes, ce que les gens ont demandé. <b>Ne dites pas les noms des personnes.</b> L'application remplit la fiche ; vous vérifiez, vous recopiez la liste signée, puis vous envoyez.</p>
  <div class="grid" style="align-items:end"><div><label for="racOutil">Quelle activité ?</label><select id="racOutil">${opts(O.map(o=>[o.id,o.titre]),'')}</select></div></div>
  <label for="racTxt" style="margin-top:.6rem">Mon récit</label><textarea id="racTxt" rows="5" placeholder="Ex. : Ce matin à Nafana, sur la place du marché, j'ai fait une causerie sur le VIH et la sécurité routière. Il y avait 12 femmes et 8 hommes. J'ai donné 30 préservatifs. Une femme a demandé si le préservatif rend stérile.">${esc(trLS.get('Recit',''))}</textarea>
- <div class="row iaRow">${dictBtn('racTxt','Parler')}<button type="button" class="btn iaB" data-act="iaFiche">${ico('etoile')} Remplir la fiche avec Claude</button></div>${dictAide()}</section>`}
+ <div class="row iaRow">${dictBtn('racTxt','Parler')}<button type="button" class="btn iaB" data-act="iaFiche">${ico('etoile')} Remplir la fiche automatiquement</button></div>${dictAide()}</section>`}
 function iaVersFiche(o,res,recit){const v={date_activite:/^\d{4}-\d{2}-\d{2}$/.test(res.date_activite||'')&&res.date_activite<=today()?res.date_activite:today(),heure_debut:/^\d{2}:\d{2}$/.test(res.heure_debut||'')?res.heure_debut:'',heure_fin:/^\d{2}:\d{2}$/.test(res.heure_fin||'')?res.heure_fin:'',
   localite:res.localite||'',sous_prefecture:res.sous_prefecture||'',lieu:res.lieu||'',donnees:{_recit:recit},decompte:{},participants:[]};
  o.champs.forEach(c=>{const x=(res.donnees||{})[c.id];if(x==null||x==='')return;
@@ -6088,9 +6095,9 @@ function tdrEditeurSimple(t){const proj=S.projets.filter(p=>!['cloture','archive
  const B=(t.budget||[]).length?t.budget:[{},{}];
  return `<p><button class="lnk" data-act="tdrRetour">← TDR et ordres de mission</button></p>`+head(t.id?'Modifier mon TDR':'Préparer mon activité (TDR)','Répondez simplement aux questions, en écrivant ou en parlant. Votre superviseur relit, puis le Directeur des programmes et le Directeur exécutif valident.')+
  `<p class="row"><button class="btn ghost sm" data-act="iaTdrMode" data-v="0">Passer à la version complète</button></p>
- ${iaOK()?`<section class="card iaRac"><h3>${ico('mic')} Tout dire d'un coup</h3><p class="muted">Expliquez votre activité comme à votre chef : quoi, où, quand, pour qui, combien de personnes, comment, ce qu'il vous faut. Claude rédige un TDR complet que vous relisez.</p>
+ ${iaOK()?`<section class="card iaRac"><h3>${ico('mic')} Tout dire d'un coup</h3><p class="muted">Expliquez votre activité comme à votre chef : quoi, où, quand, pour qui, combien de personnes, comment, ce qu'il vous faut. L'assistant rédige un TDR complet que vous relisez.</p>
   <textarea id="tdrRecit" rows="5" placeholder="Ex. : Je veux faire des causeries sur le VIH à Nafana et Kolon du 5 au 7 novembre, pour les femmes et les jeunes du chantier, environ 60 personnes. Il me faut le transport en moto et des dépliants."></textarea>
-  <div class="row iaRow">${dictBtn('tdrRecit','Parler')}<button type="button" class="btn iaB" data-act="iaTdr">${ico('etoile')} Rédiger le TDR avec Claude</button></div>${dictAide()}</section>`:''}
+  <div class="row iaRow">${dictBtn('tdrRecit','Parler')}<button type="button" class="btn iaB" data-act="iaTdr">${ico('etoile')} Rédiger le TDR automatiquement</button></div>${dictAide()}</section>`:''}
  <form data-form="tdrForm" data-id="${t.id||''}" class="card grid tdrF trForm">
   <input type="hidden" name="type_mission" value="${esc(t.type_mission||'Activité de terrain')}"><input type="hidden" name="activite" value="${esc(t.activite_id||'')}"><input type="hidden" name="ligne" value="${esc(t.ligne_id||'')}">
   ${caches.map(k=>`<input type="hidden" name="${k}" value="${esc(t[k]||'')}">`).join('')}
@@ -6124,7 +6131,7 @@ const mpLigne=(l={},p)=>`<div class="mpL"><input type="date" data-m="date" value
 function mpSync(f){f.elements.lignes.value=[...f.querySelectorAll('.mpL')].map(r=>{const q=k=>r.querySelector(`[data-m="${k}"]`).value.trim();return q('date')?[q('date').split('-').reverse().join('/'),q('localite'),q('activite'),q('cible')||0].join(' ; '):''}).filter(Boolean).join('\n')}
 function mpEditeur(p,mp){const L=mp?(mp.lignes||[]):[{},{},{}],locs=[...new Set(trFiches(p).map(x=>x.localite).concat(L.map(l=>l.localite)).filter(Boolean))],acts=trOutils(p).filter(o=>o.actif).map(o=>o.titre);
  return `<form data-form="terMp" data-id="${mp?mp.id:''}" class="mpF" style="margin-top:.8rem"><p><b>Mes activités prévues</b> <span class="muted">(une ligne par activité)</span></p>
-  ${iaOK()?`<div class="iaRac" style="margin-bottom:.8rem"><label for="mpRecit">Ou dites votre plan du mois, Claude remplit les lignes :</label><textarea id="mpRecit" rows="3" placeholder="Ex. : Le 5 novembre causerie à Nafana pour 25 personnes, le 12 porte-à-porte à Kong pour 40 personnes…"></textarea><div class="row iaRow">${dictBtn('mpRecit','Parler')}<button type="button" class="btn sm iaB" data-act="iaMicroplan">${ico('etoile')} Remplir avec Claude</button></div></div>`:''}
+  ${iaOK()?`<div class="iaRac" style="margin-bottom:.8rem"><label for="mpRecit">Ou dites votre plan du mois, l'application remplit les lignes :</label><textarea id="mpRecit" rows="3" placeholder="Ex. : Le 5 novembre causerie à Nafana pour 25 personnes, le 12 porte-à-porte à Kong pour 40 personnes…"></textarea><div class="row iaRow">${dictBtn('mpRecit','Parler')}<button type="button" class="btn sm iaB" data-act="iaMicroplan">${ico('etoile')} Remplir automatiquement</button></div></div>`:''}
   <div class="mpEnt" aria-hidden="true"><span>Date</span><span>Localité</span><span>Activité</span><span>Personnes</span><span></span></div><div class="mpLs">${L.map(l=>mpLigne(l,p)).join('')}</div>
   <datalist id="trMpLoc">${locs.map(l=>`<option value="${esc(l)}">`).join('')}</datalist><datalist id="trMpAct">${acts.map(a=>`<option value="${esc(a)}">`).join('')}</datalist>
   <textarea name="lignes" hidden>${esc(L.filter(l=>l.date).map(l=>[l.date.split('-').reverse().join('/'),l.localite,l.activite,l.cible??0].join(' ; ')).join('\n'))}</textarea><div class="row" style="margin-top:.5rem"><button type="button" class="btn ghost sm" data-act="iaMpAdd">+ une activité</button><button class="btn" type="submit">${mp?'Renvoyer au superviseur':'Envoyer au superviseur'}</button></div></form>`}
@@ -6139,82 +6146,130 @@ function iaNotesRapport(p,niv){const F=trFiches(p).filter(x=>moisDe(x.date_activ
 function iaChiffres(d){if(!d)return {};const {age,vuln,...r}=d;return {...r,age_sexe:age,vulnerabilites:vuln}}
 
 /* ---------- journal d'activités et comptes rendus ---------- */
-const JO_T={reunion:'Réunion',atelier:'Atelier',visite:'Visite',mission:'Mission',formation:'Formation',activite:'Activité',autre:'Autre'};
+const JO_T={reunion_interne:'Réunion interne',reunion_projet:'Réunion de projet',reunion_externe:'Réunion externe (sur invitation)',atelier:'Atelier',formation:'Formation, renforcement de capacités',rencontre:'Rencontre formative ou d\'échanges',seminaire:'Séminaire, conférence',visite:'Visite de terrain',mission:'Mission',audience:'Audience',plaidoyer:'Plaidoyer',activite:'Activité',autre:'Autre',reunion:'Réunion'};
+const JO_T_ANC=['reunion','atelier','visite','mission','formation','activite','autre'];
+const JO_ROLE={organisateur:'OSV organise',invite:'OSV est invitée',participant:'OSV participe',intervenant:'OSV intervient (communication, facilitation)'};
 const JO_P={prive:'Moi seul(e)',direction:'Ma hiérarchie et la direction',projet:'L\'équipe du projet'};
+let p14=false;
+const joTitreDoc=j=>(j.pv&&j.pv.titre_document)||({reunion_externe:'COMPTE RENDU DE PARTICIPATION',formation:'RAPPORT DE PARTICIPATION À LA FORMATION',rencontre:'COMPTE RENDU DE RENCONTRE',seminaire:'RAPPORT DE PARTICIPATION',atelier:'COMPTE RENDU D\'ATELIER',mission:'RAPPORT DE MISSION',visite:'RAPPORT DE VISITE',audience:'COMPTE RENDU D\'AUDIENCE',plaidoyer:'COMPTE RENDU DE PLAIDOYER'}[j.type]||'COMPTE RENDU DE RÉUNION');
+const joCadre=j=>j.cadre||(j.projet_id?'projet':'institutionnel');
 const CAP_T={capitalisation:'Document de capitalisation',redevabilite:'Rapport de redevabilité',durabilite:'Note de durabilité et de pérennité',apprentissage:'Document d\'apprentissage (leçons apprises)',bonnes_pratiques:'Fiche de bonnes pratiques'};
 const capPeut=()=>['DE','DP','CP','SE'].includes(me.role);
-function svJournal(){if(!p13)return head('Journal et comptes rendus','')+'<p class="note">Exécutez le script 13 dans Supabase pour activer le journal, les comptes rendus et l\'assistant Claude.</p>';
+function svJournal(){if(!p13)return head('Journal et comptes rendus','')+'<p class="note">Exécutez le script 13 dans Supabase pour activer le journal, les comptes rendus et l\'assistant de rédaction.</p>';
  if(JR.user!==me.id)Object.assign(JR,{user:me.id,tab:'liste',sel:null,edit:null,pvEdit:false,capSel:null,capEdit:false,filtre:'moi'});
  if(JR.edit)return joEditeur(JR.edit==='new'?null:S.journal.find(j=>j.id===JR.edit));
  if(JR.sel&&S.journal.some(j=>j.id===JR.sel))return joDetail(S.journal.find(j=>j.id===JR.sel));
  if(JR.capSel&&(S.capis||[]).some(c=>c.id===JR.capSel))return capDetail(S.capis.find(c=>c.id===JR.capSel));
- const tabs=[['liste','Journal'],...(capPeut()||me.role==='CA'?[['capi','Capitalisation et redevabilité']]:[]),...(me.role==='DE'?[['assistant','Assistant Claude']]:[])];
+ const tabs=[['liste','Journal'],...(capPeut()||me.role==='CA'?[['capi','Capitalisation et redevabilité']]:[]),...(me.role==='DE'?[['assistant','Assistant de rédaction']]:[])];
  if(!tabs.some(t=>t[0]===JR.tab))JR.tab='liste';
- return head('Journal et comptes rendus','Consignez chaque réunion, atelier, visite ou mission : dictez pendant l\'activité ou résumez après. Claude rédige le compte rendu ; vous le relisez et le validez. Ce journal nourrit la capitalisation, la redevabilité et l\'apprentissage de l\'organisation.')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
+ return head('Journal et comptes rendus','Consignez chaque réunion, atelier, visite ou mission : dictez pendant l\'activité ou résumez après. L\'assistant rédige le compte rendu ; vous le relisez et le validez. Ce journal nourrit la capitalisation, la redevabilité et l\'apprentissage de l\'organisation.')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
  `<nav class="subnav">${tabs.map(([k,l])=>`<button data-act="joTab" data-v="${k}" ${JR.tab===k?'aria-current="page"':''}>${l}</button>`).join('')}</nav>`+({liste:joListe,capi:capListe,assistant:iaReglagesVue}[JR.tab])()}
 function joListe(){let L=S.journal.slice();if(JR.filtre==='moi')L=L.filter(j=>j.auteur_id===me.id);L.sort((a,b)=>a.date_evt<b.date_evt?1:-1);
  const tous=S.journal.some(j=>j.auteur_id!==me.id);
  return `<section class="card"><div class="row" style="justify-content:space-between;margin-bottom:.8rem"><button class="btn" data-act="joNouveau">${ico('mic')} Nouvelle réunion ou activité</button>${tous?`<div class="row"><label class="trChk"><input type="radio" name="joF" data-jo="moi" ${JR.filtre==='moi'?'checked':''}> Mon journal</label><label class="trChk"><input type="radio" name="joF" data-jo="tous" ${JR.filtre==='tous'?'checked':''}> Tout ce que je peux voir</label></div>`:''}</div>
  ${svT(['Date','Type','Objet','Lieu','Par','Compte rendu',''],L.map(j=>[fmtD(j.date_evt),esc(JO_T[j.type]||j.type),`<b>${esc(j.titre)}</b>${j.projet_id&&projet(j.projet_id)?`<br><span class="muted">${esc(libProj(projet(j.projet_id)))}</span>`:''}`,esc(j.lieu||''),esc(who(j.auteur_id)),
   j.statut==='valide'?tag(['validé','ok']):j.pv?tag(['à relire','warn']):tag(['notes seulement','']),`<button class="btn ghost sm" data-act="joVoir" data-id="${j.id}">Ouvrir</button>`]),'Aucune entrée. Commencez par votre prochaine réunion : ouvrez une entrée et lancez l\'enregistrement.')}</section>`}
-function joEditeur(j){j=j||{};const proj=S.projets.filter(p=>!['archive','rejete'].includes(p.statut));
- return `<p><button class="lnk" data-act="joFermer">← Journal</button></p>`+head(j.id?'Modifier l\'entrée':'Nouvelle réunion ou activité','Pendant la réunion, posez le téléphone ou l\'ordinateur devant vous et lancez l\'enregistrement : la parole est transcrite au fil de l\'eau. À la fin, Claude rédige le compte rendu.')+
+function joEditeur(j){j=j||{};const proj=S.projets.filter(p=>!['archive','rejete'].includes(p.statut)&&(['DE','DP','CA'].includes(me.role)||trEmploye(p)));
+ const cadre=j.id?joCadre(j):(['DE','CA','RA','RH','CPT','LOG'].includes(me.role)?'institutionnel':'projet');
+ const types=p14?Object.entries(JO_T).filter(([k])=>k!=='reunion'||j.type==='reunion'):Object.entries(JO_T).filter(([k])=>JO_T_ANC.includes(k));
+ return `<p><button class="lnk" data-act="joFermer">← Journal</button></p>`+head(j.id?'Modifier l\'entrée':'Nouvelle réunion ou activité','Réunion de projet, réunion à laquelle OSV est invitée, formation, atelier, mission… Pendant l\'activité, lancez l\'enregistrement : la parole s\'écrit au fil de l\'eau. À la fin, l\'assistant rédige le document ; vous le relisez et le validez.')+
  `<form data-form="joForm" data-id="${j.id||''}" class="card grid trForm">
-  <div><label>Type</label><select name="type">${opts(Object.entries(JO_T),j.type||'reunion')}</select></div>
-  <div class="trL2"><label>Objet <span class="req">*</span></label><input name="titre" required value="${esc(j.titre||'')}" placeholder="ex. Réunion de coordination à la Direction départementale de la santé"></div>
-  <div><label>Date</label><input name="date_evt" type="date" required value="${j.date_evt||today()}"></div><div><label>Lieu</label><input name="lieu" value="${esc(j.lieu||'')}"></div>
-  <div><label>Projet concerné</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),j.projet_id||'','— aucun —')}</select></div>
-  <div class="trL"><label for="jo_part">Participants (noms, fonctions, structures)</label><textarea id="jo_part" name="participants" rows="2">${esc(j.participants||'')}</textarea></div>
-  <div class="trL joRec"><label for="jo_tr">Enregistrement de la réunion (transcription)</label><div class="row iaRow">${SR?`<button type="button" class="btn dictBtn joBig" data-act="dicter" data-cible="jo_tr" aria-pressed="false">${ico('mic')} <span>Démarrer l'enregistrement</span></button><span class="dictLive" data-live="jo_tr" aria-live="polite"></span>`:''}</div>${dictAide()}
-   <textarea id="jo_tr" name="transcription" rows="10" placeholder="La transcription s'écrit ici pendant que l'on parle. Vous pouvez aussi coller ou taper vos notes.">${esc(j.transcription||'')}</textarea>
-   <small class="muted">L'écran reste allumé pendant l'enregistrement. La dictée a besoin d'Internet ; elle comprend le français. Relisez les noms propres.</small></div>
+  ${p14?`<fieldset class="trL joCadre"><legend>Cette activité relève</legend><label class="trChk"><input type="radio" name="cadre" value="projet" ${cadre==='projet'?'checked':''} data-jo-cadre> d'un projet d'OSV</label><label class="trChk"><input type="radio" name="cadre" value="institutionnel" ${cadre==='institutionnel'?'checked':''} data-jo-cadre> de la vie de l'organisation (hors projet : invitation, formation, partenariat, plaidoyer…)</label></fieldset>`:''}
+  <div class="trL2"><label>Nature de l'activité</label><select name="type">${opts(types,j.type||(cadre==='projet'?(p14?'reunion_projet':'reunion'):(p14?'reunion_externe':'reunion')))}</select></div>
+  <div class="trL2 joProj" ${p14&&cadre!=='projet'?'hidden':''}><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),j.projet_id||'','— choisir —')}</select></div>
+  <div class="trL"><label>Objet <span class="req">*</span></label><input name="titre" required value="${esc(j.titre||'')}" placeholder="ex. Réunion de coordination à la Direction départementale de la santé de Kong"></div>
+  ${p14?`<div class="trL2"><label>Structure organisatrice</label><input name="organisateur" value="${esc(j.organisateur||'')}" placeholder="ex. Direction régionale de la santé, PNUD, OSV"></div>
+  <div><label>Rôle d'OSV</label><select name="role_osv">${opts(Object.entries(JO_ROLE),j.role_osv||(cadre==='projet'?'organisateur':'invite'))}</select></div>`:''}
+  <div><label>Date</label><input name="date_evt" type="date" required value="${j.date_evt||today()}"></div>
+  ${p14?`<div><label>Début</label><input name="heure_debut" type="time" value="${esc(j.heure_debut||'')}"></div><div><label>Fin</label><input name="heure_fin" type="time" value="${esc(j.heure_fin||'')}"></div>`:''}
+  <div class="trL2"><label>Lieu</label><input name="lieu" value="${esc(j.lieu||'')}"></div>
+  <div class="trL"><label for="jo_part">Participants : une personne par ligne, « nom ; fonction ; structure »</label><textarea id="jo_part" name="participants" rows="3" placeholder="KONE Ali ; Directeur départemental ; DDS Kong">${esc(j.participants||'')}</textarea></div>
+  <div class="trL joRec"><label for="jo_tr">Enregistrement de l'activité</label><div class="row iaRow">${SR?`<button type="button" class="btn dictBtn joBig" data-act="dicter" data-cible="jo_tr" aria-pressed="false">${ico('mic')} <span>Démarrer l'enregistrement</span></button><span class="dictLive" data-live="jo_tr" aria-live="polite"></span>`:''}</div>${dictAide()}
+   <textarea id="jo_tr" name="transcription" rows="10" placeholder="La parole s'écrit ici pendant l'activité. Vous pouvez aussi coller ou taper vos notes.">${esc(j.transcription||'')}</textarea>
+   <small class="muted">L'écran reste allumé pendant l'enregistrement. Il faut Internet ; relisez les noms propres et les chiffres.</small></div>
   <div class="trL"><label for="jo_notes">Mes notes (décisions, chiffres, points à retenir)</label><textarea id="jo_notes" name="notes" rows="4">${esc(j.notes||'')}</textarea>${dictBtn('jo_notes')}</div>
   <div><label>Qui peut lire ?</label><select name="partage">${opts(Object.entries(JO_P),j.partage||'direction')}</select></div>
   <div class="trL"><label class="trChk"><input type="checkbox" name="confidentiel" ${j.confidentiel?'checked':''}> Confidentiel : seul le Directeur exécutif pourra le lire, une fois validé</label></div>
-  <div class="trL row"><button class="btn ghost" type="submit" value="brouillon">Enregistrer</button>${iaOK()?`<button class="btn iaB" type="submit" value="pv">${ico('etoile')} Enregistrer et rédiger le compte rendu avec Claude</button>`:''}</div></form>`}
-function joDetail(j){const a=j.auteur_id===me.id,pv=j.pv;
- return `<p><button class="lnk" data-act="joFermer">← Journal</button></p>${srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:''}<div class="head"><h1>${esc(j.titre)}</h1><p>${esc(JO_T[j.type])} · ${fmtD(j.date_evt)}${j.lieu?' · '+esc(j.lieu):''} · ${esc(who(j.auteur_id))}${j.projet_id&&projet(j.projet_id)?' · '+esc(libProj(projet(j.projet_id))):''}</p></div>
- <div class="row" style="margin-bottom:1rem">${j.statut==='valide'?tag(['Compte rendu validé','ok']):tag(['Brouillon','warn'])}${j.confidentiel?tag(['Confidentiel','bad']):''}<span class="muted">Lecture : ${esc(JO_P[j.partage])}</span></div>
- ${a?`<div class="row" style="margin-bottom:1rem"><button class="btn ghost sm" data-act="joModif" data-id="${j.id}">Modifier les notes</button>${iaOK()?`<button class="btn sm iaB" data-act="joPv" data-id="${j.id}">${ico('etoile')} ${pv?'Refaire':'Rédiger'} le compte rendu avec Claude</button>`:''}${pv&&!JR.pvEdit?`<button class="btn ghost sm" data-act="joPvEdit">Corriger le compte rendu</button>`:''}${pv&&j.statut!=='valide'?`<button class="btn sm" data-act="joValider" data-id="${j.id}">Valider le compte rendu</button>`:''}${j.statut!=='valide'?`<button class="btn danger sm" data-act="joSuppr" data-id="${j.id}">Supprimer</button>`:''}</div>`:''}
- ${pv?(JR.pvEdit&&a?pvEditeur(j):`<article class="card pvDoc">${pvHTML(pv)}</article><p><button class="btn ghost sm" data-act="joImp" data-id="${j.id}">Imprimer ou télécharger en Word</button></p>`):`<p class="note">Pas encore de compte rendu.${a&&iaOK()?' Cliquez sur « Rédiger le compte rendu avec Claude ».':''}</p>`}
- ${j.participants?`<section class="card"><h3>Participants</h3><p class="pre">${esc(j.participants)}</p></section>`:''}
- ${j.notes?`<section class="card"><h3>Notes</h3><p class="pre">${esc(j.notes)}</p></section>`:''}
- ${j.transcription?`<details class="card"><summary><b>Transcription</b> <span class="muted">(${num(j.transcription.split(/\s+/).length)} mots)</span></summary><p class="pre" style="margin-top:.6rem">${esc(j.transcription)}</p></details>`:''}`}
-const L2=v=>(Array.isArray(v)?v:[]).filter(Boolean);
-function pvHTML(pv,papier){const H=papier?'h2':'h3',ul=L=>L.length?`<ul>${L.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'';let n=0;const T=t=>`<${H}>${++n}. ${t}</${H}>`;
- const part=L2(pv.participants);
- return `${pv.resume?`<p><b>En bref :</b> ${esc(pv.resume)}</p>`:''}
- ${pv.contexte?T('Contexte et objet')+`<p class="pre">${esc(pv.contexte)}</p>`:''}
- ${part.length?T('Participants')+`<table class="${papier?'':'trKv'}"><thead><tr><th>Nom</th><th>Fonction</th><th>Structure</th></tr></thead><tbody>${part.map(x=>`<tr><td>${esc(x.nom||'')}</td><td>${esc(x.fonction||'')}</td><td>${esc(x.structure||'')}</td></tr>`).join('')}</tbody></table>`:''}
- ${L2(pv.ordre_du_jour).length?T('Ordre du jour')+ul(L2(pv.ordre_du_jour)):''}
- ${L2(pv.points).length?T('Déroulement et points discutés')+L2(pv.points).map(x=>`<p><b>${esc(x.titre||'')}</b><br>${esc(x.synthese||'')}</p>`).join(''):''}
- ${L2(pv.decisions).length?T('Décisions')+ul(L2(pv.decisions)):''}
- ${L2(pv.actions).length?T('Actions à suivre')+`<table class="${papier?'':'trKv'}"><thead><tr><th>Action</th><th>Responsable</th><th>Échéance</th></tr></thead><tbody>${L2(pv.actions).map(x=>`<tr><td>${esc(x.action||'')}</td><td>${esc(x.responsable||'')}</td><td>${esc(x.echeance||'')}</td></tr>`).join('')}</tbody></table>`:''}
- ${L2(pv.engagements_osv).length?T('Engagements d\'OSV')+ul(L2(pv.engagements_osv)):''}
- ${L2(pv.redevabilite).length?T('Redevabilité')+ul(L2(pv.redevabilite)):''}
- ${L2(pv.lecons).length||L2(pv.bonnes_pratiques).length?T('Leçons apprises et bonnes pratiques')+ul(L2(pv.lecons))+ul(L2(pv.bonnes_pratiques).map(x=>'Bonne pratique : '+x)):''}
- ${pv.suite?T('Suite à donner')+`<p class="pre">${esc(pv.suite)}</p>`:''}`}
-function pvEditeur(j){const pv=j.pv||{},Lg=(k)=>L2(pv[k]).join('\n'),A=(k,l,v,r=3)=>`<div class="trL"><label for="pv_${k}">${l}</label><textarea id="pv_${k}" name="${k}" rows="${r}">${esc(v)}</textarea></div>`;
- return `<form data-form="joPvForm" data-id="${j.id}" class="card grid trForm"><p class="muted trL">Une ligne par élément. Pour les tableaux, séparez les colonnes par « ; ».</p>
- ${A('resume','En bref',pv.resume||'',2)}${A('contexte','Contexte et objet',pv.contexte||'')}${A('participants','Participants : « nom ; fonction ; structure »',L2(pv.participants).map(x=>[x.nom,x.fonction,x.structure].join(' ; ')).join('\n'))}
- ${A('ordre_du_jour','Ordre du jour',Lg('ordre_du_jour'))}${A('points','Points discutés : « titre ; synthèse »',L2(pv.points).map(x=>[x.titre,x.synthese].join(' ; ')).join('\n'),6)}${A('decisions','Décisions',Lg('decisions'))}
- ${A('actions','Actions à suivre : « action ; responsable ; échéance »',L2(pv.actions).map(x=>[x.action,x.responsable,x.echeance].join(' ; ')).join('\n'))}${A('engagements_osv','Engagements d\'OSV',Lg('engagements_osv'))}${A('redevabilite','Redevabilité',Lg('redevabilite'))}
- ${A('lecons','Leçons apprises',Lg('lecons'))}${A('bonnes_pratiques','Bonnes pratiques',Lg('bonnes_pratiques'))}${A('suite','Suite à donner',pv.suite||'',2)}
+  <div class="trL row"><button class="btn ghost" type="submit" value="brouillon">Enregistrer</button>${iaOK()?`<button class="btn iaB" type="submit" value="pv">${ico('etoile')} Enregistrer et rédiger le document</button>`:''}</div></form>`}
+const joMarques=pv=>(JSON.stringify(pv||{}).match(/\[à (compléter|préciser)[^\]]*\]/gi)||[]).length;
+function joDetail(j){const a=j.auteur_id===me.id,pv=j.pv,p=j.projet_id&&projet(j.projet_id),nm=joMarques(pv);
+ return `<p><button class="lnk" data-act="joFermer">← Journal</button></p>${srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:''}<div class="head"><h1>${esc(j.titre)}</h1><p>${esc(JO_T[j.type]||j.type)} · ${fmtD(j.date_evt)}${j.heure_debut?' · '+esc(j.heure_debut)+(j.heure_fin?'–'+esc(j.heure_fin):''):''}${j.lieu?' · '+esc(j.lieu):''} · ${esc(who(j.auteur_id))}</p><p>${p?'Projet : '+esc(libProj(p)):'Activité institutionnelle (hors projet)'}${j.organisateur?' · organisée par '+esc(j.organisateur):''}${j.role_osv?' · '+esc(JO_ROLE[j.role_osv]||''):''}</p></div>
+ <div class="row" style="margin-bottom:1rem">${j.statut==='valide'?tag(['Document validé','ok']):tag(['Brouillon','warn'])}${j.confidentiel?tag(['Confidentiel','bad']):''}${nm&&j.statut!=='valide'?tag([nm+' passage(s) à compléter','bad']):''}<span class="muted">Lecture : ${esc(JO_P[j.partage])}</span></div>
+ ${pv?`<div class="row" style="margin-bottom:1rem"><button class="btn" data-act="joWord" data-id="${j.id}">Télécharger en Word</button><button class="btn ghost sm" data-act="joImp" data-id="${j.id}">Aperçu, impression ou PDF</button></div>`:''}
+ ${a?`<div class="row" style="margin-bottom:1rem"><button class="btn ghost sm" data-act="joModif" data-id="${j.id}">Modifier les informations et les notes</button>${pv&&!JR.pvEdit&&j.statut!=='valide'?`<button class="btn ghost sm" data-act="joPvEdit">Corriger le document</button>`:''}${iaOK()&&j.statut!=='valide'?`<button class="btn ghost sm iaB2" data-act="joPv" data-id="${j.id}">${ico('etoile')} ${pv?'Rédiger à nouveau':'Rédiger le document'}</button>`:''}${pv&&j.statut!=='valide'?`<button class="btn sm" data-act="joValider" data-id="${j.id}">Valider le document</button>`:''}${j.statut!=='valide'?`<button class="btn danger sm" data-act="joSuppr" data-id="${j.id}">Supprimer</button>`:''}</div>`:''}
+ ${nm&&a&&j.statut!=='valide'?`<p class="note">Les passages <mark>surlignés</mark> sont à compléter avant validation : cliquez sur « Corriger le document ».</p>`:''}
+ ${pv?(JR.pvEdit&&a?pvEditeur(j):`<article class="card pvDoc">${pvHTML(pv,false,j)}</article>`):`<p class="note">Pas encore de document.${a&&iaOK()?' Cliquez sur « Rédiger le document ».':''}</p>`}
+ ${j.notes?`<details class="card"><summary><b>Notes</b></summary><p class="pre" style="margin-top:.6rem">${esc(j.notes)}</p></details>`:''}
+ ${j.transcription?`<details class="card"><summary><b>Enregistrement</b> <span class="muted">(${num(j.transcription.split(/\s+/).length)} mots)</span></summary><p class="pre" style="margin-top:.6rem">${esc(j.transcription)}</p></details>`:''}`}
+const L2=v=>(Array.isArray(v)?v:[]).filter(x=>x&&(typeof x!=='string'||x.trim()));
+const joMark=(s,papier)=>papier?esc(s):esc(s).replace(/\[à (compléter|préciser)[^\]]*\]/gi,m=>`<mark>${m}</mark>`);
+function joPartsJ(j){const t=String(j&&j.participants||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean);return t.length&&t.some(l=>l.includes(';'))?t.map(l=>{const [nom,fonction,structure]=l.split(';').map(x=>x.trim());return {nom,fonction:fonction||'',structure:structure||''}}):[]}
+function pvHTML(pv,papier,j){const M=s=>joMark(String(s??''),papier),ul=L=>L.length?`<ul>${L.map(x=>`<li>${M(x)}</li>`).join('')}</ul>`:'',ol=L=>L.length?`<ol>${L.map(x=>`<li>${M(x)}</li>`).join('')}</ol>`:'';
+ let n=0;const T=t=>`<h2>${++n}. ${t}</h2>`,para=s=>String(s||'').split(/\n{2,}|\n/).filter(x=>x.trim()).map(x=>`<p>${M(x)}</p>`).join('');
+ const part=L2(pv.participants).length?L2(pv.participants):joPartsJ(j);
+ const tab=(cols,w,rows)=>`<table data-w="${w}"><thead><tr>${cols.map((c,i)=>`<th style="width:${w.split(',')[i]}%">${c}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+ const pts=L2(pv.points);let h='';
+ if(pv.resume)h+=`<p><b>Synthèse.</b> ${M(pv.resume)}</p>`;
+ if(pv.contexte||L2(pv.objectifs).length)h+=T('Contexte et objectifs')+para(pv.contexte)+(L2(pv.objectifs).length?`<p>Objectifs :</p>${ul(L2(pv.objectifs))}`:'');
+ if(part.length)h+=T('Participants')+tab(['N°','Nom et prénoms','Fonction','Structure'],'6,34,30,30',part.map((x,i)=>[i+1,M(x.nom),M(x.fonction),M(x.structure)]))+`<p class="petit">Effectif : ${part.length} participant(s).</p>`;
+ if(L2(pv.ordre_du_jour).length)h+=T('Ordre du jour')+ol(L2(pv.ordre_du_jour));
+ if(pts.length){h+=T('Déroulement et principaux échanges');const k=n;h+=pts.map((x,i)=>`<h3>${k}.${i+1}. ${M(x.titre)}</h3>${para(x.synthese)}`).join('')}
+ if(L2(pv.constats).length)h+=T('Constats')+ul(L2(pv.constats));
+ if(L2(pv.acquis).length)h+=T('Acquis et compétences renforcées')+ul(L2(pv.acquis));
+ if(L2(pv.position_osv).length)h+=T('Position et contributions d\'OSV')+ul(L2(pv.position_osv));
+ if(L2(pv.decisions).length)h+=T('Décisions')+ol(L2(pv.decisions));
+ if(L2(pv.recommandations).length)h+=T('Recommandations')+ol(L2(pv.recommandations));
+ if(L2(pv.actions).length)h+=T('Plan d\'actions')+tab(['N°','Action','Responsable','Échéance'],'6,54,22,18',L2(pv.actions).map((x,i)=>[i+1,M(x.action),M(x.responsable),M(x.echeance)]));
+ if(L2(pv.engagements_osv).length)h+=T('Engagements d\'OSV')+ul(L2(pv.engagements_osv));
+ if(L2(pv.opportunites).length)h+=T('Opportunités pour OSV')+ul(L2(pv.opportunites));
+ if(L2(pv.redevabilite).length)h+=T('Redevabilité')+ul(L2(pv.redevabilite));
+ if(L2(pv.lecons).length||L2(pv.bonnes_pratiques).length)h+=T('Leçons apprises et bonnes pratiques')+(L2(pv.lecons).length?`<p>Leçons apprises :</p>${ul(L2(pv.lecons))}`:'')+(L2(pv.bonnes_pratiques).length?`<p>Bonnes pratiques :</p>${ul(L2(pv.bonnes_pratiques))}`:'');
+ if(pv.suite||pv.conclusion)h+=T('Conclusion et prochaines étapes')+para(pv.conclusion)+para(pv.suite);
+ return h}
+function pvEditeur(j){const pv=j.pv||{},Lg=k=>L2(pv[k]).join('\n'),A=(k,l,v,r=3)=>`<div class="trL"><label for="pv_${k}">${l}</label><textarea id="pv_${k}" name="${k}" rows="${r}">${esc(v)}</textarea></div>`;
+ return `<form data-form="joPvForm" data-id="${j.id}" class="card grid trForm"><p class="muted trL">Une ligne par élément. Dans les tableaux, séparez les colonnes par « ; ». Remplacez chaque « [à compléter : …] » par l'information exacte.</p>
+ ${A('titre_document','Intitulé du document (ex. COMPTE RENDU DE RÉUNION)',pv.titre_document||joTitreDoc(j),1)}${A('resume','Synthèse',pv.resume||'',3)}${A('contexte','Contexte',pv.contexte||'',4)}${A('objectifs','Objectifs',Lg('objectifs'))}
+ ${A('participants','Participants : « nom ; fonction ; structure »',L2(pv.participants).map(x=>[x.nom,x.fonction,x.structure].join(' ; ')).join('\n'))}
+ ${A('ordre_du_jour','Ordre du jour',Lg('ordre_du_jour'))}${A('points','Déroulement : « titre du point ; texte »',L2(pv.points).map(x=>[x.titre,x.synthese].join(' ; ')).join('\n'),8)}
+ ${A('constats','Constats',Lg('constats'))}${A('acquis','Acquis et compétences renforcées',Lg('acquis'))}${A('position_osv','Position et contributions d\'OSV',Lg('position_osv'))}
+ ${A('decisions','Décisions',Lg('decisions'))}${A('recommandations','Recommandations',Lg('recommandations'))}
+ ${A('actions','Plan d\'actions : « action ; responsable ; échéance »',L2(pv.actions).map(x=>[x.action,x.responsable,x.echeance].join(' ; ')).join('\n'))}
+ ${A('engagements_osv','Engagements d\'OSV',Lg('engagements_osv'))}${A('opportunites','Opportunités pour OSV',Lg('opportunites'))}${A('redevabilite','Redevabilité',Lg('redevabilite'))}
+ ${A('lecons','Leçons apprises',Lg('lecons'))}${A('bonnes_pratiques','Bonnes pratiques',Lg('bonnes_pratiques'))}${A('conclusion','Conclusion',pv.conclusion||'',3)}${A('suite','Prochaines étapes',pv.suite||'',2)}
  <div class="trL row"><button class="btn" type="submit">Enregistrer les corrections</button><button class="btn ghost" type="button" data-act="joPvAnnul">Annuler</button></div></form>`}
-function joImprimer(j){const corps=`<h1 class="doc-t">${j.type==='reunion'?'COMPTE RENDU DE RÉUNION':'COMPTE RENDU'}</h1><p class="doc-s">${esc(j.titre)}</p>
- <table class="kv"><tr><th>Date</th><td>${fmtD(j.date_evt)}</td></tr>${j.lieu?`<tr><th>Lieu</th><td>${esc(j.lieu)}</td></tr>`:''}${j.projet_id&&projet(j.projet_id)?`<tr><th>Projet</th><td>${esc(libProj(projet(j.projet_id)))}</td></tr>`:''}<tr><th>Rédigé par</th><td>${esc(who(j.auteur_id))}</td></tr></table>
- ${pvHTML(j.pv||{},true)}<div class="bloc"><div class="sig" style="--n:2"><div><b>Rédigé par</b>${esc(who(j.auteur_id))}</div><div><b>${j.statut==='valide'?'Validé le':'Statut'}</b>${j.statut==='valide'?fmtD(j.valide_le):'brouillon'}</div></div></div>`;
- ouvrirPapier('Compte rendu – '+j.titre,corps,{nom:`Compte_rendu_${j.date_evt}_${trSlug(j.titre)}`,ref:`<b>${fmtD(j.date_evt)}</b><br>${esc(JO_T[j.type])}`,filigrane:j.statut==='valide'?null:'BROUILLON'})}
+function joCorps(j){const pv=j.pv||{},p=j.projet_id&&projet(j.projet_id),u=S.staff.find(x=>x.id===j.auteur_id)||{},fonc=u.id?posteLib(u):'';
+ const lig=[['Objet',esc(pv.titre||j.titre)],['Date',fmtD(j.date_evt)+(j.heure_debut?`, de ${esc(j.heure_debut)}${j.heure_fin?' à '+esc(j.heure_fin):''}`:'')],...(j.lieu?[['Lieu',esc(j.lieu)]]:[]),...(j.organisateur?[['Organisé par',esc(j.organisateur)]]:[]),
+  ...(j.role_osv?[['Participation d\'OSV',esc(JO_ROLE[j.role_osv]||'')]]:[]),['Cadre',p?'Projet « '+esc(p.nom)+' »'+(p.bailleur?' – '+esc(p.bailleur):''):'Activité institutionnelle'],['Rapporteur',esc(u.nom||who(j.auteur_id))+(fonc?', '+esc(fonc):'')]];
+ return `<h1 class="doc-t">${esc(String(joTitreDoc(j)).toUpperCase())}</h1><p class="doc-s">${esc(pv.titre||j.titre)}</p>
+ <table class="kv">${lig.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('')}</table>
+ ${pvHTML(pv,true,j)}
+ <div class="bloc"><p style="text-align:right">Fait à ${esc((j.lieu||'Yamoussoukro').split(',')[0])}, le ${fmtD(j.valide_le||j.date_evt)}</p><div class="sig" style="--n:2"><div><b>Le rapporteur</b>${esc(u.nom||'')}<br>${esc(fonc)}</div><div><b>Visa de la direction</b>${j.statut==='valide'?'':'<br>'}</div></div></div>`}
+const joNom=j=>`${String(joTitreDoc(j)).replace(/[^A-Za-zÀ-ÿ0-9]+/g,'_').replace(/^_|_$/g,'')}_${j.date_evt}`;
+const joRef=j=>`<b>${fmtD(j.date_evt)}</b><br>${esc(JO_T[j.type]||'')}`;
+function joImprimer(j){ouvrirPapier(joTitreDoc(j)+' – '+j.titre,joCorps(j),{nom:joNom(j),ref:joRef(j),filigrane:j.statut==='valide'?null:'PROJET'})}
+function joWord(j){telechargerWord(joNom(j)+'.docx',joTitreDoc(j)+' – '+j.titre,joCorps(j),{ref:joRef(j)})}
+function joContexte(rec,id){const c={nature:JO_T[rec.type]||rec.type,cadre:rec.cadre==='institutionnel'||!rec.projet_id?'institutionnel (hors projet)':'projet',structure_organisatrice:rec.organisateur||'',role_osv:JO_ROLE[rec.role_osv]||'',horaire:[rec.heure_debut,rec.heure_fin].filter(Boolean).join(' – '),
+  redacteur:{nom:who(me.id),fonction:posteLib(S.staff.find(u=>u.id===me.id)||{})}};
+ const p=rec.projet_id&&projet(rec.projet_id);
+ if(p){const N={og:'Objectif global',os:'Objectif spécifique',res:'Résultat attendu'};
+  c.projet={nom:p.nom,code:p.code,bailleur:p.bailleur,zone:p.zone,domaine:p.domaine,debut:p.debut,fin:p.fin,statut:(PSTAT[p.statut]||[p.statut])[0],
+   cadre_logique:(S.cadre||[]).filter(x=>x.projet_id===p.id&&N[x.niveau]).map(x=>`${N[x.niveau]}${x.code?' '+x.code:''} : ${x.libelle}`).slice(0,25),
+   indicateurs:(S.inds||[]).filter(i=>i.projet_id===p.id).map(i=>i.libelle+(i.cible!=null?` (cible : ${i.cible} ${i.unite||''})`:'')).slice(0,20),
+   comptes_rendus_precedents:S.journal.filter(x=>x.projet_id===p.id&&x.id!==id&&x.pv&&x.statut==='valide').sort((a,b)=>a.date_evt<b.date_evt?1:-1).slice(0,3).map(x=>({date:x.date_evt,objet:x.titre,synthese:x.pv.resume,decisions:x.pv.decisions,actions:x.pv.actions}))}}
+ else c.organisation={nom:'ONG Sécurité Vie (OSV)',siege:'Yamoussoukro, Côte d\'Ivoire',domaines:OSV_DOMAINES,slogan:'Agir pour sauver des vies au quotidien',
+  activites_institutionnelles_recentes:S.journal.filter(x=>!x.projet_id&&x.id!==id&&x.pv&&x.statut==='valide').sort((a,b)=>a.date_evt<b.date_evt?1:-1).slice(0,3).map(x=>({date:x.date_evt,objet:x.titre,synthese:x.pv.resume}))};
+ return c}
+const joPayload=(rec,id)=>({type:JO_T[rec.type]||rec.type,titre:rec.titre,date:rec.date_evt,lieu:rec.lieu,participants:rec.participants,notes:rec.notes,transcription:rec.transcription,contexte:joContexte(rec,id)});
 
 /* ---------- capitalisation, redevabilité, durabilité, apprentissage ---------- */
 function capListe(){const L=(S.capis||[]).slice(),proj=S.projets.filter(p=>!['rejete'].includes(p.statut)&&(['DE','DP'].includes(me.role)||trEmploye(p)));
  const a=new Date();a.setMonth(a.getMonth()-6);
- return (capPeut()&&iaOK()?`<section class="card iaRac"><h3>${ico('etoile')} Préparer un document avec Claude</h3><p class="muted">Claude s'appuie uniquement sur ce qui est validé dans l'application : comptes rendus du journal, rapports mensuels de collecte, indicateurs, TDR et missions de la période. Plus le journal est tenu, plus le document est riche. Relisez, complétez, puis faites valider par le DE ou le DP.</p>
+ return (capPeut()&&iaOK()?`<section class="card iaRac"><h3>${ico('etoile')} Préparer un document automatiquement</h3><p class="muted">Le document s'appuie uniquement sur ce qui est validé dans l'application : comptes rendus du journal, rapports mensuels de collecte, indicateurs, TDR et missions de la période. Plus le journal est tenu, plus le document est riche. Relisez, complétez, puis faites valider par le DE ou le DP.</p>
  <form data-form="capForm" class="grid" style="align-items:end"><div class="trL2"><label>Document</label><select name="type">${opts(Object.entries(CAP_T),'capitalisation')}</select></div>
   <div class="trL2"><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),'',['DE','DP'].includes(me.role)?'— toute l\'organisation —':undefined)}</select></div>
   <div><label>Du</label><input name="debut" type="date" value="${a.toISOString().slice(0,10)}" required></div><div><label>Au</label><input name="fin" type="date" value="${today()}" required></div>
   <div class="trL"><label>Ce que vous voulez mettre en avant (facultatif)</label><textarea id="cap_note" name="note" rows="2"></textarea>${dictBtn('cap_note')}</div>
-  <div class="trL"><button class="btn iaB" type="submit">${ico('etoile')} Rédiger avec Claude</button></div></form></section>`:'')+
+  <div class="trL"><button class="btn iaB" type="submit">${ico('etoile')} Rédiger automatiquement</button></div></form></section>`:'')+
  `<section class="card"><h3>Documents (${L.length})</h3>${svT(['Document','Projet','Période','Statut','Par',''],L.map(c=>[`<b>${esc(c.titre)}</b><br><span class="muted">${esc(CAP_T[c.type])}</span>`,c.projet_id&&projet(c.projet_id)?esc(libProj(projet(c.projet_id))):'Organisation',`${fmtD(c.periode_debut)} → ${fmtD(c.periode_fin)}`,c.statut==='valide'?tag(['validé','ok']):tag(['brouillon','warn']),esc(who(c.auteur_id)),`<button class="btn ghost sm" data-act="capVoir" data-id="${c.id}">Ouvrir</button>`]),'Aucun document pour le moment.')}</section>`}
 function capSources(pid,d1,d2){const dans=d=>d&&d>=d1&&d<=d2,P=pid?[projet(pid)].filter(Boolean):S.projets.filter(p=>!['rejete'].includes(p.statut));
  const J=S.journal.filter(j=>j.statut==='valide'&&!j.confidentiel&&dans(j.date_evt)&&(!pid||j.projet_id===pid)).slice(0,120).map(j=>({date:j.date_evt,type:JO_T[j.type],objet:j.titre,lieu:j.lieu,
@@ -6234,30 +6289,34 @@ function capDetail(c){const s=(c.contenu&&c.contenu.sections)||[],a=c.auteur_id=
  ${(c.sources||{}).resume?`<p class="muted">Sources utilisées : ${esc(c.sources.resume)}.</p>`:''}`}
 function capImprimer(c){const s=(c.contenu&&c.contenu.sections)||[],corps=`<h1 class="doc-t">${esc(c.titre.toUpperCase())}</h1><p class="doc-s">${esc(CAP_T[c.type])}<br>${c.projet_id&&projet(c.projet_id)?esc(libProj(projet(c.projet_id))):'ONG Sécurité Vie'} · du ${fmtD(c.periode_debut)} au ${fmtD(c.periode_fin)}</p>
  ${s.map((x,i)=>`<h2>${i+1}. ${esc(x.titre)}</h2>${String(x.contenu||'').split(/\n{2,}/).map(p=>`<p class="pre">${esc(p)}</p>`).join('')}`).join('')}
- <p class="petit">Document préparé à partir des données validées dans OSV Gestion${(c.sources||{}).resume?' ('+esc(c.sources.resume)+')':''}, rédigé avec l'assistant Claude puis relu${c.statut==='valide'?' et validé par '+esc(who(c.valide_par))+' le '+fmtD(c.valide_le):''}.</p>`;
+ <p class="petit">Document préparé à partir des données validées dans OSV Gestion${(c.sources||{}).resume?' ('+esc(c.sources.resume)+')':''}, relu${c.statut==='valide'?' et validé par '+esc(who(c.valide_par))+' le '+fmtD(c.valide_le):''}.</p>`;
  ouvrirPapier(c.titre,corps,{nom:`${trSlug(CAP_T[c.type])}_${c.periode_fin||''}`,ref:`<b>${esc(CAP_T[c.type])}</b><br>${fmtD(c.periode_fin)}`,filigrane:c.statut==='valide'?null:'PROJET'})}
 function iaReglagesVue(){const g=S.iaReg||{actif:true,quota_jour:40,quota_org_jour:600},U=S.iaUsage||[],j=today(),m=today().slice(0,7);
  const uj=U.filter(u=>u.le.slice(0,10)===j),um=U.filter(u=>u.le.slice(0,7)===m),tk=L=>somme(L,u=>u.tokens_in)+somme(L,u=>u.tokens_out);
  const parT={};um.forEach(u=>parT[u.tache]=(parT[u.tache]||0)+1);const parU={};um.forEach(u=>parU[u.user_id]=(parU[u.user_id]||0)+1);
- return `<section class="card"><h3>Réglages de l'assistant Claude</h3><p class="muted">La clé de l'API est rangée sur le serveur (secrets Supabase), jamais dans l'application. Vous pouvez suspendre l'assistant à tout moment et limiter le nombre de demandes, pour maîtriser la facture.</p>
+ return `<section class="card"><h3>Réglages de l'assistant de rédaction</h3><p class="muted">La clé de l'API est rangée sur le serveur (secrets Supabase), jamais dans l'application. Vous pouvez suspendre l'assistant à tout moment et limiter le nombre de demandes, pour maîtriser la facture.</p>
  <form data-form="iaReg" class="grid" style="align-items:end"><div><label class="trChk"><input type="checkbox" name="actif" ${g.actif!==false?'checked':''}> Assistant activé</label></div><div><label>Demandes par personne et par jour</label><input name="quota_jour" type="number" min="0" max="1000" value="${g.quota_jour}"></div><div><label>Demandes par jour pour toute l'organisation</label><input name="quota_org_jour" type="number" min="0" max="20000" value="${g.quota_org_jour}"></div><div><button class="btn" type="submit">Enregistrer</button></div></form></section>
  <div class="kpis"><div class="kpi"><b>${num(uj.length)}</b><span>demandes aujourd'hui</span></div><div class="kpi"><b>${num(um.length)}</b><span>demandes ce mois</span></div><div class="kpi"><b>${num(Math.round(tk(um)/1000))} k</b><span>jetons ce mois (entrée + sortie)</span></div><div class="kpi"><b>${num(um.filter(u=>u.statut==='erreur').length)}</b><span>échecs ce mois</span></div></div>
  <section class="card"><h3>Utilisation du mois</h3>${trBarres(Object.entries(parT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[{fiche:'Fiches remplies à partir d\'un récit',tdr:'TDR rédigés',microplan:'Microplans',rapport:'Rapports mensuels',pv:'Comptes rendus',capitalisation:'Capitalisation et redevabilité',ameliorer:'Améliorations de texte'}[k]||k,v]))||'<p class="empty">Aucune demande ce mois.</p>'}
  ${Object.keys(parU).length?`<h4>Par personne</h4>${trBarres(Object.entries(parU).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>[who(k),v]))}`:''}
- <p class="muted">Le coût dépend du nombre de jetons et du modèle choisi ; consultez la page des tarifs de Claude et votre console Anthropic pour la facture réelle.</p></section>`}
+ <p class="muted">Le coût dépend du nombre de jetons et du modèle choisi ; consultez la console de votre fournisseur (Anthropic) pour la facture réelle.</p></section>`}
 
 /* ---------- formulaires ---------- */
 document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target,t=f.dataset&&f.dataset.form;if(!['joForm','joPvForm','capForm','capEditForm','iaReg'].includes(t))return;e.preventDefault();e.stopImmediatePropagation();srvMsg='';dictStop();
  const d=Object.fromEntries(new FormData(f).entries()),sub=e.submitter&&e.submitter.value;
- if(t==='joForm'){const id=f.dataset.id||uuid(),rec={type:d.type,titre:String(d.titre||'').trim(),date_evt:d.date_evt,lieu:(d.lieu||'').trim()||null,projet_id:d.projet||null,participants:(d.participants||'').trim()||null,transcription:(d.transcription||'').trim()||null,notes:(d.notes||'').trim()||null,partage:d.partage,confidentiel:!!d.confidentiel};
+ if(t==='joForm'){const id=f.dataset.id||uuid(),inst=p14&&d.cadre==='institutionnel';
+  const rec={type:d.type,titre:String(d.titre||'').trim(),date_evt:d.date_evt,lieu:(d.lieu||'').trim()||null,projet_id:inst?null:(d.projet||null),participants:(d.participants||'').trim()||null,transcription:(d.transcription||'').trim()||null,notes:(d.notes||'').trim()||null,partage:d.partage,confidentiel:!!d.confidentiel,
+   ...(p14?{cadre:inst?'institutionnel':'projet',organisateur:(d.organisateur||'').trim()||null,role_osv:d.role_osv||null,heure_debut:d.heure_debut||null,heure_fin:d.heure_fin||null}:{})};
   if(!rec.titre){alert('Indiquez l\'objet.');return}
-  if(sub==='pv'&&!rec.transcription&&!rec.notes){alert('Il n\'y a encore ni transcription ni notes : enregistrez la réunion ou écrivez vos notes.');return}
+  if(p14&&!inst&&!rec.projet_id){alert('Choisissez le projet, ou cochez « vie de l\'organisation (hors projet) ».');return}
+  if(rec.partage==='projet'&&!rec.projet_id)rec.partage='direction';
+  if(sub==='pv'&&!rec.transcription&&!rec.notes){alert('Il n\'y a encore ni enregistrement ni notes : enregistrez l\'activité ou écrivez vos notes.');return}
   const nouveau=!f.dataset.id;
   iaAvec(e.submitter,async()=>{if(nouveau)await ins('journal',{id,org_id:S.org.id,...rec});else await upd('journal',`id=eq.${id}`,rec);
-   if(sub==='pv'){const pv=await iaAppel('pv',{type:JO_T[rec.type],titre:rec.titre,date:rec.date_evt,lieu:rec.lieu,participants:rec.participants,notes:rec.notes,transcription:rec.transcription});await upd('journal',`id=eq.${id}`,{pv})}
-   await srvLoad();JR.edit=null;JR.sel=id;JR.pvEdit=false;srvMsg=sub==='pv'?'Compte rendu rédigé par Claude : relisez-le, corrigez-le si besoin, puis validez-le.':'Entrée enregistrée.';render();scrollTo(0,0)});return}
+   if(sub==='pv'){const pv=await iaAppel('pv',joPayload(rec,id));await upd('journal',`id=eq.${id}`,{pv})}
+   await srvLoad();JR.edit=null;JR.sel=id;JR.pvEdit=false;srvMsg=sub==='pv'?'Document rédigé : relisez-le, complétez les passages surlignés, puis validez-le.':'Entrée enregistrée.';render();scrollTo(0,0)});return}
  if(t==='joPvForm'){const Lg=k=>String(d[k]||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean),C=k=>Lg(k).map(l=>l.split(';').map(x=>x.trim()));
-  const pv={resume:(d.resume||'').trim(),contexte:(d.contexte||'').trim(),participants:C('participants').map(([nom,fonction,structure])=>({nom,fonction:fonction||'',structure:structure||''})),ordre_du_jour:Lg('ordre_du_jour'),points:C('points').map(([titre,...r])=>({titre,synthese:r.join(' ; ')})),decisions:Lg('decisions'),
+  const pv={...(S.journal.find(x=>x.id===f.dataset.id)||{}).pv,titre_document:(d.titre_document||'').trim(),resume:(d.resume||'').trim(),contexte:(d.contexte||'').trim(),objectifs:Lg('objectifs'),constats:Lg('constats'),acquis:Lg('acquis'),position_osv:Lg('position_osv'),recommandations:Lg('recommandations'),opportunites:Lg('opportunites'),conclusion:(d.conclusion||'').trim(),participants:C('participants').map(([nom,fonction,structure])=>({nom,fonction:fonction||'',structure:structure||''})),ordre_du_jour:Lg('ordre_du_jour'),points:C('points').map(([titre,...r])=>({titre,synthese:r.join(' ; ')})),decisions:Lg('decisions'),
    actions:C('actions').map(([action,responsable,echeance])=>({action,responsable:responsable||'',echeance:echeance||''})),engagements_osv:Lg('engagements_osv'),redevabilite:Lg('redevabilite'),lecons:Lg('lecons'),bonnes_pratiques:Lg('bonnes_pratiques'),suite:(d.suite||'').trim()};
   action(async()=>{await upd('journal',`id=eq.${f.dataset.id}`,{pv});JR.pvEdit=false},'Compte rendu corrigé.');return}
  if(t==='capForm'){if(d.fin<d.debut){alert('La fin de la période précède son début.');return}const src=capSources(d.projet||null,d.debut,d.fin);
@@ -6266,7 +6325,7 @@ document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.tar
   const p=d.projet&&projet(d.projet),resume=`${src.journal_valide.length} compte(s) rendu(s), ${src.rapports_mensuels_valides.length} rapport(s) mensuel(s), ${src.activites_terrain_validees.fiches} fiche(s) terrain, ${src.indicateurs.length} indicateur(s), ${src.missions_tdr_valides.length} TDR`;
   iaAvec(e.submitter,async()=>{const r=await iaAppel('capitalisation',{type:d.type,document:CAP_T[d.type],periode:{du:d.debut,au:d.fin},projet:p?p.nom:'Toute l\'organisation',a_mettre_en_avant:(d.note||'').trim(),donnees:src});
    const id=uuid();await ins('capitalisations',{id,org_id:S.org.id,type:d.type,titre:String(r.titre||CAP_T[d.type]).slice(0,200),projet_id:d.projet||null,periode_debut:d.debut,periode_fin:d.fin,contenu:{sections:(r.sections||[]).map(s=>({titre:String(s.titre||''),contenu:String(s.contenu||'')}))},sources:{resume}});
-   await srvLoad();JR.capSel=id;JR.capEdit=false;srvMsg='Document rédigé par Claude à partir des données validées : relisez et complétez les passages « [à compléter] ».';render();scrollTo(0,0)});return}
+   await srvLoad();JR.capSel=id;JR.capEdit=false;srvMsg='Document rédigé à partir des données validées : relisez et complétez les passages « [à compléter] ».';render();scrollTo(0,0)});return}
  if(t==='capEditForm'){const c=S.capis.find(x=>x.id===f.dataset.id),s=((c.contenu||{}).sections||[]).map((x,i)=>({titre:d['t_'+i]||x.titre,contenu:d['c_'+i]??x.contenu}));
   action(async()=>{await upd('capitalisations',`id=eq.${c.id}`,{titre:String(d.titre||c.titre).trim(),contenu:{sections:s}});JR.capEdit=false},'Document enregistré.');return}
  if(t==='iaReg'){const rec={actif:!!d.actif,quota_jour:Number(d.quota_jour)||0,quota_org_jour:Number(d.quota_org_jour)||0,modifie_par:me.id,modifie_le:new Date().toISOString()};
@@ -6288,12 +6347,12 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.targ
   iaAvec(b,async()=>{const pj=projet(fd.projet);const r=await iaAppel('tdr',{recit,deja_rempli:{titre:fd.titre,destination:fd.destination,date_debut:fd.date_debut,date_fin:fd.date_fin,pourquoi:fd.objectif_general,pour_qui:fd.cibles,comment:fd.methodologie,resultats:fd.resultats,besoins:fd.budget},type_mission:fd.type_mission,projet:pj?{nom:pj.nom,zone:pj.zone}:null,redacteur:posteLib(S.staff.find(u=>u.id===me.id)||{}),aujourd_hui:today()});
    const P={_pour:f.dataset.id||'new'};['titre','destination',...TDR_SEC.map(s=>s[0])].forEach(k=>{if(r[k])P[k]=String(r[k])});['date_debut','date_fin'].forEach(k=>{if(/^\d{4}-\d{2}-\d{2}$/.test(r[k]||''))P[k]=r[k]});
    if(Array.isArray(r.budget)&&r.budget.length)P.budget=r.budget.map(x=>({libelle:String(x.libelle||''),quantite:Number(x.quantite)||0,unite:String(x.unite||''),cout:Number(x.cout)||0})).filter(x=>x.libelle);
-   if(fd.projet)P.projet_id=fd.projet;tdrPre=P;tdrSimple=false;srvMsg='TDR rédigé par Claude à partir de votre récit : relisez chaque partie, corrigez, puis enregistrez.';render();scrollTo(0,0)});return}
+   if(fd.projet)P.projet_id=fd.projet;tdrPre=P;tdrSimple=false;srvMsg='TDR rédigé à partir de votre récit : relisez chaque partie, corrigez, puis enregistrez.';render();scrollTo(0,0)});return}
  if(a==='iaMpAdd'){const f=b.closest('form');f.querySelector('.mpLs').insertAdjacentHTML('beforeend',mpLigne({},trP()));return}
  if(a==='iaMpDel'){const f=b.closest('form');b.closest('.mpL').remove();mpSync(f);return}
  if(a==='iaMicroplan'){const f=b.closest('form'),recit=document.getElementById('mpRecit').value.trim(),p=trP();if(recit.length<15){alert('Dites d\'abord votre plan du mois.');return}
   iaAvec(b,async()=>{const r=await iaAppel('microplan',{recit,mois:TR.mois,aujourd_hui:today(),activites_possibles:trOutils(p).filter(o=>o.actif).map(o=>o.titre),localites_connues:[...new Set(trFiches(p).map(x=>x.localite))].slice(0,40)});
-   const L=L2(r.lignes).filter(l=>/^\d{4}-\d{2}-\d{2}$/.test(l.date||'')&&moisDe(l.date)===TR.mois);if(!L.length){alert('Claude n\'a trouvé aucune activité datée dans le mois : précisez les dates.');return}
+   const L=L2(r.lignes).filter(l=>/^\d{4}-\d{2}-\d{2}$/.test(l.date||'')&&moisDe(l.date)===TR.mois);if(!L.length){alert('Aucune activité datée n\'a été trouvée dans le mois : précisez les dates.');return}
    f.querySelector('.mpLs').innerHTML=L.map(l=>mpLigne(l,p)).join('');mpSync(f);if(L2(r.a_verifier).length)alert('À vérifier :\n· '+L2(r.a_verifier).join('\n· '))});return}
  if(a==='iaRapport'){const f=b.closest('form'),niv=f.dataset.niv,p=trP(),F=trFiches(p).filter(x=>moisDe(x.date_activite)===TR.mois),R=trRefs(p).filter(x=>moisDe(x.date_reference)===TR.mois);
   const ags=trAgents(p).filter(u=>niv==='projet'||trVerifie(p,u.id)).map(u=>u.id);
@@ -6310,8 +6369,9 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.targ
  if(a==='joPvEdit'){JR.pvEdit=true;render();return}
  if(a==='joPvAnnul'){JR.pvEdit=false;render();return}
  if(a==='joPv'){const j=S.journal.find(x=>x.id===id);if(!j.transcription&&!j.notes){alert('Il n\'y a ni transcription ni notes à résumer.');return}if(j.pv&&!confirm('Remplacer le compte rendu actuel par une nouvelle rédaction ?'))return;
-  iaAvec(b,async()=>{const pv=await iaAppel('pv',{type:JO_T[j.type],titre:j.titre,date:j.date_evt,lieu:j.lieu,participants:j.participants,notes:j.notes,transcription:j.transcription});await upd('journal',`id=eq.${id}`,{pv,statut:'brouillon'});await srvLoad();srvMsg='Compte rendu rédigé par Claude : relisez-le, puis validez-le.';render()});return}
- if(a==='joValider'){if(!confirm('Valider ce compte rendu ? Il pourra servir aux documents de capitalisation et de redevabilité.'))return;action(()=>upd('journal',`id=eq.${id}`,{statut:'valide'}),'Compte rendu validé.');return}
+  iaAvec(b,async()=>{const pv=await iaAppel('pv',joPayload(j,j.id));await upd('journal',`id=eq.${id}`,{pv,statut:'brouillon'});await srvLoad();srvMsg='Document rédigé : relisez-le, complétez les passages surlignés, puis validez-le.';render()});return}
+ if(a==='joWord'){joWord(S.journal.find(x=>x.id===id));return}
+ if(a==='joValider'){const nm=joMarques((S.journal.find(x=>x.id===id)||{}).pv);if(nm&&!confirm(`Il reste ${nm} passage(s) « à compléter » dans le document. Valider quand même ?`))return;if(!nm&&!confirm('Valider ce compte rendu ? Il pourra servir aux documents de capitalisation et de redevabilité.'))return;action(()=>upd('journal',`id=eq.${id}`,{statut:'valide'}),'Compte rendu validé.');return}
  if(a==='joSuppr'){if(!confirm('Supprimer cette entrée du journal ?'))return;action(async()=>{await del('journal',`id=eq.${id}`);JR.sel=null},'Entrée supprimée.');return}
  if(a==='joImp'){joImprimer(S.journal.find(x=>x.id===id));return}
  if(a==='capVoir'){JR.capSel=id;JR.capEdit=false;render();scrollTo(0,0);return}
@@ -6323,7 +6383,8 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.targ
  if(a==='capImp'){capImprimer(S.capis.find(x=>x.id===id));return}
 },true);
 document.addEventListener('input',e=>{const f=e.target.closest&&e.target.closest('form');if(!f)return;if(e.target.closest('.tdrsL'))tdrsSync(f);if(e.target.closest('.mpL'))mpSync(f)});
-document.addEventListener('change',e=>{const r=e.target;if(r.dataset&&r.dataset.jo){JR.filtre=r.dataset.jo;render()}});
+document.addEventListener('change',e=>{const r=e.target;if(r.dataset&&r.dataset.jo){JR.filtre=r.dataset.jo;render()}
+ if(r.hasAttribute&&r.hasAttribute('data-jo-cadre')){const f=r.form,pj=r.value==='projet';f.querySelector('.joProj').hidden=!pj;const ty=f.elements.type;if(pj&&['reunion_externe'].includes(ty.value))ty.value='reunion_projet';if(!pj&&ty.value==='reunion_projet')ty.value='reunion_externe';if(f.elements.role_osv)f.elements.role_osv.value=pj?'organisateur':'invite';if(!pj&&f.elements.partage.value==='projet')f.elements.partage.value='direction'}});
 
 /* ---------- démarrage ---------- */
 async function srvInit(){
