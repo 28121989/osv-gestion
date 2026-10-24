@@ -434,6 +434,8 @@ details>summary{font-size:.9rem}
 .trOutils{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;margin-top:.6rem}
 .trO{display:flex;flex-direction:column;gap:.25rem;text-align:left;padding:.85rem 1rem;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:inherit;cursor:pointer;min-height:4.2rem}
 .trO b{font-size:.9rem;font-weight:600;line-height:1.3}.trO span{font-size:.76rem;color:var(--muted)}
+.trCat{min-height:5.4rem;border-color:color-mix(in srgb,var(--brand) 25%,var(--line))}.trCat b{font-size:1rem;color:var(--brand)}.trCat .trNb{margin-top:auto;font-weight:600}
+.trProj{margin:.35rem 0 0;line-height:1.35}
 .trO:hover,.trO:focus-visible{border-color:var(--brand);background:var(--brand-tint)}
 .trForm{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));align-items:start}
 .trForm>div>label,.trForm .lbl{display:block;margin-bottom:.25rem}
@@ -5614,6 +5616,24 @@ const MOD_OUTILS=[
   champs:[C('phase','Phase de l\'enquête contrôlée','choix',{requis:true,options:['Base (avant)','Finale (après)']}),C('ref','Repère du questionnaire contrôlé (heure, lieu)','texte',{requis:true}),
    C('q_age','Âge concordant','ouinon',{pts:true}),C('q_public','Public concordant','ouinon',{pts:true}),C('q_v1','Réponse sur le préservatif concordante','ouinon',{pts:true}),C('q_v8','Réponse sur le test du VIH concordante','ouinon',{pts:true}),C('q_c3','Réponse sur le mécanisme de plainte concordante','ouinon',{pts:true}),
    C('entretien','La personne confirme avoir été interrogée','ouinon',{requis:true}),C('obs','Observations','long')]}];
+/* l'agent choisit d'abord ce qu'il fait, puis le type d'activité */
+const TR_CAT=[['prep','Préparer le terrain','Profil du village, consultation, mobilisation des leaders',['PROFIL','CONSULT','MOBIL']],
+ ['enq','Enquête','Questionnaire avant ou après, comptage des casques',['ENQCH','CAP','COMPTAGE']],
+ ['sens','Sensibilisation','Causerie, visite à domicile, séance de masse, sécurité routière',['SEANCE','VAD','MASSE','SECU','ROUTE']],
+ ['dist','Distribution','Préservatifs, kits, plants, avec émargement',['DISTRIB']],
+ ['alerte','Plainte ou alerte','Plainte d\'un habitant, accident, rumeur, incident',['PLAINTE','INCIDENT']],
+ ['sup','Supervision','Grille de supervision, contrôle des enquêtes',['SUPERV','CQENQ']]];
+const TR_LIB={SEANCE:['Causerie de groupe','avec liste de présence'],VAD:['Visite à domicile (VAD)','un ménage'],MASSE:['Sensibilisation de masse','marché, gare, cérémonie : comptage sans liste'],SECU:['Causerie sécurité au chantier','avant la prise de poste'],ROUTE:['Sécurité routière','gares, carrefours, écoles'],
+ PROFIL:['Profil du village et croquis','une fois par localité'],CONSULT:['Consultation communautaire','une fiche par groupe consulté'],MOBIL:['Rencontre avec les leaders','chefferie, religieux, associations'],
+ ENQCH:['Questionnaire d\'enquête','une personne interrogée, sans nom'],CAP:['Enquête CAP','questionnaire individuel'],COMPTAGE:['Comptage des casques','30 minutes à un point fixe'],
+ DISTRIB:['Distribution','liste d\'émargement'],PLAINTE:['Plainte d\'un habitant','mécanisme de gestion des plaintes'],INCIDENT:['Incident ou alerte','accident, rumeur, tension'],SUPERV:['Grille de supervision','observer un ASC, score calculé'],CQENQ:['Contrôle des enquêtes','réinterroger 1 personne sur 10']};
+const trCatDe=o=>(TR_CAT.find(c=>c[3].includes(o.modele))||['autre'])[0];
+function trChoixOutils(O){const C=[...TR_CAT.map(c=>({k:c[0],t:c[1],d:c[2],L:O.filter(o=>trCatDe(o)===c[0])})),{k:'autre',t:'Autres activités',d:'Outils propres à ce projet',L:O.filter(o=>trCatDe(o)==='autre')}].filter(c=>c.L.length);
+ const btn=o=>{const l=TR_LIB[o.modele];return `<button class="trO" data-act="terRemplir" data-id="${o.id}"><b>${esc(l?l[0]:o.titre)}</b><span>${esc(l?l[1]:(OUT_TYPES[o.type]||''))}${o.presence==='nominative'&&!(l&&/liste/.test(l[1]))?' · liste de présence':''}</span></button>`};
+ if(C.length<2)return `<div class="trOutils">${O.map(btn).join('')}</div>`;
+ const cur=C.find(c=>c.k===TR.cat);
+ if(!cur)return `<p class="muted">Que faites-vous aujourd'hui ?</p><div class="trOutils trCats">${C.map(c=>`<button class="trO trCat" data-act="terCat" data-v="${c.k}"><b>${esc(c.t)}</b><span>${esc(c.d)}</span><span class="trNb">${c.L.length} fiche${c.L.length>1?'s':''}</span></button>`).join('')}</div>`;
+ return `<p><button class="lnk" data-act="terCat" data-v="">← Autre type d'activité</button></p><h4 class="trSec" style="margin-top:.2rem">${esc(cur.t)} : quel type ?</h4><div class="trOutils">${cur.L.map(btn).join('')}</div>`}
 /* outils remplis par l'encadrement (superviseure, suivi-évaluation), pas proposés aux ASC */
 const OUT_SUP=['SUPERV','CQENQ'];
 const trEstSupO=o=>!!o&&OUT_SUP.includes(o.modele);
@@ -5629,7 +5649,7 @@ const PACK_CHANTIER=['PROFIL','CONSULT','ENQCH','COMPTAGE','MOBIL','SEANCE','MAS
 /* ---------- vue principale ---------- */
 function svTerrain(){
  if(!p12)return head('Collecte terrain','')+'<p class="note">Exécutez le script 12 dans Supabase pour activer la collecte des données terrain.</p>';
- if(TR.user!==me.id)Object.assign(TR,{user:me.id,tab:null,pid:null,fiche:null,saisie:null,outil:null,agent:'',statut:'',outilF:'',refForm:false});
+ if(TR.user!==me.id)Object.assign(TR,{user:me.id,tab:null,pid:null,fiche:null,saisie:null,outil:null,agent:'',statut:'',outilF:'',refForm:false,cat:null});
  const L=trProjets(),p=trP();
  if(!p)return head('Collecte terrain','Fiches d\'activité, listes de présence, références et rapports des agents communautaires.')+'<p class="empty">Vous n\'êtes affecté(e) à aucun projet. Le chef de projet ou le DP vous affecte dans « Personnel des projets ».</p>';
  TR.pid=p.id;const niv=trNiv(p);
@@ -5648,7 +5668,7 @@ function svTerrain(){
   projet:'Les données de la communauté remontent ici : agent, superviseur, puis validation. Seules les fiches validées alimentent le tableau de bord, le rapport mensuel et les indicateurs du projet.',ca:'Rapports mensuels des projets, validés par le Directeur des programmes.'}[niv];
  return head('Collecte terrain',intro)+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
   (file.length?`<p class="note trFile" role="status"><b>${file.length} envoi(s) gardé(s) sur ce téléphone</b>, en attente de réseau.${file.some(q=>q.erreur)?' Une erreur est signalée : '+esc(file.find(q=>q.erreur).erreur):''} <button class="btn sm" data-act="terSync">Envoyer maintenant</button></p>`:'')+
-  `<div class="trBarre"><div><label for="trPid">Projet</label><select id="trPid" data-ter="pid">${opts(L.map(x=>[x.id,libProj(x)]),p.id)}</select></div>
+  `<div class="trBarre">${L.length>1?`<div><label for="trPid">Projet</label><select id="trPid" data-ter="pid">${opts(L.map(x=>[x.id,libProj(x)]),p.id)}</select></div>`:`<div><span class="lbl">Projet</span><p class="trProj"><b>${esc(p.code||p.nom)}</b> <span class="muted">${esc(p.code?p.nom:'')}</span></p></div>`}
    <div><label for="trMois">Mois</label><input id="trMois" type="month" data-ter="mois" value="${TR.mois}" max="${today().slice(0,7)}"></div></div>
   <nav class="subnav trTabs" aria-label="Collecte terrain">${tabs.map(([k,l])=>`<button data-act="terTab" data-v="${k}" ${TR.tab===k?'aria-current="page"':''}>${l}${nb[k]?` <span class="badge">${nb[k]}</span>`:''}</button>`).join('')}</nav>`+
   ({saisir:trSaisir,fiches:trListeFiches,references:trReferences,microplan:trMicroplan,rapport:trRapport,outils:trOutilsVue,verifier:trVerifierVue,agents:trAgentsVue,tableau:trTableau,qualite:trQualite}[TR.tab]||trSaisir)(p,niv)}
@@ -5658,7 +5678,7 @@ function trSaisir(p,niv){const O=trOutils(p).filter(o=>o.actif&&(niv!=='agent'||
  return (cor.length?`<section class="card notif"><h3>À corriger (${cor.length})</h3><p class="muted">Ces fiches vous ont été renvoyées. Corrigez-les : elles repartent automatiquement à la vérification.</p>
    ${cor.map(f=>`<div class="q-row"><div><b>${esc((trOutil(f.outil_id)||{}).titre||'Fiche')}</b> · ${fmtD(f.date_activite)} · ${esc(f.localite)}<br><span class="muted">Remarque de ${esc(who(f.retour_par))} : ${esc(f.retour_motif||'')}</span></div><button class="btn sm" data-act="terCorriger" data-id="${f.id}">Corriger</button></div>`).join('')}</section>`:'')+
   (br&&br.pid===p.id&&trOutil(br.outil)?`<section class="card"><h3>Fiche commencée</h3><div class="q-row"><div><b>${esc(trOutil(br.outil).titre)}</b><br><span class="muted">gardée sur ce téléphone le ${new Date(br.le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}</span></div><div class="row"><button class="btn sm" data-act="terReprendre">Reprendre</button><button class="btn ghost sm" data-act="terAbandon">Abandonner</button></div></div></section>`:'')+
-  iaRacontCarte(p)+`<section class="card"><h3>Remplir une fiche</h3>${O.length?`<p class="muted">Choisissez l'outil qui correspond à l'activité menée. Sans réseau, la fiche est gardée sur ce téléphone et part dès que le réseau revient.</p><div class="trOutils">${O.map(o=>`<button class="trO" data-act="terRemplir" data-id="${o.id}"><b>${esc(o.titre)}</b><span>${esc(OUT_TYPES[o.type]||'')}${o.presence==='nominative'?' · liste de présence':o.presence==='anonyme'?' · décompte anonyme':''}</span></button>`).join('')}</div>`
+  iaRacontCarte(p)+`<section class="card"><h3>Remplir une fiche</h3>${O.length?`${trChoixOutils(O)}<p class="muted" style="margin-top:.6rem">Sans réseau, la fiche est gardée sur ce téléphone et part dès que le réseau revient.</p>`
    :`<p class="empty">Aucun outil de collecte n'est encore installé pour ce projet.${niv==='projet'?' Ouvrez l\'onglet « Outils de collecte » pour installer les fiches OSV.':' Le chef de projet doit les installer.'}</p>`}</section>`+
   `<section class="card"><h3>Orienter une personne vers un service</h3><p class="muted">Dépistage, planification familiale, consultation prénatale, prise en charge d'une violence… Chaque orientation a sa fiche de référence, avec un talon de contre-référence à faire remplir par la structure.</p><button class="btn ghost sm" data-act="terTab" data-v="references" data-ref="1">Nouvelle référence</button></section>`}
 
@@ -6062,6 +6082,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.targ
  const fx=id&&S.fterrain.find(x=>x.id===id);
  if(a==='terTab'){TR.tab=b.dataset.v;TR.fiche=null;if(b.dataset.ref)TR.refForm=true;render();return}
  if(a==='terProjet'){TR.pid=id;render();return}
+ if(a==='terCat'){TR.cat=b.dataset.v||null;render();return}
  if(a==='terRemplir'){const br=trLS.get('Brouillon',null);if(br&&br.outil===id&&br.pid===TR.pid)TR.saisie={outil:id,v:br.v};else{if(br&&!confirm('Une autre fiche commencée est gardée sur ce téléphone. La remplacer par une nouvelle fiche ?'))return;trLS.del('Brouillon');TR.saisie={outil:id}}render();scrollTo(0,0);return}
  if(a==='terReprendre'){const br=trLS.get('Brouillon',null);if(br){TR.pid=br.pid;TR.saisie={outil:br.outil,v:br.v}}render();scrollTo(0,0);return}
  if(a==='terAbandon'){if(!confirm('Abandonner cette fiche ? Ce qui a été saisi sera effacé de ce téléphone.'))return;trLS.del('Brouillon');TR.saisie=null;render();return}
