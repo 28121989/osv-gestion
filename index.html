@@ -4870,8 +4870,14 @@ function tdrAlertes(){if(!p08)return [];const A=[],m=S.tdrs.filter(tdrActeur);
  const c=S.tdrs.filter(t=>t.auteur_id===me.id&&t.statut==='a_corriger').length;if(c)A.push(['bad',`${c} de vos TDR renvoyé(s) pour correction`,'go','missions']);
  const o=S.tdrs.filter(t=>t.auteur_id===me.id&&tdrPeutOM(t)).length;if(o)A.push(['warn',`${o} TDR validé(s) : établissez l'ordre de mission`,'go','missions']);return A}
 const TDR_COLS=['TDR','Mission','Dates','Rédigé par','Statut','Ordre de mission',''];
+/* ordres de mission visibles sur la page des TDR : à signer d'abord, puis en cours et signés */
+function tdrOMSection(){if(!p07)return '';const L=(S.missions||[]).filter(m=>m.tdr_id&&!['rejetee','annulee'].includes(m.statut)).sort((a,b)=>(b.date_depart||'').localeCompare(a.date_depart||''));if(!L.length)return '';
+ const sig=L.filter(omPeutSigner),aut=L.filter(m=>!omPeutSigner(m));
+ return `${sig.length?`<section class="card notif"><h3>Ordres de mission à signer (${sig.length})</h3><p class="muted">Vous pouvez les modifier avant de signer. À la signature, l'ordre reçoit son numéro et son QR code.</p>${svT(MI_COLS,sig.map(miLigne))}</section>`:''}
+ ${aut.length?`<section class="card"><h3>Ordres de mission (${aut.length})</h3>${svT(MI_COLS,aut.map(miLigne))}</section>`:''}`}
 const tdrLigne=t=>{const om=tdrOM(t);return [`${t.numero?`<b>${esc(t.numero)}</b><br>`:''}${esc(t.titre)}`,`${esc(t.destination||'-')}${t.projet_id?`<br><span class="muted">${esc(libProj(projet(t.projet_id)))}</span>`:''}`,`${fmtD(t.date_debut)} au ${fmtD(t.date_fin)}`,esc(who(t.auteur_id)),tag(TDR_ST[t.statut]),
- om?`${esc(om.numero||'')} ${tag(MI_ST[om.statut])}`:t.statut==='valide'?'<span class="muted">à établir</span>':'-',`<button class="btn sm${tdrActeur(t)?'':' ghost'}" data-act="tdrOuvrir" data-id="${t.id}">${tdrActeur(t)?'Traiter':'Ouvrir'}</button>`]};
+ om?`${om.numero?`<b>${esc(om.numero)}</b> `:''}${om.statut==='demandee'&&!om.numero?tag(['À signer','warn']):tag(MI_ST[om.statut])}<div class="row" style="gap:.3rem;margin-top:.35rem"><button class="btn ghost sm" data-act="miOM" data-id="${om.id}">Voir l'ordre</button>${omPeutSigner(om)?`<button class="btn sm" data-act="miSt" data-v="approuvee" data-id="${om.id}">Signer</button>`:''}${omPeutModifier(om)?`<button class="btn ghost sm" data-act="miModif" data-id="${om.id}">Modifier</button>`:''}</div>`
+  :t.statut==='valide'?(tdrPeutOM(t)?`<button class="btn sm" data-act="tdrOuvrir" data-id="${t.id}" data-om="1">Établir l'ordre de mission</button>`:'<span class="muted">à établir</span>'):'<span class="muted">après validation du TDR</span>',`<button class="btn sm${tdrActeur(t)?'':' ghost'}" data-act="tdrOuvrir" data-id="${t.id}">${tdrActeur(t)?'Traiter':'Ouvrir le TDR'}</button>`]};
 
 function svMissions(){if(!tdrEdit){tdrPre=null;tdrSimple=null}if(!p08)return head('TDR et ordres de mission','')+'<p class="note">Exécutez le script 08 dans Supabase pour activer les TDR.</p>';
  if(tdrEdit)return tdrEditeur(tdrEdit==='new'?null:S.tdrs.find(t=>t.id===tdrEdit));
@@ -4883,6 +4889,7 @@ function svMissions(){if(!tdrEdit){tdrPre=null;tdrSimple=null}if(!p08)return hea
  <div class="kpis"><div class="kpi"><span>TDR en circuit de validation</span><b>${enCours}</b></div><div class="kpi"><span>À corriger</span><b>${n('a_corriger')}</b></div><div class="kpi"><span>Validés</span><b>${n('valide')}</b><span>${S.tdrs.filter(t=>t.statut==='valide'&&!tdrOM(t)).length} sans ordre de mission</span></div><div class="kpi"><span>Ordres de mission signés</span><b>${S.missions.filter(m=>m.numero).length}</b></div></div>
  <p><button class="btn" data-act="tdrNouveau">Rédiger un TDR</button></p>
  ${aT.length?`<section class="card notif"><h3>À traiter (${aT.length})</h3>${svT(TDR_COLS,aT.map(tdrLigne))}</section>`:''}
+ ${tdrOMSection()}
  <section class="card"><h3>Mes TDR (${mes.length})</h3>${svT(TDR_COLS,mes.map(tdrLigne),'Vous n\'avez pas encore rédigé de TDR. Chaque mission commence par là : « Rédiger un TDR ».')}</section>
  ${autres.length?`<section class="card"><h3>Autres TDR que vous pouvez consulter (${autres.length})</h3>${svT(TDR_COLS,autres.map(tdrLigne))}</section>`:''}`}
 
@@ -5193,7 +5200,7 @@ document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.tar
 document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.target.closest('[data-act^="tdr"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const a=b.dataset.act,id=b.dataset.id;srvMsg='';
  if(a==='tdrNouveau'){tdrEdit='new';render();scrollTo(0,0);return}
  if(a==='tdrRetour'){tdrEdit=null;tdrSel=null;render();scrollTo(0,0);return}
- if(a==='tdrOuvrir'){tdrSel=id;tdrEdit=null;render();scrollTo(0,0);return}
+ if(a==='tdrOuvrir'){tdrSel=id;tdrEdit=null;render();scrollTo(0,0);if(b.dataset.om){const f=document.querySelector('form[data-form="mdMission"]');if(f)f.closest('section').scrollIntoView({behavior:'smooth',block:'start'})}return}
  if(a==='tdrModif'){tdrEdit=id;render();scrollTo(0,0);return}
  if(a==='tdrImprimer'){tdrImprimer(S.tdrs.find(t=>t.id===id));return}
  if(a==='tdrWord'){tdrWord(S.tdrs.find(t=>t.id===id));return}
