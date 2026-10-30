@@ -816,6 +816,12 @@ main>.note[role=status]{border-left-color:var(--t-vert);background:var(--brand-t
  .rail-mini .srvNav .badge{position:absolute;top:3px;right:6px;margin:0;min-width:16px;height:16px;padding:0 4px;font-size:11px!important;line-height:16px}
 }
 @media (max-width:860px){.rail-pli{display:none}}
+/* fenêtre de modification */
+.dlg{border:0;border-radius:14px;padding:1.2rem 1.3rem;width:min(760px,94vw);max-height:90vh;overflow:auto;background:var(--panel);color:var(--ink);box-shadow:0 20px 60px rgba(15,25,40,.3)}
+.dlg::backdrop{background:rgba(15,22,32,.45)}
+.dlg-tete{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:.8rem}.dlg-tete h2{font-size:1.15rem;margin:0;color:var(--ink)!important}
+.dlg-pied{margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--line);align-items:center}
+@media (max-width:600px){.dlg{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;border-radius:0;margin:0}}
 /* aucun texte sous 12 px */
 small,.muted small,.pa-bas,.bande-date,.tb-leg,.pfCode,.tb-date,.trPb,.nav-g{font-size:max(12px,.75rem)!important}
 .navBas button{font-size:12px!important}.navBas .nb b{font-size:12px!important}
@@ -2400,7 +2406,37 @@ function indTable(inds,opt={}){return svT(['Indicateur','Chaîne','Unité','#Ré
  return [`<b>${esc(i.code?i.code+', ':'')}${esc(i.libelle)}</b>${par?`<br><span class="muted">contribue à : ${esc(par.libelle)}</span>`:''}${p.src==='agregat'?`<br><span class="muted">calculé à partir de ${p.n}/${p.nEnf} indicateur(s) contributeur(s)</span>`:''}`,
   esc(CHAINE[i.chaine]||i.chaine),esc(i.unite),num(i.baseline),num(i.cible),p.v!=null?num(p.v):'-',`${tx(p.taux)}${barre(p.taux,p.att)}`,
   `${tag(PERF_ST[p.st])}${p.raison?`<br><span class="muted">${esc(p.raison)}</span>`:''}`,
-  opt.suppr&&ecritInd(i)&&!S.mesures.some(m=>m.indicateur_id===i.id)?`<button class="btn danger sm" data-act="svDelInd" data-id="${i.id}">Supprimer</button>`:'']}),opt.vide||'Aucun indicateur défini.')}
+  ecritInd(i)?`<button class="btn ghost sm" data-act="indModifier" data-id="${i.id}" aria-label="Modifier l'indicateur ${esc(i.code||i.libelle)}">Modifier</button>`:'']}),opt.vide||'Aucun indicateur défini.')}
+/* modification d'un indicateur (chef du projet, DP, DE) dans une fenêtre, avec trace dans le journal */
+function indParents(i){if(i.projet_id){const p=projet(i.projet_id)||{},g=programme(p.programmeId);return S.inds.filter(x=>x.id!==i.id&&((x.niveau==='programme'&&x.programme_id===p.programmeId)||(x.niveau==='strategique'&&g&&x.objectif_id===g.objectif_id)))}
+ if(i.programme_id){const g=programme(i.programme_id);return S.inds.filter(x=>x.id!==i.id&&x.niveau==='strategique'&&g&&x.objectif_id===g.objectif_id)}return []}
+function indModifierHTML(i){const P=indParents(i),v=k=>esc(i[k]??''),nm=S.mesures.filter(m=>m.indicateur_id===i.id).length;
+ return `<form data-form="svIndMaj" data-id="${i.id}" method="dialog"><div class="dlg-tete"><h2>Modifier l'indicateur</h2><button type="button" class="btn ghost sm" data-act="indFermer" aria-label="Fermer">Fermer</button></div>
+ ${nm?`<p class="note">${nm} mesure(s) déjà saisie(s) : la modification de la cible ou de la valeur de référence recalcule le taux de réalisation. La modification est tracée dans le journal d'audit.</p>`:''}
+ <div class="grid">
+ <div style="grid-column:1/-1"><label>Libellé de l'indicateur</label><input name="libelle" required value="${v('libelle')}"></div>
+ <div><label>Code</label><input name="code" value="${v('code')}"></div>
+ <div><label>Niveau de la chaîne des résultats</label><select name="chaine">${opts(Object.entries(CHAINE),i.chaine)}</select></div>
+ <div><label>Unité</label><input name="unite" required value="${v('unite')}"></div>
+ <div><label>Mode de calcul dans le temps</label><select name="mode_periode"><option value="cumul" ${i.mode_periode==='cumul'?'selected':''}>Cumul des mesures</option><option value="dernier" ${i.mode_periode==='dernier'?'selected':''}>Dernière mesure</option></select></div>
+ <div><label>Valeur de référence</label><input name="baseline" type="number" step="any" value="${v('baseline')}"></div><div><label>Date de référence</label><input name="baseline_date" type="date" value="${v('baseline_date')}"></div>
+ <div><label>Cible</label><input name="cible" type="number" step="any" value="${v('cible')}"></div><div><label>Échéance de la cible</label><input name="cible_date" type="date" value="${v('cible_date')}"></div>
+ <div><label>Source de vérification</label><input name="source_verif" value="${v('source_verif')}"></div>
+ <div><label>Fréquence de collecte</label><select name="frequence">${opts(['Mensuelle','Trimestrielle','Semestrielle','Annuelle','Ponctuelle'].map(x=>[x,x]),i.frequence||'Trimestrielle')}</select></div>
+ <div><label>Désagrégation</label><input name="desagregation" value="${v('desagregation')}" placeholder="ex. sexe, âge, district"></div>
+ ${P.length?`<div style="grid-column:1/-1"><label>Contribue à l'indicateur de niveau supérieur</label><select name="parent_id">${opts(P.map(x=>[x.id,`${x.niveau==='strategique'?'Stratégique':'Programme'}, ${x.code?x.code+', ':''}${x.libelle}`]),i.parent_id||'','Aucun')}</select></div>`:''}
+ ${i.projet_id?`<div style="grid-column:1/-1"><label>Niveau du cadre logique mesuré</label><select name="cadre_id">${opts(S.cadre.filter(c=>c.projet_id===i.projet_id).map(c=>[c.id,`${CL_NIV[c.niveau]}, ${c.code?c.code+', ':''}${c.libelle}`]),i.cadre_id||'','-')}</select></div>`:`<div><label>Agrégation des contributions</label><select name="mode_agregat"><option value="somme" ${i.mode_agregat!=='moyenne'?'selected':''}>Somme</option><option value="moyenne" ${i.mode_agregat==='moyenne'?'selected':''}>Moyenne des taux d'atteinte</option></select></div>`}
+ <div style="grid-column:1/-1"><label style="font-weight:400"><input type="checkbox" name="sensible" ${i.sensible?'checked':''}> Donnée sensible (chiffres agrégés seulement)</label></div>
+ </div><div class="row dlg-pied">${!nm?`<button type="button" class="btn danger sm" data-act="svDelInd" data-id="${i.id}">Supprimer l'indicateur</button>`:'<span class="muted" style="font-size:.85rem">Un indicateur qui a des mesures ne peut pas être supprimé.</span>'}<span style="flex:1"></span><button type="button" class="btn ghost" data-act="indFermer">Annuler</button><button class="btn" type="submit">Enregistrer les modifications</button></div></form>`}
+function indDlg(){let d=document.getElementById('indDlg');if(!d){d=document.createElement('dialog');d.id='indDlg';d.className='dlg';d.setAttribute('aria-labelledby','indDlgT');document.body.appendChild(d)}return d}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="indModifier"],[data-act="indFermer"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const d=indDlg();
+ if(b.dataset.act==='indFermer'){d.close();return}const i=S.inds.find(x=>x.id===b.dataset.id);if(!i||!ecritInd(i))return;d.innerHTML=indModifierHTML(i);d.showModal();const f=d.querySelector('input[name=libelle]');if(f)f.focus()},true);
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#indDlg [data-act="svDelInd"]');if(b){const d=document.getElementById('indDlg');if(d)setTimeout(()=>d.close(),0)}},true);
+document.addEventListener('submit',e=>{const f=e.target;if(!f.dataset||f.dataset.form!=='svIndMaj')return;e.preventDefault();e.stopImmediatePropagation();const d=Object.fromEntries(new FormData(f)),i=S.inds.find(x=>x.id===f.dataset.id);if(!i)return;
+ const r=lireInd(d);if(!r.libelle)return;const row={...r,mode_agregat:i.projet_id?i.mode_agregat:(d.mode_agregat||'somme')};if(i.projet_id)row.cadre_id=d.cadre_id||null;if(!('parent_id' in d))row.parent_id=i.parent_id||null;
+ const ch=[['libelle','libellé'],['cible','cible'],['baseline','référence'],['unite','unité'],['cible_date','échéance']].filter(([k])=>String(i[k]??'')!==String(row[k]??'')).map(([k,l])=>`${l} : ${i[k]??'vide'} devient ${row[k]??'vide'}`).join(' ; ');
+ document.getElementById('indDlg').close();
+ action(async()=>{await upd('indicateurs',`id=eq.${i.id}`,row);logO(i.projet_id?'projet':i.programme_id?'programme':'strategie',i.projet_id||i.programme_id||null,`Indicateur modifié : ${i.code?i.code+', ':''}${row.libelle}${ch?' ('+ch+')':''}`);if(i.projet_id)delete actChk[i.projet_id]},'Indicateur modifié.')},true);
 function indForm(form,extra,parents,champs){return `<details class="card"><summary>Ajouter un indicateur</summary><form data-form="${form}" ${extra||''} style="margin-top:.7rem"><div class="grid">
  <div style="grid-column:span 2"><label>Libellé de l'indicateur</label><input name="libelle" required></div><div><label>Code</label><input name="code" placeholder="ex. IOS1.1"></div>
  <div><label>Niveau de la chaîne des résultats</label><select name="chaine">${opts(Object.entries(CHAINE),'extrant')}</select></div>
