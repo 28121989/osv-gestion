@@ -608,6 +608,135 @@ label{color:color-mix(in srgb,var(--ink) 82%,var(--muted))}
 
 .lnk:hover,.lnk:focus-visible{text-decoration:underline!important;text-underline-offset:3px}
 </style>
+<style id="charte">
+/* ===== Charte 2026 : accessibilité (WCAG 2.2 AA) et ergonomie =====
+   contrastes d'au moins 4,5 pour 1, cibles tactiles de 44 px, focus visible,
+   un seul accent d'action, couleurs du logo pour les repères. */
+:root{--muted:#5A6762;--accent:#AD4F09;--accent-h:#93430A;--accent-ink:#FFFFFF;--focus:#1D5F95;
+ --o-vert:#2E6B30;--o-or:#C9930A;--o-bleu:#0078A8;--o-brun:#7A4A1E;--o-violet:#601890;
+ --r-s:8px;--r-m:12px;--ombre:0 1px 2px rgba(16,24,20,.05),0 2px 8px rgba(16,24,20,.04)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--muted:#A3B2AC;--accent:#F07A26;--accent-h:#F58C43;--accent-ink:#1C0B00;--focus:#7DB8E8}}
+:root[data-theme="dark"]{--muted:#A3B2AC;--accent:#F07A26;--accent-h:#F58C43;--accent-ink:#1C0B00;--focus:#7DB8E8}
+
+/* lecture : taille et interligne confortables */
+body{font-size:15.5px;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+p,li{max-width:78ch}
+td p,td li,.card p.muted{max-width:none}
+th{font-size:.82rem!important;letter-spacing:.01em}
+.tag,.badge{font-size:.78rem!important;line-height:1.5}
+small,.muted small{font-size:.8rem}
+
+/* focus clavier : toujours visible, sur fond clair comme sur fond sombre */
+:focus-visible{outline:3px solid var(--focus)!important;outline-offset:2px!important;box-shadow:0 0 0 5px color-mix(in srgb,var(--focus) 18%,transparent)}
+.rail :focus-visible{outline-color:#fff!important}
+.skip{background:var(--focus);color:#fff;font-weight:600}
+
+/* boutons : une seule couleur d'action, états nets */
+.btn{min-height:40px;border-radius:var(--r-s);font-weight:600;letter-spacing:.005em;transition:background-color .15s,border-color .15s,box-shadow .15s}
+.btn:not(.ghost):not(.danger){background:var(--accent);color:var(--accent-ink);box-shadow:0 1px 0 rgba(0,0,0,.06)}
+.btn:not(.ghost):not(.danger):hover{background:var(--accent-h)}
+.btn.ghost{border-color:color-mix(in srgb,var(--ink) 22%,var(--line))}
+.btn.ghost:hover{background:var(--soft);border-color:color-mix(in srgb,var(--ink) 35%,var(--line))}
+.btn.sm{min-height:34px}
+.btn:disabled,.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+input,select,textarea{border-radius:var(--r-s);border-color:color-mix(in srgb,var(--ink) 20%,var(--line));min-height:40px}
+textarea{min-height:0;line-height:1.5}
+input:hover,select:hover,textarea:hover{border-color:color-mix(in srgb,var(--ink) 35%,var(--line))}
+input:focus,select:focus,textarea:focus{border-color:var(--focus)}
+input[type=checkbox],input[type=radio]{min-height:0;width:18px;height:18px;accent-color:var(--accent)}
+label{color:color-mix(in srgb,var(--ink) 78%,var(--muted));font-weight:550}
+::placeholder{color:color-mix(in srgb,var(--muted) 85%,transparent)}
+
+/* cartes et titres : calme, hiérarchie claire */
+.card{border-radius:var(--r-m);box-shadow:var(--ombre)}
+.card h3,h3{color:var(--ink)}
+.head h1,main>h1,.head h2{color:var(--brand,#2F6B57);letter-spacing:-.01em}
+.card>h3:first-child,.tb-h h3{display:flex;align-items:center;gap:.5rem}
+.card>h3:first-child::before{content:"";width:4px;height:1.05em;border-radius:2px;background:var(--o-or);flex:none}
+.tb-h h3::before{content:"";width:4px;height:1.05em;border-radius:2px;background:var(--o-or);flex:none}
+
+/* indicateurs : fond blanc, repère de couleur du logo, chiffre lisible */
+.kpis .kpi,.kpis .kpi:nth-child(n){background:var(--panel)!important;border:1px solid var(--line)!important;border-top:4px solid var(--o-vert)!important;border-radius:var(--r-m);box-shadow:var(--ombre)}
+.kpis .kpi:nth-child(4n+2){border-top-color:var(--o-or)!important}
+.kpis .kpi:nth-child(4n+3){border-top-color:var(--o-bleu)!important}
+.kpis .kpi:nth-child(4n+4){border-top-color:var(--o-brun)!important}
+.kpis .kpi b{color:var(--ink)!important}
+.kpis .kpi span{color:var(--muted)}
+
+/* tableaux : en-tête sobre, lignes lisibles */
+th{background:var(--soft)!important;color:var(--ink)!important;font-weight:650}
+tbody tr:hover td{background:color-mix(in srgb,var(--o-or) 7%,var(--panel))}
+
+/* messages de l'application : confirmation verte, alerte, erreur */
+main>.note[role=status]{border:0;border-left:4px solid var(--o-vert);background:color-mix(in srgb,var(--o-vert) 9%,var(--panel));color:var(--ink);padding:.75rem 1rem;border-radius:0 var(--r-s) var(--r-s) 0;font-size:.95rem}
+.note[role=alert]{border-left-color:var(--bad)}
+.toast{position:fixed;left:50%;bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;max-width:min(92vw,560px);background:#17302A;color:#fff;padding:.8rem 1.1rem;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.22);display:flex;gap:.7rem;align-items:center;font-size:.95rem}
+.toast .ico{color:#8FD5A6}
+@media (prefers-reduced-motion:no-preference){.toast{animation:toastIn .25s ease-out both}@keyframes toastIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}}
+
+/* accueil : la liste des tâches en premier, séparée de ce qui est à surveiller */
+.svAl li{border-radius:0 var(--r-s) var(--r-s) 0;padding:.5rem .7rem}
+.svAl .lnk{display:block;width:100%;padding:.15rem 0}
+.aFaireG{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:.9rem 0 .4rem;font-weight:650}
+.aFaireG:first-of-type{margin-top:.2rem}
+.prog-jour{display:flex;align-items:center;gap:.8rem;margin:.2rem 0 .9rem}
+.prog-jour .bar{flex:1;height:8px;margin:0}
+.prog-jour span{font-size:.85rem;color:var(--muted);white-space:nowrap}
+.bande{border-bottom:1px solid var(--line)!important}
+.bande::after,.bande::before,.bande>.route{display:none!important}
+
+/* menu latéral : rubriques groupées par domaine de travail */
+.nav-g{margin:.9rem .85rem .25rem;font-size:.72rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.nav-g:first-of-type{margin-top:.4rem}
+.srvNav button{min-height:40px}
+
+/* téléphone et tablette : barre d'onglets en bas, menu complet à la demande */
+.navBas,.menuFond,.tb-logo{display:none}
+@media (max-width:860px){
+ .auth{grid-template-columns:1fr!important}
+ body{font-size:16px}
+ input,select,textarea{font-size:16px}
+ .rail{display:none!important}
+ .shell.menu-ouvert .rail{display:flex!important;position:fixed;inset:0 auto 0 0;width:min(86vw,330px);height:100dvh;z-index:70;flex-direction:column;align-items:stretch;padding:1rem .8rem calc(5.5rem + env(safe-area-inset-bottom,0px));overflow-y:auto;background:var(--panel);border-right:1px solid var(--line);box-shadow:8px 0 30px rgba(0,0,0,.25)}
+ .shell.menu-ouvert .rail-brand span{display:inline!important}
+ .shell.menu-ouvert .srvNav{flex-direction:column!important;overflow:visible!important}
+ .shell.menu-ouvert .srvNav button{width:100%!important;white-space:normal!important;min-height:44px;font-size:.98rem!important}
+ .shell.menu-ouvert .menuFond{display:block;position:fixed;inset:0;z-index:65;background:rgba(10,20,16,.45);border:0}
+ .stage main{padding-bottom:calc(6rem + env(safe-area-inset-bottom,0px))!important}
+ .navBas{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:66;background:var(--panel);border-top:1px solid var(--line);padding:.25rem .25rem calc(.25rem + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 16px rgba(16,24,20,.06)}
+ .navBas button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;min-height:56px;background:none;border:0;border-radius:10px;color:var(--muted);font-size:.72rem;font-weight:600;line-height:1.15;padding:.3rem .1rem;text-align:center}
+ .navBas button .ico{width:22px;height:22px}
+ .navBas button[aria-current="page"]{color:var(--brand,#2F6B57);background:var(--brand-tint,#EBF2EE)}
+ .navBas .nb{position:relative}
+ .navBas .nb b{position:absolute;top:2px;right:calc(50% - 20px);min-width:18px;height:18px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font-size:.68rem;display:grid;place-items:center;padding:0 4px}
+ .topbar .tb-nom small{display:none}
+ .tb-logo{display:block!important;width:34px;height:34px;object-fit:contain;flex:none}
+ .topbar .tb-titre{display:block!important;font-size:1rem!important;color:var(--ink)!important;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+ .topbar{gap:.6rem!important;padding:.5rem .8rem!important}
+ .topbar .tb-nom b{display:none}
+ .toast{bottom:calc(5.2rem + env(safe-area-inset-bottom,0px))}
+}
+
+/* cibles tactiles : au moins 44 px au doigt */
+@media (pointer:coarse){
+ .btn,button.btn{min-height:44px}
+ .btn.sm{min-height:40px;padding-left:.8rem;padding-right:.8rem}
+ input:not([type=checkbox]):not([type=radio]),select{min-height:44px}
+ input[type=checkbox],input[type=radio]{width:22px;height:22px}
+ .lnk{padding-top:.45rem;padding-bottom:.45rem}
+ .srvNav button{min-height:44px}
+ .bande-pts button{position:relative}
+ .bande-pts button::after{content:"";position:absolute;inset:-14px -6px}
+ .dictBtn,.iaCompI{min-width:44px;min-height:44px}
+}
+
+/* aucun texte sous 12 px */
+small,.muted small,.pa-bas,.bande-date,.tb-leg,.pfCode,.tb-date,.trPb,.nav-g{font-size:max(12px,.75rem)!important}
+.navBas button{font-size:12px!important}.navBas .nb b{font-size:11.5px!important}
+/* animations réduites pour qui le demande */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+@media print{.navBas,.toast,.menuFond{display:none!important}}
+</style>
 </head>
 <body>
 <div id="root"></div>
@@ -1958,7 +2087,7 @@ function srvNav(r){if(r==='EXT')return ['politiques'];const appui=APPUI.includes
 async function notifierSrv(dest,texte,lien,ref){const ids=[...new Set(dest.filter(Boolean))].filter(id=>id!==me.id&&S.staff.some(u=>u.id===id));
  if(!ids.length)return 0;await ins('notifications',ids.map(id=>({org_id:S.org.id,user_id:id,texte,lien,ref,envoye_par:me.id})));return ids.length}
 async function action(fn,msg){if(srvBusy)return;srvBusy=true;document.body.classList.add('busy');
- try{await fn();await srvLoad();if(msg)srvMsg=msg}catch(e){alert(e.message||String(e));try{await srvLoad()}catch(_){} }
+ try{await fn();await srvLoad();if(msg){srvMsg=msg;TOASTM=msg}}catch(e){alert(e.message||String(e));try{await srvLoad()}catch(_){} }
  finally{srvBusy=false;document.body.classList.remove('busy');render()}}
 
 /* ---------- écrans du mode serveur ---------- */
@@ -2234,7 +2363,11 @@ function alertes(){const A=[],t=today(),d60=new Date(Date.now()+60*864e5).toISOS
  S.risques.filter(r=>r.statut!=='clos'&&r.probabilite*r.impact>=15).forEach(r=>A.push(['bad',`Risque élevé (${r.probabilite*r.impact}) : ${r.libelle}`,r.projet_id?'svDos':'svPg',r.projet_id||r.programme_id,'rq']));
  S.inds.filter(i=>indPerf(i).st==='bad').slice(0,8).forEach(i=>A.push(['bad',`Indicateur en retard : ${i.libelle}`,i.projet_id?'svDos':i.programme_id?'svPg':'go',i.projet_id||i.programme_id||'strategie','ind']));
  return A.concat(finAlertes(),admAlertes(),tdrAlertes(),ctrAlertes(),trAlertes(),veAlertes())}
-function alerteHTML(A){return A.length?`<ul class="svAl">${A.slice(0,15).map(([c,t,act,id,tab])=>`<li class="${c}"><button class="lnk" data-act="${act}" ${act==='go'?`data-v="${id}"`:`data-id="${id||''}"`} ${tab?`data-tab="${tab}"`:''}>${esc(t)}</button></li>`).join('')}</ul>${A.length>15?`<p class="muted">… et ${A.length-15} autre(s).</p>`:''}`:'<p class="empty">Aucune alerte. Tout est à jour.</p>'}
+const estTache=([c,t,act])=>act==='rapAller'||/^(Rédiger|Corriger|Valider|Vérifier|Déposer|Compléter|Approuver|Signer)\b/i.test(t)||/\bà (valider|vérifier|rédiger|déposer|signer|approuver|envoyer|compléter|confirmer|liquider|traiter)\b/i.test(t);
+function alerteListe(A){return `<ul class="svAl">${A.slice(0,15).map(([c,t,act,id,tab])=>`<li class="${c}"><button class="lnk" data-act="${act}" ${act==='go'?`data-v="${id}"`:`data-id="${id||''}"`} ${tab?`data-tab="${tab}"`:''}>${esc(t)}</button></li>`).join('')}</ul>${A.length>15?`<p class="muted">… et ${A.length-15} autre(s).</p>`:''}`}
+function alerteHTML(A){if(!A.length)return '<p class="empty">Aucune alerte. Tout est à jour.</p>';const T=A.filter(estTache),V=A.filter(x=>!estTache(x));
+ if(!T.length||!V.length)return alerteListe(A);
+ return `<p class="aFaireG">Mes tâches (${T.length})</p>${alerteListe(T)}<p class="aFaireG">À surveiller (${V.length})</p>${alerteListe(V)}`}
 function pilotageHTML(){const pl=planCourant(),pp=perfPlan(pl),ps=S.projets,actifs=ps.filter(p=>['active','execution'].includes(p.statut));
  const s=synth(S.inds),budget=ps.filter(p=>!['rejete','archive'].includes(p.statut)).reduce((x,p)=>x+(p.budgetApprouve||p.montant||0),0),A=alertes();
  const k=(v,l,act,val)=>`<button class="kpi svK" data-act="${act}" ${val?`data-v="${val}"`:''}><b>${v}</b><span>${l}</span></button>`;
@@ -4792,6 +4925,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv')return;const b=e.target.cl
 
 /* Pictogrammes : Lucide (licence ISC, © Lucide Icons and Contributors) */
 const ICO={"rapports":"<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/><path d=\"m9 15 2 2 4-4\"/>","plus":"<path d=\"M12 5v14\"/><path d=\"M5 12h14\"/>","envoyer":"<path d=\"M20 4v7a4 4 0 0 1-4 4H4\"/><path d=\"m9 10-5 5 5 5\"/>","ondes":"<path d=\"M2 10v3\"/><path d=\"M6 6v11\"/><path d=\"M10 3v18\"/><path d=\"M14 8v7\"/><path d=\"M18 5v13\"/><path d=\"M22 10v3\"/>","home": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/>", "strategie": "<circle cx=\"12\" cy=\"12\" r=\"10\"/> <path d=\"m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z\"/>", "programmes": "<path d=\"M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z\"/> <path d=\"M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12\"/> <path d=\"M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17\"/>", "projets": "<path d=\"M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z\"/> <path d=\"M8 10v4\"/> <path d=\"M12 10v2\"/> <path d=\"M16 10v6\"/>", "equipes": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\"/> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/> <circle cx=\"9\" cy=\"7\" r=\"4\"/>", "finances": "<path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\"/> <path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\"/>", "adm": "<path d=\"M10 18v-7\"/> <path d=\"M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z\"/> <path d=\"M14 18v-7\"/> <path d=\"M18 18v-7\"/> <path d=\"M3 22h18\"/> <path d=\"M6 18v-7\"/>", "performance": "<path d=\"M16 7h6v6\"/> <path d=\"m22 7-8.5 8.5-5-5L2 17\"/>", "archives": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\"/> <path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\"/> <path d=\"M10 12h4\"/>", "politiques": "<path d=\"M12 5v16\"/> <path d=\"m16 12 2 2 4-4\"/> <path d=\"M22 6V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2h4.001A2 2 0 0022 17v-1.344\"/>", "mesdem": "<polyline points=\"22 12 16 12 14 15 10 15 8 12 2 12\"/> <path d=\"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z\"/>", "personnel": "<path d=\"M13 19a4 4 0 00-8 0\"/> <path d=\"M16 10h2\"/> <path d=\"M16 14h2\"/> <circle cx=\"9\" cy=\"12\" r=\"3\"/> <rect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"2\"/>", "audit": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/> <path d=\"m9 12 2 2 4-4\"/>", "missions": "<circle cx=\"6\" cy=\"19\" r=\"3\"/> <path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\"/> <circle cx=\"18\" cy=\"5\" r=\"3\"/>", "logout": "<path d=\"m16 17 5-5-5-5\"/> <path d=\"M21 12H9\"/> <path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\"/>", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\"/> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\"/>", "cal": "<path d=\"M8 2v3\"/> <path d=\"M16 2v3\"/> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/> <path d=\"M3 9h18\"/>", "pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\"/> <circle cx=\"12\" cy=\"10\" r=\"3\"/>"};
+Object.assign(ICO,{menu:'<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>',check:'<path d="M20 6 9 17l-5-5"/>'});
 const ico=(n,c="ico")=>ICO[n]?`<svg class="${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[n]}</svg>`:"";
 
 /* ===== Habillage : cadre de l'application, connexion, accueil ===== */
@@ -4807,12 +4941,34 @@ function srvRender(){const root=document.getElementById('root');
  const bt=v=>`<button data-act="go" data-v="${v}" ${cur===v?'aria-current="page"':''}>${ico(v)}<span>${v==='home'?'Accueil':VIEWS[v]}</span>${v==='politiques'&&polEnAttente().length?`<span class="badge">${polEnAttente().length}</span>`:''}</button>`;
  root.innerHTML=`<a class="skip" href="#main">Aller au contenu</a><div class="shell"><aside class="rail">
   <button class="rail-brand" data-act="go" data-v="home" aria-label="Accueil d'OSV Gestion"><img src="${LOGO}" alt="Logo ONG Sécurité Vie"><span><strong>OSV Gestion</strong><small>ONG Sécurité Vie</small></span></button>
-  <nav class="srvNav" aria-label="Menu principal">${bt('home')}${nav.map(bt).join('')}</nav>
+  <nav class="srvNav" aria-label="Menu principal">${bt('home')}${navGroupes(nav,bt)}</nav>
   <p class="rail-foot">Agir pour sauver des vies au quotidien</p></aside>
- <div class="stage"><header class="topbar"><p class="tb-titre">${view==='dossier'?'Dossier du projet':esc(titre)}</p>
+ <div class="stage"><header class="topbar"><img class="tb-logo" src="${LOGO}" alt="" aria-hidden="true"><p class="tb-titre">${view==='dossier'?'Dossier du projet':esc(titre)}</p>
   <div class="tb-moi"><span class="avatar" aria-hidden="true">${esc(initiales(me.nom))}</span><span class="tb-nom"><b>${esc(me.nom)}</b><small>${esc(posteLib(me))}</small></span></div>
   <button class="btn ghost sm" data-act="logout">${ico('logout')}<span>Se déconnecter</span></button></header>
- <main id="main" tabindex="-1">${omEdit&&view===omEditV?omEditVue():view==='home'?home():viewHTML()}</main>${piedApp()}</div></div>`}
+ <main id="main" tabindex="-1">${omEdit&&view===omEditV?omEditVue():view==='home'?home():viewHTML()}</main>${piedApp()}</div><button class="menuFond" data-act="menuFermer" aria-label="Fermer le menu"></button>${navBas(nav,cur)}</div>`;
+ if(TOASTM){const m=TOASTM;TOASTM='';toast(m)}}
+/* menu : rubriques regroupées par domaine de travail (lecture plus rapide) */
+const NAV_G=[['Pilotage',['strategie','programmes','projets','performance']],['Terrain et activités',['terrain','missions','rapports','journal','courriers']],['Équipes et finances',['equipes','finances','adm','contrats','mesdem','personnel']],['Documents et contrôle',['archives','politiques','veille','audit']]];
+function navGroupes(nav,bt){const vu=new Set(),out=[];NAV_G.forEach(([g,L])=>{const x=nav.filter(v=>L.includes(v));if(!x.length)return;x.forEach(v=>vu.add(v));out.push(`<p class="nav-g" aria-hidden="true">${g}</p>`+x.map(bt).join(''))});const reste=nav.filter(v=>!vu.has(v));if(reste.length)out.push(`<p class="nav-g" aria-hidden="true">Autres</p>`+reste.map(bt).join(''));return out.join('')}
+/* téléphone : 3 raccourcis selon le rôle, l'accueil et le menu complet, à portée de pouce */
+const NAV_FAV=['terrain','rapports','missions','journal','mesdem','projets','adm','finances','strategie','archives'];
+const NAV_COURT={terrain:'Terrain',rapports:'Rapports',missions:'Missions',journal:'Journal',mesdem:'Demandes',projets:'Projets',adm:'Admin.',finances:'Finances',strategie:'Stratégie',archives:'Archives',equipes:'Équipes',programmes:'Programmes',performance:'Performance',politiques:'Politiques',courriers:'Courriers',veille:'Veille',contrats:'Contrats',personnel:'Personnel',audit:'Audit'};
+function navBas(nav,cur){const f=NAV_FAV.filter(v=>nav.includes(v)).slice(0,3),nbA=(typeof alertes==='function'&&p03)?alertes().length:0;
+ const b=(v,lib,extra='')=>`<button data-act="go" data-v="${v}" ${cur===v?'aria-current="page"':''} class="nb">${ico(v)}<span>${lib}</span>${extra}</button>`;
+ return `<nav class="navBas" aria-label="Raccourcis">${b('home','Accueil',nbA?`<b aria-label="${nbA} point(s) à traiter">${nbA>99?'99+':nbA}</b>`:'')}${f.map(v=>b(v,NAV_COURT[v]||VIEWS[v])).join('')}<button data-act="menuOuvrir" aria-label="Ouvrir le menu complet" aria-expanded="false">${ico('menu')}<span>Menu</span></button></nav>`}
+let TOASTM='';
+function toast(m){document.querySelectorAll('.toast').forEach(x=>x.remove());const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.innerHTML=`${ico('check')}<span>${esc(m)}</span>`;document.body.appendChild(t);setTimeout(()=>t.remove(),4200)}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="menuOuvrir"],[data-act="menuFermer"]');const sh=document.querySelector('.shell');if(!sh)return;
+ if(b){e.preventDefault();e.stopImmediatePropagation();const o=b.dataset.act==='menuOuvrir';sh.classList.toggle('menu-ouvert',o);if(o){const f=sh.querySelector('.srvNav button[aria-current="page"]')||sh.querySelector('.srvNav button');if(f)f.focus()}return}
+ if(sh.classList.contains('menu-ouvert')&&e.target.closest('.rail [data-act="go"]'))sh.classList.remove('menu-ouvert')},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const sh=document.querySelector('.shell.menu-ouvert');if(sh)sh.classList.remove('menu-ouvert')}});
+/* chaque champ lié à son étiquette : lu correctement par les lecteurs d'écran, et un clic sur l'étiquette place le curseur */
+let A11Y_N=0;
+function a11yEtiquettes(r){(r||document).querySelectorAll('label:not([for])').forEach(l=>{if(l.querySelector('input,select,textarea'))return;let c=l.nextElementSibling;
+  if(!c||!c.matches('input,select,textarea'))c=l.parentElement&&l.parentElement.querySelector(':scope > input:not([type=hidden]),:scope > select,:scope > textarea');
+  if(!c||c.type==='hidden')return;if(!c.id)c.id='ch_'+(++A11Y_N);l.htmlFor=c.id})}
+new MutationObserver(()=>{if(a11yEtiquettes.t)return;a11yEtiquettes.t=requestAnimationFrame(()=>{a11yEtiquettes.t=0;a11yEtiquettes()})}).observe(document.documentElement,{childList:true,subtree:true});
 
 function srvLoginHTML(){const anim=dsAnim.login?' anim':'';
  const cote=`<section class="auth-side${anim}" aria-label="ONG Sécurité Vie"><span class="route" aria-hidden="true"></span>
