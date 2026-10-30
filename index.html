@@ -730,9 +730,50 @@ main>.note[role=status]{border:0;border-left:4px solid var(--o-vert);background:
  .dictBtn,.iaCompI{min-width:44px;min-height:44px}
 }
 
+/* bilan visuel : palette du logo validée (vision des couleurs comprise), légendes chiffrées */
+:root{--vz1:#2E6B30;--vz2:#B07D0A;--vz3:#0078A8;--vz4:#8A4B14;--vz0:#C5CCC8;--vz-track:#EDF0EE}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--vz1:#4E9A5E;--vz2:#C08A1C;--vz3:#3D93C4;--vz4:#C0703A;--vz0:#56625D;--vz-track:#22302B}}
+:root[data-theme="dark"]{--vz1:#4E9A5E;--vz2:#C08A1C;--vz3:#3D93C4;--vz4:#C0703A;--vz0:#56625D;--vz-track:#22302B}
+.vz-titre{font-size:1.05rem;margin:.4rem 0 .8rem;color:var(--ink)}
+.vz-grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-bottom:1.6rem}
+.vz-carte{margin:0;display:flex;flex-direction:column}
+.vz-carte .tb-h{margin-bottom:.7rem}
+.vz-donut{display:grid;grid-template-columns:104px minmax(0,1fr);gap:.9rem;align-items:center}
+.vz-donut svg,.vz-anneau svg{width:104px;height:104px;display:block;flex:none}
+.vz-c1{font-size:15px;font-weight:700;fill:var(--ink);font-family:inherit}
+.vz-c2{font-size:8.5px;fill:var(--muted);font-family:inherit}
+.vz-leg{list-style:none;margin:0;padding:0;display:grid;gap:.35rem;font-size:.86rem}
+.vz-leg li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:.45rem;align-items:baseline;max-width:none;line-height:1.3}
+.vz-leg .vz-k{align-self:center}
+.vz-leg b{font-variant-numeric:tabular-nums;color:var(--ink)}
+.vz-p{display:none}
+.vz-k{width:12px;height:12px;border-radius:3px;display:inline-block}
+.vz-leg-h{display:flex;gap:1.2rem;margin-top:.3rem}.vz-leg-h li{display:flex;gap:.45rem}
+.vz-anneau{display:flex;align-items:center;gap:1rem}
+.vz-sous{margin:0;font-size:.88rem;color:var(--muted);line-height:1.5}.vz-sous b{color:var(--ink)}
+.vz-mois{width:100%;height:auto;display:block;overflow:visible}
+.vz-ax{font-size:11.5px;fill:var(--muted);font-family:inherit}
+.vz-val{font-size:9.5px;fill:var(--ink);font-weight:600;font-family:inherit}
+.vz-mois rect{transition:opacity .15s}.vz-mois g:hover rect{opacity:.8}
+.vz-plus{margin:auto 0 0;padding-top:.8rem;font-size:.86rem}
+.vz-donut circle,.vz-anneau circle{transition:stroke-dasharray .6s ease}
+@media (max-width:420px){.vz-donut{grid-template-columns:92px minmax(0,1fr);gap:.7rem}.vz-donut svg,.vz-anneau svg{width:92px;height:92px}}
+/* tableaux compacts pour ranger les listes */
+.tbA{width:100%;border-collapse:separate;border-spacing:0;font-size:.9rem}
+.tbA td{padding:.5rem .55rem;border-bottom:1px solid var(--line);vertical-align:middle;background:none!important}
+.tbA tr:last-child td{border-bottom:0}
+.tbA td:first-child{width:1%;white-space:nowrap}
+.tbA .lnk{text-align:left;font-weight:500;line-height:1.4}
+.tbA .tag{font-size:12px!important}
+.tbA tr:hover td{background:color-mix(in srgb,var(--o-or) 6%,var(--panel))!important}
+.tbA td.d{white-space:nowrap;color:var(--muted);font-size:.82rem;font-variant-numeric:tabular-nums}
+
+.head p,main>.head>p{font-size:.92rem;line-height:1.55;color:var(--muted)}
+main section.card+section.card{margin-top:1rem}
+.card .tb-h .muted{font-size:.8rem}
 /* aucun texte sous 12 px */
 small,.muted small,.pa-bas,.bande-date,.tb-leg,.pfCode,.tb-date,.trPb,.nav-g{font-size:max(12px,.75rem)!important}
-.navBas button{font-size:12px!important}.navBas .nb b{font-size:11.5px!important}
+.navBas button{font-size:12px!important}.navBas .nb b{font-size:12px!important}
 /* animations réduites pour qui le demande */
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 @media print{.navBas,.toast,.menuFond{display:none!important}}
@@ -1727,7 +1768,7 @@ function polDuProjet(p){const l=polLisibles().filter(d=>(d.projets||[]).includes
  return `<section class="card"><h3>Politiques et procédures applicables à ce projet</h3><div class="pol-list">${l.map(polCarte).join('')}</div></section>`}
 function notifBox(){const n=mesNotifs();if(!n.length)return '';
  return `<section class="card notif" aria-label="Notifications"><div class="row" style="justify-content:space-between"><h3>Notifications (${n.length})</h3><button class="btn ghost sm" data-act="notifLu">Tout marquer comme lu</button></div>
- ${n.slice(0,5).map(x=>`<div class="q-row"><div><b>${esc(x.texte)}</b><br><span class="muted">${new Date(x.date).toLocaleString('fr-FR')}</span></div><button class="btn sm" data-act="notifOuvrir" data-id="${x.id}">Ouvrir</button></div>`).join('')}</section>`}
+ <table class="tbA"><tbody>${n.slice(0,5).map(x=>`<tr><td class="d">${new Date(x.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})}<br>${new Date(x.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</td><td>${esc(x.texte)}</td><td style="width:1%"><button class="btn ghost sm" data-act="notifOuvrir" data-id="${x.id}">Ouvrir</button></td></tr>`).join('')}</tbody></table>${n.length>5?`<p class="muted" style="margin:.5rem 0 0;font-size:.85rem">et ${n.length-5} autre(s)</p>`:''}</section>`}
 
 /* ---------- consultation publique, sans connexion ---------- */
 function publicHTML(){const l=S.pol.docs.filter(d=>d.org===ORG()&&!d.archive&&d.niveau===1&&vPub(d)>=0),d=l.find(x=>x.id===pubDoc);
@@ -2094,7 +2135,7 @@ async function action(fn,msg){if(srvBusy)return;srvBusy=true;document.body.class
 function srvHome(){const n=ROLES[me.role].nav,pa=polEnAttente().length;
  const D={courriers:'Lettres aux autorités et aux communautés : rédigées automatiquement, signées et numérotées',veille:'Alertes, opportunités, besoins des communautés et leçons tirés des activités : réservé à la direction',journal:'Réunions, visites et missions : dictées, comptes rendus rédigés automatiquement, capitalisation',terrain:'Fiches d\'activité, listes de présence, références, microplans et rapports des agents communautaires',adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',rapports:'Rapport de chaque activité : volet programmatique validé par le DP, volet financier vérifié par la comptabilité et approuvé par la RAF',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
  return accHero()+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+notifBox()+
- (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:'')+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
+ (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():(p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:'')+bilanHTML())+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
  `${['DE','DP','CA'].includes(me.role)&&p03?'':accTableauBord()}
  ${srvRecup?'<p class="note" role="alert">Lien de réinitialisation accepté : choisissez maintenant votre nouveau mot de passe ci-dessous.</p>':''}<details class="card" style="margin-top:1.5rem" ${srvRecup?'open':''}><summary><b>Mon compte</b> <span class="muted">, ${esc(sess.user.email)}</span></summary>
   <form data-form="srvPwd" class="grid" style="margin-top:.8rem;align-items:end"><div><label for="np1">Nouveau mot de passe (12 caractères au moins)</label><input id="np1" name="p1" type="password" minlength="12" autocomplete="new-password" required></div>
@@ -2363,21 +2404,76 @@ function alertes(){const A=[],t=today(),d60=new Date(Date.now()+60*864e5).toISOS
  S.risques.filter(r=>r.statut!=='clos'&&r.probabilite*r.impact>=15).forEach(r=>A.push(['bad',`Risque élevé (${r.probabilite*r.impact}) : ${r.libelle}`,r.projet_id?'svDos':'svPg',r.projet_id||r.programme_id,'rq']));
  S.inds.filter(i=>indPerf(i).st==='bad').slice(0,8).forEach(i=>A.push(['bad',`Indicateur en retard : ${i.libelle}`,i.projet_id?'svDos':i.programme_id?'svPg':'go',i.projet_id||i.programme_id||'strategie','ind']));
  return A.concat(finAlertes(),admAlertes(),tdrAlertes(),ctrAlertes(),trAlertes(),veAlertes())}
-const estTache=([c,t,act])=>act==='rapAller'||/^(Rédiger|Corriger|Valider|Vérifier|Déposer|Compléter|Approuver|Signer)\b/i.test(t)||/\bà (valider|vérifier|rédiger|déposer|signer|approuver|envoyer|compléter|confirmer|liquider|traiter)\b/i.test(t);
-function alerteListe(A){return `<ul class="svAl">${A.slice(0,15).map(([c,t,act,id,tab])=>`<li class="${c}"><button class="lnk" data-act="${act}" ${act==='go'?`data-v="${id}"`:`data-id="${id||''}"`} ${tab?`data-tab="${tab}"`:''}>${esc(t)}</button></li>`).join('')}</ul>${A.length>15?`<p class="muted">… et ${A.length-15} autre(s).</p>`:''}`}
+const estTache=([c,t,act])=>act==='rapAller'||/^(Rédiger|Corriger|Valider|Vérifier|Déposer|Compléter|Approuver|Signer)\b/i.test(t)||/(^|\s)à (valider|vérifier|rédiger|déposer|signer|approuver|envoyer|compléter|confirmer|liquider|traiter|établir|corriger)(\s|$|[ ,.:;)])/i.test(t);
+function alerteListe(A){return `<table class="tbA svAlT"><tbody>${A.slice(0,15).map(([c,t,act,id,tab])=>`<tr><td>${tag(c==='bad'?['Alerte','bad']:estTache([c,t,act])?['À traiter','warn']:['À suivre',''])}</td><td><button class="lnk" data-act="${act}" ${act==='go'?`data-v="${id}"`:`data-id="${id||''}"`} ${tab?`data-tab="${tab}"`:''}>${esc(t)}</button></td></tr>`).join('')}</tbody></table>${A.length>15?`<p class="muted">… et ${A.length-15} autre(s).</p>`:''}`}
 function alerteHTML(A){if(!A.length)return '<p class="empty">Aucune alerte. Tout est à jour.</p>';const T=A.filter(estTache),V=A.filter(x=>!estTache(x));
  if(!T.length||!V.length)return alerteListe(A);
  return `<p class="aFaireG">Mes tâches (${T.length})</p>${alerteListe(T)}<p class="aFaireG">À surveiller (${V.length})</p>${alerteListe(V)}`}
+/* ===== Bilan visuel de l'accueil : anneaux, secteurs et barres, selon le poste =====
+   Chaque graphique porte sa légende chiffrée (jamais la couleur seule), un titre et une info-bulle. */
+const VZ_C=['var(--vz1)','var(--vz2)','var(--vz3)','var(--vz4)'],VZ_N='var(--vz0)';
+const vzPct=(v,t)=>t?Math.round(v*1000/t)/10:0,vzP=x=>String(x).replace('.',',')+' %';
+function vzDonut(parts,o={}){parts=parts.filter(p=>p.v>0);const T=parts.reduce((s,p)=>s+p.v,0),R=40,C=2*Math.PI*R,gap=parts.length>1?2.2:0;let acc=0;
+ const segs=parts.map(p=>{const len=Math.max(0,p.v/T*C-gap),s=`<circle r="${R}" cx="50" cy="50" fill="none" stroke="${p.c}" stroke-width="13" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-acc).toFixed(2)}"><title>${esc(p.l)} : ${num(p.v)} (${vzP(vzPct(p.v,T))})</title></circle>`;acc+=p.v/T*C;return s}).join('');
+ const lab=parts.map(p=>`${p.l} ${num(p.v)}`).join(', ');
+ return `<div class="vz-donut"><svg viewBox="0 0 100 100" role="img" aria-label="${esc((o.aria||'')+' : '+lab)}"><g transform="rotate(-90 50 50)"><circle r="${R}" cx="50" cy="50" fill="none" stroke="var(--vz-track)" stroke-width="13"/>${T?segs:''}</g><text x="50" y="${o.sous?48:54}" text-anchor="middle" class="vz-c1">${esc(o.centre??num(T))}</text>${o.sous?`<text x="50" y="63" text-anchor="middle" class="vz-c2">${esc(o.sous)}</text>`:''}</svg>
+ <ul class="vz-leg">${parts.map(p=>`<li><span class="vz-k" style="background:${p.c}"></span><span class="vz-l">${esc(p.l)}</span><b>${num(p.v)} <span class="muted" style="font-weight:400;font-size:.8rem">(${vzP(Math.round(vzPct(p.v,T)))})</span></b></li>`).join('')||'<li class="muted">Aucune donnée pour le moment.</li>'}</ul></div>`}
+function vzAnneau(v,o={}){const R=40,C=2*Math.PI*R,p=Math.max(0,Math.min(1,v||0)),cible=o.cible!=null?Math.max(0,Math.min(1,o.cible)):null;
+ const mk=cible!=null?(()=>{const a=cible*2*Math.PI-Math.PI/2,x1=50+(R-9)*Math.cos(a),y1=50+(R-9)*Math.sin(a),x2=50+(R+9)*Math.cos(a),y2=50+(R+9)*Math.sin(a);return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(--ink)" stroke-width="2"><title>Rythme attendu : ${vzP(Math.round(cible*100))}</title></line>`})():'';
+ return `<div class="vz-anneau"><svg viewBox="0 0 100 100" role="img" aria-label="${esc(o.aria||'')} : ${vzP(Math.round(p*100))}"><g transform="rotate(-90 50 50)"><circle r="${R}" cx="50" cy="50" fill="none" stroke="var(--vz-track)" stroke-width="11"/>${p>0?'':'<!--'}<circle r="${R}" cx="50" cy="50" fill="none" stroke="${o.c||VZ_C[0]}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${(p*C).toFixed(2)} ${C.toFixed(2)}"><title>${esc(o.aria||'')} : ${vzP(Math.round(p*100))}</title></circle>${p>0?'':'-->'}</g>${mk}<text x="50" y="54" text-anchor="middle" class="vz-c1">${vzP(Math.round(p*100))}</text></svg>${o.legende?`<p class="vz-sous">${o.legende}</p>`:''}</div>`}
+/* barres groupées par mois : femmes et hommes */
+function vzMois(M,o={}){const max=Math.max(1,...M.flatMap(m=>[m.f,m.h])),W=300,H=130,b=Math.min(16,(W/M.length-10)/2),pas=W/M.length;
+ const bars=M.map((m,i)=>{const x0=i*pas+(pas-2*b-2)/2,hf=m.f/max*(H-18),hh=m.h/max*(H-18);
+  return `<g><title>${esc(m.lib)} : ${num(m.f)} femmes, ${num(m.h)} hommes</title><rect x="${x0.toFixed(1)}" y="${(H-hf).toFixed(1)}" width="${b.toFixed(1)}" height="${hf.toFixed(1)}" rx="3" fill="${VZ_C[0]}"/><rect x="${(x0+b+2).toFixed(1)}" y="${(H-hh).toFixed(1)}" width="${b.toFixed(1)}" height="${hh.toFixed(1)}" rx="3" fill="${VZ_C[2]}"/><text x="${(i*pas+pas/2).toFixed(1)}" y="${H+14}" text-anchor="middle" class="vz-ax">${esc(m.court)}</text>${m.f+m.h?`<text x="${(i*pas+pas/2).toFixed(1)}" y="${(H-Math.max(hf,hh)-5).toFixed(1)}" text-anchor="middle" class="vz-val">${num(m.f+m.h)}</text>`:''}</g>`}).join('');
+ return `<svg class="vz-mois" viewBox="0 -4 ${W} ${H+22}" role="img" aria-label="${esc(o.aria||'')} : ${M.map(m=>`${m.lib} ${m.f} femmes et ${m.h} hommes`).join(' ; ')}"><line x1="0" x2="${W}" y1="${H}" y2="${H}" stroke="var(--line)"/>${bars}</svg>
+ <ul class="vz-leg vz-leg-h"><li><span class="vz-k" style="background:${VZ_C[0]}"></span>Femmes <b>${num(M.reduce((s,m)=>s+m.f,0))}</b></li><li><span class="vz-k" style="background:${VZ_C[2]}"></span>Hommes <b>${num(M.reduce((s,m)=>s+m.h,0))}</b></li></ul>`}
+const vzCarte=(t,sous,corps,act)=>`<section class="card vz-carte"><div class="tb-h"><h3>${t}</h3>${sous?`<span class="muted">${sous}</span>`:''}</div>${corps}${act?`<p class="vz-plus">${act}</p>`:''}</section>`;
+const vzMoisDerniers=n=>{const L=[],d=new Date();d.setDate(1);for(let i=n-1;i>=0;i--){const x=new Date(d.getFullYear(),d.getMonth()-i,1),k=`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}`;L.push({k,lib:x.toLocaleDateString('fr-FR',{month:'long',year:'numeric'}),court:x.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')})}return L};
+
+/* ---------- les cartes du bilan ---------- */
+function bzTerrain(){const F=(S.fterrain||[]).filter(f=>f.statut!=='rejetee'&&(!['ASC','SUP'].includes(me.role)||[f.agent_id,f.saisi_par].includes(me.id)||me.role==='SUP'));if(!F.length)return '';
+ const M=vzMoisDerniers(6).map(m=>{const x=F.filter(f=>String(f.date_activite||'').slice(0,7)===m.k&&f.statut!=='a_corriger');return {...m,f:somme(x,f=>Number(f.nb_f)||0),h:somme(x,f=>Number(f.nb_h)||0)}});
+ const tf=somme(M,m=>m.f),th=somme(M,m=>m.h);if(!tf&&!th)return '';
+ return vzCarte('Personnes touchées',`6 derniers mois, ${num(tf+th)} personnes, ${vzP(vzPct(tf,tf+th))} de femmes`,vzMois(M,{aria:'Personnes touchées par mois'}),`<button class="lnk" data-act="go" data-v="terrain">Voir la collecte terrain</button>`)}
+function bzFiches(){const m=today().slice(0,7),F=(S.fterrain||[]).filter(f=>String(f.date_activite||'').slice(0,7)===m&&(['ASC'].includes(me.role)?[f.agent_id,f.saisi_par].includes(me.id):true));if(!F.length)return '';
+ const c=k=>F.filter(f=>f.statut===k).length;
+ return vzCarte('Fiches terrain du mois',moisLib(m).toLowerCase(),vzDonut([{v:c('validee'),l:'Validées',c:VZ_C[0]},{v:c('verifiee'),l:'Vérifiées, à valider',c:VZ_C[2]},{v:c('soumise'),l:'Envoyées, à vérifier',c:VZ_C[1]},{v:c('a_corriger'),l:'À corriger',c:VZ_C[3]}],{centre:num(F.length),sous:'fiches',aria:'Fiches terrain du mois'}))}
+function bzIndic(){const s=synth(S.inds),n=s.ok+s.warn+s.bad+s.nd;if(!n)return '';
+ return vzCarte('Santé des indicateurs',`${n} indicateur(s) suivi(s)`,vzDonut([{v:s.ok,l:'Dans les temps',c:'var(--ok)'},{v:s.warn,l:'À surveiller',c:'var(--warn)'},{v:s.bad,l:'En retard',c:'var(--bad)'},{v:s.nd,l:'Sans données',c:VZ_N}],{centre:s.score!=null?vzP(Math.round(s.score*100)):'nd',sous:'réalisation',aria:'Santé des indicateurs'}),`<button class="lnk" data-act="go" data-v="performance">Voir la performance</button>`)}
+function bzProjets(){const L=S.projets.filter(p=>!['archive','rejete'].includes(p.statut));if(!L.length)return '';const g=k=>L.filter(p=>k.includes(p.statut)).length;
+ return vzCarte('Portefeuille des projets',`${L.length} projet(s)`,vzDonut([{v:g(['active','execution']),l:'En exécution',c:VZ_C[0]},{v:g(['brouillon','configuration','verification','validation','a_corriger']),l:'En préparation',c:VZ_C[1]},{v:g(['suspendu']),l:'Suspendus',c:VZ_C[3]},{v:g(['cloture']),l:'Clôturés',c:VZ_N}],{sous:'projets',aria:'Projets par étape'}),`<button class="lnk" data-act="go" data-v="projets">Voir le portefeuille</button>`)}
+function bzRapports(){if(typeof p22==='undefined'||!p22)return '';const L=S.rapports||[];if(!L.length)return '';
+ const clos=L.filter(rapClos).length,val=L.filter(r=>r.statut==='valide'&&!rapClos(r)).length,sou=L.filter(r=>r.statut==='soumis').length,red=L.filter(r=>['a_rediger','a_corriger'].includes(r.statut)).length,ret=L.filter(r=>rapRetards(r).length).length;
+ return vzCarte('Rapports d\'activité',`${L.length} activité(s)${ret?`, ${ret} en retard`:''}`,vzDonut([{v:clos,l:'Clôturés',c:VZ_C[0]},{v:val,l:'Validés, volet financier en cours',c:VZ_C[2]},{v:sou,l:'À valider par le DP',c:VZ_C[1]},{v:red,l:'À rédiger ou corriger',c:VZ_C[3]}],{centre:vzP(vzPct(clos,L.length)),sous:'clôturés',aria:'Rapports d\'activité'}),`<button class="lnk" data-act="go" data-v="rapports">Voir les rapports</button>`)}
+function bzMissions(){const y=today().slice(0,4),L=(S.missions||[]).filter(m=>String(m.date_depart||'').slice(0,4)===y&&!['annulee','rejetee'].includes(m.statut));if(!L.length)return '';const c=k=>L.filter(m=>m.statut===k).length;
+ return vzCarte('Ordres de mission',`année ${y}`,vzDonut([{v:c('demandee'),l:'À signer',c:VZ_C[1]},{v:c('approuvee'),l:'Signés',c:VZ_C[0]},{v:c('rapport'),l:'À liquider',c:VZ_C[3]},{v:c('liquidee'),l:'Liquidés',c:VZ_C[2]}],{sous:'missions',aria:'Ordres de mission'}))}
+function bzPlan(){if(!['DE','DP','CA'].includes(me.role)||typeof planCourant!=='function')return '';const pp=perfPlan(planCourant());if(!pp||pp.score==null)return '';
+ return vzCarte('Plan stratégique','réalisation et rythme attendu',vzAnneau(pp.score,{cible:pp.att,aria:'Réalisation du plan stratégique',legende:`Réalisé : <b>${vzP(Math.round(pp.score*100))}</b>${pp.att!=null?`, rythme attendu à ce jour : <b>${vzP(Math.round(pp.att*100))}</b> (petit trait sur l’anneau)`:''}`}),`<button class="lnk" data-act="go" data-v="strategie">Voir le plan</button>`)}
+function bzBudget(){if(typeof finStats!=='function')return '';const L=S.projets.filter(p=>!['rejete','archive'].includes(p.statut)&&voitFin(p)).map(p=>finStats(p)).filter(s=>s.budget>0);if(!L.length)return '';
+ const b=somme(L,s=>s.budget),r=somme(L,s=>s.real);
+ return vzCarte('Exécution budgétaire',`${num(L.length)} projet(s)`,vzAnneau(r/b,{c:VZ_C[1],aria:'Exécution budgétaire',legende:`<b>${tbM(r)}</b> dépensés sur <b>${tbM(b)}</b> FCFA`}),`<button class="lnk" data-act="go" data-v="finances">Voir les finances</button>`)}
+function bzAvances(){if(!['RA','CPT','DE'].includes(me.role)||!(S.avances||[]).length)return '';const L=S.avances,c=k=>somme(L.filter(a=>a.statut===k),a=>Number(a.montant)||0);
+ return vzCarte('Avances au personnel','montants en FCFA',vzDonut([{v:c('versee'),l:'Versées, à justifier',c:VZ_C[3]},{v:c('justifiee'),l:'Justifiées, à solder',c:VZ_C[1]},{v:c('soldee'),l:'Soldées',c:VZ_C[0]},{v:c('demandee')+c('approuvee'),l:'Demandées',c:VZ_C[2]}],{centre:tbM(somme(L.filter(a=>a.statut!=='rejetee'),a=>Number(a.montant)||0)),sous:'FCFA',aria:'Avances au personnel'}),`<button class="lnk" data-act="go" data-v="adm">Voir l'administration</button>`)}
+function bzPieces(){if(!['RA','CPT','DE'].includes(me.role)||typeof p22==='undefined'||!p22)return '';const L=S.rpieces||[];if(!L.length)return '';const c=k=>L.filter(p=>p.statut===k).length;
+ return vzCarte('Pièces justificatives',`${num(L.length)} pièce(s)`,vzDonut([{v:c('acceptee'),l:'Acceptées',c:VZ_C[0]},{v:c('soumise'),l:'À vérifier',c:VZ_C[1]},{v:c('rejetee'),l:'Rejetées',c:VZ_C[3]}],{sous:'pièces',aria:'Pièces justificatives'}),`<button class="lnk" data-act="go" data-v="rapports">Voir les rapports</button>`)}
+function bilanHTML(){if(!me)return '';const r=me.role,pil=['DE','DP','CA'].includes(r);
+ const B=pil?[bzPlan(),bzIndic(),bzProjets(),bzTerrain(),bzRapports(),bzBudget(),bzMissions()]
+  :['RA','CPT'].includes(r)?[bzAvances(),bzPieces(),bzRapports(),bzBudget(),bzMissions()]
+  :['CP','SE','LECT'].includes(r)?[bzTerrain(),bzFiches(),bzIndic(),bzRapports(),bzMissions()]
+  :[bzTerrain(),bzFiches(),bzRapports(),bzMissions()];
+ const L=B.filter(Boolean);if(!L.length)return '';
+ return `<h2 class="vz-titre">Bilan</h2><div class="vz-grille">${L.join('')}</div>`}
+
 function pilotageHTML(){const pl=planCourant(),pp=perfPlan(pl),ps=S.projets,actifs=ps.filter(p=>['active','execution'].includes(p.statut));
  const s=synth(S.inds),budget=ps.filter(p=>!['rejete','archive'].includes(p.statut)).reduce((x,p)=>x+(p.budgetApprouve||p.montant||0),0),A=alertes();
  const k=(v,l,act,val)=>`<button class="kpi svK" data-act="${act}" ${val?`data-v="${val}"`:''}><b>${v}</b><span>${l}</span></button>`;
- return `<div class="kpis">${k(S.programmes.filter(g=>g.type==='programme').length+' et '+S.programmes.filter(g=>g.type==='operation').length,'Programmes et opérations stratégiques','go','programmes')}
+ const kp=`<div class="kpis">${k(S.programmes.filter(g=>g.type==='programme').length+' et '+S.programmes.filter(g=>g.type==='operation').length,'Programmes et opérations stratégiques','go','programmes')}
   ${k(actifs.length+' / '+ps.length,'Projets actifs / total','go','projets')}${k(budget?Math.round(budget/1e6).toLocaleString('fr-FR')+' M':'-','Budget approuvé du portefeuille (FCFA)','go','projets')}
   ${k(pp&&pp.score!=null?tx(pp.score):'-','Réalisation du plan stratégique'+(pp&&pp.att!=null?` (rythme attendu ${tx(pp.att)})`:''),'go','performance')}
   ${k(`${s.ok}, ${s.warn}, ${s.bad}`,'Indicateurs dans les temps, à surveiller, en retard','go','performance')}${k(s.nd,'Indicateurs sans données suffisantes','go','performance')}
   ${k(aValider().length,'Mesures à valider','go','projets')}${k(S.risques.filter(r=>r.statut!=='clos'&&r.probabilite*r.impact>=15).length,'Risques élevés ouverts','go','programmes')}
-  ${k(S.docs.length,'Documents archivés visibles','go','archives')}</div>${accTableauBord()}
- <section class="card" style="margin-top:1.4rem"><h3>Alertes et décisions à prendre (${A.length})</h3>${alerteHTML(A)}</section>`}
+  ${k(S.docs.length,'Documents archivés visibles','go','archives')}</div>`;
+ return bilanHTML()+`<section class="card"><h3>Alertes et décisions à prendre (${A.length})</h3>${alerteHTML(A)}</section><h2 class="vz-titre">Repères chiffrés</h2>`+kp+accTableauBord()}
 
 /* ---------- plan stratégique ---------- */
 function svStrategie(){const de=me.role==='DE',pl=planCourant();
@@ -6240,12 +6336,12 @@ function tbEcheances(){const t=today(),lim=new Date(Date.now()+45*864e5).toISOSt
  S.projets.filter(p=>['brouillon','configuration','validation','active'].includes(p.statut)&&dans(p.debut)).forEach(p=>E.push([p.debut,'Démarrage',p.nom,'projets']));
  (S.tdrs||[]).filter(x=>x.statut==='valide'&&dans(x.date_debut)&&!tdrOM(x)&&x.auteur_id===me.id).forEach(x=>E.push([x.date_debut,'Ordre de mission à établir',x.titre,'missions']));
  E.sort((a,b)=>a[0]<b[0]?-1:1);const nav=ROLES[me.role].nav;
- return tbCarte('Prochaines échéances','45 prochains jours',E.length?`<ul class="tb-ech">${E.slice(0,8).map(([d,k,l,v])=>{const j=Math.round((new Date(d)-new Date(t))/864e5);
-  return `<li><span class="tb-date"><b>${new Date(d).toLocaleDateString('fr-FR',{day:'2-digit'})}</b>${new Date(d).toLocaleDateString('fr-FR',{month:'short'})}</span><span class="tb-t"><span class="muted">${k}, ${j===0?'aujourd\'hui':j===1?'demain':'dans '+j+' jours'}</span>${nav.includes(v)?`<button class="lnk" data-act="go" data-v="${v}">${esc(l)}</button>`:esc(l)}</span></li>`}).join('')}</ul>${E.length>8?`<p class="muted tb-plus">et ${E.length-8} autre(s)</p>`:''}`:'<p class="empty">Aucune échéance dans les 45 prochains jours.</p>')}
+ return tbCarte('Prochaines échéances','45 prochains jours',E.length?`<table class="tbA"><tbody>${E.slice(0,8).map(([d,k,l,v])=>{const j=Math.round((new Date(d)-new Date(t))/864e5);
+  return `<tr><td class="d"><b style="color:var(--ink)">${new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})}</b><br>${j===0?'aujourd\'hui':j===1?'demain':'dans '+j+' j'}</td><td><span class="muted" style="font-size:.8rem;display:block">${k}</span>${nav.includes(v)?`<button class="lnk" data-act="go" data-v="${v}">${esc(l)}</button>`:esc(l)}</td></tr>`}).join('')}</tbody></table>${E.length>8?`<p class="muted tb-plus">et ${E.length-8} autre(s)</p>`:''}`:'<p class="empty">Aucune échéance dans les 45 prochains jours.</p>')}
 function actLib(t){return String(t==null?'':t).replace(/\s*\u2192\s*/g,', puis ').replace(/\s*[\u2014\u2013]\s*/g,', ').replace(/\s*\u00b7\s*/g,', ')}
 function tbActivite(){if(me.role!=='DE'||!srvAudit.length)return '';const L=srvAudit.filter(a=>!/^(Connexion|Déconnexion)/.test(String(a.action))).slice(0,6);if(!L.length)return '';
  const il=d=>{const m=Math.round((Date.now()-new Date(d))/6e4);return m<60?`il y a ${Math.max(1,m)} min`:m<1440?`il y a ${Math.round(m/60)} h`:`il y a ${Math.round(m/1440)} j`};
- return tbCarte('Activité récente','journal d\'audit',`<ul class="tb-act">${L.map(a=>`<li><span class="muted">${il(a.le)}, ${esc(a.user_id?who(a.user_id):'Système')}</span>${esc(actLib(a.action).slice(0,140))}</li>`).join('')}</ul><p class="tb-plus"><button class="lnk" data-act="go" data-v="audit">Tout le journal</button></p>`)}
+ return tbCarte('Activité récente','journal d\'audit',`<table class="tbA"><tbody>${L.map(a=>`<tr><td class="d">${il(a.le)}</td><td><span class="muted" style="font-size:.8rem;display:block">${esc(a.user_id?who(a.user_id):'Système')}</span>${esc(actLib(a.action).slice(0,140))}</td></tr>`).join('')}</tbody></table><p class="tb-plus"><button class="lnk" data-act="go" data-v="audit">Tout le journal</button></p>`)}
 function tbMesProjets(){const L=projetsVisibles?S.projets.filter(p=>p.chefId===me.id||(p.membres||[]).some(m=>m.staffId===me.id)):[];if(!L.length)return '';
  return tbCarte('Mes projets',`${L.length}`,`<ul class="tb-act">${L.map(p=>{const s=synth(indsProjet(p));return `<li><span class="muted">${(PSTAT[p.statut]||[p.statut])[0]}, ${fmtD(p.debut)} au ${fmtD(p.fin)}${s.score!=null?', indicateurs '+tx(s.score):''}</span><button class="lnk" data-act="svDos" data-id="${p.id}">${esc(libProj(p))}</button></li>`}).join('')}</ul>`)}
 function accTableauBord(){const pil=['DE','DP','CA'].includes(me.role)&&p03;
