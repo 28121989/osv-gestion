@@ -799,6 +799,23 @@ main>.note[role=status]{border-left-color:var(--t-vert);background:var(--brand-t
 .aFaireG{color:var(--brand)}
 .auth-main h2,.login-box h2{color:var(--brand)!important}
 .auth-side{background:var(--brand-tint)!important}
+.rail-tete{display:flex;align-items:flex-start;gap:.3rem;border-bottom:1px solid var(--line);margin-bottom:.8rem}
+.rail-tete .rail-brand{border:0!important;margin:0!important;flex:1;min-width:0}
+.rail-pli{flex:none;width:34px;height:34px;display:grid;place-items:center;background:none;border:1px solid var(--line);border-radius:8px;color:var(--muted);margin-top:.15rem}
+.rail-pli:hover{background:var(--soft);color:var(--brand)}
+.infobulle{position:fixed;z-index:90;transform:translateY(-50%);background:#1E2530;color:#fff;font-size:.82rem;font-weight:600;padding:.35rem .6rem;border-radius:6px;pointer-events:none;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+@media (min-width:861px){
+ .shell{transition:grid-template-columns .2s ease}
+ .shell.rail-mini{grid-template-columns:72px minmax(0,1fr)!important}
+ .rail-mini .rail{padding:.8rem .45rem!important;overflow-x:hidden}
+ .rail-mini .rail-tete{flex-direction:column;align-items:center;gap:.5rem;padding-bottom:.7rem}
+ .rail-mini .rail-brand{padding:0!important;justify-content:center}
+ .rail-mini .rail-brand span,.rail-mini .rail-foot,.rail-mini .srvNav button>span:not(.badge){display:none!important}
+ .rail-mini .nav-g{font-size:0!important;height:1px;background:var(--line);margin:.55rem .5rem!important;padding:0}
+ .rail-mini .srvNav button{justify-content:center;padding:.6rem 0!important;position:relative}
+ .rail-mini .srvNav .badge{position:absolute;top:3px;right:6px;margin:0;min-width:16px;height:16px;padding:0 4px;font-size:11px!important;line-height:16px}
+}
+@media (max-width:860px){.rail-pli{display:none}}
 /* aucun texte sous 12 px */
 small,.muted small,.pa-bas,.bande-date,.tb-leg,.pfCode,.tb-date,.trPb,.nav-g{font-size:max(12px,.75rem)!important}
 .navBas button{font-size:12px!important}.navBas .nb b{font-size:12px!important}
@@ -5049,7 +5066,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv')return;const b=e.target.cl
 
 /* Pictogrammes : Lucide (licence ISC, © Lucide Icons and Contributors) */
 const ICO={"rapports":"<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/><path d=\"m9 15 2 2 4-4\"/>","plus":"<path d=\"M12 5v14\"/><path d=\"M5 12h14\"/>","envoyer":"<path d=\"M20 4v7a4 4 0 0 1-4 4H4\"/><path d=\"m9 10-5 5 5 5\"/>","ondes":"<path d=\"M2 10v3\"/><path d=\"M6 6v11\"/><path d=\"M10 3v18\"/><path d=\"M14 8v7\"/><path d=\"M18 5v13\"/><path d=\"M22 10v3\"/>","home": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/>", "strategie": "<circle cx=\"12\" cy=\"12\" r=\"10\"/> <path d=\"m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z\"/>", "programmes": "<path d=\"M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z\"/> <path d=\"M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12\"/> <path d=\"M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17\"/>", "projets": "<path d=\"M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z\"/> <path d=\"M8 10v4\"/> <path d=\"M12 10v2\"/> <path d=\"M16 10v6\"/>", "equipes": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\"/> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/> <circle cx=\"9\" cy=\"7\" r=\"4\"/>", "finances": "<path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\"/> <path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\"/>", "adm": "<path d=\"M10 18v-7\"/> <path d=\"M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z\"/> <path d=\"M14 18v-7\"/> <path d=\"M18 18v-7\"/> <path d=\"M3 22h18\"/> <path d=\"M6 18v-7\"/>", "performance": "<path d=\"M16 7h6v6\"/> <path d=\"m22 7-8.5 8.5-5-5L2 17\"/>", "archives": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\"/> <path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\"/> <path d=\"M10 12h4\"/>", "politiques": "<path d=\"M12 5v16\"/> <path d=\"m16 12 2 2 4-4\"/> <path d=\"M22 6V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2h4.001A2 2 0 0022 17v-1.344\"/>", "mesdem": "<polyline points=\"22 12 16 12 14 15 10 15 8 12 2 12\"/> <path d=\"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z\"/>", "personnel": "<path d=\"M13 19a4 4 0 00-8 0\"/> <path d=\"M16 10h2\"/> <path d=\"M16 14h2\"/> <circle cx=\"9\" cy=\"12\" r=\"3\"/> <rect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"2\"/>", "audit": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/> <path d=\"m9 12 2 2 4-4\"/>", "missions": "<circle cx=\"6\" cy=\"19\" r=\"3\"/> <path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\"/> <circle cx=\"18\" cy=\"5\" r=\"3\"/>", "logout": "<path d=\"m16 17 5-5-5-5\"/> <path d=\"M21 12H9\"/> <path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\"/>", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\"/> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\"/>", "cal": "<path d=\"M8 2v3\"/> <path d=\"M16 2v3\"/> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/> <path d=\"M3 9h18\"/>", "pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\"/> <circle cx=\"12\" cy=\"10\" r=\"3\"/>"};
-Object.assign(ICO,{menu:'<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>',check:'<path d="M20 6 9 17l-5-5"/>'});
+Object.assign(ICO,{pliF:'<path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/>',pliO:'<path d="m6 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/>',menu:'<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>',check:'<path d="M20 6 9 17l-5-5"/>'});
 const ico=(n,c="ico")=>ICO[n]?`<svg class="${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[n]}</svg>`:"";
 
 /* ===== Habillage : cadre de l'application, connexion, accueil ===== */
@@ -5062,9 +5079,11 @@ function srvRender(){const root=document.getElementById('root');
  if(!me){root.innerHTML=pubView?publicHTML():loginHTML();if(!pubView)document.getElementById('email')?.focus();dsAnim.login=false;return}
  const nav=ROLES[me.role].nav;if(view!=='home'&&!nav.includes(view)&&!(view==='dossier'&&p03&&nav.includes('projets')))view='home';
  const cur=view==='dossier'?'projets':view,titre=cur==='home'?'Accueil':VIEWS[cur]||'';
- const bt=v=>`<button data-act="go" data-v="${v}" ${cur===v?'aria-current="page"':''}>${ico(v)}<span>${v==='home'?'Accueil':VIEWS[v]}</span>${v==='politiques'&&polEnAttente().length?`<span class="badge">${polEnAttente().length}</span>`:''}</button>`;
- root.innerHTML=`<a class="skip" href="#main">Aller au contenu</a><div class="shell"><aside class="rail">
-  <button class="rail-brand" data-act="go" data-v="home" aria-label="Accueil d'OSV Gestion"><img src="${LOGO}" alt="Logo ONG Sécurité Vie"><span><strong>OSV Gestion</strong><small>ONG Sécurité Vie</small></span></button>
+ const bt=v=>`<button data-act="go" data-v="${v}" data-tip="${esc(v==='home'?'Accueil':VIEWS[v]||'')}" ${cur===v?'aria-current="page"':''}>${ico(v)}<span>${v==='home'?'Accueil':VIEWS[v]}</span>${v==='politiques'&&polEnAttente().length?`<span class="badge">${polEnAttente().length}</span>`:''}</button>`;
+ const mini=railMini();
+ root.innerHTML=`<a class="skip" href="#main">Aller au contenu</a><div class="shell${mini?' rail-mini':''}"><aside class="rail">
+  <div class="rail-tete"><button class="rail-brand" data-act="go" data-v="home" aria-label="Accueil d'OSV Gestion"><img src="${LOGO}" alt="Logo ONG Sécurité Vie"><span><strong>OSV Gestion</strong><small>ONG Sécurité Vie</small></span></button>
+  <button class="rail-pli" data-act="railPli" aria-pressed="${mini}" aria-label="${mini?'Agrandir le menu':'Réduire le menu'}" title="${mini?'Agrandir le menu':'Réduire le menu à des icônes'}">${ico(mini?'pliO':'pliF')}</button></div>
   <nav class="srvNav" aria-label="Menu principal">${bt('home')}${navGroupes(nav,bt)}</nav>
   <p class="rail-foot">Agir pour sauver des vies au quotidien</p></aside>
  <div class="stage"><header class="topbar"><img class="tb-logo" src="${LOGO}" alt="" aria-hidden="true"><p class="tb-titre">${view==='dossier'?'Dossier du projet':esc(titre)}</p>
@@ -5082,6 +5101,17 @@ function navBas(nav,cur){const f=NAV_FAV.filter(v=>nav.includes(v)).slice(0,3),n
  const b=(v,lib,extra='')=>`<button data-act="go" data-v="${v}" ${cur===v?'aria-current="page"':''} class="nb">${ico(v)}<span>${lib}</span>${extra}</button>`;
  return `<nav class="navBas" aria-label="Raccourcis">${b('home','Accueil',nbA?`<b aria-label="${nbA} point(s) à traiter">${nbA>99?'99+':nbA}</b>`:'')}${f.map(v=>b(v,NAV_COURT[v]||VIEWS[v])).join('')}<button data-act="menuOuvrir" aria-label="Ouvrir le menu complet" aria-expanded="false">${ico('menu')}<span>Menu</span></button></nav>`}
 let TOASTM='';
+/* menu repliable : une colonne d'icônes pour gagner de la place ; le choix est retenu sur cet appareil */
+const railMini=()=>{try{return localStorage.getItem('osv_menu_mini_'+(me&&me.id))==='1'}catch(_){return false}};
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="railPli"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const sh=document.querySelector('.shell');if(!sh)return;
+ const m=!sh.classList.contains('rail-mini');sh.classList.toggle('rail-mini',m);try{localStorage.setItem('osv_menu_mini_'+(me&&me.id),m?'1':'0')}catch(_){}
+ b.setAttribute('aria-pressed',m);b.setAttribute('aria-label',m?'Agrandir le menu':'Réduire le menu');b.title=m?'Agrandir le menu':'Réduire le menu à des icônes';b.innerHTML=ico(m?'pliO':'pliF');infoBulle(null)},true);
+/* info-bulle du menu réduit (souris et clavier) */
+let IB_EL=null;
+function infoBulle(btn){if(!IB_EL){IB_EL=document.createElement('div');IB_EL.className='infobulle';IB_EL.setAttribute('role','tooltip');document.body.appendChild(IB_EL)}
+ if(!btn||!btn.closest('.rail-mini')||matchMedia('(max-width:860px)').matches){IB_EL.hidden=true;return}const r=btn.getBoundingClientRect();IB_EL.textContent=btn.dataset.tip||btn.getAttribute('aria-label')||'';IB_EL.style.top=(r.top+r.height/2)+'px';IB_EL.style.left=(r.right+10)+'px';IB_EL.hidden=false}
+['mouseover','focusin'].forEach(ev=>document.addEventListener(ev,e=>{const b=e.target.closest&&e.target.closest('.rail .srvNav button,.rail-pli,.rail-brand');infoBulle(b&&(b.dataset.tip||b.classList.contains('rail-pli'))?b:null)}));
+['mouseout','focusout','scroll'].forEach(ev=>document.addEventListener(ev,e=>{if(ev==='scroll'||!(e.relatedTarget&&e.relatedTarget.closest&&e.relatedTarget.closest('.rail .srvNav button')))infoBulle(null)},true));
 function toast(m){document.querySelectorAll('.toast').forEach(x=>x.remove());const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.innerHTML=`${ico('check')}<span>${esc(m)}</span>`;document.body.appendChild(t);setTimeout(()=>t.remove(),4200)}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="menuOuvrir"],[data-act="menuFermer"]');const sh=document.querySelector('.shell');if(!sh)return;
  if(b){e.preventDefault();e.stopImmediatePropagation();const o=b.dataset.act==='menuOuvrir';sh.classList.toggle('menu-ouvert',o);if(o){const f=sh.querySelector('.srvNav button[aria-current="page"]')||sh.querySelector('.srvNav button');if(f)f.focus()}return}
