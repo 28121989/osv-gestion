@@ -831,6 +831,14 @@ small,.muted small,.pa-bas,.bande-date,.tb-leg,.pfCode,.tb-date,.trPb,.nav-g{fon
 @media print{.navBas,.toast,.menuFond{display:none!important}}
 </style>
 <style id="compact">
+/* pied de page distinct du fond : bleu discret, liseré bleu, vert et jaune */
+:root{--pied:#E4ECF5;--pied-ink:#2A3442}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--pied:#1A222D;--pied-ink:#C9D2DE}}
+:root[data-theme="dark"]{--pied:#1A222D;--pied-ink:#C9D2DE}
+@media screen{.pied-app{background:var(--pied);color:var(--pied-ink);max-width:none!important;margin:3rem 0 0!important;padding:1.7rem clamp(1rem,2.4vw,2.2rem) 1.5rem!important;border-top:4px solid;border-image:linear-gradient(90deg,var(--brand) 0 62%,var(--t-vert) 62% 81%,var(--t-jaune) 81% 100%) 1}
+.pied-app b,.pied-app h4,.pied-app strong{color:var(--ink)}
+.pied-app .muted,.pied-app span{color:var(--pied-ink)}
+.pied-app a{color:var(--brand)}}
 .caListe{list-style:none;margin:.7rem 0 0;padding:0;display:grid;gap:.75rem}.caL-t{display:flex;justify-content:space-between;gap:.6rem;font-size:.92rem}.caL-t b{white-space:nowrap}.caL-s{display:flex;justify-content:space-between;align-items:center;gap:.5rem;font-size:max(12px,.8rem);color:var(--muted);margin-top:.25rem}
 /* Écran plus compact : textes un peu plus petits, menu de gauche plus étroit, espace de travail plus large */
 @media screen{
