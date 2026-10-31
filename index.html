@@ -608,7 +608,8 @@ label{color:color-mix(in srgb,var(--ink) 82%,var(--muted))}
 
 .lnk:hover,.lnk:focus-visible{text-decoration:underline!important;text-underline-offset:3px}
 </style>
-<style id="charte">
+<style id="charte">.svSous th{background:transparent;font-weight:600;padding-left:1.1rem;color:var(--ink)}.svSous th.num{text-align:right}.bdVue{gap:.4rem;align-items:center;margin:.2rem 0 .5rem}.bdev{border:1px solid var(--line);border-radius:10px;padding:.8rem;margin-top:.4rem;background:var(--panel)}.bdev h4{margin:.2rem 0 .5rem}.bdAvert{font-size:.85rem;color:var(--muted);margin:.3rem 0 .6rem 1.1rem}.bdev input[data-bdl]{min-width:15rem;width:100%}
+
 /* ===== Charte 2026 : accessibilité (WCAG 2.2 AA) et ergonomie =====
    contrastes d'au moins 4,5 pour 1, cibles tactiles de 44 px, focus visible,
    un seul accent d'action, couleurs du logo pour les repères. */
@@ -2127,7 +2128,7 @@ async function authRefresh(){const s=sess;if(!s)return;sess=null;
 async function authLogout(){try{if(sess)await api('/auth/v1/logout',{method:'POST'})}catch(e){}sessEcrire(null)}
 
 /* ---------- chargement des données autorisées ---------- */
-function srvVide(){return {courriers:[],org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],veille:[],opps:[],journal:[],capis:[],iaUsage:[],outils:[],fterrain:[],refs:[],microplans:[],rterrain:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
+function srvVide(){return {courriers:[],org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],bversions:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],veille:[],opps:[],journal:[],capis:[],iaUsage:[],outils:[],fterrain:[],refs:[],microplans:[],rterrain:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
 async function srvLoad(){
  const uid=sess.user.id,mine=await sel('membres',`select=*&user_id=eq.${uid}&actif=is.true`);
  const m=(mine||[]).find(x=>!x.fin_acces||x.fin_acces>=today());
@@ -2153,7 +2154,7 @@ async function srvLoad(){
  N.pol.notifs=nt.map(n=>({id:n.id,docId:n.lien==='politique'?n.ref:null,lien:n.lien==='politique'?null:n.lien,ref:n.ref,texte:n.texte,date:n.cree_le,dest:[uid],lus:n.lu?[uid]:[]}));
  const opt=q=>q.catch(()=>null),T=await Promise.all([sel('plans_strategiques',f+'&order=debut.desc'),sel('axes_strategiques',f),sel('objectifs_strategiques',f),sel('programmes',f+'&order=code,nom'),sel('jalons',f),sel('cadre_logique',f),sel('indicateurs',f+'&order=code,cree_le'),sel('mesures',f+'&order=periode_fin'),sel('risques',f),sel('documents',f+'&order=cree_le.desc&limit=5000'),sel('audit',f+'&objet_id=not.is.null&order=le.desc&limit=2000')].map(opt));
  p03=T[0]!==null;[N.plans,N.axes,N.objectifs,N.programmes,N.jalons,N.cadre,N.inds,N.mesures,N.risques,N.docs,N.histo]=T.map(x=>x||[]);
- const T5=await Promise.all([sel('budget_lignes',f),sel('depenses',f),sel('financements',f),sel('seuils_approbation',f)].map(opt));p05=T5[0]!==null;[N.blignes,N.depenses,N.financements,N.seuils]=T5.map(x=>x||[]);
+ const T5=await Promise.all([sel('budget_lignes',f),sel('depenses',f),sel('financements',f),sel('seuils_approbation',f)].map(opt));p05=T5[0]!==null;[N.blignes,N.depenses,N.financements,N.seuils]=T5.map(x=>x||[]);{const T24=p05?await opt(sel('budget_versions',f+'&order=le.desc')):null;p24=T24!==null;N.bversions=T24||[]}
  const T6=await Promise.all(['comptes_tresorerie','mouvements','rapprochements','avances','fournisseurs','seuils_achat','achats','devis','baremes_mission','missions','biens','inventaires','plan_comptable','correspondances'].map(t=>sel(t,f)).concat([sel('inventaire_lignes')]).map(opt));p06=T6[3]!==null;
  const T7=await opt(sel('mission_membres',f+'&order=ordre'));p07=T7!==null;N.mmembres=T7||[];p11=p07&&(await opt(sel('missions','select=revision&limit=1')))!==null;N.mrev=p11?(await opt(sel('missions_revisions',f+'&order=le')))||[]:[];
  const T8=await Promise.all([sel('tdrs',f+'&order=cree_le.desc'),sel('tdr_avis',f+'&order=le'),sel('acces_budget',f)].map(opt));p08=T8[0]!==null;p20=p08&&(await opt(sel('tdrs','select=details&limit=1')))!==null;p21=p08&&(await opt(sel('tdr_avis','select=avant&limit=1')))!==null;N.tdrs=T8[0]||[];N.tavis=T8[1]||[];N.accBud=T8[2]||[];
@@ -2673,7 +2674,7 @@ function dosInd(p){const inds=indsProjet(p),g=programme(p.programmeId),parents=S
  return `<section class="card"><h3>Indicateurs du projet (${inds.length})</h3>${indTable(inds,{suppr:true})}</section>${gereProj(p)?indForm('svIndJ',`data-p="${p.id}"`,parents,`<div style="grid-column:span 2"><label>Niveau du cadre logique mesuré</label><select name="cadre_id">${opts(S.cadre.filter(c=>c.projet_id===p.id).map(c=>[c.id,`${CL_NIV[c.niveau]}, ${c.code?c.code+', ':''}${c.libelle}`]),'','-')}</select></div>`):''}${mesuresBloc(inds)}`}
 function dosEquipe(p){const ge=srvGereEq(p),actifs=S.staff.filter(u=>u.actif).sort((a,b)=>(a.role==='EXT')-(b.role==='EXT')||a.nom.localeCompare(b.nom));
  return `<section class="card"><h3>Équipe affectée (${p.membres.length})</h3>${p.membres.length?`<div class="tbl"><table><thead><tr><th>Personne</th><th>Rôle dans le projet</th><th class="num">Imputation</th><th>Du</th><th>Au</th>${p09&&['DE','DP','RA'].includes(me.role)?'<th>Accès au budget</th>':''}${ge?'<th></th>':''}</tr></thead><tbody>${p.membres.map(m=>`<tr><td>${esc(who(m.staffId))}${p10&&ctrGere()&&(S.staff.find(u=>u.id===m.staffId)||{}).statut!=='Salarié'?`<br>${S.contrats.some(c=>c.user_id===m.staffId&&c.statut==='signe'&&(!c.projet_id||c.projet_id===p.id))?'<span class="tag ok">contrat signé</span>':`<button class="lnk" data-act="ctrNouveauPour" data-p="${p.id}" data-id="${m.staffId}">Établir son contrat</button>`}`:''}</td><td>${esc(m.roleProjet)}</td><td class="num">${m.taux!==''&&m.taux!=null?m.taux+' %':'-'}</td><td>${fmtD(m.debut)}</td><td>${fmtD(m.fin)}</td>${p09&&['DE','DP','RA'].includes(me.role)?`<td>${budCell(p,m)}</td>`:''}${ge?`<td><button class="btn danger sm" data-act="srvDelAff" data-id="${m.affId}">Retirer</button></td>`:''}</tr>`).join('')}</tbody></table></div>`:'<p class="empty">Personne n\'est encore affecté.</p>'}
- ${ge?`<form data-form="srvAff" data-p="${p.id}" class="grid" style="margin-top:.6rem;align-items:end"><div><label>Personne</label><select name="user" required>${actifs.map(u=>`<option value="${u.id}">${esc(u.nom)} (${esc(posteLib(u))}${u.role==='EXT'?', externe, lecture seule':''})</option>`).join('')}</select></div><div><label>Rôle dans le projet</label><select name="role">${ROLES_PROJET.map(r=>`<option>${r}</option>`).join('')}</select></div>${p05?`<div><label>Part du temps payée par le projet (%)</label><input name="taux" type="number" min="0" max="100" placeholder="ex. 100"></div><div><label>Ligne budgétaire</label><select name="ligne">${opts(lignesP(p).filter(l=>['personnel','charges_sociales'].includes(l.rubrique)).map(l=>[l.id,`${l.code||''} ${l.libelle}`]),'','-')}</select></div>`:''}<div><label>Du</label><input type="date" name="debut"></div><div><label>Au</label><input type="date" name="fin"></div><div><button class="btn sm" type="submit">Affecter</button></div></form>`:''}</section>`}
+ ${ge?`<form data-form="srvAff" data-p="${p.id}" class="grid" style="margin-top:.6rem;align-items:end"><div><label>Personne</label><select name="user" required>${actifs.map(u=>`<option value="${u.id}">${esc(u.nom)} (${esc(posteLib(u))}${u.role==='EXT'?', externe, lecture seule':''})</option>`).join('')}</select></div><div><label>Rôle dans le projet</label><select name="role">${ROLES_PROJET.map(r=>`<option>${r}</option>`).join('')}</select></div>${p05?`<div><label>Part du temps payée par le projet (%)</label><input name="taux" type="number" min="0" max="100" placeholder="ex. 100"></div><div><label>Ligne budgétaire</label><select name="ligne">${opts(lignesP(p).filter(l=>['personnel','charges_sociales'].includes(l.rubrique)).map(l=>[l.id,blNom(l)]),'','-')}</select></div>`:''}<div><label>Du</label><input type="date" name="debut"></div><div><label>Au</label><input type="date" name="fin"></div><div><button class="btn sm" type="submit">Affecter</button></div></form>`:''}</section>`}
 function dosDocs(p){const ds=S.docs.filter(d=>d.projet_id===p.id);
  return `<section class="card"><h3>Documents du projet (${ds.length})</h3><p class="muted">Vous voyez les documents que vos droits permettent de consulter. Les pièces comptables restent dans les archives de la comptabilité.</p>${docsTable(ds)}
  <div class="row" style="margin-top:.6rem"><button class="btn sm" data-act="svArDepot" data-id="${p.id}">Archiver un document pour ce projet</button><button class="btn ghost sm" data-act="svAudit" data-id="${p.id}">Télécharger le dossier d'audit (.zip)</button></div></section>`}
@@ -2882,7 +2883,7 @@ const DEP_ST={saisie:['Saisie','warn'],verifiee:['Vérifiée','warn'],approuvee:
 const MODES={virement:'Virement',cheque:'Chèque',especes:'Espèces',mobile_money:'Mobile Money',autre:'Autre'};
 const FACT_ST={emise:['Émise','warn'],payee_partiel:['Payée en partie','warn'],payee:['Payée','ok'],annulee:['Annulée','']};
 const SRC={bailleur:'Bailleur',osv:'Contribution OSV',autre:'Autre source'};
-let p05=true,finSel=null,finPer={du:'',au:''};
+let p05=true,p24=false,finSel=null,finPer={du:'',au:''};
 const PRE_ACT=['brouillon','configuration','verification','a_corriger'];
 const voitFin=p=>p&&(p09?(['DE','DP','CA','RA'].includes(me.role)||(me.role==='CPT'&&employeC(p,me.id))||(employeC(p,me.id)&&me.statut==='Salarié'&&accBud(p,me.id))):(['DE','DP','CA','RA','CPT'].includes(me.role)||p.chefId===me.id));
 const gereBud=p=>voitFin(p)&&(['DE','RA'].includes(me.role)||((me.role==='DP'||p.chefId===me.id)&&PRE_ACT.includes(p.statut)));
@@ -2939,20 +2940,17 @@ function finDetail(p){const s=finStats(p),L=lignesP(p),D=depP(p),F=factP(p),gb=g
   <div class="kpi"><span>Engagé (en contrôle)</span><b>${num(s.engage)}</b><span>FCFA</span></div><div class="kpi"><span>Solde disponible</span><b>${num(s.budget-s.real-s.engage)}</b><span>FCFA</span></div>
   <div class="kpi"><span>Facturé, reçu du bailleur</span><b>${num(s.recu)}</b><span>sur ${num(s.facture)} FCFA facturés</span></div><div class="kpi"><span>Trésorerie du projet</span><b>${num(s.recu-s.paye)}</b><span>reçu − payé (FCFA)</span></div></div>
  <section class="card"><h3>Budget par ligne (${L.length})</h3>${!PRE_ACT.includes(p.statut)?'<p class="muted">Projet activé : le budget approuvé est figé. Toute révision est faite par le DE ou le RAF et tracée dans l\'historique.</p>':''}
- ${L.length?`<div class="tbl"><table><thead><tr><th>Code</th><th>Libellé</th><th>Source</th><th class="num">Qté × coût unitaire</th><th class="num">Budget</th><th class="num">Réalisé</th><th class="num">Engagé</th><th class="num">Solde</th><th>Consommation</th>${gb?'<th></th>':''}</tr></thead><tbody>
-  ${rubs.map(rb=>{const ls=L.filter(l=>l.rubrique===rb),t=ls.reduce((a,l)=>{const x=parL(l);return [a[0]+Number(l.montant),a[1]+x.r,a[2]+x.e]},[0,0,0]);
-   return `<tr class="svRub"><th colspan="4">${esc(RUB[rb])}</th><th class="num">${num(t[0])}</th><th class="num">${num(t[1])}</th><th class="num">${num(t[2])}</th><th class="num">${num(t[0]-t[1]-t[2])}</th><th>${t[0]?tx(t[1]/t[0]):'-'}</th>${gb?'<th></th>':''}</tr>`+
-   ls.map(l=>{const x=parL(l),over=x.solde<0;return `<tr><td>${esc(l.code||'')}</td><td>${esc(l.libelle)}${l.unite?`<br><span class="muted">${esc(l.unite)}</span>`:''}</td><td>${esc(SRC[l.source])}</td><td class="num">${l.quantite!=null&&l.cout_unitaire!=null?num(l.quantite)+' × '+num(l.cout_unitaire):'-'}</td><td class="num">${num(l.montant)}</td><td class="num">${num(x.r)}</td><td class="num">${num(x.e)}</td><td class="num">${over?`<span class="tag bad">${num(x.solde)}</span>`:num(x.solde)}</td><td>${Number(l.montant)?tx(x.r/l.montant)+barre(x.r/l.montant,s.att):'-'}</td>${gb?`<td>${D.some(d=>d.ligne_id===l.id)?'':`<button class="btn danger sm" data-act="ligneSuppr" data-id="${l.id}">Supprimer</button>`}</td>`:''}</tr>`}).join('')}).join('')}
-  <tr class="svRub"><th colspan="4">Total</th><th class="num">${num(s.budget)}</th><th class="num">${num(s.real)}</th><th class="num">${num(s.engage)}</th><th class="num">${num(s.budget-s.real-s.engage)}</th><th>${tx(s.taux)}</th>${gb?'<th></th>':''}</tr></tbody></table></div>`:'<p class="empty">Le budget n\'est pas encore saisi.</p>'}
+ ${L.length?finBudTable(p,L,gb,s,parL):'<p class="empty">Le budget n\'est pas encore saisi.</p>'}
  ${gb?`<details style="margin-top:.6rem"><summary>Ajouter une ligne budgétaire</summary><form data-form="svLigne" data-p="${p.id}" class="grid" style="margin-top:.6rem;align-items:end">
   <div><label>Code</label><input name="code" placeholder="ex. 2.1"></div><div><label>Rubrique</label><select name="rubrique">${opts(Object.entries(RUB),'activites')}</select></div><div style="grid-column:span 2"><label>Libellé</label><input name="libelle" required></div>
   <div><label>Unité</label><input name="unite" placeholder="ex. personne-mois, séance"></div><div><label>Quantité</label><input name="quantite" type="number" min="0" step="any"></div><div><label>Coût unitaire (FCFA)</label><input name="cout_unitaire" type="number" min="0" step="any"></div>
   <div><label>Montant (FCFA, calculé si vide)</label><input name="montant" type="number" min="0"></div><div><label>Source de financement</label><select name="source">${opts(Object.entries(SRC),'bailleur')}</select></div><div><button class="btn sm" type="submit">Ajouter</button></div></form></details>
   <details><summary>Importer le budget depuis Excel (copier-coller)</summary><form data-form="svImport" data-p="${p.id}" style="margin-top:.6rem"><p class="muted">Dans Excel, sélectionnez les colonnes <b>Code, Rubrique, Libellé, Unité, Quantité, Coût unitaire</b> (dans cet ordre, sans la ligne de titres), copiez, puis collez ici. Rubriques reconnues : ${Object.values(RUB).join(', ')}.</p>
-  <textarea name="texte" rows="5" required placeholder="1.1	Personnel	Chef de projet	mois	12	350000"></textarea><button class="btn sm" type="submit" style="margin-top:.4rem">Importer les lignes</button></form></details>`:''}</section>
+  <textarea name="texte" rows="5" required placeholder="1.1	Personnel	Chef de projet	mois	12	350000"></textarea><button class="btn sm" type="submit" style="margin-top:.4rem">Importer les lignes</button></form></details>
+  <details${BDEV&&BDEV.pid===p.id?' open':''}><summary>Remplacer tout le budget par un devis Excel restructuré</summary><div style="margin-top:.6rem">${p24?(BDEV&&BDEV.pid===p.id?bdevHTML(p):`<p class="muted">Le devis est lu tel qu'il est présenté : titres de phase et d'activité, puis lignes avec unité, quantité, fréquence et prix unitaire. Les sous-totaux du fichier servent de contrôle. Rien n'est enregistré avant votre confirmation, et les dépenses ou documents déjà rattachés à l'ancien budget passent sur les nouvelles lignes de votre choix.</p><label for="bdevF">Devis Excel (.xlsx)</label><input id="bdevF" type="file" accept=".xlsx" data-bdevf="${p.id}">`):'<p class="note">Cette fonction demande une mise à jour de la base de données : le script 24 doit d\'abord être exécuté dans Supabase.</p>'}</div></details>`:''}${bdVersionsHTML(p)}</section>
  <section class="card"><h3>Dépenses (${D.length})</h3><p class="muted">Circuit : saisie avec pièce justificative, puis vérification par la comptabilité, puis approbation selon les délégations, puis paiement. Trois personnes différentes au moins ; une dépense approuvée ne se modifie plus, une erreur se corrige par un rejet motivé.</p>
  ${sd&&L.length?`<details ${D.length?'':'open'}><summary><b>Enregistrer une dépense</b></summary><form data-form="svDep" data-p="${p.id}" class="grid" style="margin-top:.6rem;align-items:end">
-  <div style="grid-column:span 2"><label>Ligne budgétaire</label><select name="ligne" required>${opts(L.map(l=>[l.id,`${l.code?l.code+', ':''}${l.libelle} (solde ${num(parL(l).solde)})`]))}</select></div><div><label>Date</label><input name="date_dep" type="date" required max="${today()}"></div>
+  <div style="grid-column:span 2"><label>Ligne budgétaire</label><select name="ligne" required>${opts(L.map(l=>[l.id,`${blNom(l)} (solde ${num(parL(l).solde)})`]))}</select></div><div><label>Date</label><input name="date_dep" type="date" required max="${today()}"></div>
   <div style="grid-column:span 2"><label>Objet de la dépense</label><input name="libelle" required></div><div><label>Fournisseur ou bénéficiaire</label><input name="fournisseur"></div>
   <div><label>Montant (FCFA)</label><input name="montant" type="number" min="1" required></div><div><label>Mode de paiement</label><select name="mode">${opts(Object.entries(MODES),'virement')}</select></div><div><label>N° de pièce (facture, reçu)</label><input name="piece_ref"></div>
   <div style="grid-column:span 2"><label>Pièce justificative (scan ou photo ; peut être jointe plus tard)</label><input name="fichier" type="file" accept=".pdf,.jpg,.jpeg,.png"></div><div><button class="btn sm" type="submit">Enregistrer la dépense</button></div></form></details>`:sd?'<p class="muted">Saisissez d\'abord le budget par ligne pour pouvoir enregistrer des dépenses.</p>':''}
@@ -2978,6 +2976,123 @@ function finRapport(p){const L=lignesP(p),du=finPer.du||'0000',au=finPer.au||'99
  rows.push(['','','TOTAL','',tb,tp,tc,tb-tc,tb?Math.round(tc/tb*1000)/10:''],[],['Dépenses de la période'],['Date','Ligne','Objet','Fournisseur ou bénéficiaire','Montant','Mode de paiement','N° de pièce','Pièce justificative archivée','Statut','Saisie par','Vérifiée par','Approuvée par']);
  D.filter(d=>d.date_dep>=du&&d.date_dep<=au).sort((a,b)=>a.date_dep<b.date_dep?-1:1).forEach(d=>{const l=L.find(x=>x.id===d.ligne_id)||{};rows.push([d.date_dep,l.code||l.libelle,d.libelle,d.fournisseur||'',n(d.montant),MODES[d.mode_paiement],d.piece_ref||'',d.document_id?'Oui':'Non',DEP_ST[d.statut][0],who(d.saisi_par),who(d.verifie_par),who(d.approuve_par)])});
  fichierLien(`Rapport_financier_${nomSur(p.code||p.nom).slice(0,40)}_${today()}.csv`,'﻿'+rows.map(r=>r.map(c).join(';')).join('\r\n'),'text/csv;charset=utf-8');logO('projet',p.id,'Rapport financier téléchargé')}
+
+/* ---------- budget par activité : affichage, lecture d'un devis Excel, remplacement ---------- */
+let finVue='act',BDEV=null;
+const blCtx=l=>l.sous_section||l.section||'';
+const blNom=l=>`${l.code?l.code+' ':''}${blCtx(l)?blCtx(l)+', ':''}${l.libelle}`;
+const blQte=l=>l.quantite!=null&&l.cout_unitaire!=null?num(l.quantite)+(l.frequence!=null&&Number(l.frequence)!==1?' × '+num(l.frequence):'')+' × '+num(l.cout_unitaire):'-';
+function finBudTable(p,L,gb,s,parL){const parAct=finVue==='act'&&L.some(l=>l.section);
+ const tot=ls=>ls.reduce((a,l)=>{const x=parL(l);return [a[0]+Number(l.montant),a[1]+x.r,a[2]+x.e]},[0,0,0]);
+ const tete=(lib,ls,cl)=>{const t=tot(ls);return `<tr class="${cl}"><th colspan="4">${lib}</th><th class="num">${num(t[0])}</th><th class="num">${num(t[1])}</th><th class="num">${num(t[2])}</th><th class="num">${num(t[0]-t[1]-t[2])}</th><th>${t[0]?tx(t[1]/t[0]):'-'}</th>${gb?'<th></th>':''}</tr>`};
+ const ligne=l=>{const x=parL(l),over=x.solde<0;return `<tr><td>${esc(l.code||'')}</td><td>${esc(l.libelle)}${l.unite?`<br><span class="muted">${esc(l.unite)}, ${esc(RUB[l.rubrique]||'')}</span>`:''}</td><td>${esc(SRC[l.source])}</td><td class="num">${blQte(l)}</td><td class="num">${num(l.montant)}</td><td class="num">${num(x.r)}</td><td class="num">${num(x.e)}</td><td class="num">${over?`<span class="tag bad">${num(x.solde)}</span>`:num(x.solde)}</td><td>${Number(l.montant)?tx(x.r/l.montant)+barre(x.r/l.montant,s.att):'-'}</td>${gb?`<td>${D_ref(l)?'':`<button class="btn ghost sm" data-act="ligneSuppr" data-id="${l.id}" aria-label="Supprimer la ligne ${esc(l.libelle)}">Supprimer</button>`}</td>`:''}</tr>`};
+ let corps='';
+ if(parAct){const secs=[...new Set(L.map(l=>l.section||''))];
+  corps=secs.map(sc=>{const ls=L.filter(l=>(l.section||'')===sc),sous=[...new Set(ls.map(l=>l.sous_section||''))];
+   return tete(esc(sc||'Sans section'),ls,'svRub')+sous.map(ss=>{const lss=ls.filter(l=>(l.sous_section||'')===ss);return (ss?tete(esc(ss),lss,'svSous'):'')+lss.map(ligne).join('')}).join('')}).join('')}
+ else{const rubs=[...new Set(L.map(l=>l.rubrique))];corps=rubs.map(rb=>{const ls=L.filter(l=>l.rubrique===rb);return tete(esc(RUB[rb]),ls,'svRub')+ls.map(ligne).join('')}).join('')}
+ const bascule=L.some(l=>l.section)?`<div class="row bdVue" role="group" aria-label="Regrouper le budget"><span class="muted">Regrouper par</span><button class="btn sm ${parAct?'':'ghost'}" data-act="finVue" data-v="act" aria-pressed="${parAct}">Activité</button><button class="btn sm ${parAct?'ghost':''}" data-act="finVue" data-v="nat" aria-pressed="${!parAct}">Nature de dépense</button></div>`:'';
+ return `${bascule}<div class="tbl"><table><thead><tr><th>Code</th><th>Libellé</th><th>Source</th><th class="num">Qté${L.some(l=>l.frequence!=null&&Number(l.frequence)!==1)?' × fréq.':''} × coût unitaire</th><th class="num">Budget</th><th class="num">Réalisé</th><th class="num">Engagé</th><th class="num">Solde</th><th>Consommation</th>${gb?'<th></th>':''}</tr></thead><tbody>${corps}
+  <tr class="svRub"><th colspan="4">Total</th><th class="num">${num(s.budget)}</th><th class="num">${num(s.real)}</th><th class="num">${num(s.engage)}</th><th class="num">${num(s.budget-s.real-s.engage)}</th><th>${tx(s.taux)}</th>${gb?'<th></th>':''}</tr></tbody></table></div>`}
+const D_ref=l=>S.depenses.some(d=>d.ligne_id===l.id);
+
+/* lecture d'un classeur Excel (.xlsx) cellule par cellule */
+const bdNorm=v=>String(v??'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ').trim();
+const bdPropre=t=>{const x=String(t??'').replace(/\s+/g,' ').replace(/\s*:\s*/g,' : ').replace(/\s+,/g,',').trim();return x.charAt(0).toUpperCase()+x.slice(1)};
+const bdNb=v=>{if(typeof v==='number')return v;if(v==null)return null;const t=String(v).replace(/[\s  ]/g,'').replace(',','.');if(t==='')return null;const x=Number(t);return isNaN(x)?null:x};
+async function xlsxGrilles(file){const F=await zipLire(await file.arrayBuffer());if(!F['xl/workbook.xml'])throw new Error(file.name+' : ce n\'est pas un classeur Excel (.xlsx). Un ancien .xls s\'enregistre d\'abord en .xlsx.');
+ const ss=F['xl/sharedStrings.xml']?[...(await F['xl/sharedStrings.xml']()).matchAll(/<si>([\s\S]*?)<\/si>/g)].map(m=>xmlTxt(m[1].replace(/<rPh[\s\S]*?<\/rPh>/g,''))):[];
+ const col=r=>{let n=0;for(const ch of r)n=n*26+ch.charCodeAt(0)-64;return n-1},out=[];
+ for(const k of Object.keys(F).filter(k=>/^xl\/worksheets\/sheet\d+\.xml$/.test(k)).sort((a,b)=>parseInt(a.match(/\d+/))-parseInt(b.match(/\d+/)))){const x=await F[k](),rows=[];
+  for(const r of x.matchAll(/<row\b[^>]*>([\s\S]*?)<\/row>/g)){const row=[],t=r[1],re=/<c\b([^>]*)>/g;let m;
+   while((m=re.exec(t))){const at=m[1],ref=(at.match(/r="([A-Z]+)\d+"/)||[])[1];let body='';if(!at.endsWith('/')){const e=t.indexOf('</c>',re.lastIndex);body=e<0?'':t.slice(re.lastIndex,e);if(e>=0)re.lastIndex=e+4}
+    if(!ref)continue;const v=(body.match(/<v>([\s\S]*?)<\/v>/)||[])[1],is=(body.match(/<is>([\s\S]*?)<\/is>/)||[])[1];let val=null;
+    if(/t="s"/.test(at)&&v!=null)val=ss[Number(v)]??'';else if(is!=null)val=xmlTxt(is);else if(/t="(str|e)"/.test(at))val=v!=null?xmlTxt(v):null;else if(v!=null&&v!=='')val=Number(v);
+    row[col(ref)]=val}
+   rows.push(row)}
+  out.push(rows)}
+ return out}
+function rubDevine(lib,ctx){const x=bdNorm(lib),c=bdNorm(ctx);
+ if(/\brapport|livrable/.test(x))return 'services';
+ if(/personnel de mission|^mission|vehicule|carburant|peage|transport|deplacement|per ?diem|hebergement|billet/.test(x))return 'deplacements';
+ if(/chef de mission|specialiste|charge de|expert|coordonnat|assistant|animat|superviseur|consultant/.test(x)||(/personnel/.test(c)&&!/mission/.test(x)))return 'personnel';
+ if(/spot|radio|griot|communication|affiche|banderole|tee-?shirt|polo|casquette|badge|chasuble|pancarte|pencarte|film|gadget|depliant|crieur|visibilite/.test(x))return 'communication';
+ if(/preservatif|phallus|vaccin|casque|reprographie|fourniture|\bkit|medicament|consommable/.test(x))return 'fournitures';
+ if(/enqueteur|enquete|maitre de ceremonie|prestat/.test(x))return 'services';
+ return 'activites'}
+/* Devis structuré : titres de section (Phase…), sous-sections, lignes chiffrées, sous-totaux de contrôle */
+function devisLire(grilles){
+ for(const rows of grilles){const hi=rows.findIndex(r=>r&&r.some(c=>/prix unitaire|cout unitaire/.test(bdNorm(c))));if(hi<0)continue;
+  const H=[...rows[hi]].map(bdNorm),cherche=re=>H.findIndex(h=>h&&re.test(h));
+  const cPU=cherche(/prix unitaire|cout unitaire/),cQ=cherche(/quantit|^qte/),cF=cherche(/frequen|nombre de fois/),cU=cherche(/^unite|^unit/),cM=cherche(/montant|^total/);
+  let cL=cherche(/activit|libell|designation|description|intitule|poste|rubrique/);if(cL<0)cL=Math.min(...[cU,cQ].filter(x=>x>=0))-1;
+  if(cQ<0||cL<0)continue;
+  const L=[],ctl=[],avert=[];let sec='',sous='',phase=false;
+  for(let i=hi+1;i<rows.length;i++){const r=rows[i]||[],lib=bdPropre(r[cL]);if(!lib)continue;const n=bdNorm(lib);
+   const q=bdNb(r[cQ]),pu=bdNb(r[cPU]),f=cF>=0?bdNb(r[cF]):null,mt=cM>=0?bdNb(r[cM]):null;
+   if(/^(sous[ -]?total|total)\b/.test(n)){const tout=/^total( general)?$/.test(n);ctl.push({lib,attendu:mt,portee:tout?'tout':(sous&&!/phase/.test(n)?'sous':'sec'),sec,sous,ligne:i+1});if(/phase/.test(n)){phase=false;sous=''}continue}
+   if(q!=null&&pu!=null){const fr=f==null?1:f,m=Math.round(q*fr*pu);
+    L.push({section:sec,sous_section:sous,libelle:lib,unite:String(r[cU]??'').trim(),quantite:q,frequence:fr,cout_unitaire:pu,montant:m,rubrique:rubDevine(lib,sec+' '+sous),source:'bailleur'});
+    if(mt!=null&&Math.abs(mt-m)>=1)avert.push(`« ${lib} » (ligne ${i+1}) : le fichier indique ${num(mt)} FCFA, le calcul quantité × fréquence × prix unitaire donne ${num(m)} FCFA. C'est le calcul qui est retenu.`);continue}
+   if(q==null&&pu==null){if(/^phase\b/.test(n)){sec=lib;sous='';phase=true}else if(phase)sous=lib;else{sec=lib;sous=''}continue}
+   avert.push(`« ${lib} » (ligne ${i+1}) : quantité ou prix unitaire manquant, ligne ignorée.`)}
+  if(!L.length)continue;
+  const secs=[...new Set(L.map(l=>l.section))];L.forEach(l=>{const si=secs.indexOf(l.section)+1,ssl=[...new Set(L.filter(x=>x.section===l.section&&x.sous_section).map(x=>x.sous_section))],ssi=l.sous_section?ssl.indexOf(l.sous_section)+1:0,
+   rang=L.filter(x=>x.section===l.section&&x.sous_section===l.sous_section).indexOf(l)+1;l.code=ssi?`${si}.${ssi}.${rang}`:`${si}.${rang}`});
+  ctl.forEach(c=>{c.calcule=somme(L.filter(l=>c.portee==='tout'||(l.section===c.sec&&(c.portee==='sec'||l.sous_section===c.sous))),l=>l.montant)});
+  return {lignes:L,ctl,avert}}
+ throw new Error('Aucun tableau de devis trouvé : le fichier doit avoir une ligne de titres avec au moins « Quantité » et « Prix unitaire ».')}
+const bdMots=t=>new Set(bdNorm(t).split(/[^a-z0-9]+/).filter(w=>w.length>2&&!['des','les','pour','une','aux','par','avec','dans'].includes(w)));
+function bdSuggere(o,L){let best=0,sc=-1;const a=bdMots(o.libelle);L.forEach((l,i)=>{const b=bdMots(l.libelle+' '+(l.sous_section||'')),inter=[...a].filter(w=>b.has(w)).length,v=inter/(new Set([...a,...b]).size||1)+(l.rubrique===o.rubrique?.4:0)+(bdNorm(l.libelle)===bdNorm(o.libelle)?1:0);if(v>sc){sc=v;best=i}});return best}
+async function bdevCharger(p,file){const r=devisLire(await xlsxGrilles(file));let refs=[];
+ try{refs=(await rpc('budget_references',{p:p.id})||[]).filter(x=>x.depenses+x.tdrs+x.missions+x.avances+x.achats+x.contrats+x.affectations>0)}catch(e){throw new Error('Le serveur ne connaît pas encore le remplacement de budget : le script 24 doit être exécuté dans Supabase.')}
+ const anc=lignesP(p),corr={};refs.forEach(x=>{const o=anc.find(l=>l.id===x.ligne_id);if(o)corr[o.id]=bdSuggere(o,r.lignes)});
+ BDEV={pid:p.id,fichier:file.name,...r,refs,corr,motif:'',okTotal:false}}
+const bdRefLib=x=>[['depenses','dépense'],['tdrs','TDR'],['missions','ordre de mission'],['avances','avance'],['achats','achat'],['contrats','contrat'],['affectations','affectation']].filter(([k])=>x[k]).map(([k,l])=>`${x[k]} ${l}${x[k]>1&&!/TDR/.test(l)?'s':''}`).join(', ');
+function bdevHTML(p){const B=BDEV,L=B.lignes,tot=somme(L,l=>l.montant),act=somme(lignesP(p),l=>Number(l.montant)),ecart=tot-act,anc=lignesP(p);
+ const ctlOK=B.ctl.filter(c=>c.attendu!=null&&Math.abs(c.attendu-c.calcule)<1).length,ctlKO=B.ctl.filter(c=>c.attendu!=null&&Math.abs(c.attendu-c.calcule)>=1);
+ const secs=[...new Set(L.map(l=>l.section))];
+ return `<div class="bdev" id="bdevZone"><h4>Aperçu du devis « ${esc(B.fichier)} »</h4>
+ <div class="kpis"><div class="kpi"><span>Lignes lues</span><b>${L.length}</b><span>${secs.length} section(s)</span></div><div class="kpi"><span>Total du devis</span><b>${num(tot)}</b><span>FCFA</span></div><div class="kpi"><span>Budget actuel</span><b>${num(act)}</b><span>FCFA, ${anc.length} ligne(s)</span></div><div class="kpi"><span>Écart</span><b>${ecart?(ecart>0?'+':'')+num(ecart):'0'}</b><span>${ecart?'FCFA':'montant global inchangé'}</span></div></div>
+ ${ecart?`<p class="note" role="alert">Le total du devis diffère du budget actuel de ${num(Math.abs(ecart))} FCFA (${ecart>0?'en plus':'en moins'}). Vérifiez avant de remplacer : si c'est voulu, cochez la confirmation plus bas.</p>`:''}
+ <p class="muted">Contrôle des sous-totaux du fichier : ${ctlOK} sur ${B.ctl.filter(c=>c.attendu!=null).length} concordent avec le calcul ligne par ligne.</p>
+ ${ctlKO.length?`<ul class="bdAvert">${ctlKO.map(c=>`<li>« ${esc(c.lib)} » : le fichier indique ${num(c.attendu)} FCFA, les lignes au-dessus totalisent ${num(c.calcule)} FCFA.</li>`).join('')}</ul>`:''}
+ ${B.avert.length?`<ul class="bdAvert">${B.avert.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>`:''}
+ <p class="muted">Libellé et nature de dépense restent modifiables ici avant l'enregistrement. La nature est proposée d'après le libellé.</p>
+ <div class="tbl"><table><thead><tr><th>Code</th><th>Libellé</th><th>Unité</th><th class="num">Qté × fréq. × PU</th><th class="num">Montant</th><th>Nature de dépense</th></tr></thead><tbody>
+ ${secs.map(sc=>{const ls=L.filter(l=>l.section===sc),sous=[...new Set(ls.map(l=>l.sous_section))];return `<tr class="svRub"><th colspan="4">${esc(sc||'Sans section')}</th><th class="num">${num(somme(ls,l=>l.montant))}</th><th></th></tr>`+
+  sous.map(ss=>{const lss=ls.filter(l=>l.sous_section===ss);return (ss?`<tr class="svSous"><th colspan="4">${esc(ss)}</th><th class="num">${num(somme(lss,l=>l.montant))}</th><th></th></tr>`:'')+lss.map(l=>{const i=L.indexOf(l);
+   return `<tr><td>${esc(l.code)}</td><td><input data-bdl="${i}" value="${esc(l.libelle)}" aria-label="Libellé de la ligne ${esc(l.code)}"></td><td>${esc(l.unite)}</td><td class="num">${num(l.quantite)} × ${num(l.frequence)} × ${num(l.cout_unitaire)}</td><td class="num">${num(l.montant)}</td><td><select data-bdr="${i}" aria-label="Nature de dépense de la ligne ${esc(l.code)}">${opts(Object.entries(RUB),l.rubrique)}</select></td></tr>`}).join('')}).join('')}).join('')}
+ <tr class="svRub"><th colspan="4">Total</th><th class="num">${num(tot)}</th><th></th></tr></tbody></table></div>
+ ${B.refs.length?`<h4>Ce qui est déjà rattaché à l'ancien budget</h4><p class="muted">Ces anciennes lignes portent déjà des dépenses ou des documents. Choisissez pour chacune la nouvelle ligne qui les reprend : rien n'est perdu, et chaque transfert est inscrit au journal d'audit. Une proposition est faite d'après les libellés ; vérifiez-la.</p>
+ <div class="tbl"><table><thead><tr><th>Ancienne ligne</th><th>Déjà rattaché</th><th>Nouvelle ligne</th></tr></thead><tbody>${B.refs.map(x=>{const o=anc.find(l=>l.id===x.ligne_id)||{};return `<tr><td>${esc(blNom(o))}<br><span class="muted">${num(o.montant)} FCFA</span></td><td>${esc(bdRefLib(x))}</td><td><select data-bdc="${o.id}" aria-label="Nouvelle ligne pour ${esc(o.libelle||'')}">${L.map((l,i)=>`<option value="${i}"${B.corr[o.id]===i?' selected':''}>${esc(l.code+' '+(l.sous_section||l.section)+', '+l.libelle)}</option>`).join('')}</select></td></tr>`}).join('')}</tbody></table></div>`:'<p class="muted">Aucune dépense ni aucun document n\'est encore rattaché à l\'ancien budget : il est simplement remplacé.</p>'}
+ <div class="grid" style="align-items:end;margin-top:.6rem"><div style="grid-column:span 2"><label for="bdMotif">Motif du remplacement (inscrit au journal d'audit)</label><input id="bdMotif" data-bdm="1" value="${esc(B.motif)}" placeholder="ex. Réorganisation du budget par activité, à montant global inchangé"></div>
+ ${ecart?`<div style="grid-column:1/-1"><label class="row" style="gap:.4rem"><input type="checkbox" data-bdt="1"${B.okTotal?' checked':''}> Je confirme que le montant global passe de ${num(act)} à ${num(tot)} FCFA.</label></div>`:''}
+ <div class="row" style="gap:.5rem"><button class="btn" data-act="bdevOk" data-id="${p.id}">Remplacer le budget</button><button class="btn ghost" data-act="bdevAnnul">Annuler</button></div></div>
+ <p class="legend">L'ancien budget est gardé dans l'historique des versions du projet.</p></div>`}
+function bdVersionsHTML(p){const V=(S.bversions||[]).filter(v=>v.projet_id===p.id);if(!V.length)return '';
+ return `<details style="margin-top:.6rem"><summary>Versions précédentes du budget (${V.length})</summary>${svT(['Remplacée le','Par','#Total','Lignes','Motif',''],V.map(v=>[fmtD(String(v.le).slice(0,10)),esc(who(v.par)),num(v.total),String((v.lignes||[]).length),esc(v.motif||''),`<button class="btn ghost sm" data-act="bdVersionDl" data-id="${v.id}">Télécharger (Excel)</button>`]))}</details>`}
+document.addEventListener('input',e=>{if(!BDEV)return;const t=e.target;if(t.dataset.bdl!=null)BDEV.lignes[+t.dataset.bdl].libelle=t.value;else if(t.dataset.bdm)BDEV.motif=t.value},true);
+document.addEventListener('change',async e=>{const t=e.target;
+ if(t.dataset&&t.dataset.bdevf){const f=t.files&&t.files[0];if(!f)return;const p=projet(t.dataset.bdevf);t.disabled=true;
+  try{await bdevCharger(p,f);render();const z=document.getElementById('bdevZone');if(z)z.scrollIntoView({block:'start'})}catch(err){alert(err.message||String(err));t.disabled=false;t.value=''}return}
+ if(!BDEV)return;if(t.dataset.bdr!=null)BDEV.lignes[+t.dataset.bdr].rubrique=t.value;else if(t.dataset.bdc)BDEV.corr[t.dataset.bdc]=+t.value;else if(t.dataset.bdt)BDEV.okTotal=t.checked},true);
+document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+ if(!['finVue','bdevOk','bdevAnnul','bdVersionDl'].includes(a))return;e.preventDefault();e.stopImmediatePropagation();
+ if(a==='finVue'){finVue=b.dataset.v;render();return}
+ if(a==='bdevAnnul'){BDEV=null;render();return}
+ if(a==='bdVersionDl'){const v=(S.bversions||[]).find(x=>x.id===b.dataset.id),p=v&&projet(v.projet_id);if(!v)return;const c=x=>'"'+String(x??'').replace(/"/g,'""')+'"';
+  const rows=[[S.org.nom],['Budget remplacé le',String(v.le).slice(0,10),'par',who(v.par)],['Projet',p?p.nom:''],['Motif',v.motif||''],[],['Code','Section','Sous-section','Nature','Libellé','Unité','Quantité','Fréquence','Prix unitaire','Montant']]
+   .concat((v.lignes||[]).map(l=>[l.code||'',l.section||'',l.sous_section||'',RUB[l.rubrique]||l.rubrique,l.libelle,l.unite||'',l.quantite??'',l.frequence??'',l.cout_unitaire??'',Math.round(Number(l.montant)||0)]),[['','','','','TOTAL','','','','',Math.round(Number(v.total)||0)]]);
+  fichierLien(`Budget_precedent_${nomSur((p&&(p.code||p.nom))||'projet').slice(0,40)}_${String(v.le).slice(0,10)}.csv`,'﻿'+rows.map(r=>r.map(c).join(';')).join('\r\n'),'text/csv;charset=utf-8');return}
+ if(a==='bdevOk'){const B=BDEV,p=projet(b.dataset.id);if(!B||!p)return;const tot=somme(B.lignes,l=>l.montant),act=somme(lignesP(p),l=>Number(l.montant));
+  if(!B.motif.trim()){alert('Indiquez le motif du remplacement : il est inscrit au journal d\'audit.');document.getElementById('bdMotif').focus();return}
+  if(tot!==act&&!B.okTotal){alert('Le montant global change : cochez la confirmation, ou corrigez le devis.');return}
+  if(B.lignes.some(l=>!l.libelle.trim())){alert('Une ligne n\'a plus de libellé.');return}
+  if(!confirm(`Remplacer les ${lignesP(p).length} lignes actuelles par les ${B.lignes.length} lignes du devis (${num(tot)} FCFA) ?`))return;
+  const lignes=B.lignes.map(l=>({code:l.code,section:l.section,sous_section:l.sous_section,rubrique:l.rubrique,libelle:l.libelle.trim(),unite:l.unite,quantite:l.quantite,frequence:l.frequence,cout_unitaire:l.cout_unitaire,source:l.source}));
+  action(async()=>{await rpc('budget_remplacer',{p:p.id,lignes,corresp:B.corr,motif:B.motif.trim()});BDEV=null;finVue='act'},`Budget remplacé : ${B.lignes.length} lignes, ${num(tot)} FCFA.`);return}
+},true);
 
 /* ---------- formulaires et actions ---------- */
 function rubDe(t){const x=String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();if(!x)return 'autre';
@@ -4988,7 +5103,7 @@ function omForm(t,m){if(!p07)return '';t=t||{};const tous=gAdm()||['DP','CP'].in
  <div style="grid-column:span 2"><label>Objet de la mission</label><input name="objet" required value="${esc(V.objet)}" placeholder="ex. Sensibilisation des riverains du chantier"></div>
  <div><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),V.projet||'','Hors projet')}</select></div>
  <div style="grid-column:span 2"><label>Activité du cadre logique</label><select name="activite">${opts(acts.map(a=>[a.id,`${(projet(a.projet_id)||{}).code||''}, ${a.code?a.code+' ':''}${a.libelle}`.slice(0,140)]),V.activite||'','Aucune')}</select></div>
- <div style="grid-column:span 2"><label>Ligne budgétaire imputée</label><select name="ligne">${opts(S.blignes.filter(l=>proj.some(p=>p.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''}, ${l.code?l.code+' ':''}${l.libelle}`.slice(0,140)]),V.ligne||'','À préciser par la comptabilité')}</select></div>
+ <div style="grid-column:span 2"><label>Ligne budgétaire imputée</label><select name="ligne">${opts(S.blignes.filter(l=>proj.some(p=>p.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''}, ${blNom(l)}`.slice(0,140)]),V.ligne||'','À préciser par la comptabilité')}</select></div>
  ${h('2. Missionnaires')}
  <div><label>Chef de mission</label><select name="agent" required>${opts(ag.map(u=>[u.id,`${u.nom} (${posteLib(u)})`]),V.agent)}</select></div>
  <div style="grid-column:span 2"><label>Autres membres d'OSV</label><div class="domChk" style="max-height:9rem;overflow:auto;border:1px solid var(--line,#ccc);padding:.3rem .5rem;border-radius:6px">${autres.map(u=>`<label style="display:block;font-weight:normal"><input type="checkbox" name="membres" value="${u.id}"${coches.has(u.id)?' checked':''}> ${esc(u.nom)} <span class="muted">, ${esc(posteLib(u))}</span></label>`).join('')}</div></div>
@@ -5849,7 +5964,7 @@ function tdrEditeur(t){t=t||{};if(tdrPre&&tdrPre._pour===(t.id||'new'))t={...t,.
  <div><label>Projet</label><select name="projet">${opts(proj.map(p=>[p.id,libProj(p)]),t.projet_id||'','Hors projet')}</select></div>
  ${p20?`<div style="grid-column:span 2"><label>Sous-projet ou volet</label><input name="det_sous_projet" value="${esc(D.sous_projet||'')}" placeholder="ex. Campagne de sensibilisation sur les IST, le VIH/sida et la sécurité routière"></div>`:''}
  <div style="grid-column:span 2"><label>Activité du cadre logique</label><select name="activite">${opts(acts.map(a=>[a.id,`${(projet(a.projet_id)||{}).code||''}, ${a.code?a.code+' ':''}${a.libelle}`.slice(0,140)]),t.activite_id||'','Aucune')}</select></div>
- <div style="grid-column:span 2"><label>Ligne budgétaire</label><select name="ligne">${opts(S.blignes.filter(l=>proj.some(p=>p.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''}, ${l.code?l.code+' ':''}${l.libelle}`.slice(0,140)]),t.ligne_id||'','À préciser')}</select></div>
+ <div style="grid-column:span 2"><label>Ligne budgétaire</label><select name="ligne">${opts(S.blignes.filter(l=>proj.some(p=>p.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''}, ${blNom(l)}`.slice(0,140)]),t.ligne_id||'','À préciser')}</select></div>
  <div><label>Destination (ville)</label><input name="destination" value="${esc(t.destination||'')}" placeholder="ex. Kong"></div>
  ${p20?`<div style="grid-column:span 2"><label>Lieu des activités (détail)</label><input name="det_lieu" value="${esc(D.lieu||'')}" placeholder="ex. Kong, bureaux d'EBOMAF (réunion le 26/10/2026)"></div>`:''}
  <div><label>Du</label><input name="date_debut" type="date" value="${t.date_debut||''}"></div><div><label>Au</label><input name="date_fin" type="date" value="${t.date_fin||''}"></div>
@@ -5986,7 +6101,7 @@ function ctrEditeur(c){const pre=ctrPre||{};c=c||{type:'prestation',preavis_jour
  <h3 style="grid-column:1/-1">La mission</h3>
  <div style="grid-column:span 2"><label>Fiche de poste</label><select name="fiche_code">${opts(FICHES.map(f=>[f.code,f.intitule]),c.fiche&&c.fiche.code||'','Sans fiche de poste')}</select></div><div style="grid-column:span 2"><button type="button" class="btn ghost sm" data-act="ctrFiche">Remplir la qualité, les tâches et les livrables depuis la fiche</button></div>
  <div style="grid-column:span 2"><label>Projet</label><select name="projet_id">${opts(proj.map(x=>[x.id,libProj(x)]),c.projet_id||'','Hors projet')}</select></div>
- <div style="grid-column:span 2"><label>Ligne budgétaire</label><select name="ligne_id">${opts(S.blignes.filter(l=>proj.some(x=>x.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''}, ${l.code?l.code+' ':''}${l.libelle}`.slice(0,140)]),c.ligne_id||'','À préciser')}</select></div>
+ <div style="grid-column:span 2"><label>Ligne budgétaire</label><select name="ligne_id">${opts(S.blignes.filter(l=>proj.some(x=>x.id===l.projet_id)).map(l=>[l.id,`${(projet(l.projet_id)||{}).code||''}, ${blNom(l)}`.slice(0,140)]),c.ligne_id||'','À préciser')}</select></div>
  <div style="grid-column:1/-1"><label>Objet du contrat</label><input name="objet" required value="${esc(c.objet||'')}" placeholder="ex. Coordination de la mission d'appui socio-environnemental du chantier de l'aéroport de Kong"></div>
  <div style="grid-column:1/-1"><label>Tâches et responsabilités : une par ligne</label><textarea name="taches" rows="6" placeholder="ex. Coordonner l'équipe et la planification des activités">${esc(c.taches||'')}</textarea>${p?`<button type="button" class="lnk" data-act="ctrActs" style="margin-top:.3rem">Insérer les activités du cadre logique de ce projet</button>`:''}</div>
  <div style="grid-column:1/-1"><label>Livrables : un par ligne, « livrable ; échéance (jj/mm/aaaa) »</label><textarea name="livrables" rows="3" placeholder="Rapport de démarrage ; 10/11/2026&#10;Rapport final ; 05/12/2026">${esc((c.livrables||[]).map(l=>`${l.libelle} ; ${l.echeance?fmtD(l.echeance):''}`).join('\n'))}</textarea></div>
