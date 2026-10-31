@@ -830,6 +830,24 @@ small,.muted small,.pa-bas,.bande-date,.tb-leg,.pfCode,.tb-date,.trPb,.nav-g{fon
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 @media print{.navBas,.toast,.menuFond{display:none!important}}
 </style>
+<style id="compact">
+/* Écran plus compact : textes un peu plus petits, menu de gauche plus étroit, espace de travail plus large */
+@media screen{
+html{font-size:15px}
+body{font-size:14px!important;line-height:1.5}
+.srvNav button{font-size:13px!important;min-height:38px;padding-top:.35rem!important;padding-bottom:.35rem!important}
+main{max-width:1480px!important;padding:1.4rem clamp(1rem,2.4vw,2.2rem) 3rem!important}
+main .head h1,main>h1{font-size:1.55rem!important;line-height:1.25}
+main h2{font-size:1.2rem}
+main h3{font-size:1.02rem}
+.card{padding:1rem 1.1rem}
+.kpi b{font-size:1.5rem}
+td,th{font-size:13px}
+.muted,.legend,.tag,.badge,small,label,.kpi span,.tb-v,td .muted{font-size:max(12px,.8rem)!important}
+}
+@media screen and (min-width:861px){.shell:not(.rail-mini){grid-template-columns:200px minmax(0,1fr)}.rail{font-size:13px}.rail .srvNav button,.rail nav button{font-size:13px!important}}
+@media screen and (max-width:860px){main{padding:1rem .8rem 6rem!important}}
+</style>
 </head>
 <body>
 <div id="root"></div>
