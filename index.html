@@ -831,6 +831,7 @@ small,.muted small,.pa-bas,.bande-date,.tb-leg,.pfCode,.tb-date,.trPb,.nav-g{fon
 @media print{.navBas,.toast,.menuFond{display:none!important}}
 </style>
 <style id="compact">
+.pol-texte h3{font-size:1.05rem;color:var(--brand);margin:1.4rem 0 .5rem}.pol-texte h4{font-size:.98rem;margin:1rem 0 .35rem}
 /* pied de page distinct du fond : bleu discret, liseré bleu, vert et jaune */
 :root{--pied:#E4ECF5;--pied-ink:#2A3442}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--pied:#1A222D;--pied-ink:#C9D2DE}}
@@ -1768,7 +1769,7 @@ function polLecture(d){const v=vCour(d),req=polDoitConfirmer(d),ac=polAccuse(d,m
   <div class="facts"><div><span>Version</span><b>${esc(v.v)}</b></div><div><span>Approuvée le</span><b>${fmtD(v.dateApp)}</b></div><div><span>En vigueur depuis</span><b>${fmtD(v.dateEffet||v.publieLe)}</b></div><div><span>Prochaine révision</span><b>${fmtD(v.dateRev)}</b></div><div><span>Responsable</span><b>${esc(d.responsable||'-')}</b></div><div><span>Accès</span><b>${POL_NIV[d.niveau]}</b></div></div>
   ${d.description?`<p>${esc(d.description)}</p>`:''}
   ${v.fichier?`<div class="pol-file"><div><b>${esc(v.fichier.nom)}</b><br><span class="muted">${taille(v.fichier.taille)}</span></div><div class="row">${/pdf/i.test(v.fichier.type)?`<button class="btn ghost sm" data-act="polVoirPdf" data-id="${d.id}">Afficher le PDF</button>`:''}${d.dl?`<button class="btn sm" data-act="polDl" data-id="${d.id}">Télécharger</button>`:'<span class="tag">Consultation seule, téléchargement non autorisé</span>'}</div></div><div id="pdfZone"></div>`:''}
-  ${v.texte?`<div class="pol-texte">${LN(v.texte).map(t=>`<p>${esc(t)}</p>`).join('')}</div>`:''}
+  ${v.texte?`<div class="pol-texte">${LN(v.texte).map(t=>/^\d+\. \S/.test(t)&&t===t.toUpperCase()?`<h3>${esc(t)}</h3>`:/^\d+\.\d+ \S/.test(t)?`<h4>${esc(t)}</h4>`:`<p>${esc(t)}</p>`).join('')}</div>`:''}
   ${!v.texte&&!v.fichier?'<p class="empty">Aucun contenu.</p>':''}
   ${!v.fichier&&v.texte&&d.dl?`<p><button class="btn ghost sm" data-act="polDl" data-id="${d.id}">Télécharger (document Word)</button></p>`:''}
  </article>
