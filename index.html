@@ -831,6 +831,7 @@ small,.muted small,.pa-bas,.bande-date,.tb-leg,.pfCode,.tb-date,.trPb,.nav-g{fon
 @media print{.navBas,.toast,.menuFond{display:none!important}}
 </style>
 <style id="compact">
+.caListe{list-style:none;margin:.7rem 0 0;padding:0;display:grid;gap:.75rem}.caL-t{display:flex;justify-content:space-between;gap:.6rem;font-size:.92rem}.caL-t b{white-space:nowrap}.caL-s{display:flex;justify-content:space-between;align-items:center;gap:.5rem;font-size:max(12px,.8rem);color:var(--muted);margin-top:.25rem}
 /* Écran plus compact : textes un peu plus petits, menu de gauche plus étroit, espace de travail plus large */
 @media screen{
 html{font-size:15px}
@@ -2146,7 +2147,7 @@ async function authRefresh(){const s=sess;if(!s)return;sess=null;
 async function authLogout(){try{if(sess)await api('/auth/v1/logout',{method:'POST'})}catch(e){}sessEcrire(null)}
 
 /* ---------- chargement des données autorisées ---------- */
-function srvVide(){return {courriers:[],org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],bversions:[],retards:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],veille:[],opps:[],journal:[],capis:[],iaUsage:[],outils:[],fterrain:[],refs:[],microplans:[],rterrain:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
+function srvVide(){return {courriers:[],org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],bversions:[],retards:[],cibles:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],veille:[],opps:[],journal:[],capis:[],iaUsage:[],outils:[],fterrain:[],refs:[],microplans:[],rterrain:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
 async function srvLoad(){
  const uid=sess.user.id,mine=await sel('membres',`select=*&user_id=eq.${uid}&actif=is.true`);
  const m=(mine||[]).find(x=>!x.fin_acces||x.fin_acces>=today());
@@ -2182,7 +2183,7 @@ async function srvLoad(){
  const T18=await opt(sel('courriers',f+'&order=cree_le.desc&limit=3000'));p18=T18!==null;N.courriers=T18||[];
  const T22=await Promise.all([sel('rapports_activite',f+'&order=cree_le.desc'),sel('pieces_justificatives',f+'&order=cree_le'),sel('rapport_avis',f+'&order=le'),sel('rapport_reglages',f)].map(opt));p22=T22[0]!==null;N.rapports=T22[0]||[];N.rpieces=T22[1]||[];N.ravis=T22[2]||[];N.rreg=(T22[3]||[])[0]||null;
  const T15=await Promise.all([sel('veille_notes',f+'&order=date_evt.desc&limit=3000'),sel('opportunites',f+'&order=cree_le.desc')].map(opt));p15=T15[0]!==null;N.veille=T15[0]||[];N.opps=T15[1]||[];
- const T12=await Promise.all([sel('outils_collecte',f+'&order=cree_le'),sel('fiches_terrain',f+'&order=date_activite.desc,saisi_le.desc&limit=10000'),sel('references_communautaires',f+'&order=date_reference.desc&limit=10000'),sel('microplans',f),sel('rapports_terrain',f+'&order=mois.desc')].map(opt));p12=T12[0]!==null;[N.outils,N.fterrain,N.refs,N.microplans,N.rterrain]=T12.map(x=>x||[]);
+ const T12=await Promise.all([sel('outils_collecte',f+'&order=cree_le'),sel('fiches_terrain',f+'&order=date_activite.desc,saisi_le.desc&limit=10000'),sel('references_communautaires',f+'&order=date_reference.desc&limit=10000'),sel('microplans',f),sel('rapports_terrain',f+'&order=mois.desc')].map(opt));p12=T12[0]!==null;[N.outils,N.fterrain,N.refs,N.microplans,N.rterrain]=T12.map(x=>x||[]);{const T26=p12?await opt(sel('cibles_agents',f)):null;p26=T26!==null;N.cibles=T26||[]}
  [N.comptes,N.mouvements,N.rapprochements,N.avances,N.fournisseurs,N.seuilsAchat,N.achats,N.devis,N.baremes,N.missions,N.biens,N.inventaires,N.pcomptes,N.correspondances,N.invLignes]=T6.map(x=>x||[]);
  S=N;me=S.staff.find(x=>x.id===uid);
  Object.keys(ROLES).forEach(k=>ROLES[k].nav=srvNav(k));
@@ -2205,7 +2206,7 @@ async function action(fn,msg){if(srvBusy)return;srvBusy=true;document.body.class
 function srvHome(){const n=ROLES[me.role].nav,pa=polEnAttente().length;
  const D={courriers:'Lettres aux autorités et aux communautés : rédigées automatiquement, signées et numérotées',veille:'Alertes, opportunités, besoins des communautés et leçons tirés des activités : réservé à la direction',journal:'Réunions, visites et missions : dictées, comptes rendus rédigés automatiquement, capitalisation',terrain:'Fiches d\'activité, listes de présence, références, microplans et rapports des agents communautaires',adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',rapports:'Rapport de chaque activité : volet programmatique validé par le DP, volet financier vérifié par la comptabilité et approuvé par la RAF',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
  return accHero()+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+notifBox()+
- (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():(p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:'')+bilanHTML())+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
+ (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():(p26&&caCibles({id:null}).length===0&&(S.cibles||[]).some(c=>c.agent_id===me.id)?bilanHTML()+(p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:''):(p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:'')+bilanHTML()))+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
  `${['DE','DP','CA'].includes(me.role)&&p03?'':accTableauBord()}
  ${srvRecup?'<p class="note" role="alert">Lien de réinitialisation accepté : choisissez maintenant votre nouveau mot de passe ci-dessous.</p>':''}<details class="card" style="margin-top:1.5rem" ${srvRecup?'open':''}><summary><b>Mon compte</b> <span class="muted">, ${esc(sess.user.email)}</span></summary>
   <form data-form="srvPwd" class="grid" style="margin-top:.8rem;align-items:end"><div><label for="np1">Nouveau mot de passe (12 caractères au moins)</label><input id="np1" name="p1" type="password" minlength="12" autocomplete="new-password" required></div>
@@ -2557,10 +2558,10 @@ function bzAvances(){if(!['RA','CPT','DE'].includes(me.role)||!(S.avances||[]).l
 function bzPieces(){if(!['RA','CPT','DE'].includes(me.role)||typeof p22==='undefined'||!p22)return '';const L=S.rpieces||[];if(!L.length)return '';const c=k=>L.filter(p=>p.statut===k).length;
  return vzCarte('Pièces justificatives',`${num(L.length)} pièce(s)`,vzDonut([{v:c('acceptee'),l:'Acceptées',c:VZ_C[0]},{v:c('soumise'),l:'À vérifier',c:VZ_C[1]},{v:c('rejetee'),l:'Rejetées',c:VZ_C[3]}],{sous:'pièces',aria:'Pièces justificatives'}),`<button class="lnk" data-act="go" data-v="rapports">Voir les rapports</button>`)}
 function bilanHTML(){if(!me)return '';const r=me.role,pil=['DE','DP','CA'].includes(r);
- const B=pil?[bzPlan(),bzIndic(),bzProjets(),bzTerrain(),bzRapports(),bzBudget(),bzMissions()]
+ const B=pil?[bzPlan(),bzIndic(),bzProjets(),bzTerrain(),bzPerfEquipe(),bzRapports(),bzBudget(),bzMissions()]
   :['RA','CPT'].includes(r)?[bzAvances(),bzPieces(),bzRapports(),bzBudget(),bzMissions()]
-  :['CP','SE','LECT'].includes(r)?[bzTerrain(),bzFiches(),bzIndic(),bzRapports(),bzMissions()]
-  :[bzTerrain(),bzFiches(),bzRapports(),bzMissions()];
+  :['CP','SE','LECT'].includes(r)?[bzPerfEquipe(),bzTerrain(),bzFiches(),bzIndic(),bzRapports(),bzMissions()]
+  :[bzPerfAgent(),bzPerfEquipe(),bzTerrain(),bzFiches(),bzRapports(),bzMissions()];
  const L=B.filter(Boolean);if(!L.length)return '';
  return `<h2 class="vz-titre">Bilan</h2><div class="vz-grille">${L.join('')}</div>`}
 
@@ -2901,7 +2902,7 @@ const DEP_ST={saisie:['Saisie','warn'],verifiee:['Vérifiée','warn'],approuvee:
 const MODES={virement:'Virement',cheque:'Chèque',especes:'Espèces',mobile_money:'Mobile Money',autre:'Autre'};
 const FACT_ST={emise:['Émise','warn'],payee_partiel:['Payée en partie','warn'],payee:['Payée','ok'],annulee:['Annulée','']};
 const SRC={bailleur:'Bailleur',osv:'Contribution OSV',autre:'Autre source'};
-let p05=true,p24=false,p25=false,finSel=null,finPer={du:'',au:''};
+let p05=true,p24=false,p25=false,p26=false,finSel=null,finPer={du:'',au:''};
 const PRE_ACT=['brouillon','configuration','verification','a_corriger'];
 const voitFin=p=>p&&(p09?(['DE','DP','CA','RA'].includes(me.role)||(me.role==='CPT'&&employeC(p,me.id))||(employeC(p,me.id)&&me.statut==='Salarié'&&accBud(p,me.id))):(['DE','DP','CA','RA','CPT'].includes(me.role)||p.chefId===me.id));
 const gereBud=p=>voitFin(p)&&(['DE','RA'].includes(me.role)||((me.role==='DP'||p.chefId===me.id)&&PRE_ACT.includes(p.statut)));
@@ -7381,7 +7382,53 @@ function trAgentsVue(p,niv){const ags=trAgents(p).filter(u=>niv==='projet'||trVe
   const sv=trFiches(p).filter(f=>f.agent_id===u.id&&trEstSup(f)&&(trOutil(f.outil_id)||{}).modele==='SUPERV'&&f.statut!=='rejetee').sort((a,b)=>a.date_activite<b.date_activite?1:-1)[0],svs=sv?trScore(trOutil(sv.outil_id),sv.donnees):null;
   return [`${esc(u.nom)}${u.supId?`<br><span class="muted">sup. ${esc(who(u.supId))}</span>`:''}`,sv?`${trScoreTag(svs)}<br><span class="muted">${fmtD(sv.date_activite)}</span>`:'<span class="muted">jamais</span>',num(mf.filter(f=>!trEstSup(f)).length),num(somme(mf,f=>f.nb_total)),mp?`${ok}/${R.length} (${pcS(ok,R.length)})`:'<span class="muted">pas de microplan</span>',num(mf.filter(f=>f.statut==='validee').length),num(somme(mf,f=>f.nb_retours)),r?tag(RT_ST[r.statut]):tag(['non reçu','bad']),d?(inactif?`<b class="txt-bad">${fmtD(d)}</b>`:fmtD(d)):'<span class="muted">jamais</span>']});
  return `<section class="card"><h3>${niv==='projet'?'Agents du projet':'Mes agents'}, ${moisLib(TR.mois).toLowerCase()}</h3><p class="muted">Réalisation du microplan, fiches validées, retours pour correction et dernière activité. Une dernière activité de plus de 14 jours est signalée en rouge : appelez l'agent.</p>
- ${svT(['Agent','Dernière supervision','#Fiches','#Personnes','Microplan réalisé','#Validées','#Retours','Rapport du mois','Dernière activité'],rows,'Aucun agent affecté au projet. Affectez les agents dans « Personnel des projets ».')}</section>`}
+ ${svT(['Agent','Dernière supervision','#Fiches','#Personnes','Microplan réalisé','#Validées','#Retours','Rapport du mois','Dernière activité'],rows,'Aucun agent affecté au projet. Affectez les agents dans « Personnel des projets ».')}</section>`+caGestionHTML(p,niv)}
+
+/* ---------- cibles et performance des agents communautaires ---------- */
+const CA_MES={fiches:'Activités réalisées',personnes:'Personnes touchées',femmes:'Femmes touchées',hommes:'Hommes touchés',handicap:'Personnes handicapées touchées'};
+const caVal=(m,f)=>m==='fiches'?1:m==='personnes'?Number(f.nb_total)||0:m==='femmes'?Number(f.nb_f)||0:m==='hommes'?Number(f.nb_h)||0:Number(f.nb_handicap)||0;
+const caLib=c=>{const o=c.outil_id&&trOutil(c.outil_id);return o?`${o.titre} : ${CA_MES[c.mesure].toLowerCase()}`:CA_MES[c.mesure]};
+const caCibles=(p,a)=>(S.cibles||[]).filter(c=>c.projet_id===p.id&&(a==null||c.agent_id===a));
+function caPerf(c){const p=projet(c.projet_id)||{},d0=c.debut||p.debut,d1=c.fin||p.fin,F=(S.fterrain||[]).filter(f=>f.projet_id===c.projet_id&&f.agent_id===c.agent_id&&(!c.outil_id||f.outil_id===c.outil_id)&&!trEstSup(f)&&(!d0||f.date_activite>=d0)&&(!d1||f.date_activite<=d1));
+ const real=somme(F.filter(f=>f.statut==='validee'),f=>caVal(c.mesure,f)),att=somme(F.filter(f=>['soumise','verifiee'].includes(f.statut)),f=>caVal(c.mesure,f)),cor=F.filter(f=>f.statut==='a_corriger').length;
+ const taux=Number(c.cible)?real/Number(c.cible):null,ry=rythme(d0,d1);
+ const st=taux!=null&&taux>=1?['Cible atteinte','ok']:ry==null||taux==null?['',''] :(taux-ry)>=-.05?['Dans les temps','ok']:(taux-ry)>=-.2?['À surveiller','warn']:['En retard','bad'];
+ return {c,lib:caLib(c),real,att,cor,cible:Number(c.cible),taux,ry,st,d0,d1}}
+const caScore=L=>{const v=L.filter(x=>x.taux!=null);return v.length?somme(v,x=>Math.min(1,x.taux))/v.length:null};
+function caLigneHTML(x){return `<li class="caL"><div class="caL-t"><span>${esc(x.lib)}</span><b>${num(x.real)} / ${num(x.cible)}</b></div>${barre(x.taux,x.ry)}<div class="caL-s"><span>${tx(x.taux)} réalisé${x.ry!=null?`, ${tx(x.ry)} attendu à ce jour`:''}</span>${x.st[0]?tag(x.st):''}</div>${x.att||x.cor?`<div class="caL-s muted">${x.att?`+ ${num(x.att)} en attente de validation`:''}${x.att&&x.cor?' ; ':''}${x.cor?`${x.cor} fiche(s) à corriger`:''}</div>`:''}</li>`}
+/* tableau de bord de l'agent : sa propre performance, projet par projet */
+function bzPerfAgent(){if(!p26)return '';const P=S.projets.filter(p=>caCibles(p,me.id).length);if(!P.length)return '';
+ return P.map(p=>{const L=caCibles(p,me.id).map(caPerf),sc=caScore(L);
+  return vzCarte('Ma performance',esc(p.code||p.nom),`<div class="vz-anneau">${vzAnneau(sc,{c:VZ_C[0],cible:L[0]&&L[0].ry,aria:'Ma performance globale'})}<p class="vz-sous"><b>${tx(sc)}</b> de mes cibles atteintes en moyenne.${L[0]&&L[0].ry!=null?` À ce jour, ${tx(L[0].ry)} de la période est écoulée.`:''} Seules les fiches validées comptent.</p></div><ul class="caListe">${L.map(caLigneHTML).join('')}</ul>`,`<button class="lnk" data-act="go" data-v="terrain">Saisir une fiche</button>`)}).join('')}
+/* superviseur, chef de projet : performance des agents suivis */
+function bzPerfEquipe(){if(!p26||!['SUP','CP','SE','DP','DE'].includes(me.role))return '';
+ const P=S.projets.filter(p=>caCibles(p).length&&(trValide(p)||trAgents(p).some(u=>trVerifie(p,u.id))));if(!P.length)return '';
+ return P.map(p=>{const ags=trAgents(p).filter(u=>caCibles(p,u.id).length&&(trValide(p)||trVerifie(p,u.id))),R=ags.map(u=>{const L=caCibles(p,u.id).map(caPerf);return {u,sc:caScore(L),ret:L.filter(x=>x.st[1]==='bad').length}}).sort((a,b)=>(b.sc??-1)-(a.sc??-1));
+  if(!R.length)return '';const ry=rythme(p.debut,p.fin);
+  return vzCarte('Performance des agents',esc(p.code||p.nom),`<ul class="caListe">${R.slice(0,8).map(r=>`<li class="caL"><div class="caL-t"><span>${esc(r.u.nom)}</span><b>${tx(r.sc)}</b></div>${barre(r.sc,ry)}${r.ret?`<div class="caL-s"><span class="tag bad">${r.ret} cible(s) en retard</span></div>`:''}</li>`).join('')}</ul>${R.length>8?`<p class="muted">et ${R.length-8} autre(s) agent(s)</p>`:''}`,`<button class="lnk" data-act="go" data-v="terrain">Voir les agents</button>`)}).join('')}
+/* onglet Agents : fixer les cibles (chef de projet, suivi-évaluation, DP, DE) */
+function caGestionHTML(p,niv){if(!p26)return niv==='projet'?'<section class="card"><h3>Cibles des agents</h3><p class="note">Exécutez le script 26 dans Supabase pour fixer les cibles des agents.</p></section>':'';
+ const ags=trAgents(p).filter(u=>niv==='projet'||trVerifie(p,u.id)),C=caCibles(p).filter(c=>ags.some(u=>u.id===c.agent_id)),O=trOutils(p).filter(o=>o.actif&&!trEstSupO(o));
+ const rows=C.map(c=>{const x=caPerf(c);return [esc(who(c.agent_id)),esc(x.lib),num(x.cible),`${fmtD(x.d0)} au ${fmtD(x.d1)}`,`${num(x.real)}${x.att?`<br><span class="muted">+ ${num(x.att)} en attente</span>`:''}`,`${tx(x.taux)}${barre(x.taux,x.ry)}`,x.st[0]?tag(x.st):'-',niv==='projet'?`<button class="btn ghost sm" data-act="caSuppr" data-id="${c.id}" aria-label="Supprimer la cible ${esc(x.lib)} de ${esc(who(c.agent_id))}">Retirer</button>`:'']});
+ return `<section class="card"><h3>Cibles des agents (${C.length})</h3><p class="muted">Chaque agent voit ses cibles et sa progression dès sa page d'accueil. Seules les fiches validées comptent ; les fiches en attente de validation sont indiquées à part. Le trait vertical de chaque barre marque le niveau attendu à ce jour.</p>
+ ${svT(['Agent','Cible','#Valeur cible','Période','#Réalisé','Taux','Situation',''],rows,'Aucune cible fixée pour le moment.')}
+ ${niv==='projet'&&ags.length?`<details style="margin-top:.6rem"${C.length?'':' open'}><summary>Fixer ou modifier une cible</summary><form data-form="caCible" data-p="${p.id}" class="grid" style="margin-top:.6rem;align-items:end">
+  <div><label>Agent</label><select name="agent" required><option value="*">Tous les agents du projet (${ags.length})</option>${ags.map(u=>`<option value="${u.id}">${esc(u.nom)}</option>`).join('')}</select></div>
+  <div><label>Ce qui est mesuré</label><select name="mesure">${opts(Object.entries(CA_MES),'fiches')}</select></div>
+  <div><label>Pour quelle activité</label><select name="outil"><option value="">Toutes les activités</option>${O.map(o=>`<option value="${o.id}">${esc(o.titre)}</option>`).join('')}</select></div>
+  <div><label>Valeur cible (par agent)</label><input name="cible" type="number" min="1" required placeholder="ex. 24"></div>
+  <div><label>Du</label><input name="debut" type="date" value="${p.debut||''}"></div><div><label>Au</label><input name="fin" type="date" value="${p.fin||''}"></div>
+  <div><button class="btn sm" type="submit">Enregistrer la cible</button></div></form><p class="legend">Si une cible existe déjà pour le même agent, la même mesure et la même activité, elle est mise à jour.</p></details>`:''}</section>`}
+document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target;if(!f.dataset||f.dataset.form!=='caCible')return;e.preventDefault();e.stopImmediatePropagation();
+ const d=Object.fromEntries(new FormData(f)),p=projet(f.dataset.p),cible=nbr(d.cible);if(!(cible>0)){alert('Indiquez une valeur cible supérieure à 0.');return}
+ if(d.debut&&d.fin&&d.fin<d.debut){alert('La date de fin précède la date de début.');return}
+ const ags=d.agent==='*'?trAgents(p).map(u=>u.id):[d.agent],o=d.outil||null;
+ action(async()=>{for(const a of ags){const ex=(S.cibles||[]).find(c=>c.projet_id===p.id&&c.agent_id===a&&c.mesure===d.mesure&&(c.outil_id||null)===o),row={cible,debut:d.debut||null,fin:d.fin||null};
+   if(ex)await upd('cibles_agents',`id=eq.${ex.id}`,row);else await ins('cibles_agents',{org_id:S.org.id,projet_id:p.id,agent_id:a,mesure:d.mesure,outil_id:o,...row})}
+  logO('projet',p.id,`Cible des agents : ${CA_MES[d.mesure]}${o?' ('+((trOutil(o)||{}).titre||'')+')':''}, ${num(cible)} pour ${ags.length} agent(s)`)},`Cible enregistrée pour ${ags.length} agent(s).`)},true);
+document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.target.closest('[data-act="caSuppr"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
+ const c=(S.cibles||[]).find(x=>x.id===b.dataset.id);if(!c||!confirm(`Retirer la cible « ${caLib(c)} » de ${who(c.agent_id)} ?`))return;
+ action(async()=>{await del('cibles_agents',`id=eq.${c.id}`);logO('projet',c.projet_id,`Cible retirée : ${caLib(c)}, ${who(c.agent_id)}`)},'Cible retirée.')},true);
 
 /* ---------- tableau de bord du projet ---------- */
 function trTableau(p,niv){const FV=trFiches(p).filter(f=>f.statut==='validee'),Fm=FV.filter(f=>moisDe(f.date_activite)===TR.mois),Fall=trFiches(p).filter(f=>moisDe(f.date_activite)===TR.mois);
