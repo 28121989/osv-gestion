@@ -831,6 +831,7 @@ small,.muted small,.pa-bas,.bande-date,.tb-leg,.pfCode,.tb-date,.trPb,.nav-g{fon
 @media print{.navBas,.toast,.menuFond{display:none!important}}
 </style>
 <style id="compact">
+.rppCh{background:var(--soft);border-radius:8px;padding:.7rem .9rem;margin:.6rem 0}.rppCh ul{margin:.4rem 0 .5rem 1.1rem;padding:0}.rppTxt p{margin:.25rem 0}.rppTxt{padding:.3rem 0}
 .pol-texte h3{font-size:1.05rem;color:var(--brand);margin:1.4rem 0 .5rem}.pol-texte h4{font-size:.98rem;margin:1rem 0 .35rem}
 /* pied de page distinct du fond : bleu discret, liseré bleu, vert et jaune */
 :root{--pied:#E4ECF5;--pied-ink:#2A3442}
@@ -2156,7 +2157,7 @@ async function authRefresh(){const s=sess;if(!s)return;sess=null;
 async function authLogout(){try{if(sess)await api('/auth/v1/logout',{method:'POST'})}catch(e){}sessEcrire(null)}
 
 /* ---------- chargement des données autorisées ---------- */
-function srvVide(){return {courriers:[],org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],bversions:[],retards:[],cibles:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],veille:[],opps:[],journal:[],capis:[],iaUsage:[],outils:[],fterrain:[],refs:[],microplans:[],rterrain:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
+function srvVide(){return {courriers:[],org:{id:'',nom:''},staff:[],bureaux:[],postes:[],projets:[],pol:{docs:[],accuses:[],notifs:[]},fdr:[],obs:[],audit:[],demandes:[],collectes:[],fiches:[],formulaires:[],activites:[],actualites:[],politiques:[],brouillons:{},plan:{annee:new Date().getFullYear(),objectifs:[]},blignes:[],bversions:[],retards:[],cibles:[],rpp:[],depenses:[],financements:[],seuils:[],comptes:[],mouvements:[],rapprochements:[],avances:[],fournisseurs:[],seuilsAchat:[],achats:[],devis:[],baremes:[],missions:[],mmembres:[],tdrs:[],tavis:[],accBud:[],contrats:[],veille:[],opps:[],journal:[],capis:[],iaUsage:[],outils:[],fterrain:[],refs:[],microplans:[],rterrain:[],biens:[],inventaires:[],invLignes:[],pcomptes:[],correspondances:[],plans:[],axes:[],objectifs:[],programmes:[],jalons:[],cadre:[],inds:[],mesures:[],risques:[],docs:[],histo:[]}}
 async function srvLoad(){
  const uid=sess.user.id,mine=await sel('membres',`select=*&user_id=eq.${uid}&actif=is.true`);
  const m=(mine||[]).find(x=>!x.fin_acces||x.fin_acces>=today());
@@ -2192,7 +2193,7 @@ async function srvLoad(){
  const T18=await opt(sel('courriers',f+'&order=cree_le.desc&limit=3000'));p18=T18!==null;N.courriers=T18||[];
  const T22=await Promise.all([sel('rapports_activite',f+'&order=cree_le.desc'),sel('pieces_justificatives',f+'&order=cree_le'),sel('rapport_avis',f+'&order=le'),sel('rapport_reglages',f)].map(opt));p22=T22[0]!==null;N.rapports=T22[0]||[];N.rpieces=T22[1]||[];N.ravis=T22[2]||[];N.rreg=(T22[3]||[])[0]||null;
  const T15=await Promise.all([sel('veille_notes',f+'&order=date_evt.desc&limit=3000'),sel('opportunites',f+'&order=cree_le.desc')].map(opt));p15=T15[0]!==null;N.veille=T15[0]||[];N.opps=T15[1]||[];
- const T12=await Promise.all([sel('outils_collecte',f+'&order=cree_le'),sel('fiches_terrain',f+'&order=date_activite.desc,saisi_le.desc&limit=10000'),sel('references_communautaires',f+'&order=date_reference.desc&limit=10000'),sel('microplans',f),sel('rapports_terrain',f+'&order=mois.desc')].map(opt));p12=T12[0]!==null;[N.outils,N.fterrain,N.refs,N.microplans,N.rterrain]=T12.map(x=>x||[]);{const T26=p12?await opt(sel('cibles_agents',f)):null;p26=T26!==null;N.cibles=T26||[]}
+ const T12=await Promise.all([sel('outils_collecte',f+'&order=cree_le'),sel('fiches_terrain',f+'&order=date_activite.desc,saisi_le.desc&limit=10000'),sel('references_communautaires',f+'&order=date_reference.desc&limit=10000'),sel('microplans',f),sel('rapports_terrain',f+'&order=mois.desc')].map(opt));p12=T12[0]!==null;[N.outils,N.fterrain,N.refs,N.microplans,N.rterrain]=T12.map(x=>x||[]);{const T26=p12?await opt(sel('cibles_agents',f)):null;p26=T26!==null;N.cibles=T26||[]}{const T28=await opt(sel('rapports_periodiques',f+'&order=debut.desc'));p28=T28!==null;N.rpp=T28||[]}
  [N.comptes,N.mouvements,N.rapprochements,N.avances,N.fournisseurs,N.seuilsAchat,N.achats,N.devis,N.baremes,N.missions,N.biens,N.inventaires,N.pcomptes,N.correspondances,N.invLignes]=T6.map(x=>x||[]);
  S=N;me=S.staff.find(x=>x.id===uid);
  Object.keys(ROLES).forEach(k=>ROLES[k].nav=srvNav(k));
@@ -2203,7 +2204,7 @@ const APPUI=['RH','RA','CPT','LOG'];
 function srvNav(r){if(r==='EXT')return ['politiques'];const appui=APPUI.includes(r),n=[];
  if(p03&&['DE','DP','CA'].includes(r))n.push('strategie','programmes');
  if(!appui)n.push('projets');if(p12&&['ASC','SUP','SE','CP','DP','DE','CA'].includes(r)){if(['ASC','SUP'].includes(r))n.splice(n.indexOf('projets'),0,'terrain');else n.push('terrain')}if(p03&&['DE','DP','CA',...APPUI].includes(r))n.push('equipes');if(p05&&['DE','DP','CA','RA','CPT'].includes(r))n.push('finances');if(p06&&['DE','DP','CA','RA','CPT','LOG'].includes(r))n.push('adm');
- if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');if(p08)n.push('missions');if(p22&&r!=='EXT')n.push('rapports');if(p06)n.push('mesdem');if(p13)n.push('journal');if(p18&&!['EXT','CA'].includes(r))n.push('courriers');if(p15&&['DE','DP','RA','CA','CP'].includes(r))n.push('veille');
+ if(p03&&['DE','DP','CA','CP','SE'].includes(r))n.push('performance');if(p03)n.push('archives');n.push('politiques');if(p08)n.push('missions');if(p22&&r!=='EXT')n.push('rapports');if(p28&&r!=='EXT')n.push('rpp');if(p06)n.push('mesdem');if(p13)n.push('journal');if(p18&&!['EXT','CA'].includes(r))n.push('courriers');if(p15&&['DE','DP','RA','CA','CP'].includes(r))n.push('veille');
  if(p10&&['DE','DP','RH','RA'].includes(r))n.push('contrats');if(['DE','RH'].includes(r))n.push('personnel');if(r==='DE')n.push('audit');return n}
 async function notifierSrv(dest,texte,lien,ref){const ids=[...new Set(dest.filter(Boolean))].filter(id=>id!==me.id&&S.staff.some(u=>u.id===id));
  if(!ids.length)return 0;await ins('notifications',ids.map(id=>({org_id:S.org.id,user_id:id,texte,lien,ref,envoye_par:me.id})));return ids.length}
@@ -2513,7 +2514,7 @@ function alertes(){const A=[],t=today(),d60=new Date(Date.now()+60*864e5).toISOS
  S.jalons.filter(j=>j.echeance&&j.echeance<t&&!['fait','abandonne'].includes(j.statut)).forEach(j=>A.push(['bad',`Jalon en retard : ${j.libelle} (${fmtD(j.echeance)}), ${libProg(programme(j.programme_id))}`,'svPg',j.programme_id]));
  S.risques.filter(r=>r.statut!=='clos'&&r.probabilite*r.impact>=15).forEach(r=>A.push(['bad',`Risque élevé (${r.probabilite*r.impact}) : ${r.libelle}`,r.projet_id?'svDos':'svPg',r.projet_id||r.programme_id,'rq']));
  S.inds.filter(i=>indPerf(i).st==='bad').slice(0,8).forEach(i=>A.push(['bad',`Indicateur en retard : ${i.libelle}`,i.projet_id?'svDos':i.programme_id?'svPg':'go',i.projet_id||i.programme_id||'strategie','ind']));
- return A.concat(finAlertes(),admAlertes(),tdrAlertes(),ctrAlertes(),trAlertes(),veAlertes())}
+ return A.concat(finAlertes(),admAlertes(),tdrAlertes(),ctrAlertes(),trAlertes(),veAlertes(),rppAlertes())}
 const estTache=([c,t,act])=>act==='rapAller'||/^(Rédiger|Corriger|Valider|Vérifier|Déposer|Compléter|Approuver|Signer)\b/i.test(t)||/(^|\s)à (valider|vérifier|rédiger|déposer|signer|approuver|envoyer|compléter|confirmer|liquider|traiter|établir|corriger)(\s|$|[ ,.:;)])/i.test(t);
 function alerteListe(A){return `<table class="tbA svAlT"><tbody>${A.slice(0,15).map(([c,t,act,id,tab])=>`<tr><td>${tag(c==='bad'?['Alerte','bad']:estTache([c,t,act])?['À traiter','warn']:['À suivre',''])}</td><td><button class="lnk" data-act="${act}" ${act==='go'?`data-v="${id}"`:`data-id="${id||''}"`} ${tab?`data-tab="${tab}"`:''}>${esc(t)}</button></td></tr>`).join('')}</tbody></table>${A.length>15?`<p class="muted">… et ${A.length-15} autre(s).</p>`:''}`}
 function alerteHTML(A){if(!A.length)return '<p class="empty">Aucune alerte. Tout est à jour.</p>';const T=A.filter(estTache),V=A.filter(x=>!estTache(x));
@@ -2911,7 +2912,7 @@ const DEP_ST={saisie:['Saisie','warn'],verifiee:['Vérifiée','warn'],approuvee:
 const MODES={virement:'Virement',cheque:'Chèque',especes:'Espèces',mobile_money:'Mobile Money',autre:'Autre'};
 const FACT_ST={emise:['Émise','warn'],payee_partiel:['Payée en partie','warn'],payee:['Payée','ok'],annulee:['Annulée','']};
 const SRC={bailleur:'Bailleur',osv:'Contribution OSV',autre:'Autre source'};
-let p05=true,p24=false,p25=false,p26=false,finSel=null,finPer={du:'',au:''};
+let p05=true,p24=false,p25=false,p26=false,p28=false,finSel=null,finPer={du:'',au:''};
 const PRE_ACT=['brouillon','configuration','verification','a_corriger'];
 const voitFin=p=>p&&(p09?(['DE','DP','CA','RA'].includes(me.role)||(me.role==='CPT'&&employeC(p,me.id))||(employeC(p,me.id)&&me.statut==='Salarié'&&accBud(p,me.id))):(['DE','DP','CA','RA','CPT'].includes(me.role)||p.chefId===me.id));
 const gereBud=p=>voitFin(p)&&(['DE','RA'].includes(me.role)||((me.role==='DP'||p.chefId===me.id)&&PRE_ACT.includes(p.statut)));
@@ -5292,11 +5293,11 @@ function srvRender(){const root=document.getElementById('root');
  <main id="main" tabindex="-1">${omEdit&&view===omEditV?omEditVue():view==='home'?home():viewHTML()}</main>${piedApp()}</div><button class="menuFond" data-act="menuFermer" aria-label="Fermer le menu"></button>${navBas(nav,cur)}</div>`;
  if(TOASTM){const m=TOASTM;TOASTM='';toast(m)}}
 /* menu : rubriques regroupées par domaine de travail (lecture plus rapide) */
-const NAV_G=[['Pilotage',['strategie','programmes','projets','performance']],['Terrain et activités',['terrain','missions','rapports','journal','courriers']],['Équipes et finances',['equipes','finances','adm','contrats','mesdem','personnel']],['Documents et contrôle',['archives','politiques','veille','audit']]];
+const NAV_G=[['Pilotage',['strategie','programmes','projets','performance']],['Terrain et activités',['terrain','missions','rapports','rpp','journal','courriers']],['Équipes et finances',['equipes','finances','adm','contrats','mesdem','personnel']],['Documents et contrôle',['archives','politiques','veille','audit']]];
 function navGroupes(nav,bt){const vu=new Set(),out=[];NAV_G.forEach(([g,L])=>{const x=nav.filter(v=>L.includes(v));if(!x.length)return;x.forEach(v=>vu.add(v));out.push(`<p class="nav-g" aria-hidden="true">${g}</p>`+x.map(bt).join(''))});const reste=nav.filter(v=>!vu.has(v));if(reste.length)out.push(`<p class="nav-g" aria-hidden="true">Autres</p>`+reste.map(bt).join(''));return out.join('')}
 /* téléphone : 3 raccourcis selon le rôle, l'accueil et le menu complet, à portée de pouce */
 const NAV_FAV=['terrain','rapports','missions','journal','mesdem','projets','adm','finances','strategie','archives'];
-const NAV_COURT={terrain:'Terrain',rapports:'Rapports',missions:'Missions',journal:'Journal',mesdem:'Demandes',projets:'Projets',adm:'Admin.',finances:'Finances',strategie:'Stratégie',archives:'Archives',equipes:'Équipes',programmes:'Programmes',performance:'Performance',politiques:'Politiques',courriers:'Courriers',veille:'Veille',contrats:'Contrats',personnel:'Personnel',audit:'Audit'};
+const NAV_COURT={rpp:'Périodiques',terrain:'Terrain',rapports:'Rapports',missions:'Missions',journal:'Journal',mesdem:'Demandes',projets:'Projets',adm:'Admin.',finances:'Finances',strategie:'Stratégie',archives:'Archives',equipes:'Équipes',programmes:'Programmes',performance:'Performance',politiques:'Politiques',courriers:'Courriers',veille:'Veille',contrats:'Contrats',personnel:'Personnel',audit:'Audit'};
 function navBas(nav,cur){const f=NAV_FAV.filter(v=>nav.includes(v)).slice(0,3),nbA=(typeof alertes==='function'&&p03)?alertes().length:0;
  const b=(v,lib,extra='')=>`<button data-act="go" data-v="${v}" ${cur===v?'aria-current="page"':''} class="nb">${ico(v)}<span>${lib}</span>${extra}</button>`;
  return `<nav class="navBas" aria-label="Raccourcis">${b('home','Accueil',nbA?`<b aria-label="${nbA} point(s) à traiter">${nbA>99?'99+':nbA}</b>`:'')}${f.map(v=>b(v,NAV_COURT[v]||VIEWS[v])).join('')}<button data-act="menuOuvrir" aria-label="Ouvrir le menu complet" aria-expanded="false">${ico('menu')}<span>Menu</span></button></nav>`}
@@ -7439,6 +7440,147 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.targ
  const c=(S.cibles||[]).find(x=>x.id===b.dataset.id);if(!c||!confirm(`Retirer la cible « ${caLib(c)} » de ${who(c.agent_id)} ?`))return;
  action(async()=>{await del('cibles_agents',`id=eq.${c.id}`);logO('projet',c.projet_id,`Cible retirée : ${caLib(c)}, ${who(c.agent_id)}`)},'Cible retirée.')},true);
 
+/* ---------- rapports périodiques de tout le personnel, rapport global de l'organisation ---------- */
+ICO.rpp='<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h8"/><path d="M8 18h5"/>';
+const RPP_PER={mensuel:'Mensuel',trimestriel:'Trimestriel',semestriel:'Semestriel',annuel:'Annuel'};
+const RPP_ST={brouillon:['Brouillon',''],soumis:['Soumis, à valider','warn'],a_corriger:['À corriger','bad'],valide:['Validé','ok']};
+const RPP_DEPT_ROLE={CA:'GOUVERNANCE',DE:'DIRECTION',DP:'PROGRAMMES',CP:'PROGRAMMES',SE:'PROGRAMMES',SUP:'PROGRAMMES',ASC:'PROGRAMMES',LECT:'PROGRAMMES',RA:'ADMIN_FIN',CPT:'COMPTA',RH:'RH',LOG:'LOGISTIQUE'};
+const RPP_ORDRE=['GOUVERNANCE','DIRECTION','PROGRAMMES','ADMIN_FIN','COMPTA','RH','LOGISTIQUE'];
+const RPP_SECS=[['resume','Résumé de la période','En quelques phrases : l\'essentiel de ce qui a été fait, obtenu ou décidé pendant la période.'],
+ ['activites','Activités réalisées','Les principales activités, réunions, missions et dossiers traités, dans l\'ordre chronologique ou par thème.'],
+ ['resultats','Résultats obtenus et chiffres clés','Ce qui a changé, avec des chiffres : vous pouvez insérer les chiffres calculés par l\'application.'],
+ ['decisions','Décisions prises et dossiers en cours','Décisions prises ou proposées, dossiers qui restent ouverts.'],
+ ['difficultes','Difficultés réellement rencontrées','Uniquement les situations réellement survenues qui ont gêné le travail, leur cause et la solution apportée. Écrivez « Néant » s\'il n\'y en a pas eu.'],
+ ['risques','Risques pour la période suivante','Ce qui pourrait gêner le travail à venir, et comment l\'éviter.'],
+ ['lecons','Leçons apprises','Ce qui a bien marché, ce qui est à améliorer.'],
+ ['perspectives','Priorités de la période suivante','Les priorités et les échéances à venir.'],
+ ['besoins','Besoins et appuis demandés','Moyens, décisions ou appuis attendus de la hiérarchie.']];
+const rppD=d=>d.toISOString().slice(0,10),MOIS_FR=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+function rppPeriode(per,a,k){const D=(y,m,j)=>rppD(new Date(Date.UTC(y,m,j)));
+ if(per==='mensuel')return {debut:D(a,k,1),fin:D(a,k+1,0),libelle:`${MOIS_FR[k].charAt(0).toUpperCase()+MOIS_FR[k].slice(1)} ${a}`};
+ if(per==='trimestriel')return {debut:D(a,k*3,1),fin:D(a,k*3+3,0),libelle:`${k+1}${k?'e':'er'} trimestre ${a}`};
+ if(per==='semestriel')return {debut:D(a,k*6,1),fin:D(a,k*6+6,0),libelle:`${k+1}${k?'e':'er'} semestre ${a}`};
+ return {debut:D(a,0,1),fin:D(a,11,31),libelle:`Année ${a}`}}
+function rppChoix(per){const n=new Date(),a=n.getUTCFullYear(),m=n.getUTCMonth(),L=[];
+ if(per==='mensuel')for(let i=0;i<12;i++){const d=new Date(Date.UTC(a,m-i,1));L.push(rppPeriode(per,d.getUTCFullYear(),d.getUTCMonth()))}
+ else if(per==='trimestriel'){let q=Math.floor(m/3),y=a;for(let i=0;i<6;i++){L.push(rppPeriode(per,y,q));q--;if(q<0){q=3;y--}}}
+ else if(per==='semestriel'){let s=Math.floor(m/6),y=a;for(let i=0;i<4;i++){L.push(rppPeriode(per,y,s));s--;if(s<0){s=1;y--}}}
+ else for(let i=0;i<3;i++)L.push(rppPeriode(per,a-i,0));return L}
+const RPP={tab:'mes',sel:null,org:null,orgPer:'annuel'};
+const rppTous=()=>S.rpp||[];
+const rppMes=()=>rppTous().filter(r=>r.auteur_id===me.id).sort((a,b)=>a.debut<b.debut?1:-1);
+const rppValideur=r=>{if(r.auteur_id===me.id)return false;const a=S.staff.find(u=>u.id===r.auteur_id)||{},ro=r.role||a.role;if(ro==='CA')return false;if(ro==='DE')return me.role==='CA';return me.role==='DE'||auDessusC(r.auteur_id)};
+const rppAValider=()=>rppTous().filter(r=>r.statut==='soumis'&&rppValideur(r));
+const rppLib=r=>`Rapport ${RPP_PER[r.periodicite].toLowerCase()}, ${r.libelle}`;
+const rppIn=(d,d0,d1)=>{const x=String(d||'').slice(0,10);return x&&x>=d0&&x<=d1};
+/* chiffres calculés par l'application, selon le poste et la période */
+function rppChiffres(ro,uid,d0,d1,org){const L=[],n=x=>num(x),I=d=>rppIn(d,d0,d1),M=x=>num(Math.round(x));
+ const progs=['DP','CP','SE','SUP','ASC'].includes(ro),glob=org||['DE','CA'].includes(ro);
+ const mesP=ro==='CP'?S.projets.filter(p=>p.chefId===uid).map(p=>p.id):null;
+ if(glob){const act=S.projets.filter(p=>['active','execution'].includes(p.statut));L.push(`Projets en cours : ${n(act.length)} sur ${n(S.projets.filter(p=>!['rejete','archive'].includes(p.statut)).length)} projets du portefeuille.`)}
+ const T=(S.tdrs||[]).filter(t=>t.statut==='valide'&&I(t.valide_le)&&(glob||t.auteur_id===uid||(mesP&&mesP.includes(t.projet_id))||ro==='DP'));if(glob||progs)L.push(`TDR validés : ${n(T.length)}.`);
+ const Mi=(S.missions||[]).filter(m=>m.statut!=='annulee'&&m.numero&&I(m.date_depart)&&(glob||ro==='DP'||m.agent_id===uid||(typeof omMembres==='function'&&omMembres(m).some(x=>x.user_id===uid))));if(glob||progs)L.push(`Missions réalisées ou engagées : ${n(Mi.length)}.`);
+ const RA=(S.rapports||[]).filter(r=>r.statut==='valide'&&I(r.valide_le)&&(glob||ro==='DP'||r.auteur_id===uid||(mesP&&mesP.includes(r.projet_id))));if(glob||progs)L.push(`Rapports d'activité validés : ${n(RA.length)}.`);
+ const FV=(S.fterrain||[]).filter(f=>f.statut==='validee'&&I(f.date_activite)&&(glob||ro==='DP'||(ro==='ASC'&&f.agent_id===uid)||(ro==='SUP'&&(f.agent_id===uid||auDessusC(f.agent_id)))||(mesP&&mesP.includes(f.projet_id))||ro==='SE'));
+ if((glob||progs)&&FV.length){const t=somme(FV,f=>f.nb_total),fm=somme(FV,f=>f.nb_f),hm=somme(FV,f=>f.nb_h),hd=somme(FV,f=>f.nb_handicap);L.push(`Fiches de terrain validées : ${n(FV.length)}, ${n(t)} personnes touchées (${n(fm)} femmes, ${n(hm)} hommes${hd?`, dont ${n(hd)} personnes handicapées`:''}).`)}
+ if(glob||['RA','CPT'].includes(ro)){const P=(S.depenses||[]).filter(d=>d.statut==='payee'&&I(d.paye_le||d.date_dep)),V=(S.depenses||[]).filter(d=>I(d.verifie_le)&&(glob||d.verifie_par===uid));
+  L.push(`Dépenses payées : ${n(P.length)}, pour ${M(somme(P,d=>Number(d.montant)))} FCFA.`);if(!glob)L.push(`Dépenses vérifiées par moi : ${n(V.length)}.`);
+  const Av=(S.avances||[]).filter(a=>I(a.verse_le));if(Av.length)L.push(`Avances versées : ${n(Av.length)}, pour ${M(somme(Av,a=>Number(a.montant)))} FCFA.`);
+  const Lq=(S.missions||[]).filter(m=>m.statut==='liquidee'&&I(m.liquide_le));if(Lq.length)L.push(`Missions liquidées : ${n(Lq.length)}, pour ${M(somme(Lq,m=>Number(m.montant_liquide)||0))} FCFA.`);
+  const Rt=(S.avances||[]).filter(a=>a.statut==='versee'&&a.date_limite&&a.date_limite<d1);if(Rt.length)L.push(`Avances non justifiées à la fin de la période : ${n(Rt.length)}.`)}
+ if(glob||ro==='RH'){const C=(S.contrats||[]).filter(c=>I(c.valide_le)||I(c.signe_le));if(C.length||ro==='RH')L.push(`Contrats validés ou signés : ${n(C.length)}.`);if(ro==='RH'||glob)L.push(`Personnel actif à ce jour : ${n(S.staff.filter(u=>accesOK(u)&&u.role!=='EXT').length)} personnes.`)}
+ if(glob||ro==='LOG'){const A=(S.achats||[]).filter(a=>I(a.approuve_le)),Rc=(S.achats||[]).filter(a=>I(a.recu_le));if(A.length||Rc.length||ro==='LOG')L.push(`Achats approuvés : ${n(A.length)} ; achats réceptionnés : ${n(Rc.length)}.`);if(ro==='LOG')L.push(`Biens enregistrés : ${n((S.biens||[]).length)}.`)}
+ if(glob){const Pol=(S.pol&&S.pol.docs||[]).filter(d=>(d.versions||[]).some(v=>I(v.publieLe)));if(Pol.length)L.push(`Politiques et procédures publiées : ${n(Pol.length)}.`)}
+ return L}
+function rppNouveauHTML(){const per=RPP.nper||'mensuel',C=rppChoix(per),deja=new Set(rppMes().filter(r=>r.periodicite===per).map(r=>r.debut));
+ return `<section class="card"><h3>Nouveau rapport</h3><form data-form="rppNouveau" class="grid" style="align-items:end"><div><label for="rppPer">Périodicité</label><select id="rppPer" name="per" data-rpp="per">${opts(Object.entries(RPP_PER),per)}</select></div>
+ <div><label for="rppP">Période</label><select id="rppP" name="p">${C.map(c=>`<option value="${c.debut}|${c.fin}|${esc(c.libelle)}"${deja.has(c.debut)?' disabled':''}>${esc(c.libelle)}${deja.has(c.debut)?' (déjà commencé)':''}</option>`).join('')}</select></div>
+ <div><button class="btn sm" type="submit">Commencer le rapport</button></div></form><p class="legend">Chacun rédige son rapport : le Conseil d'administration, le Directeur exécutif, les directions, l'administration, la comptabilité, les RH, la logistique et les équipes de projet. Les rapports validés alimentent le rapport global de l'organisation.</p></section>`}
+function rppEditeurHTML(r){const c=r.contenu||{},ed=r.auteur_id===me.id&&['brouillon','a_corriger'].includes(r.statut),val=r.statut==='soumis'&&rppValideur(r),ch=rppChiffres(r.role||me.role,r.auteur_id,r.debut,r.fin);
+ return `<p><button class="lnk" data-act="rppRetour">Retour à la liste</button></p><section class="card"><h3>${esc(rppLib(r))}</h3><p class="muted">${esc(who(r.auteur_id))}, ${esc(DEPTS[r.departement]||r.departement)}, du ${fmtD(r.debut)} au ${fmtD(r.fin)} ${tag(RPP_ST[r.statut])}${r.valide_le?` le ${fmtD(r.valide_le)} par ${esc(who(r.valide_par))}`:''}</p>
+ ${r.avis&&r.statut==='a_corriger'?`<p class="note" role="alert"><b>À corriger :</b> ${esc(r.avis)}</p>`:''}
+ ${ch.length?`<div class="rppCh"><b>Chiffres de la période calculés par l'application</b><ul>${ch.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${ed?`<button type="button" class="btn ghost sm" data-act="rppChiffres">Insérer ces chiffres dans « Résultats obtenus »</button>`:''}</div>`:''}
+ <form data-form="rppForm" data-id="${r.id}" class="grid">${RPP_SECS.map(([k,l,aide])=>`<div class="trL"><label for="rpp_${k}">${l}</label>${ed?`<textarea id="rpp_${k}" name="${k}" rows="${k==='activites'||k==='resultats'?6:3}" placeholder="${esc(aide)}">${esc(c[k]||'')}</textarea>${dictBtn('rpp_'+k)}`:`<div class="rppTxt">${c[k]?txtBlocs(c[k]).map(b=>b.p?`<p>${esc(b.p)}</p>`:b.ul?`<ul>${b.ul.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:b.ol?`<ol>${b.ol.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:'').join(''):'<span class="muted">Non renseigné.</span>'}</div>`}</div>`).join('')}
+ <div class="trL row" style="gap:.5rem">${ed?`<button class="btn ghost" type="submit" value="brouillon">Enregistrer</button><button class="btn" type="submit" value="soumis">${(r.role||me.role)==='CA'?'Adopter le rapport':'Soumettre pour validation'}</button>`:''}
+ <button class="btn ghost" type="button" data-act="rppPDF" data-id="${r.id}">Aperçu PDF</button><button class="btn ghost" type="button" data-act="rppWord" data-id="${r.id}">Télécharger en Word</button>${ed&&r.statut==='brouillon'?`<button class="btn ghost" type="button" data-act="rppSuppr" data-id="${r.id}">Supprimer le brouillon</button>`:''}</div></form>
+ ${val?`<form data-form="rppValider" data-id="${r.id}" class="grid" style="margin-top:1rem;border-top:1px solid var(--line);padding-top:1rem"><div class="trL"><label for="rppAvis">Votre avis (obligatoire pour un renvoi)</label><textarea id="rppAvis" name="avis" rows="2"></textarea></div><div class="trL row" style="gap:.5rem"><button class="btn" type="submit" value="valide">Valider le rapport</button><button class="btn ghost" type="submit" value="a_corriger">Renvoyer pour correction</button></div></form>`:''}</section>`}
+function rppListe(L,auteur){return svT([...(auteur?['Auteur','Poste']:[]),'Période','Périodicité','Statut','Soumis le',''],L.map(r=>[...(auteur?[esc(who(r.auteur_id)),esc(DEPTS[r.departement]||'')]:[]),esc(r.libelle),RPP_PER[r.periodicite],tag(RPP_ST[r.statut]),r.soumis_le?fmtD(r.soumis_le):'-',`<button class="btn sm${r.statut==='soumis'&&rppValideur(r)?'':' ghost'}" data-act="rppOuvrir" data-id="${r.id}">${r.statut==='soumis'&&rppValideur(r)?'Examiner':'Ouvrir'}</button>`]),'Aucun rapport.')}
+/* rapport global : on retient, pour chaque auteur, les rapports validés les plus larges couvrant la période */
+function rppRetenus(d0,d1){const V=rppTous().filter(r=>r.statut==='valide'&&r.debut>=d0&&r.fin<=d1),R=[];
+ [...new Set(V.map(r=>r.auteur_id))].forEach(a=>{const m=V.filter(r=>r.auteur_id===a);for(const p of ['annuel','semestriel','trimestriel','mensuel']){const x=m.filter(r=>r.periodicite===p);if(x.length){R.push(...x.sort((a,b)=>a.debut<b.debut?-1:1));break}}});return R}
+function rppOrgPeriode(){const [a,per,k]=[Number(RPP.orgA||new Date().getUTCFullYear()),RPP.orgPer||'annuel',Number(RPP.orgK||0)];return rppPeriode(per,a,k)}
+const rppSynthCle=p=>'rppSynth_'+p.debut+'_'+p.fin;
+function rppOrgModele(){const P=rppOrgPeriode(),R=rppRetenus(P.debut,P.fin),ch=rppChiffres('DE',me.id,P.debut,P.fin,true),secs=[],synth=trLS.get(rppSynthCle(P),'');
+ secs.push({titre:'Synthèse générale',blocs:synth?txtBlocs(synth):[{note:'Synthèse à rédiger par la Direction exécutive.'}],subs:[]});
+ secs.push({titre:'Chiffres clés de la période',blocs:ch.length?[{ul:ch}]:[{p:'Aucune donnée enregistrée pour la période.'}],subs:[]});
+ const Pj=S.projets.filter(p=>!['rejete','archive'].includes(p.statut));if(Pj.length&&typeof finStats==='function')secs.push({titre:'Portefeuille des projets',blocs:[{tab:{cols:['Projet','Bailleur','Statut','Budget (FCFA)','Consommé'],w:[38,18,14,16,14],nums:[3,4],rows:Pj.map(p=>{const s=finStats(p);return [p.code||p.nom,p.bailleur||'',(PSTAT[p.statut]||[p.statut])[0],num(s.budget),s.budget?tx(s.real/s.budget):'-']})}}],subs:[]});
+ RPP_ORDRE.forEach(dp=>{const L=R.filter(r=>r.departement===dp);if(!L.length)return;
+  secs.push({titre:DEPTS[dp],blocs:[],subs:L.map(r=>{const c=r.contenu||{},bl=[];RPP_SECS.forEach(([k,l])=>{if(String(c[k]||'').trim()&&!/^n[ée]ant\.?$/i.test(String(c[k]).trim())){bl.push({h3:l},...txtBlocs(c[k]))}});return {titre:`${who(r.auteur_id)}, ${rppLib(r).replace(/^Rapport /,'rapport ')}`,blocs:bl.length?bl:[{p:'Rapport sans contenu.'}]}})})});
+ const staff=S.staff.filter(u=>accesOK(u)&&!['EXT'].includes(u.role)),ann=[{titre:'État de remise des rapports',blocs:[{tab:{cols:['Personne','Poste','Rapports validés sur la période','En attente'],w:[32,30,22,16],nums:[2,3],rows:staff.map(u=>{const m=rppTous().filter(r=>r.auteur_id===u.id&&r.debut>=P.debut&&r.fin<=P.fin);return [u.nom,posteLib(u),String(m.filter(r=>r.statut==='valide').length),String(m.filter(r=>r.statut!=='valide').length)]})}}]}];
+ const de=S.staff.find(u=>u.role==='DE'&&accesOK(u))||{},ca=S.staff.find(u=>u.role==='CA'&&accesOK(u));
+ return {garde:{projet:S.org.nom||'ONG Sécurité Vie',sous_projet:'',titre:`Rapport d'activité de l'organisation, ${P.libelle.toLowerCase()}`,sous_titre:`Du ${fmtD(P.debut)} au ${fmtD(P.fin)}`,type:'',kv:[['Période',`${fmtD(P.debut)} au ${fmtD(P.fin)}`],['Rapports pris en compte',`${R.length} rapport(s) validé(s) de ${new Set(R.map(r=>r.auteur_id)).size} personne(s)`],['Établi le',fmtD(today())]],photo:null,
+  sig:{red:{nom:de.nom||'Directeur exécutif',fct:'Directeur exécutif'},val:{nom:ca?ca.nom:'Président du Conseil d\'administration',fct:'Président du Conseil d\'administration',attente:true}}},sigles:[],secs,ann,valide:false,
+  lib:{type:'RAPPORT D\'ACTIVITÉ',court:'Rapport de l\'organisation',red:'ÉTABLI PAR',val:'ADOPTÉ PAR',fic:'Rapport',filigrane:'PROJET DE RAPPORT',travail:', projet'}}}
+function rppOrgHTML(){const P=rppOrgPeriode(),R=rppRetenus(P.debut,P.fin),a=Number(RPP.orgA||new Date().getUTCFullYear()),per=RPP.orgPer||'annuel',k=Number(RPP.orgK||0),synth=trLS.get(rppSynthCle(P),''),ch=rppChiffres('DE',me.id,P.debut,P.fin,true);
+ const ks=per==='mensuel'?MOIS_FR.map((m,i)=>[i,m]):per==='trimestriel'?[0,1,2,3].map(i=>[i,`${i+1}${i?'e':'er'} trimestre`]):per==='semestriel'?[[0,'1er semestre'],[1,'2e semestre']]:[];
+ const parD=RPP_ORDRE.map(d=>[d,R.filter(r=>r.departement===d)]);
+ return `<section class="card"><h3>Rapport global de l'organisation</h3><p class="muted">L'application rassemble les rapports validés de toutes les directions et de tous les postes sur la période choisie, ajoute les chiffres clés tirés des données (projets, activités, terrain, finances, personnel, logistique) et produit le rapport en PDF ou en Word. Pour chaque personne, les rapports les plus larges sont retenus (annuel, sinon semestriels, sinon trimestriels, sinon mensuels).</p>
+ <div class="grid" style="align-items:end"><div><label for="rpoPer">Période</label><select id="rpoPer" data-rpo="orgPer">${opts(Object.entries({annuel:'Année',semestriel:'Semestre',trimestriel:'Trimestre',mensuel:'Mois'}),per)}</select></div>${ks.length?`<div><label for="rpoK">&nbsp;</label><select id="rpoK" data-rpo="orgK">${ks.map(([i,l])=>`<option value="${i}"${i===k?' selected':''}>${l}</option>`).join('')}</select></div>`:''}<div><label for="rpoA">Année</label><select id="rpoA" data-rpo="orgA">${[0,1,2].map(i=>new Date().getUTCFullYear()-i).map(y=>`<option${y===a?' selected':''}>${y}</option>`).join('')}</select></div></div>
+ <div class="kpis" style="margin-top:.8rem"><div class="kpi"><span>Rapports validés retenus</span><b>${R.length}</b><span>${new Set(R.map(r=>r.auteur_id)).size} personne(s)</span></div>${parD.filter(([d,L])=>L.length).map(([d,L])=>`<div class="kpi"><span>${esc(DEPTS[d])}</span><b>${L.length}</b><span>rapport(s)</span></div>`).join('')}</div>
+ ${ch.length?`<div class="rppCh"><b>Chiffres clés de la période</b><ul>${ch.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
+ <div class="trL" style="margin-top:.8rem"><label for="rpoSynth">Synthèse générale (rédigée par la Direction exécutive)</label><textarea id="rpoSynth" rows="7" data-rpo="synth" placeholder="L'année ${a} a été marquée par…">${esc(synth)}</textarea>${dictBtn('rpoSynth')}</div>
+ <div class="row" style="gap:.5rem;margin-top:.6rem">${iaOK()?`<button class="btn iaB" data-act="rpoIA">${ico('etoile')} Rédiger la synthèse à partir des rapports</button>`:''}<button class="btn" data-act="rpoPDF">Aperçu du rapport (PDF)</button><button class="btn ghost" data-act="rpoWord">Télécharger en Word</button></div>
+ <p class="legend">La synthèse est gardée sur cet appareil. Un rapport non validé n'est pas pris en compte : relancez les personnes qui n'ont pas encore remis le leur (voir l'état de remise en annexe du rapport).</p></section>`}
+function svRpp(){if(!p28)return head('Rapports périodiques','')+'<p class="note">Exécutez le script 28 dans Supabase pour activer les rapports périodiques.</p>';
+ const r0=RPP.sel&&rppTous().find(x=>x.id===RPP.sel);if(r0)return head('Rapports périodiques','')+rppEditeurHTML(r0);
+ const av=rppAValider(),recus=rppTous().filter(r=>r.auteur_id!==me.id&&r.statut!=='brouillon').sort((a,b)=>a.debut<b.debut?1:-1),org=['DE','CA','DP'].includes(me.role);
+ const tabs=[['mes','Mes rapports'],...(av.length||recus.length?[['recus',`Rapports reçus${av.length?` (${av.length} à valider)`:''}`]]:[]),...(org?[['org','Rapport de l\'organisation']]:[])];if(!tabs.some(t=>t[0]===RPP.tab))RPP.tab='mes';
+ return head('Rapports périodiques','Rapport mensuel, trimestriel, semestriel ou annuel de chaque poste, validé par le supérieur hiérarchique, puis rapport global de l\'organisation.')+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
+ `<nav class="subnav" aria-label="Rapports périodiques">${tabs.map(([k,l])=>`<button data-act="rppTab" data-v="${k}" ${RPP.tab===k?'aria-current="page"':''}>${esc(l)}</button>`).join('')}</nav>`+
+ (RPP.tab==='mes'?rppNouveauHTML()+`<section class="card"><h3>Mes rapports (${rppMes().length})</h3>${rppListe(rppMes(),false)}</section>`
+  :RPP.tab==='recus'?(av.length?`<section class="card notif"><h3>À valider (${av.length})</h3>${rppListe(av,true)}</section>`:'')+`<section class="card"><h3>Rapports reçus (${recus.length})</h3>${rppListe(recus,true)}</section>`
+  :rppOrgHTML())}
+function rppAlertes(){if(typeof p28==='undefined'||!p28||!me||me.role==='EXT')return [];const A=[],n=new Date(),d=new Date(Date.UTC(n.getUTCFullYear(),n.getUTCMonth()-1,1)),P=rppPeriode('mensuel',d.getUTCFullYear(),d.getUTCMonth()),r=rppMes().find(x=>x.periodicite==='mensuel'&&x.debut===P.debut);
+ if(!r||['brouillon','a_corriger'].includes(r.statut))A.push(['warn',`Rédiger mon rapport mensuel de ${P.libelle.toLowerCase()}`,r?'rppOuvrir':'go',r?r.id:'rpp']);
+ const av=rppAValider();if(av.length)A.push(['warn',`${av.length} rapport(s) périodique(s) à valider`,'go','rpp']);return A}
+const rppPseudo=(r,ok)=>({id:r?r.id:'org',statut:ok?'valide':'brouillon',titre:r?(who(r.auteur_id)||''):'Organisation',numero:(r?r.libelle:rppOrgPeriode().libelle).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9]+/g,'_'),projet_id:null});
+function rppModele(r){const c=r.contenu||{},a=S.staff.find(u=>u.id===r.auteur_id)||{},v=r.valide_par&&S.staff.find(u=>u.id===r.valide_par),secs=[];
+ RPP_SECS.forEach(([k,l])=>secs.push({titre:l,blocs:String(c[k]||'').trim()?txtBlocs(c[k]):[{note:r.statut==='valide'?'Néant.':'Rubrique à compléter.'}],subs:[]}));
+ return {garde:{projet:S.org.nom||'ONG Sécurité Vie',sous_projet:'',titre:rppLib(r),sous_titre:`${a.nom||who(r.auteur_id)}, ${posteLib(a)||''}`,type:'',kv:[['Période',`${fmtD(r.debut)} au ${fmtD(r.fin)}`],['Département',DEPTS[r.departement]||''],['Statut',RPP_ST[r.statut][0]+(r.valide_le?', le '+fmtD(r.valide_le):'')]],photo:null,
+  sig:{red:{nom:a.nom||who(r.auteur_id),fct:posteLib(a)||''},val:v?{nom:v.nom,fct:posteLib(v),le:r.valide_le}:{nom:'',fct:'Supérieur hiérarchique',attente:true}}},sigles:[],secs,ann:[],valide:r.statut==='valide',
+  lib:{type:'RAPPORT '+RPP_PER[r.periodicite].toUpperCase(),court:'Rapport périodique',red:'RAPPORT RÉDIGÉ PAR',val:'VALIDÉ PAR',fic:'Rapport',filigrane:'RAPPORT NON VALIDÉ',travail:', version de travail'}}}
+document.addEventListener('change',e=>{const t=e.target;if(!t.dataset)return;
+ if(t.dataset.rpp==='per'){RPP.nper=t.value;render();return}
+ if(t.dataset.rpo&&t.dataset.rpo!=='synth'){RPP[t.dataset.rpo]=t.value;if(t.dataset.rpo==='orgPer')RPP.orgK=0;render()}},true);
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.rpo==='synth')trLS.set(rppSynthCle(rppOrgPeriode()),t.value)},true);
+document.addEventListener('submit',e=>{if(MODE!=='srv'||!me)return;const f=e.target,k=f.dataset&&f.dataset.form;if(!['rppNouveau','rppForm','rppValider'].includes(k))return;e.preventDefault();e.stopImmediatePropagation();const d=Object.fromEntries(new FormData(f)),sub=e.submitter&&e.submitter.value;srvMsg='';
+ if(k==='rppNouveau'){const [debut,fin,libelle]=String(d.p).split('|');const nid=crypto.randomUUID();action(async()=>{await ins('rapports_periodiques',{id:nid,org_id:S.org.id,auteur_id:me.id,departement:RPP_DEPT_ROLE[me.role]||'DIRECTION',periodicite:d.per,debut,fin,libelle,contenu:{}});RPP.sel=nid},'Rapport créé : rédigez-le, puis soumettez-le.');return}
+ if(k==='rppForm'){const r=rppTous().find(x=>x.id===f.dataset.id),c={};RPP_SECS.forEach(([s])=>c[s]=String(d[s]||'').trim());
+  if(sub==='soumis'&&!c.resume&&!c.activites){alert('Rédigez au moins le résumé ou les activités réalisées avant de soumettre.');return}
+  if(sub==='soumis'&&!confirm((r.role||me.role)==='CA'?'Adopter ce rapport ? Il ne sera plus modifiable.':'Soumettre ce rapport pour validation ? Il ne sera plus modifiable, sauf renvoi pour correction.'))return;
+  action(async()=>{await upd('rapports_periodiques',`id=eq.${r.id}`,{contenu:c});if(sub==='soumis'){await upd('rapports_periodiques',`id=eq.${r.id}`,{statut:'soumis'});
+   const a=S.staff.find(u=>u.id===me.id)||{},dest=me.role==='DE'?S.staff.filter(u=>u.role==='CA'&&accesOK(u)).map(u=>u.id):me.role==='CA'?[]:[a.supId,...S.staff.filter(u=>u.role==='DE'&&accesOK(u)&&!a.supId).map(u=>u.id)];
+   await notifierSrv(dest,`Rapport à valider : ${me.nom}, ${rppLib(r).toLowerCase()}`,'rpp',r.id)}},sub==='soumis'?((r.role||me.role)==='CA'?'Rapport adopté.':'Rapport soumis pour validation.'):'Rapport enregistré.');return}
+ if(k==='rppValider'){const r=rppTous().find(x=>x.id===f.dataset.id),av=String(d.avis||'').trim();if(sub==='a_corriger'&&!av){alert('Indiquez ce qu\'il faut corriger.');return}
+  action(async()=>{await upd('rapports_periodiques',`id=eq.${r.id}`,{statut:sub,avis:av||null});await notifierSrv([r.auteur_id],sub==='valide'?`Votre ${rppLib(r).toLowerCase()} est validé.`:`Votre ${rppLib(r).toLowerCase()} est à corriger : ${av}`,'rpp',r.id)},sub==='valide'?'Rapport validé.':'Rapport renvoyé pour correction.')}},true);
+document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+ if(!['rppTab','rppOuvrir','rppRetour','rppPDF','rppWord','rppSuppr','rppChiffres','rpoPDF','rpoWord','rpoIA'].includes(a))return;e.preventDefault();e.stopImmediatePropagation();
+ if(a==='rppTab'){RPP.tab=b.dataset.v;RPP.sel=null;render();return}
+ if(a==='rppOuvrir'){view='rpp';RPP.sel=b.dataset.id;render();scrollTo(0,0);return}
+ if(a==='rppRetour'){RPP.sel=null;render();return}
+ const r=rppTous().find(x=>x.id===b.dataset.id);
+ if(a==='rppPDF'&&r){tdrPDFOuvrir(rppPseudo(r,r.statut==='valide'),rppModele(r));return}
+ if(a==='rppWord'&&r){tdrWord(rppPseudo(r,r.statut==='valide'),rppModele(r));return}
+ if(a==='rppSuppr'&&r){if(!confirm('Supprimer ce brouillon ?'))return;action(async()=>{await del('rapports_periodiques',`id=eq.${r.id}`);RPP.sel=null},'Brouillon supprimé.');return}
+ if(a==='rppChiffres'){const t=document.getElementById('rpp_resultats'),r2=rppTous().find(x=>x.id===RPP.sel);if(!t||!r2)return;const L=rppChiffres(r2.role||me.role,r2.auteur_id,r2.debut,r2.fin);t.value=(t.value.trim()?t.value.trim()+'\n':'')+L.map(x=>'- '+x).join('\n');t.focus();return}
+ if(a==='rpoPDF'){tdrPDFOuvrir(rppPseudo(null,false),rppOrgModele());return}
+ if(a==='rpoWord'){tdrWord(rppPseudo(null,false),rppOrgModele());return}
+ if(a==='rpoIA'){const P=rppOrgPeriode(),R=rppRetenus(P.debut,P.fin);if(!R.length){alert('Aucun rapport validé sur cette période : la synthèse ne peut pas être rédigée.');return}
+  const src=R.map(r=>`=== ${who(r.auteur_id)}, ${DEPTS[r.departement]||''}, ${rppLib(r)} ===\n`+RPP_SECS.map(([k,l])=>(r.contenu||{})[k]?`${l} : ${(r.contenu||{})[k]}`:'').filter(Boolean).join('\n')).join('\n\n'),ch=rppChiffres('DE',me.id,P.debut,P.fin,true).join('\n'),t=document.getElementById('rpoSynth');
+  iaAvec(b,async()=>{const x=await iaAppel('ameliorer',{texte:(t&&t.value)||'',consigne:`Rédige la synthèse générale du rapport d'activité de l'ONG Sécurité Vie pour la période « ${P.libelle} », à partir UNIQUEMENT des rapports validés et des chiffres fournis. Texte narratif, en français, phrases simples avec connecteurs logiques et phrases de transition, 4 à 6 paragraphes : faits marquants, résultats chiffrés, gouvernance et fonctionnement interne, difficultés réellement rencontrées, perspectives. N'invente aucun chiffre ni aucun fait.`,rubrique:'Synthèse générale',page:'Rapport global de l\'organisation',autres_rubriques:'',pieces_jointes:(`Chiffres clés :\n${ch}\n\n${src}`).slice(0,110000),aujourd_hui:today()});
+   if(x&&x.texte&&t){t.value=x.texte;trLS.set(rppSynthCle(P),x.texte)}});return}
+},true);
+
 /* ---------- tableau de bord du projet ---------- */
 function trTableau(p,niv){const FV=trFiches(p).filter(f=>f.statut==='validee'),Fm=FV.filter(f=>moisDe(f.date_activite)===TR.mois),Fall=trFiches(p).filter(f=>moisDe(f.date_activite)===TR.mois);
  const d=trInstantane(p,Fm,trRefs(p).filter(r=>moisDe(r.date_reference)===TR.mois)),cum=trAgreger(FV),ags=trAgents(p);
@@ -8617,9 +8759,9 @@ async function srvInit(){
  if(MODE!=='srv'){render();return}
  save=function(){};                                              // rien de réel n'est gardé dans le navigateur
  const _log=log;log=function(a){if(me&&S.org&&S.org.id)ins('audit',{org_id:S.org.id,user_id:me.id,action:String(a).slice(0,500)}).catch(()=>{})};
- loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{courriers:'Courriers',veille:'Veille stratégique',journal:'Journal et comptes rendus',terrain:'Collecte terrain',contrats:'Contrats et conventions',missions:'TDR et ordres de mission',rapports:'Rapports d\'activité',adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
+ loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{courriers:'Courriers',veille:'Veille stratégique',journal:'Journal et comptes rendus',terrain:'Collecte terrain',contrats:'Contrats et conventions',missions:'TDR et ordres de mission',rapports:'Rapports d\'activité',rpp:'Rapports périodiques',adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
  render=srvRender;
- viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,missions:svMissions,rapports:svRapports,contrats:svContrats,terrain:svTerrain,journal:svJournal,veille:svVeille,courriers:svCourriers,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
+ viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,missions:svMissions,rapports:svRapports,rpp:svRpp,contrats:svContrats,terrain:svTerrain,journal:svJournal,veille:svVeille,courriers:svCourriers,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h};
  S=srvVide();me=null;sess=sessLire();await omVerifCharger();
  const h=new URLSearchParams(location.hash.slice(1));                // retour d'un lien « mot de passe oublié »
  if(h.get('access_token')){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
