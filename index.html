@@ -860,6 +860,60 @@ td,th{font-size:13px}
 @media screen and (min-width:861px){.shell:not(.rail-mini){grid-template-columns:200px minmax(0,1fr)}.rail{font-size:13px}.rail .srvNav button,.rail nav button{font-size:13px!important}}
 @media screen and (max-width:860px){main{padding:1rem .8rem 6rem!important}}
 </style>
+<style id="deco">
+/* ===== Décoration intérieure : vagues, formes superposées, lumières douces, ouverture animée ===== */
+@media screen{
+:root{--deco-a:rgba(47,93,138,.10);--deco-b:rgba(94,154,107,.10);--deco-c:rgba(212,174,58,.12)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--deco-a:rgba(141,180,226,.08);--deco-b:rgba(111,174,126,.07);--deco-c:rgba(217,181,74,.07)}}
+:root[data-theme="dark"]{--deco-a:rgba(141,180,226,.08);--deco-b:rgba(111,174,126,.07);--deco-c:rgba(217,181,74,.07)}
+/* fond de l'espace de travail : lumières douces aux coins et lignes de niveau */
+.stage{position:relative;isolation:isolate;background:
+  radial-gradient(700px 420px at 100% 0%,var(--deco-a),transparent 70%),
+  radial-gradient(520px 380px at 0% 100%,var(--deco-b),transparent 70%),
+  radial-gradient(380px 260px at 85% 92%,var(--deco-c),transparent 70%),
+  url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22520%22 height=%22520%22 viewBox=%220 0 520 520%22%3E%3Cg fill=%22none%22 stroke=%22%232F5D8A%22 stroke-opacity=%22.05%22 stroke-width=%221%22%3E%3Cpath d=%22M-20 120 C80 60 180 180 300 110 S480 60 560 120%22/%3E%3Cpath d=%22M-20 170 C90 110 190 230 310 160 S490 110 560 170%22/%3E%3Cpath d=%22M-20 360 C100 300 200 420 320 350 S500 300 560 360%22/%3E%3Cpath d=%22M-20 410 C110 350 210 470 330 400 S510 350 560 410%22/%3E%3C/g%3E%3C/svg%3E") repeat,var(--bg)}
+/* en-tête de chaque page : bandeau aux vagues superposées */
+main .head{position:relative;padding:1.3rem 1.4rem 2.6rem;margin:-.2rem 0 1.6rem;border-radius:18px;background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 160%22 preserveAspectRatio=%22none%22%3E%3Cpath d=%22M0 110 C200 60 380 150 600 105 S1000 50 1200 95 V160 H0Z%22 fill=%22%232F5D8A%22 fill-opacity=%22.07%22/%3E%3Cpath d=%22M0 130 C240 95 420 165 640 128 S1010 85 1200 120 V160 H0Z%22 fill=%22%232F5D8A%22 fill-opacity=%22.08%22/%3E%3Cpath d=%22M0 150 C260 128 470 168 700 146 S1040 122 1200 142 V160 H0Z%22 fill=%22%235E9A6B%22 fill-opacity=%22.10%22/%3E%3Cpath d=%22M820 160 C900 140 1010 132 1200 136 V160Z%22 fill=%22%23D4AE3A%22 fill-opacity=%22.16%22/%3E%3C/svg%3E") bottom/100% 70% no-repeat,linear-gradient(135deg,var(--panel) 0%,color-mix(in srgb,var(--brand) 5%,var(--panel)) 100%);border:1px solid var(--line);overflow:hidden}
+main .head::before{content:"";position:absolute;width:180px;height:180px;right:-50px;top:-70px;border-radius:50%;background:radial-gradient(circle,var(--deco-c),transparent 70%);pointer-events:none}
+main .head::after{content:"";position:absolute;left:1.4rem;top:0;width:56px;height:4px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,var(--brand) 0 60%,var(--t-vert) 60% 80%,var(--t-jaune) 80%)}
+main .head h1{position:relative}main .head p{position:relative;max-width:70ch}
+/* cartes : arcs décoratifs dans l'angle, légère élévation au survol */
+.card{position:relative;background-image:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 120 120%22%3E%3Ccircle cx=%22120%22 cy=%220%22 r=%2258%22 fill=%22%232F5D8A%22 fill-opacity=%22.045%22/%3E%3Ccircle cx=%22120%22 cy=%220%22 r=%2282%22 fill=%22none%22 stroke=%22%232F5D8A%22 stroke-opacity=%22.08%22 stroke-width=%221%22/%3E%3Ccircle cx=%22120%22 cy=%220%22 r=%22100%22 fill=%22none%22 stroke=%22%23D4AE3A%22 stroke-opacity=%22.22%22 stroke-width=%221%22 stroke-dasharray=%222 5%22/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:top right;background-size:120px 120px;transition:transform .25s ease,box-shadow .25s ease}
+.vz-carte:hover{transform:translateY(-2px);box-shadow:0 10px 28px -14px rgba(30,37,48,.28)}
+.card.notif{background-image:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 120 120%22%3E%3Ccircle cx=%22120%22 cy=%220%22 r=%2258%22 fill=%22%232F5D8A%22 fill-opacity=%22.045%22/%3E%3Ccircle cx=%22120%22 cy=%220%22 r=%2282%22 fill=%22none%22 stroke=%22%232F5D8A%22 stroke-opacity=%22.08%22 stroke-width=%221%22/%3E%3Ccircle cx=%22120%22 cy=%220%22 r=%22100%22 fill=%22none%22 stroke=%22%23D4AE3A%22 stroke-opacity=%22.22%22 stroke-width=%221%22 stroke-dasharray=%222 5%22/%3E%3C/svg%3E"),linear-gradient(180deg,color-mix(in srgb,var(--t-jaune) 6%,var(--panel)),var(--panel) 60%)}
+/* tuiles chiffrées : dégradé discret et filet de couleur */
+.kpi{position:relative;overflow:hidden;background:linear-gradient(160deg,var(--panel) 55%,color-mix(in srgb,var(--brand) 6%,var(--panel)))!important;transition:transform .25s ease,box-shadow .25s ease}
+.kpi::after{content:"";position:absolute;right:-26px;bottom:-26px;width:78px;height:78px;border-radius:50%;border:10px solid var(--deco-a);pointer-events:none}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 10px 24px -14px rgba(30,37,48,.3)}
+/* bandeau d'accueil */
+.bande{background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 160%22 preserveAspectRatio=%22none%22%3E%3Cpath d=%22M0 110 C200 60 380 150 600 105 S1000 50 1200 95 V160 H0Z%22 fill=%22%232F5D8A%22 fill-opacity=%22.07%22/%3E%3Cpath d=%22M0 130 C240 95 420 165 640 128 S1010 85 1200 120 V160 H0Z%22 fill=%22%232F5D8A%22 fill-opacity=%22.08%22/%3E%3Cpath d=%22M0 150 C260 128 470 168 700 146 S1040 122 1200 142 V160 H0Z%22 fill=%22%235E9A6B%22 fill-opacity=%22.10%22/%3E%3Cpath d=%22M820 160 C900 140 1010 132 1200 136 V160Z%22 fill=%22%23D4AE3A%22 fill-opacity=%22.16%22/%3E%3C/svg%3E") bottom/100% 80% no-repeat,linear-gradient(120deg,var(--panel),color-mix(in srgb,var(--brand) 7%,var(--panel)))!important}
+/* menu latéral : vagues en bas, repère animé de la rubrique active */
+.rail{background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 240 220%22 preserveAspectRatio=%22none%22%3E%3Cpath d=%22M0 90 C60 50 140 120 240 70 V220 H0Z%22 fill=%22%232F5D8A%22 fill-opacity=%22.06%22/%3E%3Cpath d=%22M0 140 C80 105 160 170 240 128 V220 H0Z%22 fill=%22%232F5D8A%22 fill-opacity=%22.07%22/%3E%3Cpath d=%22M0 185 C90 160 170 205 240 178 V220 H0Z%22 fill=%22%235E9A6B%22 fill-opacity=%22.09%22/%3E%3C/svg%3E") bottom/100% 200px no-repeat,var(--side)!important}
+.rail [aria-current="page"]{position:relative}
+.rail [aria-current="page"]::before{content:"";position:absolute;left:0;top:18%;bottom:18%;width:3px;border-radius:3px;background:linear-gradient(180deg,var(--brand),var(--t-vert));animation:osvBarre .35s ease-out}
+/* pied de page : vague tricolore au lieu du filet droit */
+.pied-app{border-top:0!important;border-image:none!important;background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 40%22 preserveAspectRatio=%22none%22%3E%3Cpath d=%22M0 22 C220 2 420 38 640 18 S1020 4 1200 20 V0 H0Z%22 fill=%22%232F5D8A%22 fill-opacity=%22.9%22/%3E%3Cpath d=%22M0 22 C220 2 420 38 640 18 S1020 4 1200 20 V26 C1020 10 840 30 640 24 S220 10 0 28Z%22 fill=%22%235E9A6B%22 fill-opacity=%22.8%22/%3E%3Cpath d=%22M760 25 C900 18 1060 12 1200 24 V30 C1060 18 900 26 760 29Z%22 fill=%22%23D4AE3A%22/%3E%3C/svg%3E") top/100% 26px no-repeat,var(--pied)!important;padding-top:2.6rem!important}
+/* page de connexion */
+.auth{background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 160%22 preserveAspectRatio=%22none%22%3E%3Cpath d=%22M0 110 C200 60 380 150 600 105 S1000 50 1200 95 V160 H0Z%22 fill=%22%232F5D8A%22 fill-opacity=%22.07%22/%3E%3Cpath d=%22M0 130 C240 95 420 165 640 128 S1010 85 1200 120 V160 H0Z%22 fill=%22%232F5D8A%22 fill-opacity=%22.08%22/%3E%3Cpath d=%22M0 150 C260 128 470 168 700 146 S1040 122 1200 142 V160 H0Z%22 fill=%22%235E9A6B%22 fill-opacity=%22.10%22/%3E%3Cpath d=%22M820 160 C900 140 1010 132 1200 136 V160Z%22 fill=%22%23D4AE3A%22 fill-opacity=%22.16%22/%3E%3C/svg%3E") bottom/100% 45% no-repeat,radial-gradient(600px 400px at 100% 0%,var(--deco-a),transparent 70%),radial-gradient(500px 360px at 0% 100%,var(--deco-b),transparent 70%)}
+.auth-side{background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 300%22 preserveAspectRatio=%22none%22%3E%3Cpath d=%22M0 170 C160 110 320 230 500 160 S720 110 800 150 V300 H0Z%22 fill=%22%232F5D8A%22 fill-opacity=%22.10%22/%3E%3Cpath d=%22M0 215 C180 170 340 270 540 210 S740 175 800 205 V300 H0Z%22 fill=%22%232F5D8A%22 fill-opacity=%22.13%22/%3E%3Cpath d=%22M0 255 C200 225 380 295 580 255 S760 232 800 250 V300 H0Z%22 fill=%22%235E9A6B%22 fill-opacity=%22.16%22/%3E%3Cpath d=%22M480 300 C580 270 700 262 800 270 V300Z%22 fill=%22%23D4AE3A%22 fill-opacity=%22.28%22/%3E%3C/svg%3E") bottom/100% 42% no-repeat,url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22%3E%3Ccircle cx=%22200%22 cy=%220%22 r=%22120%22 fill=%22%232F5D8A%22 fill-opacity=%22.07%22/%3E%3Ccircle cx=%22200%22 cy=%220%22 r=%22150%22 fill=%22none%22 stroke=%22%232F5D8A%22 stroke-opacity=%22.12%22/%3E%3Ccircle cx=%22200%22 cy=%220%22 r=%22175%22 fill=%22none%22 stroke=%22%23D4AE3A%22 stroke-opacity=%22.35%22 stroke-dasharray=%223 6%22/%3E%3C/svg%3E") top right/220px 220px no-repeat,linear-gradient(160deg,var(--brand-tint),color-mix(in srgb,var(--brand-tint) 80%,var(--panel)))!important}
+.auth-main{background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22%3E%3Ccircle cx=%22200%22 cy=%22200%22 r=%2290%22 fill=%22%235E9A6B%22 fill-opacity=%22.06%22/%3E%3Ccircle cx=%22200%22 cy=%22200%22 r=%22120%22 fill=%22none%22 stroke=%22%235E9A6B%22 stroke-opacity=%22.14%22 stroke-dasharray=%222 6%22/%3E%3C/svg%3E") bottom right/240px 240px no-repeat,var(--panel)!important}
+.auth-side>*{animation:osvMonte .6s ease-out both}.auth-side>*:nth-child(2){animation-delay:.08s}.auth-side>*:nth-child(3){animation-delay:.16s}.auth-side>*:nth-child(n+4){animation-delay:.24s}.auth-main form,.auth-main>*{animation:osvMonte .6s .1s ease-out both}
+/* ouverture dynamique */
+@keyframes osvMonte{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes osvAnneau{from{opacity:0;transform:rotate(-70deg) scale(.86)}to{opacity:1;transform:none}}
+@keyframes osvBarreG{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes osvBarre{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+main>.head,main>.card,main>section,main>.kpis>.kpi,.vz-grille>*{animation:osvMonte .45s ease-out both}
+main>*:nth-child(2){animation-delay:.05s}main>*:nth-child(3){animation-delay:.1s}main>*:nth-child(4){animation-delay:.15s}main>*:nth-child(5){animation-delay:.2s}main>*:nth-child(n+6){animation-delay:.25s}
+.kpis>.kpi:nth-child(2){animation-delay:.08s}.kpis>.kpi:nth-child(3){animation-delay:.16s}.kpis>.kpi:nth-child(4){animation-delay:.24s}.kpis>.kpi:nth-child(n+5){animation-delay:.3s}
+.vz-grille>*:nth-child(2){animation-delay:.08s}.vz-grille>*:nth-child(3){animation-delay:.16s}.vz-grille>*:nth-child(4){animation-delay:.24s}.vz-grille>*:nth-child(n+5){animation-delay:.3s}
+.vz-anneau svg,.vz-donut svg{animation:osvAnneau .9s cubic-bezier(.2,.8,.2,1) both;transform-origin:50% 50%}
+.bar i{transform-origin:left center;animation:osvBarreG .9s cubic-bezier(.2,.8,.2,1) both}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media print{.stage,main .head,.card,.kpi,.bande,.rail,.pied-app{background:none!important}main .head::before,main .head::after,.kpi::after{display:none}}
+</style>
+
 </head>
 <body>
 <div id="root"></div>
@@ -5398,7 +5452,7 @@ const tdrComplet=t=>{const c=['titre','destination','date_debut','date_fin',...T
 function tdrActeur(t){if(!t||t.auteur_id===me.id)return false;const a=S.staff.find(u=>u.id===t.auteur_id)||{};
  return t.statut==='sup'?a.supId===me.id:t.statut==='dp'?me.role==='DP':t.statut==='de'?me.role==='DE':t.statut==='ca'?me.role==='CA':false}
 const tdrOM=t=>S.missions.find(m=>m.tdr_id===t.id&&!['rejetee','annulee'].includes(m.statut));
-const tdrPeutOM=t=>t.statut==='valide'&&!tdrOM(t)&&(t.auteur_id===me.id||gAdm()||['DP','CP'].includes(me.role)||auDessusC(t.auteur_id)||(me.role==='CA'&&((S.staff.find(u=>u.id===t.auteur_id)||{}).role==='DE')));
+const tdrPeutOM=t=>t.statut==='valide'&&!tdrOM(t)&&(t.auteur_id===me.id||gAdm()||['DP','CP'].includes(me.role)||auDessusC(t.auteur_id));
 function tdrAlertes(){if(!p08)return [];const A=[],m=S.tdrs.filter(tdrActeur);
  if(m.length)A.push(['warn',`${m.length} TDR à traiter (${m.map(t=>TDR_ST[t.statut][0].replace(/^./,c=>c.toLowerCase())).filter((x,i,a)=>a.indexOf(x)===i).join(', ')})`,'go','missions']);
  const c=S.tdrs.filter(t=>t.auteur_id===me.id&&t.statut==='a_corriger').length;if(c)A.push(['bad',`${c} de vos TDR renvoyé(s) pour correction`,'go','missions']);
@@ -5411,7 +5465,7 @@ function tdrOMSection(){if(!p07)return '';const L=(S.missions||[]).filter(m=>m.t
  ${aut.length?`<section class="card"><h3>Ordres de mission (${aut.length})</h3>${svT(MI_COLS,aut.map(miLigne))}</section>`:''}`}
 const tdrLigne=t=>{const om=tdrOM(t);return [`${t.numero?`<b>${esc(t.numero)}</b><br>`:''}${esc(t.titre)}`,`${esc(t.destination||'-')}${t.projet_id?`<br><span class="muted">${esc(libProj(projet(t.projet_id)))}</span>`:''}`,`${fmtD(t.date_debut)} au ${fmtD(t.date_fin)}`,esc(who(t.auteur_id)),tag(TDR_ST[t.statut]),
  om?`${om.numero?`<b>${esc(om.numero)}</b> `:''}${om.statut==='demandee'&&!om.numero?tag(['À signer','warn']):tag(MI_ST[om.statut])}<div class="row" style="gap:.3rem;margin-top:.35rem"><button class="btn ghost sm" data-act="miOM" data-id="${om.id}">Voir l'ordre</button>${omPeutSigner(om)?`<button class="btn sm" data-act="miSt" data-v="approuvee" data-id="${om.id}">Signer</button>`:''}${omPeutModifier(om)?`<button class="btn ghost sm" data-act="miModif" data-id="${om.id}">Modifier</button>`:''}</div>`
-  :t.statut==='valide'?(tdrPeutOM(t)?`<button class="btn sm" data-act="tdrOuvrir" data-id="${t.id}" data-om="1">Établir l'ordre de mission</button>`:`<span class="muted">à établir par ${esc(who(t.auteur_id))} ou son supérieur</span>`):'<span class="muted">après validation du TDR</span>',`<button class="btn sm${tdrActeur(t)?'':' ghost'}" data-act="tdrOuvrir" data-id="${t.id}">${tdrActeur(t)?'Traiter':'Ouvrir le TDR'}</button>`]};
+  :t.statut==='valide'?(tdrPeutOM(t)?`<button class="btn sm" data-act="tdrOuvrir" data-id="${t.id}" data-om="1">Établir l'ordre de mission</button>`:'<span class="muted">à établir</span>'):'<span class="muted">après validation du TDR</span>',`<button class="btn sm${tdrActeur(t)?'':' ghost'}" data-act="tdrOuvrir" data-id="${t.id}">${tdrActeur(t)?'Traiter':'Ouvrir le TDR'}</button>`]};
 
 function svMissions(){if(!tdrEdit){tdrPre=null;tdrSimple=null}if(!p08)return head('TDR et ordres de mission','')+'<p class="note">Exécutez le script 08 dans Supabase pour activer les TDR.</p>';
  if(tdrEdit)return tdrEditeur(tdrEdit==='new'?null:S.tdrs.find(t=>t.id===tdrEdit));
@@ -9409,6 +9463,15 @@ function syncAff(s){const po=s.selectedOptions[0]?.dataset.po,t=s.closest('form'
 ensureModules();ensurePol();ensureMoi();save();
 const _r=render;render=function(){_r();syncSens();document.querySelectorAll('.affStaff').forEach(syncAff)};
 srvInit();
+</script>
+<script>
+/* chiffres qui défilent à l'ouverture des tableaux de bord (une seule fois par chiffre) */
+(()=>{const red=matchMedia('(prefers-reduced-motion: reduce)').matches;if(red)return;
+ const anim=el=>{if(el.dataset.compte)return;el.dataset.compte='1';const t=el.textContent.trim(),m=t.match(/^(\d{1,3}(?:[\s  ]\d{3})*|\d+)(\s?%)?$/);if(!m)return;
+  const fin=Number(m[1].replace(/[\s  ]/g,'')),suf=m[2]||'';if(!(fin>0)||fin>1e10)return;const d0=performance.now(),dur=Math.min(1100,450+fin/50);
+  const f=n=>Math.round(n).toLocaleString('fr-FR');const pas=now=>{const k=Math.min(1,(now-d0)/dur),e=1-Math.pow(1-k,3);el.textContent=f(fin*e)+suf;if(k<1)requestAnimationFrame(pas);else el.textContent=t};requestAnimationFrame(pas)};
+ let der='';const scan=()=>{const v=(typeof view!=='undefined'?view:'')+'|'+(typeof RPP!=='undefined'?RPP.tab:'')+'|'+(typeof me!=='undefined'&&me?me.id:'');const L=document.querySelectorAll('main .kpi b,main .vz-c1');if(!L.length)return;if(v===der){L.forEach(el=>el.dataset.compte='1');return}der=v;L.forEach(anim)};
+ new MutationObserver(()=>scan()).observe(document.documentElement,{childList:true,subtree:true});scan()})();
 </script>
 </body>
 </html>
