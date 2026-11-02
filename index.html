@@ -5398,7 +5398,7 @@ const tdrComplet=t=>{const c=['titre','destination','date_debut','date_fin',...T
 function tdrActeur(t){if(!t||t.auteur_id===me.id)return false;const a=S.staff.find(u=>u.id===t.auteur_id)||{};
  return t.statut==='sup'?a.supId===me.id:t.statut==='dp'?me.role==='DP':t.statut==='de'?me.role==='DE':t.statut==='ca'?me.role==='CA':false}
 const tdrOM=t=>S.missions.find(m=>m.tdr_id===t.id&&!['rejetee','annulee'].includes(m.statut));
-const tdrPeutOM=t=>t.statut==='valide'&&!tdrOM(t)&&(t.auteur_id===me.id||gAdm()||['DP','CP'].includes(me.role)||auDessusC(t.auteur_id));
+const tdrPeutOM=t=>t.statut==='valide'&&!tdrOM(t)&&(t.auteur_id===me.id||gAdm()||['DP','CP'].includes(me.role)||auDessusC(t.auteur_id)||(me.role==='CA'&&((S.staff.find(u=>u.id===t.auteur_id)||{}).role==='DE')));
 function tdrAlertes(){if(!p08)return [];const A=[],m=S.tdrs.filter(tdrActeur);
  if(m.length)A.push(['warn',`${m.length} TDR à traiter (${m.map(t=>TDR_ST[t.statut][0].replace(/^./,c=>c.toLowerCase())).filter((x,i,a)=>a.indexOf(x)===i).join(', ')})`,'go','missions']);
  const c=S.tdrs.filter(t=>t.auteur_id===me.id&&t.statut==='a_corriger').length;if(c)A.push(['bad',`${c} de vos TDR renvoyé(s) pour correction`,'go','missions']);
@@ -5411,7 +5411,7 @@ function tdrOMSection(){if(!p07)return '';const L=(S.missions||[]).filter(m=>m.t
  ${aut.length?`<section class="card"><h3>Ordres de mission (${aut.length})</h3>${svT(MI_COLS,aut.map(miLigne))}</section>`:''}`}
 const tdrLigne=t=>{const om=tdrOM(t);return [`${t.numero?`<b>${esc(t.numero)}</b><br>`:''}${esc(t.titre)}`,`${esc(t.destination||'-')}${t.projet_id?`<br><span class="muted">${esc(libProj(projet(t.projet_id)))}</span>`:''}`,`${fmtD(t.date_debut)} au ${fmtD(t.date_fin)}`,esc(who(t.auteur_id)),tag(TDR_ST[t.statut]),
  om?`${om.numero?`<b>${esc(om.numero)}</b> `:''}${om.statut==='demandee'&&!om.numero?tag(['À signer','warn']):tag(MI_ST[om.statut])}<div class="row" style="gap:.3rem;margin-top:.35rem"><button class="btn ghost sm" data-act="miOM" data-id="${om.id}">Voir l'ordre</button>${omPeutSigner(om)?`<button class="btn sm" data-act="miSt" data-v="approuvee" data-id="${om.id}">Signer</button>`:''}${omPeutModifier(om)?`<button class="btn ghost sm" data-act="miModif" data-id="${om.id}">Modifier</button>`:''}</div>`
-  :t.statut==='valide'?(tdrPeutOM(t)?`<button class="btn sm" data-act="tdrOuvrir" data-id="${t.id}" data-om="1">Établir l'ordre de mission</button>`:'<span class="muted">à établir</span>'):'<span class="muted">après validation du TDR</span>',`<button class="btn sm${tdrActeur(t)?'':' ghost'}" data-act="tdrOuvrir" data-id="${t.id}">${tdrActeur(t)?'Traiter':'Ouvrir le TDR'}</button>`]};
+  :t.statut==='valide'?(tdrPeutOM(t)?`<button class="btn sm" data-act="tdrOuvrir" data-id="${t.id}" data-om="1">Établir l'ordre de mission</button>`:`<span class="muted">à établir par ${esc(who(t.auteur_id))} ou son supérieur</span>`):'<span class="muted">après validation du TDR</span>',`<button class="btn sm${tdrActeur(t)?'':' ghost'}" data-act="tdrOuvrir" data-id="${t.id}">${tdrActeur(t)?'Traiter':'Ouvrir le TDR'}</button>`]};
 
 function svMissions(){if(!tdrEdit){tdrPre=null;tdrSimple=null}if(!p08)return head('TDR et ordres de mission','')+'<p class="note">Exécutez le script 08 dans Supabase pour activer les TDR.</p>';
  if(tdrEdit)return tdrEditeur(tdrEdit==='new'?null:S.tdrs.find(t=>t.id===tdrEdit));
