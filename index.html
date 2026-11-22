@@ -860,6 +860,28 @@ td,th{font-size:13px}
 @media screen and (min-width:861px){.shell:not(.rail-mini){grid-template-columns:200px minmax(0,1fr)}.rail{font-size:13px}.rail .srvNav button,.rail nav button{font-size:13px!important}}
 @media screen and (max-width:860px){main{padding:1rem .8rem 6rem!important}}
 </style>
+<style id="agent">
+.agTete{margin:0 0 1.1rem}.agTete h1{font-size:1.35rem;margin:.1rem 0 .15rem;color:var(--brand)}.agJour{margin:0;font-size:.8rem;color:var(--muted)}
+.agTeteS{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap}.agTeteS h1{margin:0}
+.agGrille{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.8rem;margin:0 0 1.1rem}
+.agT{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.3rem;padding:1rem 1.05rem;min-height:118px;text-align:left;font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:14px;cursor:pointer;box-shadow:0 1px 2px rgba(15,40,70,.05);transition:border-color .15s,box-shadow .15s,transform .15s}
+.agT:hover{border-color:color-mix(in srgb,var(--brand) 45%,var(--line));box-shadow:0 4px 14px rgba(15,40,70,.08);transform:translateY(-1px)}
+.agT:focus-visible{outline:3px solid color-mix(in srgb,var(--brand) 55%,transparent);outline-offset:2px}
+.agT b{font-size:1rem;font-weight:650;color:var(--brand);line-height:1.25}.agT>span:last-child{font-size:.8rem;color:var(--muted);line-height:1.35}
+.agI{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;background:color-mix(in srgb,var(--brand) 9%,var(--panel));color:var(--brand)}.agI .ico{width:20px;height:20px}
+.agT.prim{grid-column:1/-1;min-height:96px;flex-direction:row;align-items:center;gap:1rem;background:var(--brand);border-color:var(--brand);color:#fff}
+.agT.prim b{color:#fff;font-size:1.15rem}.agT.prim>span:last-child{color:rgba(255,255,255,.85);margin-left:auto;max-width:46%;text-align:right}
+.agT.prim .agI{background:rgba(255,255,255,.16);color:#fff;width:46px;height:46px}.agT.prim .agI .ico{width:24px;height:24px}
+.agT[data-alerte]>span:last-child{color:var(--warn)}
+.agCor{border-left:3px solid var(--bad)}
+.agChiffre{margin:-.3rem 0 1.1rem;font-size:.88rem;color:var(--muted)}.agChiffre b{color:var(--ink)}
+.agTabs button{font-size:.85rem}
+.agPlus{margin-top:.4rem}.agPlus>summary{cursor:pointer;list-style:none;padding:.45rem .75rem;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}.agPlus>summary::-webkit-details-marker{display:none}.agPlus>summary::after{content:' +'}.agPlus[open]>summary::after{content:' -'}.rail-mini .agPlus>summary{font-size:0}
+.agHab .trO{border-color:color-mix(in srgb,var(--t-vert,#2E7D4F) 40%,var(--line))}
+@media (max-width:600px){.agGrille{grid-template-columns:1fr 1fr;gap:.6rem}.agT{min-height:112px;padding:.85rem}.agT b{font-size:.95rem}
+ .agT.prim{flex-direction:column;align-items:flex-start;gap:.35rem}.agT.prim>span:last-child{margin-left:0;max-width:none;text-align:left}
+ .agTabs{display:none}}
+</style>
 <style id="deco">
 /* ===== Décoration intérieure : vagues, formes superposées, lumières douces, ouverture animée ===== */
 @media screen{
@@ -2283,7 +2305,7 @@ async function action(fn,msg){if(srvBusy)return;srvBusy=true;document.body.class
  finally{srvBusy=false;document.body.classList.remove('busy');render()}}
 
 /* ---------- écrans du mode serveur ---------- */
-function srvHome(){const n=ROLES[me.role].nav,pa=polEnAttente().length;
+function srvHome(){if(agentMode())return agentHome();const n=ROLES[me.role].nav,pa=polEnAttente().length;
  const D={courriers:'Lettres aux autorités et aux communautés : rédigées automatiquement, signées et numérotées',veille:'Alertes, opportunités, besoins des communautés et leçons tirés des activités : réservé à la direction',journal:'Réunions, visites et missions : dictées, comptes rendus rédigés automatiquement, capitalisation',terrain:'Fiches d\'activité, listes de présence, références, microplans et rapports des agents communautaires',adm:'Trésorerie, avances, achats, fournisseurs, missions, biens, comptabilité',missions:'Termes de référence, validation, ordres de mission',rapports:'Rapport de chaque activité : volet programmatique validé par le DP, volet financier vérifié par la comptabilité et approuvé par la RAF',contrats:'Contrats des consultants, cabinets et bénévoles',mesdem:'Avances, missions et achats : demander, suivre, justifier',finances:'Budget par ligne, dépenses justifiées, factures, rapport financier',equipes:'Équipe de chaque projet : contrats, paie, CNPS, logistique',strategie:'Axes, objectifs stratégiques, indicateurs et réalisation du plan',programmes:'Programmes et opérations stratégiques, financement à mobiliser, jalons',performance:'Performance des projets, des programmes et de l\'organisation',archives:'Documents de chaque département, scans signés, dossiers d\'audit',politiques:'Règles et procédures de l\'organisation, lectures à confirmer',projets:'Portefeuille, dossier unique de chaque projet, équipes',personnel:'Comptes, postes, responsables hiérarchiques et accès',audit:'Qui a fait quoi, et quand'};
  return accHero()+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+notifBox()+
  (p03&&['DE','DP','CA'].includes(me.role)?pilotageHTML():(p26&&caCibles({id:null}).length===0&&(S.cibles||[]).some(c=>c.agent_id===me.id)?bilanHTML()+(p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:''):(p03&&alertes().length?`<section class="card notif"><h3>À faire (${alertes().length})</h3>${alerteHTML(alertes())}</section>`:'')+bilanHTML()))+(p03?'':'<p class="note">Base des programmes non encore installée sur le serveur : exécutez le script 03 dans Supabase.</p>')+
@@ -5355,12 +5377,12 @@ function srvRender(){const root=document.getElementById('root');
  root.innerHTML=`<a class="skip" href="#main">Aller au contenu</a><div class="shell${mini?' rail-mini':''}"><aside class="rail">
   <div class="rail-tete"><button class="rail-brand" data-act="go" data-v="home" aria-label="Accueil d'OSV Gestion"><img src="${LOGO}" alt="Logo ONG Sécurité Vie"><span><strong>OSV Gestion</strong><small>ONG Sécurité Vie</small></span></button>
   <button class="rail-pli" data-act="railPli" aria-pressed="${mini}" aria-label="${mini?'Agrandir le menu':'Réduire le menu'}" title="${mini?'Agrandir le menu':'Réduire le menu à des icônes'}">${ico(mini?'pliO':'pliF')}</button></div>
-  <nav class="srvNav" aria-label="Menu principal">${bt('home')}${navGroupes(nav,bt)}</nav>
+  <nav class="srvNav" aria-label="Menu principal">${agentMode()?agRail(nav,bt):bt('home')+navGroupes(nav,bt)}</nav>
   <p class="rail-foot">Agir pour sauver des vies au quotidien</p></aside>
  <div class="stage"><header class="topbar"><img class="tb-logo" src="${LOGO}" alt="" aria-hidden="true"><p class="tb-titre">${view==='dossier'?'Dossier du projet':esc(titre)}</p>
   <div class="tb-moi"><span class="avatar" aria-hidden="true">${esc(initiales(me.nom))}</span><span class="tb-nom"><b>${esc(me.nom)}</b><small>${esc(posteLib(me))}</small></span></div>
   <button class="btn ghost sm" data-act="logout">${ico('logout')}<span>Se déconnecter</span></button></header>
- <main id="main" tabindex="-1">${omEdit&&view===omEditV?omEditVue():view==='home'?home():viewHTML()}</main>${piedApp()}</div><button class="menuFond" data-act="menuFermer" aria-label="Fermer le menu"></button>${navBas(nav,cur)}</div>`;
+ <main id="main" tabindex="-1">${omEdit&&view===omEditV?omEditVue():view==='home'?home():viewHTML()}</main>${piedApp()}</div><button class="menuFond" data-act="menuFermer" aria-label="Fermer le menu"></button>${agentMode()?agNavBas():navBas(nav,cur)}</div>`;
  if(TOASTM){const m=TOASTM;TOASTM='';toast(m)}}
 /* menu : rubriques regroupées par domaine de travail (lecture plus rapide) */
 const NAV_G=[['Pilotage',['strategie','programmes','projets','performance']],['Terrain et activités',['terrain','missions','rapports','rpp','journal','courriers']],['Équipes et finances',['equipes','finances','adm','contrats','mesdem','personnel']],['Documents et contrôle',['archives','politiques','veille','audit']]];
@@ -7193,7 +7215,7 @@ function svTerrain(){
  if(TR.saisie)return trSaisieVue(p);
  if(TR.fiche&&S.fterrain.some(f=>f.id===TR.fiche))return trFicheVue(S.fterrain.find(f=>f.id===TR.fiche));
  if(TR.outil)return trOutilEditeur(p,TR.outil==='new'?null:trOutil(TR.outil));
- const tabs=niv==='agent'?[['saisir','Saisir'],['fiches','Mes fiches'],['references','Références'],['microplan','Mon microplan'],['rapport','Mon rapport du mois'],['outils','Fiches vierges']]
+ const tabs=niv==='agent'?[['saisir','Remplir une fiche'],['fiches','Mes fiches'],['references','Orienter une personne'],['microplan','Mon microplan'],['rapport','Mon rapport du mois'],['outils','Fiches vierges']]
   :niv==='sup'?[['verifier','À vérifier'],['agents','Mes agents'],['saisir','Saisir'],['fiches','Fiches'],['references','Références'],['microplan','Microplans'],['rapport','Rapports'],['outils','Fiches vierges']]
   :niv==='ca'?[['rapport','Rapports validés']]
   :[['tableau','Tableau de bord'],['verifier','À valider'],['fiches','Fiches'],['references','Références'],['agents','Agents'],['microplan','Microplans'],['rapport','Rapport mensuel'],['qualite','Qualité des données'],['enquetes','Résultats des enquêtes'],['outils','Outils de collecte'],['saisir','Saisir une fiche papier']];
@@ -7203,20 +7225,64 @@ function svTerrain(){
  const intro={agent:'Vos fiches d\'activité, listes de présence et références remontent à votre superviseur, puis au chef de projet. Seules les fiches validées comptent dans les résultats du projet.',
   sup:'Vérifiez les fiches de vos agents en les comparant aux fiches papier signées, suivez leur microplan et leurs rapports, puis faites votre synthèse du mois.',
   projet:'Les données de la communauté remontent ici : agent, superviseur, puis validation. Seules les fiches validées alimentent le tableau de bord, le rapport mensuel et les indicateurs du projet.',ca:'Rapports mensuels des projets, validés par le Directeur des programmes.'}[niv];
- return head('Collecte terrain',intro)+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
+ return (niv==='agent'&&agentMode()?`<div class="agTete agTeteS"><h1>${esc(({saisir:'Remplir une fiche',fiches:'Mes fiches',references:'Orienter une personne',microplan:'Mon microplan',rapport:'Mon rapport du mois',outils:'Fiches vierges à imprimer'})[TR.tab]||'Mon travail')}</h1><button class="btn ghost sm" data-act="go" data-v="home">Retour à l'accueil</button></div>`:head('Collecte terrain',intro))+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
   (file.length?`<p class="note trFile" role="status"><b>${file.length} envoi(s) gardé(s) sur ce téléphone</b>, en attente de réseau.${file.some(q=>q.erreur)?' Une erreur est signalée : '+esc(file.find(q=>q.erreur).erreur):''} <button class="btn sm" data-act="terSync">Envoyer maintenant</button></p>`:'')+
-  `<div class="trBarre">${L.length>1?`<div><label for="trPid">Projet</label><select id="trPid" data-ter="pid">${opts(L.map(x=>[x.id,libProj(x)]),p.id)}</select></div>`:`<div><span class="lbl">Projet</span><p class="trProj"><b>${esc(p.code||p.nom)}</b> <span class="muted">${esc(p.code?p.nom:'')}</span>${niv==='projet'?` <button class="lnk" data-act="svDos" data-id="${p.id}">Ouvrir le dossier du projet</button>`:''}<br><span class="muted" style="font-size:.85rem">Seul projet actif pour vous : il est déjà sélectionné. Choisissez ce que vous voulez faire dans les onglets ci-dessous.</span></p></div>`}
-   <div><label for="trMois">Mois</label><input id="trMois" type="month" data-ter="mois" value="${TR.mois}" max="${today().slice(0,7)}"></div></div>
-  <nav class="subnav trTabs" aria-label="Collecte terrain">${tabs.map(([k,l])=>`<button data-act="terTab" data-v="${k}" ${TR.tab===k?'aria-current="page"':''}>${l}${nb[k]?` <span class="badge">${nb[k]}</span>`:''}</button>`).join('')}</nav>`+
+  (niv==='agent'&&agentMode()&&L.length<2&&['saisir','references','outils'].includes(TR.tab)?'':`<div class="trBarre">${L.length>1?`<div><label for="trPid">Projet</label><select id="trPid" data-ter="pid">${opts(L.map(x=>[x.id,libProj(x)]),p.id)}</select></div>`:`<div><span class="lbl">Projet</span><p class="trProj"><b>${esc(p.code||p.nom)}</b> <span class="muted">${esc(p.code?p.nom:'')}</span>${niv==='projet'?` <button class="lnk" data-act="svDos" data-id="${p.id}">Ouvrir le dossier du projet</button>`:''}<br><span class="muted" style="font-size:.85rem">Seul projet actif pour vous : il est déjà sélectionné. Choisissez ce que vous voulez faire dans les onglets ci-dessous.</span></p></div>`}
+   <div><label for="trMois">Mois</label><input id="trMois" type="month" data-ter="mois" value="${TR.mois}" max="${today().slice(0,7)}"></div></div>`)+`
+  <nav class="subnav trTabs${niv==='agent'&&agentMode()?' agTabs':''}" aria-label="Collecte terrain">${tabs.map(([k,l])=>`<button data-act="terTab" data-v="${k}" ${TR.tab===k?'aria-current="page"':''}>${l}${nb[k]?` <span class="badge">${nb[k]}</span>`:''}</button>`).join('')}</nav>`+
   ({saisir:trSaisir,fiches:trListeFiches,references:trReferences,microplan:trMicroplan,rapport:trRapport,outils:trOutilsVue,verifier:trVerifierVue,agents:trAgentsVue,tableau:trTableau,qualite:trQualite,enquetes:trEnqVue}[TR.tab]||trSaisir)(p,niv)}
+
+/* ---------- espace simplifié des agents de terrain (ASC, agents et relais communautaires) ----------
+   à l'ouverture, l'agent arrive directement sur son espace de travail : de grands boutons, rien à chercher */
+const agentMode=()=>!!me&&me.role==='ASC'&&typeof p12!=='undefined'&&p12;
+Object.assign(ICO,{agFiche:'<path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',agListe:'<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>',agOrienter:'<path d="M12 22V12"/><path d="M5 12h12l3-3-3-3H5Z"/>',agVierge:'<path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>'});
+const AG_RACC=[['saisir','Remplir une fiche','agFiche'],['fiches','Mes fiches','agListe'],['references','Orienter une personne','agOrienter'],['microplan','Mon microplan','cal'],['rapport','Mon rapport du mois','rapports'],['outils','Fiches vierges','agVierge']];
+function agRail(nav,bt){const cur=view==='terrain'?TR.tab:null,b=([k,l,i])=>`<button data-act="agGo" data-v="${k}" data-tip="${esc(l)}" ${cur===k?'aria-current="page"':''}>${ico(i)}<span>${l}</span></button>`;
+ const util=['mesdem','rpp','politiques','missions'].filter(v=>nav.includes(v)),reste=nav.filter(v=>v!=='terrain'&&!util.includes(v));
+ return `<p class="nav-g" aria-hidden="true">Mon travail</p>${bt('home')}${AG_RACC.map(b).join('')}${util.length?`<p class="nav-g" aria-hidden="true">Aussi</p>${util.map(bt).join('')}`:''}${reste.length?`<details class="agPlus"${reste.includes(view)?' open':''}><summary>Autres rubriques</summary>${reste.map(bt).join('')}</details>`:''}`}
+function agNavBas(){const cur=view==='terrain'?TR.tab:view,nbC=agStats().cor,b=(act,v,lib,i,extra='')=>`<button data-act="${act}" data-v="${v}" ${cur===v?'aria-current="page"':''} class="nb">${ico(i)}<span>${lib}</span>${extra}</button>`;
+ return `<nav class="navBas" aria-label="Raccourcis">${b('go','home','Accueil','home')}${b('agGo','saisir','Remplir','agFiche',nbC?`<b aria-label="${nbC} fiche(s) à corriger">${nbC}</b>`:'')}${b('agGo','fiches','Mes fiches','agListe')}<button data-act="menuOuvrir" aria-label="Ouvrir le menu complet" aria-expanded="false">${ico('menu')}<span>Menu</span></button></nav>`}
+function agStats(){const p=trP(),mo=today().slice(0,7);if(!p)return {p:null,mois:0,attente:0,valid:0,cor:0,pers:0};
+ const M=trFiches(p).filter(f=>f.agent_id===me.id||f.saisi_par===me.id),D=M.filter(f=>moisDe(f.date_activite)===mo&&f.statut!=='rejetee');
+ return {p,mois:D.length,attente:D.filter(f=>['soumise','verifiee'].includes(f.statut)).length,valid:D.filter(f=>f.statut==='validee').length,cor:M.filter(f=>f.statut==='a_corriger').length,pers:somme(D,f=>Number(f.nb_total)||0)}}
+function agentHome(){const st=agStats(),p=st.p,mo=today().slice(0,7),file=trFile(),br=trLS.get('Brouillon',null);
+ const jour=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+ const tete=`<div class="agTete"><p class="agJour">${esc(jour.charAt(0).toUpperCase()+jour.slice(1))}</p><h1>Bonjour, ${esc(me.nom)}</h1>${p?`<p class="muted">${esc(p.code||p.nom)}${p.code?', '+esc(p.nom):''}</p>`:''}</div>`;
+ if(!p)return tete+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+'<p class="empty">Vous n\'êtes affecté(e) à aucun projet pour le moment. Votre chef de projet doit vous ajouter à l\'équipe du projet.</p>'+notifBox()+agCompte();
+ const mp=(S.microplans||[]).find(m=>m.projet_id===p.id&&m.agent_id===me.id&&moisDe(m.mois)===mo),rt=(S.rterrain||[]).find(r=>r.projet_id===p.id&&r.niveau==='agent'&&r.auteur_id===me.id&&moisDe(r.mois)===mo);
+ const tuile=(k,titre,i,sous,cls='',extra='')=>`<button class="agT ${cls}" data-act="agGo" data-v="${k}"${extra}><span class="agI">${ico(i)}</span><b>${titre}</b><span>${sous}</span></button>`;
+ const cor=st.cor?trFiches(p).filter(f=>f.statut==='a_corriger'&&[f.agent_id,f.saisi_par].includes(me.id)):[];
+ return tete+(srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+
+  (file.length?`<p class="note trFile" role="status"><b>${file.length} fiche(s) gardée(s) sur ce téléphone</b>, elles partiront dès que le réseau revient. <button class="btn sm" data-act="terSync">Envoyer maintenant</button></p>`:'')+
+  (cor.length?`<section class="card agCor"><h3>À corriger (${cor.length})</h3><p class="muted">Votre superviseur vous a renvoyé ces fiches.</p>${cor.slice(0,4).map(f=>`<div class="q-row"><div><b>${esc((trOutil(f.outil_id)||{}).titre||'Fiche')}</b>, ${fmtD(f.date_activite)}, ${esc(f.localite||'')}<br><span class="muted">${esc(f.retour_motif||'')}</span></div><button class="btn sm" data-act="agCorr" data-id="${f.id}">Corriger</button></div>`).join('')}</section>`:'')+
+  (br&&br.pid===p.id&&trOutil(br.outil)?`<section class="card agCor"><div class="q-row"><div><b>Fiche commencée : ${esc(trOutil(br.outil).titre)}</b><br><span class="muted">gardée sur ce téléphone</span></div><button class="btn sm" data-act="agReprendre">Continuer</button></div></section>`:'')+
+  `<div class="agGrille">${tuile('saisir','Remplir une fiche','agFiche','Causerie, visite à domicile, distribution, plainte…','prim')}
+   ${typeof iaOK==='function'&&iaOK()?tuile('saisir','Raconter mon activité','mic','Je parle, l\'application remplit la fiche','',' data-cible="iaRac"'):''}
+   ${tuile('fiches','Mes fiches',`agListe`,`${st.mois} ce mois${st.attente?`, ${st.attente} en attente`:''}${st.valid?`, ${st.valid} validée${st.valid>1?'s':''}`:''}`)}
+   ${tuile('references','Orienter une personne','agOrienter','Vers un centre de santé ou un service')}
+   ${tuile('microplan','Mon microplan','cal',mp?MP_ST[mp.statut][0]:'Pas encore établi pour ce mois','',mp?'':' data-alerte="1"')}
+   ${tuile('rapport','Mon rapport du mois','rapports',rt?RT_ST[rt.statut][0]:`À envoyer avant le ${fmtD(trLimite(mo,'agent'))}`)}</div>`+
+  (st.mois?`<p class="agChiffre">Ce mois : <b>${num(st.mois)}</b> fiche${st.mois>1?'s':''}, <b>${num(st.pers)}</b> personne${st.pers>1?'s':''} touchée${st.pers>1?'s':''}.</p>`:'')+
+  (typeof bzPerfAgent==='function'?`<div class="vz-grille">${bzPerfAgent()}</div>`:'')+notifBox()+agCompte()}
+function agCompte(){return `<details class="card" style="margin-top:1.5rem" ${srvRecup?'open':''}><summary><b>Mon compte</b> <span class="muted">, ${esc(sess.user.email)}</span></summary>
+  <form data-form="srvPwd" class="grid" style="margin-top:.8rem;align-items:end"><div><label for="np1">Nouveau mot de passe (12 caractères au moins)</label><input id="np1" name="p1" type="password" minlength="12" autocomplete="new-password" required></div>
+  <div><label for="np2">Confirmer</label><input id="np2" name="p2" type="password" minlength="12" autocomplete="new-password" required></div><div><button class="btn sm" type="submit">Changer mon mot de passe</button></div></form></details>`}
+document.addEventListener('click',e=>{if(!me)return;const b=e.target.closest&&e.target.closest('[data-act="agGo"],[data-act="agCorr"],[data-act="agReprendre"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
+ if(TR.user!==me.id)Object.assign(TR,{user:me.id,tab:null,pid:null,fiche:null,saisie:null,outil:null,agent:'',statut:'',outilF:'',refForm:false,cat:null,prop:null});
+ const a=b.dataset.act;srvMsg='';TR.mois=today().slice(0,7);TR.fiche=null;TR.outil=null;view='terrain';document.querySelector('.shell')?.classList.remove('menu-ouvert');
+ if(a==='agGo'){TR.saisie=null;TR.cat=null;TR.tab=b.dataset.v;if(b.dataset.v==='references')TR.refForm=true;render();const c=b.dataset.cible;if(c)setTimeout(()=>{const el=document.querySelector('.'+c);if(el){el.scrollIntoView({behavior:'smooth',block:'start'});el.querySelector('textarea,select')?.focus()}},60);else scrollTo(0,0);return}
+ TR.tab='saisir';render();setTimeout(()=>{const x=document.querySelector(a==='agCorr'?`[data-act="terCorriger"][data-id="${b.dataset.id}"]`:'[data-act="terReprendre"]');if(x)x.click()},0)},true);
+/* fiches habituelles de l'agent : les dernières activités qu'il a renseignées, en un geste */
+function agHabituelles(p,O){const vu=[];(S.fterrain||[]).filter(f=>f.projet_id===p.id&&(f.agent_id===me.id||f.saisi_par===me.id)).sort((a,b)=>a.date_activite<b.date_activite?1:-1).forEach(f=>{if(!vu.includes(f.outil_id)&&O.some(o=>o.id===f.outil_id))vu.push(f.outil_id)});
+ if(!vu.length)return '';return `<h4 class="trSec">Vos fiches habituelles</h4><div class="trOutils agHab">${vu.slice(0,3).map(id=>{const o=trOutil(id),l=TR_LIB[o.modele];return `<button class="trO" data-act="terRemplir" data-id="${o.id}"><b>${esc(l?l[0]:o.titre)}</b><span>Encore une fiche de ce type</span></button>`}).join('')}</div><h4 class="trSec" style="margin-top:1rem">Ou une autre activité</h4>`}
 
 /* ---------- onglet Saisir ---------- */
 function trSaisir(p,niv){const O=trOutils(p).filter(o=>o.actif&&(niv!=='agent'||!trEstSupO(o))),cor=trFiches(p).filter(f=>f.statut==='a_corriger'&&[f.agent_id,f.saisi_par].includes(me.id)),br=trLS.get('Brouillon',null);
  return (cor.length?`<section class="card notif"><h3>À corriger (${cor.length})</h3><p class="muted">Ces fiches vous ont été renvoyées. Corrigez-les : elles repartent automatiquement à la vérification.</p>
    ${cor.map(f=>`<div class="q-row"><div><b>${esc((trOutil(f.outil_id)||{}).titre||'Fiche')}</b>, ${fmtD(f.date_activite)}, ${esc(f.localite)}<br><span class="muted">Remarque de ${esc(who(f.retour_par))} : ${esc(f.retour_motif||'')}</span></div><button class="btn sm" data-act="terCorriger" data-id="${f.id}">Corriger</button></div>`).join('')}</section>`:'')+
   (br&&br.pid===p.id&&trOutil(br.outil)?`<section class="card"><h3>Fiche commencée</h3><div class="q-row"><div><b>${esc(trOutil(br.outil).titre)}</b><br><span class="muted">gardée sur ce téléphone le ${new Date(br.le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}</span></div><div class="row"><button class="btn sm" data-act="terReprendre">Reprendre</button><button class="btn ghost sm" data-act="terAbandon">Abandonner</button></div></div></section>`:'')+
-  iaRacontCarte(p)+`<section class="card"><h3>Remplir une fiche</h3>${O.length?`${trChoixOutils(O)}<p class="muted" style="margin-top:.6rem">Sans réseau, la fiche est gardée sur ce téléphone et part dès que le réseau revient.</p>`
-   :`<p class="empty">Aucun outil de collecte n'est encore installé pour ce projet.${niv==='projet'?' Ouvrez l\'onglet « Outils de collecte » pour installer les fiches OSV.':' Le chef de projet doit les installer.'}</p>`}</section>`+
+  (niv==='agent'?'':iaRacontCarte(p))+`<section class="card"><h3>${niv==='agent'?'Quelle activité avez-vous menée ?':'Remplir une fiche'}</h3>${O.length?`${niv==='agent'&&!TR.cat?agHabituelles(p,O):''}${trChoixOutils(O)}<p class="muted" style="margin-top:.6rem">Sans réseau, la fiche est gardée sur ce téléphone et part dès que le réseau revient.</p>`
+   :`<p class="empty">Aucun outil de collecte n'est encore installé pour ce projet.${niv==='projet'?' Ouvrez l\'onglet « Outils de collecte » pour installer les fiches OSV.':' Le chef de projet doit les installer.'}</p>`}</section>`+(niv==='agent'?iaRacontCarte(p):'')+
   `<section class="card"><h3>Orienter une personne vers un service</h3><p class="muted">Dépistage, planification familiale, consultation prénatale, prise en charge d'une violence… Chaque orientation a sa fiche de référence, avec un talon de contre-référence à faire remplir par la structure.</p><button class="btn ghost sm" data-act="terTab" data-v="references" data-ref="1">Nouvelle référence</button></section>`}
 
 /* ---------- formulaire d'une fiche ---------- */
@@ -9089,7 +9155,7 @@ async function srvInit(){
  const _log=log;log=function(a){if(me&&S.org&&S.org.id)ins('audit',{org_id:S.org.id,user_id:me.id,action:String(a).slice(0,500)}).catch(()=>{})};
  loginHTML=srvLoginHTML;home=srvHome;Object.assign(VIEWS,{courriers:'Courriers',veille:'Veille stratégique',journal:'Journal et comptes rendus',terrain:'Collecte terrain',contrats:'Contrats et conventions',missions:'TDR et ordres de mission',rapports:'Rapports d\'activité',rpp:'Plans et rapports',adm:'Administration et finances',mesdem:'Mes demandes',finances:'Finances des projets',equipes:'Personnel des projets',projets:'Portefeuille des projets',strategie:'Plan stratégique',programmes:'Programmes et opérations',performance:'Performance',archives:'Archives',dossier:'Dossier du projet'});
  render=srvRender;
- viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,missions:svMissions,rapports:svRapports,rpp:svRpp,contrats:svContrats,terrain:svTerrain,journal:svJournal,veille:svVeille,courriers:svCourriers,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();const pz=typeof panoramaHTML==='function'&&['finances','projets','terrain','missions','rapports','rpp','adm','equipes','personnel','politiques'].includes(view)?panoramaHTML(view):'';const h2=pz?h.replace(/(<div class="head">[\s\S]*?<\/div>)/,'$1'+pz):h;return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h2};
+ viewHTML=function(){const h=({politiques,projets:()=>p03?svPortefeuille():srvProjets(),personnel:srvPersonnel,audit:srvAuditHTML,equipes:svEquipes,finances:svFinances,adm:svAdm,mesdem:svMesDem,missions:svMissions,rapports:svRapports,rpp:svRpp,contrats:svContrats,terrain:svTerrain,journal:svJournal,veille:svVeille,courriers:svCourriers,strategie:svStrategie,programmes:svProgrammes,performance:svPerformance,archives:svArchives,dossier:svDossier})[view]?.()||srvHome();const pz=typeof panoramaHTML==='function'&&!agentMode()&&['finances','projets','terrain','missions','rapports','rpp','adm','equipes','personnel','politiques'].includes(view)?panoramaHTML(view):'';const h2=pz?h.replace(/(<div class="head">[\s\S]*?<\/div>)/,'$1'+pz):h;return (view==='politiques'&&srvMsg?`<p class="note" role="status">${esc(srvMsg)}</p>`:'')+h2};
  S=srvVide();me=null;sess=sessLire();await omVerifCharger();
  const h=new URLSearchParams(location.hash.slice(1));                // retour d'un lien « mot de passe oublié »
  if(h.get('access_token')){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
