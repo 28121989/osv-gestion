@@ -881,6 +881,19 @@ td,th{font-size:13px}
 @media (max-width:600px){.agGrille{grid-template-columns:1fr 1fr;gap:.6rem}.agT{min-height:112px;padding:.85rem}.agT b{font-size:.95rem}
  .agT.prim{flex-direction:column;align-items:flex-start;gap:.35rem}.agT.prim>span:last-child{margin-left:0;max-width:none;text-align:left}
  .agTabs{display:none}}
+
+.trSigC{min-width:150px}.trSigB{display:flex;align-items:center;justify-content:center;width:100%;min-height:40px;padding:.3rem .6rem;border:1.5px dashed color-mix(in srgb,var(--brand) 55%,var(--line));border-radius:8px;background:color-mix(in srgb,var(--brand) 5%,var(--panel));color:var(--brand);font:inherit;font-size:.82rem;font-weight:600;cursor:pointer}
+.trSigB.ok{border-style:solid;border-color:var(--line);background:#fff;color:#10243E;padding:.1rem .3rem}.trSigB .sigImg{width:110px;height:40px}.trSigP{display:block;margin-top:.25rem;font-size:.74rem}
+.sigImg{width:120px;height:44px;color:#10243E;vertical-align:middle}
+body.sigOuvert{overflow:hidden}
+.sigFond{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(10,22,38,.6)}
+.sigBoite{width:min(820px,100%);max-height:100%;overflow:auto;background:var(--panel);color:var(--ink);border-radius:14px;padding:14px 14px 12px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.sigTitre{margin:0 0 .2rem;font-size:1rem}.sigAide{margin:0 0 .6rem;font-size:.8rem;color:var(--muted)}
+.sigZone{position:relative;height:min(56vh,340px);min-height:170px;background:#fff;border:2px dashed #9DB3CB;border-radius:10px;touch-action:none;overflow:hidden}
+.sigZone canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.sigLigne{position:absolute;left:8%;right:6%;bottom:26%;border-bottom:1.5px solid #C9D5E2}.sigX{position:absolute;left:3.5%;bottom:26%;font-size:1.4rem;line-height:1;color:#9DB3CB}
+.sigBtns{display:flex;gap:.5rem;align-items:center;margin-top:.7rem;flex-wrap:wrap}
+@media (orientation:landscape) and (max-height:520px){.sigBoite{padding:8px}.sigAide{display:none}.sigZone{height:calc(100vh - 110px)}}
 </style>
 <style id="deco">
 /* ===== Décoration intérieure : vagues, formes superposées, lumières douces, ouverture animée ===== */
@@ -7299,6 +7312,43 @@ function trChamp(c,v,num,D){const n='c_'+c.id,val=v==null?'':v,req=c.requis?' re
  if(c.type==='multi'){const V=Array.isArray(v)?v:[];return W(`<fieldset class="trMulti"><legend>${tq}${c.requis?' <span class="req" aria-hidden="true">*</span>':''}</legend>${(c.options||[]).map(x=>`<label><input type="checkbox" name="${n}" value="${esc(x)}"${V.includes(x)?' checked':''}> ${esc(x)}</label>`).join('')}${aide}</fieldset>`,true)}
  const t={nombre:'number',date:'date',heure:'time'}[c.type]||'text';
  return W(`${lab}<input id="tf_${c.id}" name="${n}" type="${t}"${t==='number'?' min="0" step="any" inputmode="decimal"':''}${t==='date'?` max="${today()}"`:''} value="${esc(val)}"${req}>${aide}`)}
+/* ---------- signature électronique des participants : chacun signe au doigt sur l'écran ---------- */
+const sigOK=p=>typeof p==='string'&&p.length<6000&&/^M[\d ML]*$/.test(p);
+const sigSVG=(p,cls='sigImg')=>sigOK(p)?`<svg class="${cls}" viewBox="0 0 300 110" role="img" aria-label="Signature électronique"><path d="${p}" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`:'';
+const SIG_PNG={};
+function sigPNG(p){if(!sigOK(p))return '';if(SIG_PNG[p])return SIG_PNG[p];try{const c=document.createElement('canvas');c.width=600;c.height=220;const x=c.getContext('2d');x.scale(2,2);x.lineWidth=2.6;x.lineCap='round';x.lineJoin='round';x.strokeStyle='#10243E';x.stroke(new Path2D(p));return SIG_PNG[p]=c.toDataURL('image/png')}catch(_){return ''}}
+const sigImg=p=>{const u=sigPNG(p);return u?`<img src="${u}" width="96" height="35" alt="Signature électronique">`:'signé'};
+function sigCellule(x){const s=sigOK(x.sig)?x.sig:'';
+ return `<td class="trSigC"><input type="hidden" data-k="sig" value="${esc(s)}"><input type="hidden" data-k="sigle" value="${esc(s?x.sig_le||'':'')}"><button type="button" class="trSigB${s?' ok':''}" data-act="sigOuvrir" aria-label="${s?'Refaire la signature':'Faire signer cette personne sur l\'écran'}">${s?sigSVG(s):'Faire signer'}</button><label class="trChk trSigP"${s?' hidden':''}><input type="checkbox" data-k="signe"${x.signe===true&&!s?' checked':''}> Signé sur papier</label></td>`}
+function sigOuvrir(btn){const tr=btn.closest('tr[data-p]');if(!tr)return;const nom=(tr.querySelector('[data-k="nom"]')||{}).value||'',n=(tr.querySelector('.trN')||{}).textContent||'';
+ const d=document.createElement('div');d.className='sigFond';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Signature du participant');
+ d.innerHTML=`<div class="sigBoite"><p class="sigTitre">Signature de <b>${esc(nom.trim()||'la personne n° '+n)}</b></p><p class="sigAide">La personne signe elle-même, avec le doigt, dans le cadre blanc. Sur téléphone, tournez l'écran en largeur pour avoir plus de place.</p>
+  <div class="sigZone"><span class="sigX" aria-hidden="true">×</span><span class="sigLigne" aria-hidden="true"></span><canvas aria-label="Cadre de signature"></canvas></div>
+  <div class="sigBtns"><button type="button" class="btn ghost sm" data-s="eff">Effacer</button><span style="flex:1"></span><button type="button" class="btn ghost" data-s="ann">Annuler</button><button type="button" class="btn" data-s="ok" disabled>Valider la signature</button></div></div>`;
+ document.body.appendChild(d);document.body.classList.add('sigOuvert');
+ const cv=d.querySelector('canvas'),ctx=cv.getContext('2d'),zone=d.querySelector('.sigZone'),ok=d.querySelector('[data-s="ok"]');let T=[],cur=null;
+ const dim=()=>zone.getBoundingClientRect();
+ const dessine=()=>{const r=dim();ctx.clearRect(0,0,r.width,r.height);ctx.lineWidth=2.8;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#10243E';
+  T.forEach(t=>{ctx.beginPath();t.forEach(([x,y],i)=>i?ctx.lineTo(x*r.width,y*r.height):ctx.moveTo(x*r.width,y*r.height));if(t.length===1)ctx.lineTo(t[0][0]*r.width+.5,t[0][1]*r.height+.5);ctx.stroke()});
+  ok.disabled=T.reduce((a,t)=>a+t.length,0)<8};
+ const taille=()=>{const r=dim(),k=devicePixelRatio||1;cv.width=Math.round(r.width*k);cv.height=Math.round(r.height*k);ctx.setTransform(k,0,0,k,0,0);dessine()};
+ const pt=e=>{const r=dim();return [Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),Math.min(1,Math.max(0,(e.clientY-r.top)/r.height))]};
+ cv.addEventListener('pointerdown',e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}cur=[pt(e)];T.push(cur);dessine()});
+ cv.addEventListener('pointermove',e=>{if(!cur)return;e.preventDefault();const r=dim(),q=pt(e),l=cur[cur.length-1];if(Math.hypot((q[0]-l[0])*r.width,(q[1]-l[1])*r.height)>=1.5){cur.push(q);dessine()}});
+ ['pointerup','pointercancel','pointerleave'].forEach(ev=>cv.addEventListener(ev,()=>{cur=null}));
+ const fermer=()=>{removeEventListener('resize',taille);d.remove();document.body.classList.remove('sigOuvert');btn.focus()};
+ d.addEventListener('keydown',e=>{if(e.key==='Escape')fermer()});
+ d.addEventListener('click',e=>{const s=e.target.closest('[data-s]');if(!s)return;e.preventDefault();e.stopPropagation();const a=s.dataset.s;
+  if(a==='eff'){T=[];dessine();return}if(a==='ann'){fermer();return}
+  const r=dim(),P=T.map(t=>t.map(([x,y])=>[x*r.width,y*r.height])),A=P.flat(),x0=Math.min(...A.map(p=>p[0])),x1=Math.max(...A.map(p=>p[0])),y0=Math.min(...A.map(p=>p[1])),y1=Math.max(...A.map(p=>p[1]));
+  const sc=Math.min(284/Math.max(x1-x0,1),94/Math.max(y1-y0,1),3),ox=(300-(x1-x0)*sc)/2,oy=(110-(y1-y0)*sc)/2;
+  const chem=P.map(t=>{let o='',l=null;t.forEach((p,i)=>{const X=Math.round((p[0]-x0)*sc+ox),Y=Math.round((p[1]-y0)*sc+oy);if(l&&l[0]===X&&l[1]===Y&&i<t.length-1)return;o+=(o?'L':'M')+X+' '+Y;l=[X,Y]});if(t.length===1)o+='L'+(l[0]+1)+' '+l[1];return o}).join('');
+  if(!sigOK(chem)){toast('Signature trop longue : effacez et signez plus simplement.');return}
+  tr.querySelector('[data-k="sig"]').value=chem;tr.querySelector('[data-k="sigle"]').value=new Date().toISOString();const c=tr.querySelector('[data-k="signe"]');if(c){c.checked=false;c.closest('label').hidden=true}
+  btn.classList.add('ok');btn.innerHTML=sigSVG(chem);btn.setAttribute('aria-label','Refaire la signature');const f=btn.closest('form');if(f)f.dispatchEvent(new Event('input',{bubbles:true}));fermer()});
+ addEventListener('resize',taille);requestAnimationFrame(taille);setTimeout(()=>ok.focus&&d.querySelector('[data-s="ann"]').focus(),50)}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="sigOuvrir"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();sigOuvrir(b)},true);
+
 const trNumeros=champs=>{let k=0;const m={};champs.forEach(c=>{if(c.q&&c.type!=='section')m[c.id]='Q'+(++k)});return m};
 const trLigneP=(x={},i=0)=>`<tr data-p><td class="trN">${i+1}</td><td><input data-k="nom" value="${esc(x.nom||'')}" aria-label="Nom et prénoms" placeholder="Nom et prénoms"></td>
  <td><select data-k="sexe" aria-label="Sexe"><option value="">Sexe</option><option value="F"${x.sexe==='F'?' selected':''}>F</option><option value="M"${x.sexe==='M'?' selected':''}>M</option></select></td>
@@ -7306,9 +7356,9 @@ const trLigneP=(x={},i=0)=>`<tr data-p><td class="trN">${i+1}</td><td><input dat
  <td><input data-k="tel" inputmode="tel" value="${esc(x.tel||'')}" aria-label="Téléphone" placeholder="Téléphone"></td>
  <td><label class="trChk"><input type="checkbox" data-k="handicap"${x.handicap?' checked':''}> Handicap</label></td>
  <td><select data-k="vuln" aria-label="Vulnérabilité">${TR_VULN.map(v=>`<option value="${esc(v)}"${(x.vuln||'')===v?' selected':''}>${v?esc(v):'Vulnérabilité'}</option>`).join('')}</select></td>
- <td><label class="trChk"><input type="checkbox" data-k="signe"${x.signe===false?'':' checked'}> A signé</label></td><td><button type="button" class="btn ghost sm" data-act="terPDel" aria-label="Retirer cette ligne">×</button></td></tr>`;
+ ${sigCellule(x)}<td><button type="button" class="btn ghost sm" data-act="terPDel" aria-label="Retirer cette ligne">×</button></td></tr>`;
 function trPresence(o,v){if(o.presence==='nominative'){const P=(v.participants||[]).length?v.participants:[{},{},{}];
-  return `<fieldset class="trL trPresF"><legend>Liste de présence <span class="muted">(${P.length} ligne(s))</span></legend><p class="muted">Recopiez fidèlement la liste signée. L'âge sert à la désagrégation : ne le laissez pas vide. Les lignes vides sont ignorées.</p>
+  return `<fieldset class="trL trPresF"><legend>Liste de présence <span class="muted">(${P.length} ligne(s))</span></legend><p class="muted">Chaque participant signe lui-même sur l'écran avec le bouton <b>« Faire signer »</b>. Si vous recopiez une liste papier déjà signée, cochez plutôt « Signé sur papier ». L'âge sert à la désagrégation : ne le laissez pas vide. Les lignes vides sont ignorées.</p>
   <div class="trPresW"><table class="trPres"><thead><tr><th>N°</th><th>Nom et prénoms</th><th>Sexe</th><th>Âge</th><th>Téléphone</th><th>Handicap</th><th>Vulnérabilité</th><th>Émargement</th><th></th></tr></thead><tbody>${P.map(trLigneP).join('')}</tbody></table></div>
   <div class="row"><button type="button" class="btn ghost sm" data-act="terPAdd" data-n="1">+ 1 personne</button><button type="button" class="btn ghost sm" data-act="terPAdd" data-n="5">+ 5 lignes</button><span class="muted trPresTot" aria-live="polite"></span></div></fieldset>`}
  if(o.presence==='anonyme'){const D=v.decompte||{};
@@ -7350,7 +7400,7 @@ function trLire(f){const o=trOutil(f.dataset.outil),g=n=>String((f.elements[n]||
  if(g('_recit'))donnees._recit=g('_recit');
  const conf=!!(f.elements.confidentiel&&f.elements.confidentiel.checked)||(donnees._vbg==='oui');
  const participants=[...f.querySelectorAll('tr[data-p]')].map(tr=>{const q=k=>tr.querySelector(`[data-k="${k}"]`);
-  return {nom:q('nom').value.trim(),sexe:q('sexe').value,age:q('age').value===''?null:Number(q('age').value),tel:q('tel').value.trim(),handicap:q('handicap').checked,vuln:q('vuln').value,signe:q('signe').checked}})
+  return {nom:q('nom').value.trim(),sexe:q('sexe').value,age:q('age').value===''?null:Number(q('age').value),tel:q('tel').value.trim(),handicap:q('handicap').checked,vuln:q('vuln').value,signe:q('signe').checked||sigOK(q('sig')&&q('sig').value),...(!conf&&q('sig')&&sigOK(q('sig').value)?{sig:q('sig').value,sig_le:q('sigle').value||new Date().toISOString()}:{})}})
   .filter(x=>x.nom||x.sexe||x.age!=null||x.tel);
  participants.forEach((x,i)=>{if(!x.sexe)err.push(`ligne ${i+1} de la liste : sexe`);if(!x.nom&&!conf)err.push(`ligne ${i+1} de la liste : nom`);if(x.age!=null&&!(x.age>=0&&x.age<=120))err.push(`ligne ${i+1} : âge invalide`)});
  const decompte={};if(o.presence==='anonyme'){['F','M'].forEach(s=>{decompte[s]={};TR_BANDES.forEach(b=>{const v=g(`dc_${s}_${b}`);if(v!==''){const n=Number(v);if(!(n>=0))err.push('décompte '+b);else decompte[s][b]=n}})});const h=g('dc_handicap');if(h!=='')decompte.handicap=Number(h)}
@@ -7404,7 +7454,7 @@ function trFicheVue(x){const p=projet(x.projet_id),o=trOutil(x.outil_id)||{titre
   ${(x.donnees||{})._recit?`<p style="margin-top:.8rem"><b>Récit de l'agent :</b> <span class="pre">${esc(x.donnees._recit)}</span></p>`:''}
   <p style="margin-top:.8rem"><b>Pièce jointe :</b> ${x.piece_id?docLien(x.piece_id):'<span class="muted">aucune</span>'}</p>
   ${aut&&['soumise','a_corriger'].includes(x.statut)&&!x.piece_id?`<form data-form="terPiece" data-id="${x.id}" class="row"><input name="fichier" type="file" accept="image/*,.pdf" capture="environment" required aria-label="Photo de la liste signée"><button class="btn sm" type="submit">Joindre</button></form>`:''}</section>
- ${P.length?`<section class="card"><h3>Liste de présence (${P.length})</h3>${svT(['N°','Nom et prénoms','Sexe','#Âge','Téléphone','Handicap','Vulnérabilité','Émargement'],P.map((q,i)=>[i+1,esc(q.nom||(x.confidentiel?'(confidentiel)':'')),q.sexe||'',q.age??'-',esc(q.tel||''),q.handicap?'Oui':'',esc(q.vuln||''),q.signe===false?'<span class="tag bad">non</span>':'oui']))}</section>`:''}
+ ${P.length?`<section class="card"><h3>Liste de présence (${P.length})</h3>${svT(['N°','Nom et prénoms','Sexe','#Âge','Téléphone','Handicap','Vulnérabilité','Émargement'],P.map((q,i)=>[i+1,esc(q.nom||(x.confidentiel?'(confidentiel)':'')),q.sexe||'',q.age??'-',esc(q.tel||''),q.handicap?'Oui':'',esc(q.vuln||''),sigOK(q.sig)?`${sigSVG(q.sig)}<br><span class="muted">électronique${q.sig_le?', '+new Date(q.sig_le).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'}):''}</span>`:q.signe===false?'<span class="tag bad">non</span>':'oui, sur papier']))}</section>`:''}
  ${Object.keys(x.decompte||{}).length?`<section class="card"><h3>Décompte</h3>${svT(['Tranche d\'âge','#Femmes','#Hommes'],TR_BANDES.map(b=>[b+' ans',num(((x.decompte.F)||{})[b]||0),num(((x.decompte.M)||{})[b]||0)]))}${x.decompte.handicap?`<p>dont personnes vivant avec un handicap : <b>${num(x.decompte.handicap)}</b></p>`:''}</section>`:''}
  <p><button class="btn ghost sm" data-act="terImpFiche" data-id="${x.id}">Imprimer ou télécharger en Word</button></p>`}
 
@@ -8048,7 +8098,7 @@ function trCorpsOutil(o,p,x){const v=x||{},d=v.donnees||{},vide='<span style="di
   if(['choix','multi'].includes(c.type))return (c.options||[]).map(z=>`☐ ${esc(z)}`).join(' &nbsp; ');if(c.type==='ouinon')return '☐ Oui &nbsp; ☐ Non';if(c.type==='long')return '<div style="height:44px"></div>';return vide};
  const P=v.participants||[],n=x?Math.max(P.length,1):24;
  const pres=o.presence==='nominative'?`<h2>Liste de présence</h2><table><thead><tr><th style="width:5%">N°</th><th style="width:30%">Nom et prénoms</th><th style="width:7%">Sexe</th><th style="width:7%">Âge</th><th style="width:15%">Téléphone</th><th style="width:9%">Handicap</th><th>Signature ou empreinte</th></tr></thead><tbody>
-  ${Array.from({length:n},(_,i)=>{const q=P[i]||{};return `<tr><td>${i+1}</td><td>${esc(q.nom||(x&&v.confidentiel?'(confidentiel)':''))}</td><td>${q.sexe||''}</td><td>${q.age??''}</td><td>${esc(q.tel||'')}</td><td>${q.handicap?'Oui':''}</td><td style="height:${x?'auto':'22px'}">${x?(q.signe===false?'non signé':'signé'):''}</td></tr>`}).join('')}</tbody></table>`
+  ${Array.from({length:n},(_,i)=>{const q=P[i]||{};return `<tr><td>${i+1}</td><td>${esc(q.nom||(x&&v.confidentiel?'(confidentiel)':''))}</td><td>${q.sexe||''}</td><td>${q.age??''}</td><td>${esc(q.tel||'')}</td><td>${q.handicap?'Oui':''}</td><td style="height:${x?'auto':'22px'}">${x?(sigOK(q.sig)?sigImg(q.sig):q.signe===false?'non signé':'signé sur papier'):''}</td></tr>`}).join('')}</tbody></table>`
   :o.presence==='anonyme'?`<h2>Décompte des participants</h2><table><thead><tr><th>Tranche d'âge</th><th class="num">Femmes</th><th class="num">Hommes</th><th class="num">Total</th></tr></thead><tbody>${TR_BANDES.map(b=>{const f=x?(((v.decompte||{}).F||{})[b]||0):'',h=x?(((v.decompte||{}).M||{})[b]||0):'';return `<tr><td>${b} ans</td><td class="num">${f}</td><td class="num">${h}</td><td class="num">${x?f+h:''}</td></tr>`}).join('')}<tr class="th"><th>Total</th><th class="num">${x?v.nb_f:''}</th><th class="num">${x?v.nb_h:''}</th><th class="num">${x?v.nb_total:''}</th></tr></tbody></table><p>dont personnes vivant avec un handicap : ${x?num((v.decompte||{}).handicap||0):vide}</p>`:'';
  const kv=rows=>`<table class="kv">${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('')}</table>`;
  return `<h1 class="doc-t">${esc(o.titre.toUpperCase())}</h1><p class="doc-s">${esc(OUT_TYPES[o.type]||'')}${o.theme?', '+esc(o.theme):''}</p>
@@ -8194,7 +8244,7 @@ document.addEventListener('click',e=>{if(MODE!=='srv'||!me)return;const g=e.targ
   if(b.dataset.v==='fiches'){const ch=[...new Map(F.flatMap(f=>(trOutil(f.outil_id)||{champs:[]}).champs.filter(c=>c.type!=='section').map(c=>[f.outil_id+'|'+c.id,c]))).entries()];
    trCsv(`Fiches_${p.code||'projet'}_${TR.mois}`,[['Date','Agent','Outil','Localité','Sous-préfecture','Lieu','Total','Femmes','Hommes','Handicap','Statut','Latitude','Longitude',...ch.map(([,c])=>c.label)],
     ...F.map(f=>[f.date_activite,who(f.agent_id),(trOutil(f.outil_id)||{}).titre,f.localite,f.sous_prefecture,f.lieu,f.nb_total,f.nb_f,f.nb_h,f.nb_handicap,FT_ST[f.statut][0],f.lat,f.lng,...ch.map(([k,c])=>{if(!k.startsWith(f.outil_id))return '';const v=(f.donnees||{})[c.id];return Array.isArray(v)?v.join(', '):v??''})])])}
-  else trCsv(`Participants_${p.code||'projet'}_${TR.mois}`,[['Date','Localité','Outil','Agent','Nom','Sexe','Âge','Tranche','Téléphone','Handicap','Vulnérabilité','Émargement'],...F.filter(f=>!f.confidentiel).flatMap(f=>(f.participants||[]).map(q=>[f.date_activite,f.localite,(trOutil(f.outil_id)||{}).titre,who(f.agent_id),q.nom,q.sexe,q.age??'',trBande(q.age),q.tel,q.handicap?'oui':'non',q.vuln,q.signe===false?'non':'oui']))]);return}
+  else trCsv(`Participants_${p.code||'projet'}_${TR.mois}`,[['Date','Localité','Outil','Agent','Nom','Sexe','Âge','Tranche','Téléphone','Handicap','Vulnérabilité','Émargement'],...F.filter(f=>!f.confidentiel).flatMap(f=>(f.participants||[]).map(q=>[f.date_activite,f.localite,(trOutil(f.outil_id)||{}).titre,who(f.agent_id),q.nom,q.sexe,q.age??'',trBande(q.age),q.tel,q.handicap?'oui':'non',q.vuln,sigOK(q.sig)?'oui (électronique)':q.signe===false?'non':'oui (papier)']))]);return}
  if(a==='terInstaller'){const L=b.dataset.v==='*'?MOD_OUTILS.filter(m=>!trOutils(p).some(o=>o.modele===m.code)):b.dataset.v==='pack:chantier'?PACK_CHANTIER.map(k=>MOD_OUTILS.find(m=>m.code===k)).filter(m=>m&&!trOutils(p).some(o=>o.modele===m.code)):[MOD_OUTILS.find(m=>m.code===b.dataset.v)];if(!L.length)return;
   action(()=>ins('outils_collecte',L.map(m=>({org_id:S.org.id,projet_id:p.id,modele:m.code,titre:m.titre,type:m.type,theme:m.theme,presence:m.presence,consignes:m.consignes,champs:m.champs}))),`${L.length} outil(s) installé(s). Adaptez-les si besoin, puis reliez-les aux indicateurs du projet.`);return}
  if(a==='terOutilEd'){TR.outil=id;render();scrollTo(0,0);return}
